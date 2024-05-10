@@ -1,0 +1,26 @@
+//Boilerplate code
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model User {
+  id                String         @id // Clerk user.data.id
+  first_name        String?
+  last_name         String?
+  company           String
+  email             String         @unique
+  profile_image_url String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  months_subscribed Int            @default(0)
+  just_browsing     Boolean        @default(false)
+}
+
+

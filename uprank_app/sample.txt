@@ -1,0 +1,221 @@
+
+
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/jBPrFVeA1qi
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from "@/components/ui/form"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select } from "@/components/ui/select"
+import { RadioGroup } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form, FormProvider, useForm } from "react-hook-form"
+const formSchema = z.object({
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+  })
+
+export default function Component() {
+      const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+          username: "",
+        },
+      })
+      
+      function onSubmit(values: z.infer<typeof formSchema>) {
+        // Do something with the form values.
+        // ✅ This will be type-safe and validated.
+        console.log(values)
+      }
+
+
+
+  return (
+    <div className="mx-auto max-w-4xl px-4">
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Join the Marketplace</h1>
+          <p className="text-gray-500 dark:text-gray-400">Enter your information to create an account</p>
+        </div>
+        <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+      </div>
+    </div>
+  )
+}
+
+
+
+=== component.jsx ===
+
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/jBPrFVeA1qi
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select } from "@/components/ui/select"
+import { RadioGroup } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+export default function Component() {
+  return (
+    <div className="mx-auto max-w-4xl px-4">
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Join the Marketplace</h1>
+          <p className="text-gray-500 dark:text-gray-400">Enter your information to create an account</p>
+        </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first-name">First name</Label>
+              <Input id="first-name" placeholder="Lee" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="last-name">Last name</Label>
+              <Input id="last-name" placeholder="Robinson" required />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" placeholder="m@example.com" required type="email" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input id="username" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" required type="password" />
+          </div>
+          <div className="space-y-4">
+            <Label htmlFor="bio">Bio</Label>
+            <Textarea className="min-h-[100px]" id="bio" placeholder="Enter your bio" required />
+          </div>
+          <div className="space-y-4">
+            <Label htmlFor="skills">Skills</Label>
+            <Select id="skills" multiple required>
+              <option>JavaScript</option>
+              <option>TypeScript</option>
+              <option>React</option>
+              <option>Vue.js</option>
+              <option>Node.js</option>
+            </Select>
+          </div>
+          <div className="space-y-4">
+            <Label htmlFor="experience">Years of experience</Label>
+            <RadioGroup className="grid grid-cols-3 gap-2" id="experience" value="0-2">
+              <div>0-2</div>
+              <div>3-5</div>
+              <div>6-10</div>
+              <div>10+</div>
+            </RadioGroup>
+          </div>
+          <div className="space-y-4">
+            <Label htmlFor="portfolio">Portfolio</Label>
+            <div className="flex flex-col gap-2">
+              <Checkbox value="github">GitHub</Checkbox>
+              <Checkbox value="codepen">CodePen</Checkbox>
+              <Checkbox value="dribbble">Dribbble</Checkbox>
+              <Checkbox value="behance">Behance</Checkbox>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <Label className="flex items-start" htmlFor="terms">
+              <span className="ml-[-2px]">
+                I agree to the
+                <Link className="underline" href="#">
+                  Terms of Service
+                </Link>
+              </span>
+              <Checkbox id="terms" required />
+            </Label>
+          </div>
+          <Button className="w-full" type="submit">
+            Sign Up
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+=== styles.css ===
+
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter), sans-serif;
+}
+
+=== layout.jsx ===
+
+// This is the root layout component for your Next.js app.
+// Learn more: https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#root-layout-required
+
+import { Inter } from 'next/font/google'
+import { Inter } from 'next/font/google'
+import './styles.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+export default function Layout({ children }) {
+  return (
+    <html lang="en">
+      <body className={inter.variable + inter.variable}>
+        {children}
+      </body>
+    </html>
+  )
+}
