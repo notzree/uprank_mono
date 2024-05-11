@@ -9,18 +9,94 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 model User {
-  id                String         @id // Clerk user.data.id
-  first_name        String?
-  last_name         String?
-  company           String
-  email             String         @unique
-  profile_image_url String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  months_subscribed Int            @default(0)
-  just_browsing     Boolean        @default(false)
+  id                  String    @id // Clerk user.data.id
+  first_name          String?
+  last_name           String?
+  company_name        String
+  company_description String?
+  email               String    @unique
+  profile_image_url   String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  last_login          DateTime?
+  Job                 Job[]
 }
 
+model Job {
+  id                   String   @id
+  title                String
+  user_id              String
+  createdAt            DateTime @default(now())
+  location             String
+  description          String
+  skills               String[]
+  experience_level     String
+  hourly               Boolean
+  fixed                Boolean
+  hourly_rate          Int[]
+  fixed_rate           Int[]
+  num_months           Int[]
+  average_uprank_score Int?
+  max_uprank_score     Int?
+  min_uprank_score     Int?
 
+  user        User                       @relation(fields: [user_id], references: [id])
+  Freelancers UpworkFreelancerProposal[]
+}
+
+//Represents a freelancer that has applied to a job
+model UpworkFreelancerProposal {
+  url                           String    @id
+  name                          String
+  title                         String
+  description                   String
+  city                          String
+  country                       String
+  timezone                      String
+  cv                            String    @db.Text
+  aiReccomended                 Boolean
+  fixedChargeAmount             Int
+  fixedChargeCurrency           String
+  hourlyChargeAmount            Int
+  hourlyChargeCurrency          String
+  invited                       Boolean
+  photoUrl                      String
+  recentHours                   Int
+  totalHours                    Int
+  totalPortfolioItems           Int
+  totalPortfolioV2Items         Int
+  upwork_totalFeedback          Int //Star rating out of 5
+  upwork_recentFeedback         Int //Star rating out of 5
+  upwork_topRatedStatus         Boolean
+  upwork_topRatedPlusStatus     Boolean
+  upwork_sponsored              Boolean
+  upwork_jobSuccessScore        Int //percent job success
+  upwork_reccomended            Boolean
+  skills                        String[]
+  averageRecentEarnings         Int
+  combinedAverageRecentEarnings Int
+  combinedRecentEarnings        Int
+  combinedTotalEarnings         Int
+  combinedTotalRevenue          Int
+  recentEarnings                Int
+  totalRevenue                  Int
+  uprank_score                  Int       @default(0)
+  uprank_updated_at             DateTime?
+  uprank_reccomended            Boolean   @default(false)
+  uprank_reccomended_reasons    String?
+  uprank_not_enough_data        Boolean   @default(false)
+  //Still have to add all of the individual fields used to calculate the total score but won't know that until I write out the api
+
+  Job          Job?             @relation(fields: [jobId], references: [id])
+  jobId        String?
+  Attachements AttachementRef[]
+}
+
+model AttachementRef {
+  id                          Int                       @id @default(autoincrement())
+  name                        String
+  url                         String
+  UpworkFreelancerProposal    UpworkFreelancerProposal? @relation(fields: [upworkFreelancerProposalUrl], references: [url])
+  upworkFreelancerProposalUrl String?
+}
