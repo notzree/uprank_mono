@@ -18,7 +18,7 @@ export default function Footer() {
             </p>
           </SignedOut>
         </div>
-        <p className="text-sm">Made with ❤️ by notzree</p>
+        <p className="text-sm">Made with ❤️ by <a href="https://www.richard-zhang.ca">notzree</a></p>
       </div>
     </footer>
   )

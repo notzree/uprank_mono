@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Freelancer } from "@/types/user-types"
+import { Freelancer } from "@/types/freelancer"
 import FreelancerCard from "./freelancer-card"
 
 interface FreelancerListProps {

@@ -2,7 +2,7 @@ import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { CardContent, Card } from "@/components/ui/card";
-import { Freelancer } from "@/types/user-types";
+import { Freelancer } from "@/types/freelancer";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import  craft_api_url  from "@/utils/api_utils/craft_api_url";
