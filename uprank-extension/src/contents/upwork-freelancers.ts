@@ -1,5 +1,5 @@
 import type { PlasmoCSConfig, PlasmoRender } from "plasmo"
-
+import { scrape_freelancers_action } from "~constants";
 import type { Freelancer } from "~types/freelancer"
 
 export const config: PlasmoCSConfig = {
@@ -8,7 +8,7 @@ export const config: PlasmoCSConfig = {
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === "fetchFreelancers") {
+  if (request.action === scrape_freelancers_action) {
       console.log("Activation command received");
       const freelancerMap = scrapeFreelancers();
       sendResponse({data: freelancerMap});
@@ -16,13 +16,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 const scrapeFreelancers = async () => {
-  // Send a message to content script
   let expectedFreelancerCount = null
   let freelancerMap = {}
-  console.log("Scraping job...")
+  console.log("Scraping Freelancers...")
   try {
     expectedFreelancerCount = scrapeFreelancerCount()
-    console.log(`Number of proposals: ${expectedFreelancerCount}`)
   } catch (error) {
     console.error(error)
   }

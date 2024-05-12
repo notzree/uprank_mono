@@ -1,14 +1,13 @@
 import { SignIn, useAuth, useUser } from "@clerk/chrome-extension"
 import cssText from "data-text:~style.css"
 import { useEffect, useState } from "react"
-
-import { useStorage } from "@plasmohq/storage/hook"
-
-import type { Job } from "~types/job"
-
+import { scrape_job_action, scrape_freelancers_action } from "~constants"
 import Footer from "./components/footer"
 import Header from "./components/header"
+import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-functions"
+import { getWithExpiry, setWithExpiry } from "./utils/local-storage-functions"
 
+import type { Job } from "~types/job"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -23,19 +22,30 @@ export default function PopUpEntry() {
 
   useEffect(() => {
     async function validate_job_id(id: string) {
+ 
+      // Check if the data is already cached
+      const cachedData = getWithExpiry(id)
+      if (cachedData) {
+        setIsJobValid(cachedData.exists)
+        return
+      }
+
       const response = await fetch(
         `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job/${id}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${await getToken()}` // Attach the token in Authorization header
+            Authorization: `Bearer ${await getToken()}`
           }
         }
       )
-      const data: getJobResult = await response.json()
+      const data = await response.json()
       console.log(data)
       setIsJobValid(data.exists)
+
+      // Cache the data
+      setWithExpiry(id, data, 900000); //15 minute cache invalidation
     }
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -81,9 +91,9 @@ export default function PopUpEntry() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: "fetchJob" },
+        { action: scrape_job_action, jobId: extractJobId(currentURL)},
         function (response) {
-          console.log("Content script activated:", response.status)
+          console.log("Content script activated:")
           console.log(response)
         }
       )
@@ -93,32 +103,34 @@ export default function PopUpEntry() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: "fetchFreelancers" },
+        { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         function (response) {
-          console.log("Content script activated:", response.status)
+          console.log("Content script activated:")
           console.log(response)
         }
       )
     })
   }
-
   return (
     <div className="flex flex-col w-96 h-[300px] px-4 py-8 mb-10">
       <Header />
       <div>
-        <h1 className=" text-black">Actions</h1>
+        <h1 className=" text-black">
+          {currentURL && "Uprank Job ID: " + extractJobId(currentURL)}
+        </h1>
         <div>
+          {(is_upwork_freelancer(currentURL) && !isJobValid) &&  <p>Click the "View Job Post" to get started</p>}
           {isJobValid && is_upwork_freelancer(currentURL) && (
             <button
-            onClick={()=>handleAddFreelancers()}
-             className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+              onClick={() => handleAddFreelancers()}
+              className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
               Add freelancers
             </button>
           )}
           {!isJobValid && is_upwork_job(currentURL) && (
             <button
-              onClick={() => handleAddJob()} 
-            className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+              onClick={() => handleAddJob()}
+              className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
               Add job
             </button>
           )}
@@ -129,26 +141,8 @@ export default function PopUpEntry() {
   )
 }
 
-function is_upwork_job(url: string) {
-  const pattern =
-    /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/job-details$/
-  return pattern.test(url)
-}
 
-function is_upwork_freelancer(url: string) {
-  const pattern =
-    /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/applicants$/
-  return pattern.test(url)
-}
 
-function extractJobId(url: string): string | null {
-  const pattern = /\/applicants\/(\d+)\//
-  const match = url.match(pattern)
-  if (match && match[1]) {
-    return match[1]
-  }
-  return null
-}
 
 interface getJobResult {
   exists: boolean
