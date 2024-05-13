@@ -3,26 +3,27 @@ import prisma from "@/prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ScrapedJobData } from "@/types/job";
+import enableCors from "@/utils/api_utils/enable_cors"
 
-
-export default async function handler(
+ async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    console.log("Request method", req.method);
     if (req.method === "POST") {
         await handlePost(req, res);
     } else {
-        res.status(500).json({ message: "Invalid request type" });
+        res.status(405).json({ message: "Method Not allowed" });
     }
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     try {
         const { userId } = getAuth(req);
-
         if (!userId && process.env.NODE_ENV === "production") {
             res.status(401).json({ message: "User not authenticated" });
         }
+        console.log("User ID", userId);
         const job = req.body as ScrapedJobData;
 
         const result = await prisma.job.create({
@@ -37,7 +38,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 fixed: job.fixed,
                 hourly_rate: job.hourly_rate,
                 fixed_rate: job.fixed_rate,
-                num_months: job.num_months,
                 user_id: userId as string,
             },
         });
@@ -50,3 +50,5 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }
     }
 }
+
+export default enableCors(handler);
