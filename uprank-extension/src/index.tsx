@@ -5,8 +5,8 @@ import { scrape_job_action, scrape_freelancers_action } from "~constants"
 import Footer from "./components/footer"
 import Header from "./components/header"
 import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-functions"
-import { getWithExpiry, setWithExpiry } from "./utils/local-storage-functions"
-
+import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
+import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -19,10 +19,11 @@ export default function PopUpEntry() {
   const { getToken } = useAuth()
   const [currentURL, setCurrentURL] = useState(null)
   const [isJobValid, setIsJobValid] = useState(false)
+  const [isFreelancerValid, setIsFreelancerValid] = useState(false)
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     async function validate_job_id(id: string) {
- 
       // Check if the data is already cached
       const cachedData = getWithExpiry(id)
       if (cachedData) {
@@ -56,9 +57,7 @@ export default function PopUpEntry() {
           currentTab.url != "ERROR: No tabs found" &&
           currentTab.url.includes("https://www.upwork.com")
         ) {
-          console.log("upwork tabs")
           const job_id = extractJobId(currentTab.url)
-          console.log(job_id)
           validate_job_id(job_id)
         }
       } else {
@@ -92,9 +91,29 @@ export default function PopUpEntry() {
       chrome.tabs.sendMessage(
         tabs[0].id,
         { action: scrape_job_action, jobId: extractJobId(currentURL)},
-        function (response) {
-          console.log("Content script activated:")
-          console.log(response)
+        async function (scrape_response) {
+          console.log("received response");
+          console.log(scrape_response);
+          if (!scrape_response.missingFields) {
+            const db_response = await sendToBackground({
+              //@ts-ignore
+              name: "send-job",
+              body: {
+                job: scrape_response.job,
+                authentication_token: await getToken()
+              }
+            });
+            if (!db_response.ok){
+              setMessage("Error persisting data to DB. Please try again.")
+            } 
+            setMessage("Job added successfully!")
+            removeItem(extractJobId(currentURL)) //Remove stale data from cache
+            setIsJobValid(true)
+          }
+          else {
+            setMessage("Hey! We need some help filling these fields out. Richard you need to add a function to manuall fill out missing fields")
+            //todo: Allow user to manually add job.
+          }
         }
       )
     })
@@ -104,9 +123,28 @@ export default function PopUpEntry() {
       chrome.tabs.sendMessage(
         tabs[0].id,
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
-        function (response) {
-          console.log("Content script activated:")
-          console.log(response)
+        async function (scrape_response) {
+          if (!scrape_response.missingFields){
+            const db_response = await sendToBackground({
+              //@ts-ignore
+              name: "send-freelancers",
+              body: {
+                freelancers: scrape_response.freelancers,
+                authentication_token: await getToken()
+              }
+            });
+            if (!db_response.ok){
+              setMessage("Error persisting data to DB. Please try again.")
+            }
+            setMessage("Success! You will be notified shortly when your Uprank is ready.")
+            removeItem(extractJobId(currentURL)) //Remove stale data from cache
+            setIsFreelancerValid(true)
+
+
+          } else {
+            setMessage("Hey! We need some help filling these fields out. Richard you need to add a function to manually fill out missing fields")
+          }
+
         }
       )
     })
@@ -119,7 +157,9 @@ export default function PopUpEntry() {
           {currentURL && "Uprank Job ID: " + extractJobId(currentURL)}
         </h1>
         <div>
+          <h1>{message}</h1>
           {(is_upwork_freelancer(currentURL) && !isJobValid) &&  <p>Click the "View Job Post" to get started</p>}
+          {(is_upwork_job(currentURL) && isJobValid) &&  <p>Click the "Review Proposals" section to get started</p>}
           {isJobValid && is_upwork_freelancer(currentURL) && (
             <button
               onClick={() => handleAddFreelancers()}
