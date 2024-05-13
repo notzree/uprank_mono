@@ -1,23 +1,22 @@
 import type { PlasmoCSConfig, PlasmoRender } from "plasmo"
 import { scrape_freelancers_action } from "~constants";
-import type { Freelancer } from "~types/freelancer"
+import type { ScrapedFreelancerData, UnstableScrapedFreelancerData } from "~types/freelancer"
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.upwork.com/*/applicants/*/applicants"]
 }
 
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
   if (request.action === scrape_freelancers_action) {
-      console.log("Activation command received");
-      const freelancerMap = scrapeFreelancers();
-      sendResponse({data: freelancerMap});
+      const unstableFreelancers: UnstableScrapedFreelancerData = await  scrapeFreelancers();
+      sendResponse({ freelancers: unstableFreelancers.freelancers, missingFields: unstableFreelancers.missingFields, missingFreelancers: unstableFreelancers.missingFreelancers});
   }
 });
 
-const scrapeFreelancers = async () => {
+const scrapeFreelancers = async (): Promise<UnstableScrapedFreelancerData> => {
   let expectedFreelancerCount = null
-  let freelancerMap = {}
+  let unstableFreelancerMap = {}
   console.log("Scraping Freelancers...")
   try {
     expectedFreelancerCount = scrapeFreelancerCount()
@@ -30,10 +29,10 @@ const scrapeFreelancers = async () => {
     try {
       const freelancer_url_cipher =
         freelancer_data[i].application.profile.ciphertext
-      if (freelancer_url_cipher in freelancerMap) {
+      if (freelancer_url_cipher in unstableFreelancerMap) {
         continue
       } else {
-        const freelancer: Freelancer = {
+        const freelancer: ScrapedFreelancerData = {
           name: freelancer_data[i].application.profile.shortName,
           location: {
             city: freelancer_data[i].application.profile.location.city,
@@ -91,19 +90,27 @@ const scrapeFreelancers = async () => {
           )
         }
 
-        freelancerMap[freelancer_url_cipher] = freelancer
+        unstableFreelancerMap[freelancer_url_cipher] = freelancer
       }
     } catch (e) {
       console.info(e + "occured at " + i + "th iteration")
     }
   }
   //make sure the expect matches the actual count
-  if (Object.keys(freelancerMap).length != expectedFreelancerCount) {
+  const unstableFreelancerArray: ScrapedFreelancerData[] = Object.values(unstableFreelancerMap)
+  if (unstableFreelancerArray.length != expectedFreelancerCount) {
     console.log("discrepancy in the number of proposals") //todo: implement manual adjustment
-    return
+    return {
+      freelancers: unstableFreelancerArray,
+      missingFields: true,
+      missingFreelancers: expectedFreelancerCount - unstableFreelancerArray.length
+    }
   }
-  console.log(freelancerMap)
-  return freelancerMap
+  return {
+    freelancers: unstableFreelancerArray,
+    missingFields: false,
+    missingFreelancers: 0
+  }
 }
 
 function filterLocalStorage() {
