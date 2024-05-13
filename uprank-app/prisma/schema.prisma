@@ -12,11 +12,8 @@ generator client {
 model User {
   id                  String    @id // Clerk user.data.id
   first_name          String?
-  last_name           String?
   company_name        String
-  company_description String?
   email               String    @unique
-  profile_image_url   String?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
   last_login          DateTime?
@@ -35,8 +32,7 @@ model Job {
   hourly               Boolean
   fixed                Boolean
   hourly_rate          Int[]
-  fixed_rate           Int[]
-  num_months           Int[]
+  fixed_rate           Int
   average_uprank_score Int?
   max_uprank_score     Int?
   min_uprank_score     Int?
@@ -88,8 +84,8 @@ model UpworkFreelancerProposal {
   uprank_not_enough_data        Boolean   @default(false)
   //Still have to add all of the individual fields used to calculate the total score but won't know that until I write out the api
 
-  Job          Job?             @relation(fields: [jobId], references: [id])
-  jobId        String?
+  Job          Job             @relation(fields: [jobId], references: [id])
+  jobId        String
   Attachements AttachementRef[]
 }
 
