@@ -1,6 +1,48 @@
 //All fragments need upwork.com/ in front of them
 //These fields are taken from the data extracted from local storage
-export interface Freelancer {
+type UpworkFreelancerProposal = {
+    url: string;
+    name: string;
+    title: string;
+    description: string;
+    city: string;
+    country: string;
+    timezone: string;
+    cv: string;
+    aiReccomended: boolean;
+    fixedChargeAmount: number;
+    fixedChargeCurrency: string;
+    hourlyChargeAmount: number;
+    hourlyChargeCurrency: string;
+    invited: boolean;
+    photoUrl: string;
+    recentHours: number;
+    totalHours: number;
+    totalPortfolioItems: number;
+    totalPortfolioV2Items: number;
+    upwork_totalFeedback: number; 
+    upwork_recentFeedback: number; 
+    upwork_topRatedStatus: boolean;
+    upwork_topRatedPlusStatus: boolean;
+    upwork_sponsored: boolean;
+    upwork_jobSuccessScore: number; 
+    upwork_reccomended: boolean;
+    skills: string[];
+    averageRecentEarnings: number;
+    combinedAverageRecentEarnings: number;
+    combinedRecentEarnings: number;
+    combinedTotalEarnings: number;
+    combinedTotalRevenue: number;
+    recentEarnings: number;
+    totalRevenue: number;
+    uprank_score: number; 
+    uprank_updated_at: Date | null;
+    uprank_reccomended: boolean; 
+    uprank_reccomended_reasons: string | null;
+    uprank_not_enough_data: boolean; 
+    jobId: string; 
+  };
+export interface ScrapedFreelancerData {
     name: string;
     title: string;
     description: string;
@@ -47,4 +89,15 @@ export interface EarningsInfo {
 export interface Attachements {
     name: string;
     link: string;
+}
+export interface sendFreelancerBody {
+    authentication_token: string;
+    freelancer: ScrapedFreelancerData[];
+
+}
+
+export interface UnstableScrapedFreelancerData {
+    freelancers: ScrapedFreelancerData[];
+    missingFields: boolean;
+    missingFreelancers: number;
 }
