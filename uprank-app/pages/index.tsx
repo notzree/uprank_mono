@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { CardHeader, CardContent, Card } from "@/components/ui/card";
 import { SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
-import  mux_user_type  from "@/utils/api_utils/mux_user_type";
 type CardData = {
     title: string;
     content: string;
@@ -45,7 +44,7 @@ export default function Component() {
                     {user?.id ? (
                         <Link
                             className="text-sm font-medium hover:underline"
-                            href = {mux_user_type(user?.unsafeMetadata?.type as string) + "/dashboard"}
+                            href = "/client/dashboard"
                         >
                             Dashboard
                         </Link>
