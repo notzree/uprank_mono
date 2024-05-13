@@ -68,12 +68,10 @@ export default function Home( ){
                 "id": user.id,
                 "email": values.email,
                 "first_name": values.first_name,
-                "profile_image_url": user.imageUrl,
-                "company": values.company,
+                "company_name": values.company,
                 "createdAt": new Date(),
                 "updatedAt": new Date(),
-                "months_subscribed": 0,
-                "just_browsing": values.just_browsing,
+                "last_login": new Date(),
             } as User,
             "metadata": {
                 "completed_onboarding": user.unsafeMetadata.completed_onboarding as boolean
