@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Job } from "@prisma/client";
 import enableCors from "@/utils/api_utils/enable_cors"
 
@@ -32,7 +31,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
                 error: error,
             });
         }
-        console.log("parsedJobId", jobId);
+        
         if (jobId instanceof Array) {
             res.status(400).json({ message: "Invalid Job ID" });
             return;
@@ -43,7 +42,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
                 user_id: userId as string,
             },
         });
-        console.log("result", result);
+        
 
         const responseBody: getJobResult = {
             exists: result ? true : false,
