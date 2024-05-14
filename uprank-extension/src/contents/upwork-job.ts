@@ -7,7 +7,7 @@ import type { Job, ScrapedJobData, UnstableScrapedJobData } from "~types/job"
 import { extractJobId, getCurrentTabUrl } from "~utils/url-functions"
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://www.upwork.com/*/applicants/*/job-details"]
+  matches: ["https://www.upwork.com/*/applicants/*/job-details/*"]
 }
 const MISSING_FIELD: string = "not found";
 
