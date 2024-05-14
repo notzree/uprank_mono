@@ -4,17 +4,18 @@ export default authMiddleware({
     ignoredRoutes: ["/", "/sign-in", "/sign-up", "/api/public/(.*)"],
     apiRoutes: ["/api/private/(.*)"],
     afterAuth(auth, req, evt) {
+        const res = NextResponse.next();
         console.log("path" + req.nextUrl.pathname);
         if (auth.isApiRoute) {
             //todo: Change this so that it only allows access to the api if the user is authenticated
-            return NextResponse.next();
+            return res;
         }
 
         if (!auth.userId && !auth.isPublicRoute) {
             return redirectToSignIn({ returnBackUrl: req.url });
         }
         if (req.nextUrl.pathname.includes("/api")) {
-            return NextResponse.next();
+            return res;
         }
 
         // Attempt to retrieve user-specific metadata
@@ -33,7 +34,7 @@ export default authMiddleware({
                     req.nextUrl.pathname.includes("/onboarding") ||
                     auth.isApiRoute
                 ) {
-                    return NextResponse.next();
+                    return res;
                 } else {
                     const onboarding_url = new URL(
                         "/client/onboarding/onboarding-form",
@@ -50,7 +51,7 @@ export default authMiddleware({
             }
         }
 
-        return NextResponse.next();
+        return res;
     },
 });
 
