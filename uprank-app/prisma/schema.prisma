@@ -10,14 +10,14 @@ generator client {
 }
 
 model User {
-  id                  String    @id // Clerk user.data.id
-  first_name          String?
-  company_name        String
-  email               String    @unique
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  last_login          DateTime?
-  Job                 Job[]
+  id           String    @id // Clerk user.data.id
+  first_name   String?
+  company_name String
+  email        String    @unique
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  last_login   DateTime?
+  Job          Job[]
 }
 
 model Job {
@@ -52,9 +52,9 @@ model UpworkFreelancerProposal {
   timezone                      String
   cv                            String    @db.Text
   aiReccomended                 Boolean
-  fixedChargeAmount             Int
+  fixedChargeAmount             Int?
   fixedChargeCurrency           String
-  hourlyChargeAmount            Int
+  hourlyChargeAmount            Int?
   hourlyChargeCurrency          String
   invited                       Boolean
   photoUrl                      String
@@ -77,14 +77,14 @@ model UpworkFreelancerProposal {
   combinedTotalRevenue          Int
   recentEarnings                Int
   totalRevenue                  Int
-  uprank_score                  Int       @default(0)
+  uprank_score                  Int?     @default(0)
   uprank_updated_at             DateTime?
-  uprank_reccomended            Boolean   @default(false)
+  uprank_reccomended            Boolean?   @default(false)
   uprank_reccomended_reasons    String?
-  uprank_not_enough_data        Boolean   @default(false)
+  uprank_not_enough_data        Boolean?   @default(false)
   //Still have to add all of the individual fields used to calculate the total score but won't know that until I write out the api
 
-  Job          Job             @relation(fields: [jobId], references: [id])
+  Job          Job              @relation(fields: [jobId], references: [id])
   jobId        String
   Attachements AttachementRef[]
 }
