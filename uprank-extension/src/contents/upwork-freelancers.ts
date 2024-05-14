@@ -1,29 +1,32 @@
 import type { PlasmoCSConfig, PlasmoRender } from "plasmo"
 import { scrape_freelancers_action } from "~constants";
-import type { ScrapedFreelancerData, UnstableScrapedFreelancerData } from "~types/freelancer"
+import type { EarningsInfo, ScrapedFreelancerData, UnstableScrapedFreelancerData } from "~types/freelancer"
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://www.upwork.com/*/applicants/*/applicants"]
+  matches: ["https://www.upwork.com/*/applicants/*/applicants*"]
 }
 
 
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
   if (request.action === scrape_freelancers_action) {
-      const unstableFreelancers: UnstableScrapedFreelancerData = await  scrapeFreelancers();
+      const unstableFreelancers: UnstableScrapedFreelancerData = await scrapeFreelancers();
       sendResponse({ freelancers: unstableFreelancers.freelancers, missingFields: unstableFreelancers.missingFields, missingFreelancers: unstableFreelancers.missingFreelancers});
   }
+  return true;
 });
 
 const scrapeFreelancers = async (): Promise<UnstableScrapedFreelancerData> => {
+  console.log("Scraping Freelancers...")
+  // await loadLocalStorageData();
+
   let expectedFreelancerCount = null
   let unstableFreelancerMap = {}
-  console.log("Scraping Freelancers...")
   try {
     expectedFreelancerCount = scrapeFreelancerCount()
   } catch (error) {
     console.error(error)
   }
-
+  
   const freelancer_data = filterLocalStorage()
   for (let i = 0; i < freelancer_data.length; i++) {
     try {
@@ -50,7 +53,7 @@ const scrapeFreelancers = async (): Promise<UnstableScrapedFreelancerData> => {
             freelancer_data[i].application.fixedChargeAmount.amount,
           fixedChargeCurrency:
             freelancer_data[i].application.fixedChargeAmount.currencyCode,
-          earningsInfo: freelancer_data[i].application.profile.earningsInfo,
+          earningsInfo: flattenEarningsInfo(freelancer_data[i].application.earningsInfo),
           cv: freelancer_data[i].application.coverLetter,
           url: `https://www.upwork.com/freelancers/${freelancer_data[i].application.profile.ciphertext}`,
           aiReccomended: freelancer_data[i].application.aiRecommended,
@@ -98,8 +101,10 @@ const scrapeFreelancers = async (): Promise<UnstableScrapedFreelancerData> => {
   }
   //make sure the expect matches the actual count
   const unstableFreelancerArray: ScrapedFreelancerData[] = Object.values(unstableFreelancerMap)
+
   if (unstableFreelancerArray.length != expectedFreelancerCount) {
-    console.log("discrepancy in the number of proposals") //todo: implement manual adjustment
+    console.log(`discrepancy in the number of proposals, expected ${expectedFreelancerCount} got ${unstableFreelancerArray.length}]`) //todo: implement manual adjustment
+
     return {
       freelancers: unstableFreelancerArray,
       missingFields: true,
@@ -132,6 +137,83 @@ function filterLocalStorage() {
   return matchingValues
 }
 
+async function loadLocalStorageData() {
+  await clickLoadMore();
+  
+  const clickableDivs = document.querySelectorAll('div[data-ev-tab="applicants"][data-v-9cb7f262]');
+
+  for (const div  of clickableDivs as any) {
+    div.click();
+
+    // Wait for the popup to appear
+    await waitForPopupAndClickClose('.air3-card.air3-card-sections.air3-card-outline.profile-outer-card.mb-4x', 'button.m-0.p-0.air3-btn.air3-btn-link.d-none.d-md-block');
+
+
+    // Wait a bit for the popup to close and system to settle before the next click
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
+
+function waitForPopupAndClickClose(popupSelector, closeButtonSelector) {
+  return new Promise<void>(resolve => {
+    const intervalId = setInterval(() => {
+      const popup = document.querySelector(popupSelector);
+      const closeButton = document.querySelector(closeButtonSelector);
+      console.log(popup, closeButton);
+      if (popup && closeButton) {
+        closeButton.click();
+        clearInterval(intervalId);
+        resolve();
+      }
+    }, 100); // Check every 100 milliseconds
+  });
+}
+
+const flattenEarningsInfo = (earningsInfo): EarningsInfo => {
+  const flattened: EarningsInfo = {
+      averageRecentEarnings: 0,
+      combinedAverageRecentEarnings: 0,
+      combinedRecentEarnings: 0,
+      combinedTotalEarnings: 0,
+      combinedTotalRevenue: 0,
+      recentEarnings: 0,
+      totalRevenue: 0
+  };
+  for (const key in earningsInfo) {
+      if (earningsInfo.hasOwnProperty(key) && earningsInfo[key].hasOwnProperty('value')) {
+          flattened[key] = earningsInfo[key].value;
+      }
+  }
+  return flattened;
+};
+
+
+function clickLoadMore() {
+  return new Promise<void>((resolve, reject) => {
+    function attemptClick() {
+      // Get the wrapping div
+      const loadMoreDiv = document.querySelector('div.text-center.py-4x.border-top');
+
+      // Check if the div exists
+      if (loadMoreDiv) {
+        const loadMoreButton: HTMLElement = loadMoreDiv.querySelector('button.air3-btn.air3-btn-secondary');
+
+        if (loadMoreButton) {
+          loadMoreButton.click();
+          setTimeout(attemptClick, 1000); // Continue attempting to click
+        } else {
+          setTimeout(attemptClick, 1000); // Recheck for button in the same div after delay
+        }
+      } else if (!loadMoreDiv) {
+        console.log("All freelancers loaded");
+        resolve(); // Resolve the promise when the specific div is not found
+      }
+    }
+
+    attemptClick(); // Start the clicking process
+  });
+}
+
 function scrapeFreelancerCount() {
   // Select all span elements that could potentially contain the proposal count
   const spans = document.querySelectorAll("span.air3-tab-btn-text")
@@ -157,3 +239,5 @@ function scrapeFreelancerCount() {
     throw new Error("Proposal count not found.")
   }
 }
+
+
