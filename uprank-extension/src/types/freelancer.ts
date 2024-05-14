@@ -1,5 +1,4 @@
-//All fragments need upwork.com/ in front of them
-//These fields are taken from the data extracted from local storage
+//This is the backend DB Schema
 type UpworkFreelancerProposal = {
     url: string;
     name: string;
@@ -41,7 +40,8 @@ type UpworkFreelancerProposal = {
     uprank_reccomended_reasons: string | null;
     uprank_not_enough_data: boolean; 
     jobId: string; 
-  };
+};
+//This is what gets scraped and sent to the backend
 export interface ScrapedFreelancerData {
     name: string;
     title: string;
@@ -70,12 +70,12 @@ export interface ScrapedFreelancerData {
     skills: string[];
     earningsInfo: EarningsInfo;
     attachements: Attachements[];
-}
+};
 export interface Location{
     city: string;
     country: string;
     timezone: string;
-}
+};
 export interface EarningsInfo {
     averageRecentEarnings: number;
     combinedAverageRecentEarnings: number;
@@ -84,20 +84,26 @@ export interface EarningsInfo {
     combinedTotalRevenue: number;
     recentEarnings: number;
     totalRevenue: number;
-}
+};
 
 export interface Attachements {
     name: string;
     link: string;
-}
-export interface sendFreelancerBody {
+};
+export interface SendFreelancerBody {
     authentication_token: string;
-    freelancer: ScrapedFreelancerData[];
-
-}
+    freelancers: ScrapedFreelancerData[];
+    jobId: string;
+};
 
 export interface UnstableScrapedFreelancerData {
     freelancers: ScrapedFreelancerData[];
     missingFields: boolean;
     missingFreelancers: number;
-}
+};
+
+export interface SendFreelancerResponse {
+    ok: boolean;
+    count: number;
+};
+
