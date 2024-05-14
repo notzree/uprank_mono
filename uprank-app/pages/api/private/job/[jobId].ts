@@ -41,10 +41,17 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
                 id: jobId,
                 user_id: userId as string,
             },
+            include:{
+                _count:{
+                    select:{
+                        Freelancers: true
+                    }
+                }
+            }
         });
         
 
-        const responseBody: getJobResult = {
+        const responseBody: GetJobResult = {
             exists: result ? true : false,
             job: result,
         };
@@ -59,7 +66,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
 export default enableCors(handler);
 
-export interface getJobResult {
+export interface GetJobResult {
     exists: boolean,
     job: Job | null
 

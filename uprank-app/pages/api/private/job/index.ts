@@ -11,6 +11,7 @@ import enableCors from "@/utils/api_utils/enable_cors"
 ) {
     console.log("Request method", req.method);
     if (req.method === "POST") {
+
         await handlePost(req, res);
     } else {
         res.status(405).json({ message: "Method Not allowed" });

@@ -8,6 +8,7 @@ import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-f
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
+import type { SendFreelancerBody, SendFreelancerResponse } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -19,7 +20,7 @@ export default function PopUpEntry() {
   const { getToken } = useAuth()
   const [currentURL, setCurrentURL] = useState(null)
   const [isJobValid, setIsJobValid] = useState(false)
-  const [isFreelancerValid, setIsFreelancerValid] = useState(false)
+  const [jobFreelancerCount, setJobFreelancerCount] = useState(0)
   const [message, setMessage] = useState("")
 
   useEffect(() => {
@@ -43,7 +44,8 @@ export default function PopUpEntry() {
       )
       const data = await response.json()
       console.log(data)
-      setIsJobValid(data.exists)
+      setIsJobValid(data.exists);
+      setJobFreelancerCount(data.job._count.Freelancers);
 
       // Cache the data
       setWithExpiry(id, data, 900000); //15 minute cache invalidation
@@ -85,7 +87,6 @@ export default function PopUpEntry() {
       </div>
     )
   }
-
   const handleAddJob = async () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
@@ -124,23 +125,23 @@ export default function PopUpEntry() {
         tabs[0].id,
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         async function (scrape_response) {
-          if (!scrape_response.missingFields){
-            const db_response = await sendToBackground({
+          if (!scrape_response.missingFields && scrape_response.freelancers.length > 0 && scrape_response.freelancers.length != jobFreelancerCount){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
+            const db_response: SendFreelancerResponse = await sendToBackground({
               //@ts-ignore
               name: "send-freelancers",
               body: {
                 freelancers: scrape_response.freelancers,
-                authentication_token: await getToken()
-              }
+                authentication_token: await getToken(),
+                jobId: extractJobId(currentURL)
+              } as SendFreelancerBody
             });
             if (!db_response.ok){
               setMessage("Error persisting data to DB. Please try again.")
             }
             setMessage("Success! You will be notified shortly when your Uprank is ready.")
+
             removeItem(extractJobId(currentURL)) //Remove stale data from cache
-            setIsFreelancerValid(true)
-
-
+            setJobFreelancerCount(db_response.count);
           } else {
             setMessage("Hey! We need some help filling these fields out. Richard you need to add a function to manually fill out missing fields")
           }
@@ -164,7 +165,7 @@ export default function PopUpEntry() {
             <button
               onClick={() => handleAddFreelancers()}
               className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
-              Add freelancers
+                {jobFreelancerCount > 0 ? "Update Freelancers" : "Add Freelancers"}
             </button>
           )}
           {!isJobValid && is_upwork_job(currentURL) && (
