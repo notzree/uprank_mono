@@ -1,12 +1,12 @@
 export function is_upwork_job(url: string) {
   const pattern =
-    /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/job-details$/
+    /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/job-details.*$/
   return pattern.test(url)
 }
 
 export function is_upwork_freelancer(url: string) {
   const pattern =
-    /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/applicants$/
+  /^https:\/\/www\.upwork\.com\/[^/]+\/applicants\/[^/]+\/applicants.*$/
   return pattern.test(url)
 }
 
