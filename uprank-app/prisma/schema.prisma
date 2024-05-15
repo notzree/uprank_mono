@@ -14,8 +14,8 @@ model User {
   first_name   String?
   company_name String
   email        String    @unique
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  created_at    DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
   last_login   DateTime?
   Job          Job[]
 }
@@ -24,7 +24,7 @@ model Job {
   id                   String   @id
   title                String
   user_id              String
-  createdAt            DateTime @default(now())
+  created_at            DateTime @default(now()) //When the job was added to the database
   location             String
   description          String
   skills               String[]
@@ -51,41 +51,41 @@ model UpworkFreelancerProposal {
   country                       String
   timezone                      String
   cv                            String    @db.Text
-  aiReccomended                 Boolean
-  fixedChargeAmount             Int?
-  fixedChargeCurrency           String
-  hourlyChargeAmount            Int?
-  hourlyChargeCurrency          String
+  ai_reccomended                 Boolean
+  fixed_charge_amount             Int?
+  fixed_charge_currency           String
+  hourly_charge_amount            Int?
+  hourly_charge_currency          String
   invited                       Boolean
-  photoUrl                      String
-  recentHours                   Int
-  totalHours                    Int
-  totalPortfolioItems           Int
-  totalPortfolioV2Items         Int
-  upwork_totalFeedback          Int //Star rating out of 5
-  upwork_recentFeedback         Int //Star rating out of 5
-  upwork_topRatedStatus         Boolean
-  upwork_topRatedPlusStatus     Boolean
+  photo_url                      String
+  recent_hours                   Int
+  total_hours                    Int
+  total_portfolio_items           Int
+  total_portfolio_v2_items         Int
+  upwork_total_feedback          Float //Star rating out of 5
+  upwork_recent_feedback         Float //Star rating out of 5
+  upwork_top_rated_status         Boolean
+  upwork_top_rated_plus_status     Boolean
   upwork_sponsored              Boolean
-  upwork_jobSuccessScore        Int //percent job success
+  upwork_job_success_score        Float //percent job success
   upwork_reccomended            Boolean
   skills                        String[]
-  averageRecentEarnings         Int
-  combinedAverageRecentEarnings Int
-  combinedRecentEarnings        Int
-  combinedTotalEarnings         Int
-  combinedTotalRevenue          Int
-  recentEarnings                Int
-  totalRevenue                  Int
-  uprank_score                  Int?     @default(0)
+  average_recent_earnings         Float
+  combined_average_recent_earnings Float
+  combined_recent_earnings        Float
+  combined_total_earnings         Decimal
+  combined_total_revenue          Float
+  recent_earnings                Float
+  total_revenue                  Float
+  uprank_score                  Float?     @default(0)
   uprank_updated_at             DateTime?
   uprank_reccomended            Boolean?   @default(false)
   uprank_reccomended_reasons    String?
   uprank_not_enough_data        Boolean?   @default(false)
   //Still have to add all of the individual fields used to calculate the total score but won't know that until I write out the api
 
-  Job          Job              @relation(fields: [jobId], references: [id])
-  jobId        String
+  Job          Job              @relation(fields: [job_id], references: [id])
+  job_id        String
   Attachements AttachementRef[]
 }
 
@@ -93,6 +93,6 @@ model AttachementRef {
   id                          Int                       @id @default(autoincrement())
   name                        String
   url                         String
-  UpworkFreelancerProposal    UpworkFreelancerProposal? @relation(fields: [upworkFreelancerProposalUrl], references: [url])
-  upworkFreelancerProposalUrl String?
+  Upwork_Freelancer_Proposal    UpworkFreelancerProposal? @relation(fields: [upwork_Freelancer_Proposal_Url], references: [url])
+  upwork_Freelancer_Proposal_Url String?
 }
