@@ -34,7 +34,6 @@ const formSchema = z.object({
         .min(1, {
             message: "Company name is required",
         }),
-    just_browsing: z.boolean().default(false).optional(),
 });
 
 export default function Home( ){
@@ -69,8 +68,8 @@ export default function Home( ){
                 "email": values.email,
                 "first_name": values.first_name,
                 "company_name": values.company,
-                "createdAt": new Date(),
-                "updatedAt": new Date(),
+                "created_at": new Date(),
+                "updated_at": new Date(),
                 "last_login": new Date(),
             } as User,
             "metadata": {
@@ -170,22 +169,6 @@ export default function Home( ){
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
-                                        <FormField
-                                        control = {form.control}
-                                        name = "just_browsing"
-                                        render = {({field}) => (
-                                            <div className="flex items-center space-x-2">
-                                            <Checkbox id="just_browsing" />
-                                            <label
-                                                htmlFor="just_browsing"
-                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                            >
-                                                I&apos;m just browsing
-                                            </label>
-                                        </div>
-                                        )}
-                                        
-                                        />
                                     </div>
                                 )}
                             />
