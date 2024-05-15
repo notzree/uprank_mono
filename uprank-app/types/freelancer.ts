@@ -1,5 +1,5 @@
 //This is the backend DB Schema
-type UpworkFreelancerProposal = {
+type Upwork_Freelancer_Proposal = {
     url: string;
     name: string;
     title: string;
@@ -8,96 +8,101 @@ type UpworkFreelancerProposal = {
     country: string;
     timezone: string;
     cv: string;
-    aiReccomended: boolean;
-    fixedChargeAmount: number | null;
-    fixedChargeCurrency: string;
-    hourlyChargeAmount: number;
-    hourlyChargeCurrency: string;
+    ai_reccomended: boolean;
+    fixed_charge_amount: number | null;
+    fixed_charge_currency: string;
+    hourly_charge_amount: number;
+    hourly_charge_currency: string;
     invited: boolean;
-    photoUrl: string;
-    recentHours: number;
-    totalHours: number;
-    totalPortfolioItems: number;
-    totalPortfolioV2Items: number;
-    upwork_totalFeedback: number; 
-    upwork_recentFeedback: number; 
-    upwork_topRatedStatus: boolean;
-    upwork_topRatedPlusStatus: boolean;
+    photo_url: string;
+    recent_hours: number;
+    total_hours: number;
+    total_portfolio_items: number;
+    total_portfolio_v2_items: number;
+    upwork_total_feedback: number;
+    upwork_recent_feedback: number;
+    upwork_top_rated_status: boolean;
+    upwork_top_rated_plus_status: boolean;
     upwork_sponsored: boolean;
-    upwork_jobSuccessScore: number; 
+    upwork_job_success_score: number;
     upwork_reccomended: boolean;
     skills: string[];
-    averageRecentEarnings: number;
-    combinedAverageRecentEarnings: number;
-    combinedRecentEarnings: number;
-    combinedTotalEarnings: number;
-    combinedTotalRevenue: number;
-    recentEarnings: number;
-    totalRevenue: number;
+    average_recent_earnings: number;
+    combined_average_recent_earnings: number;
+    combined_recent_earnings: number;
+    combined_total_earnings: number;
+    combined_total_revenue: number;
+    recent_earnings: number;
+    total_revenue: number;
     uprank_score: number | null;
     uprank_updated_at: Date | null;
     uprank_reccomended: boolean | null;
     uprank_reccomended_reasons: string | null;
-    uprank_not_enough_data: boolean; 
-    jobId: string; 
+    uprank_not_enough_data: boolean;
+    job_id: string;
 };
+
 //This is what gets scraped and sent to the backend
-export interface ScrapedFreelancerData {
+export interface Scraped_Freelancer_Data {
     name: string;
     title: string;
     description: string;
     location: Location;
     cv: string;
     url: string;
-    aiReccomended: boolean;
-    fixedChargeAmount: string;
-    fixedChargeCurrency: string;
-    hourlyChargeAmount: string;
-    hourlyChargeCurrency: string;
+    ai_reccomended: boolean;
+    fixed_charge_amount: string;
+    fixed_charge_currency: string;
+    hourly_charge_amount: string;
+    hourly_charge_currency: string;
     invited: boolean;
-    photoUrl: string;
-    recentHours: number;
-    totalHours: number;
-    totalPortfolioItems: number;
-    totalPortfolioV2Items: number;
-    totalFeedback: number;
-    recentFeedback: number;
-    topRatedStatus: boolean;
-    topRatedPlusStatus: boolean;
+    photo_url: string;
+    recent_hours: number;
+    total_hours: number;
+    total_portfolio_items: number;
+    total_portfolio_v2_items: number;
+    total_feedback: number;
+    recent_feedback: number;
+    top_rated_status: boolean;
+    top_rated_plus_status: boolean;
     sponsored: boolean;
-    jobSuccessScore: number;
+    job_success_score: number;
     reccomended: boolean;
     skills: string[];
-    earningsInfo: EarningsInfo;
+    earnings_info: Earnings_Info;
     attachements: Attachements[];
 };
-export interface Location{
+
+export interface Location {
     city: string;
     country: string;
     timezone: string;
 };
-export interface EarningsInfo {
-    averageRecentEarnings: number;
-    combinedAverageRecentEarnings: number;
-    combinedRecentEarnings: number;
-    combinedTotalEarnings: number;
-    combinedTotalRevenue: number;
-    recentEarnings: number;
-    totalRevenue: number;
+
+export interface Earnings_Info {
+    average_recent_earnings: number;
+    combined_average_recent_earnings: number;
+    combined_recent_earnings: number;
+    combined_total_earnings: number;
+    combined_total_revenue: number;
+    recent_earnings: number;
+    total_revenue: number;
 };
 
 export interface Attachements {
     name: string;
     link: string;
 };
-export interface SendFreelancerBody {
+
+export interface Send_Freelancer_Body {
     authentication_token: string;
-    freelancers: ScrapedFreelancerData[];
-    jobId: string;
+    freelancers: Scraped_Freelancer_Data[];
+    job_id: string;
 };
 
-export interface UnstableScrapedFreelancerData {
-    freelancers: ScrapedFreelancerData[];
-    missingFields: boolean;
-    missingFreelancers: number;
+export interface Unstable_Scraped_Freelancer_Data {
+    freelancers: Scraped_Freelancer_Data[];
+    missing_fields: boolean;
+    missing_freelancers: number;
 };
+
