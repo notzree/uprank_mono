@@ -8,7 +8,7 @@ import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-f
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
-import type { SendFreelancerBody, SendFreelancerResponse } from "~types/freelancer"
+import type { Send_Freelancer_Body, Send_Freelancer_Response } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -27,10 +27,10 @@ export default function PopUpEntry() {
     async function validate_job_id(id: string) {
       // Check if the data is already cached
       const cachedData = getWithExpiry(id)
-      if (cachedData) {
-        setIsJobValid(cachedData.exists)
-        return
-      }
+      // if (cachedData) {
+      //   setIsJobValid(cachedData.exists)
+      //   return
+      // }
 
       const response = await fetch(
         `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job/${id}`,
@@ -43,12 +43,12 @@ export default function PopUpEntry() {
         }
       )
       const data = await response.json()
-      console.log(data)
+      console.log(data);
       setIsJobValid(data.exists);
-      setJobFreelancerCount(data.job._count.Freelancers);
+      setJobFreelancerCount(data.job?._count.Freelancers || 0);
 
       // Cache the data
-      setWithExpiry(id, data, 900000); //15 minute cache invalidation
+      // setWithExpiry(id, data, 60000); //1 minute cache invalidation
     }
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -126,14 +126,14 @@ export default function PopUpEntry() {
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         async function (scrape_response) {
           if (!scrape_response.missingFields && scrape_response.freelancers.length > 0 && scrape_response.freelancers.length != jobFreelancerCount){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
-            const db_response: SendFreelancerResponse = await sendToBackground({
+            const db_response: Send_Freelancer_Response  = await sendToBackground({
               //@ts-ignore
               name: "send-freelancers",
               body: {
                 freelancers: scrape_response.freelancers,
                 authentication_token: await getToken(),
-                jobId: extractJobId(currentURL)
-              } as SendFreelancerBody
+                job_id: extractJobId(currentURL)
+              } as Send_Freelancer_Body
             });
             if (!db_response.ok){
               setMessage("Error persisting data to DB. Please try again.")
@@ -157,10 +157,13 @@ export default function PopUpEntry() {
         <h1 className=" text-black">
           {currentURL && "Uprank Job ID: " + extractJobId(currentURL)}
         </h1>
-        <div>
+        <div className=" space-x-4 justify-start flex">
           <h1>{message}</h1>
           {(is_upwork_freelancer(currentURL) && !isJobValid) &&  <p>Click the "View Job Post" to get started</p>}
           {(is_upwork_job(currentURL) && isJobValid) &&  <p>Click the "Review Proposals" section to get started</p>}
+          {isJobValid && jobFreelancerCount!=0 && <a className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+            View Uprank
+            </a>}
           {isJobValid && is_upwork_freelancer(currentURL) && (
             <button
               onClick={() => handleAddFreelancers()}
