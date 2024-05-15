@@ -42,13 +42,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 user_id: userId as string,
             },
         });
+        console.log(result);
         res.status(200).json({ message: result });
     } catch (error) {
-        if (error instanceof PrismaClientKnownRequestError)
-            res.status(500).json({ message: "Job already exsits" });
-        else {
+            console.log(error);
             res.status(500).json({ message: `${error}` });
-        }
     }
 }
 
