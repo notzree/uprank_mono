@@ -23,7 +23,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
             console.log("User id" ,userId);
             res.status(401).json({ message: "User not authenticated" });
         }
-        let { jobId } = req.query;
+        let { job_id } = req.query;
         try {
         } catch (error) {
             res.status(500).json({
@@ -32,13 +32,13 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
             });
         }
         
-        if (jobId instanceof Array) {
+        if (job_id instanceof Array) {
             res.status(400).json({ message: "Invalid Job ID" });
             return;
         }
         const result = await prisma.job.findUnique({
             where: {
-                id: jobId,
+                id: job_id,
                 user_id: userId as string,
             },
             include:{

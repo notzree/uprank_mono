@@ -5,7 +5,7 @@ import prisma from "@/prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
 import { Job, Prisma, UpworkFreelancerProposal } from "@prisma/client";
 import enableCors from "@/utils/api_utils/enable_cors";
-import { ScrapedFreelancerData, SendFreelancerBody } from "@/types/freelancer";
+import { Scraped_Freelancer_Data, Send_Freelancer_Body } from "@/types/freelancer";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
@@ -22,7 +22,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             console.log("User id", userId);
             res.status(401).json({ message: "User not authenticated" });
         }
-        let { jobId } = req.query;
+        let { job_id } = req.query;
         try {
         } catch (error) {
             res.status(500).json({
@@ -31,27 +31,27 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             });
         }
 
-        if (jobId instanceof Array || !jobId) {
+        if (job_id instanceof Array || !job_id) {
             res.status(400).json({ message: "Invalid Job ID" });
             return;
         }
         const job = await prisma.job.findUnique({
             where: {
-                id: jobId,
+                id: job_id,
             },
         });
-        const isHourly = job?.hourly;
-        const isFixed = job?.fixed;
+        const is_hourly = job?.hourly;
+        const is_fixed = job?.fixed;
         if (!job) {
             res.status(404).json({ message: "Invalid Job ID" });
             return;
         }
         //first verify if jobId is valid.
-        const body: ScrapedFreelancerData[] = req.body;
-        const UpworkFreelancerProposals: UpworkFreelancerProposal[] = body.map(
+        const body: Scraped_Freelancer_Data[] = req.body;
+        const upwork_freelancer_proposals: UpworkFreelancerProposal[] = body.map(
             (freelancer) => {
                 return {
-                    jobId: jobId,
+                    job_id: job_id,
                     url: freelancer.url,
                     name: freelancer.name,
                     title: freelancer.title,
@@ -60,40 +60,35 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                     country: freelancer.location.country,
                     timezone: freelancer.location.timezone,
                     cv: freelancer.cv,
-                    aiReccomended: freelancer.aiReccomended,
-                    fixedChargeAmount: isFixed ? 
-                    parseFloat(freelancer.fixedChargeAmount) : null,
-                    fixedChargeCurrency: freelancer.fixedChargeCurrency,
-                    hourlyChargeAmount: isHourly ? parseFloat(
-                        freelancer.hourlyChargeAmount
+                    ai_reccomended: freelancer.ai_reccomended,
+                    fixed_charge_amount: is_fixed ? 
+                        parseFloat(freelancer.fixed_charge_amount) : null,
+                    fixed_charge_currency: freelancer.fixed_charge_currency,
+                    hourly_charge_amount: is_hourly ? parseFloat(
+                        freelancer.hourly_charge_amount
                     ) : null,
-                    hourlyChargeCurrency: freelancer.hourlyChargeCurrency,
+                    hourly_charge_currency: freelancer.hourly_charge_currency,
                     invited: freelancer.invited,
-                    photoUrl: freelancer.photoUrl,
-                    recentHours: freelancer.recentHours,
-                    totalHours: freelancer.totalHours,
-                    totalPortfolioItems: freelancer.totalPortfolioItems,
-                    totalPortfolioV2Items: freelancer.totalPortfolioV2Items,
-                    upwork_totalFeedback: freelancer.totalFeedback,
-                    upwork_recentFeedback: freelancer.recentFeedback,
-                    upwork_topRatedStatus: freelancer.topRatedStatus,
-                    upwork_topRatedPlusStatus: freelancer.topRatedPlusStatus,
+                    photo_url: freelancer.photo_url,
+                    recent_hours: freelancer.recent_hours,
+                    total_hours: freelancer.total_hours,
+                    total_portfolio_items: freelancer.total_portfolio_items,
+                    total_portfolio_v2_items: freelancer.total_portfolio_v2_items,
+                    upwork_total_feedback: freelancer.total_feedback,
+                    upwork_recent_feedback: freelancer.recent_feedback,
+                    upwork_top_rated_status: freelancer.top_rated_status,
+                    upwork_top_rated_plus_status: freelancer.top_rated_plus_status,
                     upwork_sponsored: freelancer.sponsored,
-                    upwork_jobSuccessScore: freelancer.jobSuccessScore,
+                    upwork_job_success_score: freelancer.job_success_score,
                     upwork_reccomended: freelancer.reccomended,
                     skills: freelancer.skills,
-                    averageRecentEarnings:
-                        freelancer.earningsInfo.averageRecentEarnings,
-                    combinedAverageRecentEarnings:
-                        freelancer.earningsInfo.combinedAverageRecentEarnings,
-                    combinedRecentEarnings:
-                        freelancer.earningsInfo.combinedRecentEarnings,
-                    combinedTotalEarnings:
-                        freelancer.earningsInfo.combinedTotalEarnings,
-                    combinedTotalRevenue:
-                        freelancer.earningsInfo.combinedTotalRevenue,
-                    recentEarnings: freelancer.earningsInfo.recentEarnings,
-                    totalRevenue: freelancer.earningsInfo.totalRevenue,
+                    average_recent_earnings: freelancer.earnings_info.average_recent_earnings,
+                    combined_average_recent_earnings: freelancer.earnings_info.combined_average_recent_earnings,
+                    combined_recent_earnings: freelancer.earnings_info.combined_recent_earnings,
+                    combined_total_earnings: freelancer.earnings_info.combined_total_earnings,
+                    combined_total_revenue: freelancer.earnings_info.combined_total_revenue,
+                    recent_earnings: freelancer.earnings_info.recent_earnings,
+                    total_revenue: freelancer.earnings_info.total_revenue,
                     uprank_score: 0,
                     uprank_updated_at: null,
                     uprank_reccomended: false,
@@ -102,9 +97,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 };
             }
         );
+        
 
         const result = await prisma.upworkFreelancerProposal.createMany({
-            data: UpworkFreelancerProposals,
+            data: upwork_freelancer_proposals,
             skipDuplicates: true, //so this can be called multiple times without creating duplicates
         },
 );
