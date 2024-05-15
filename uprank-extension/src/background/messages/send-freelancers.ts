@@ -1,12 +1,11 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
-import type { ScrapedFreelancerData, SendFreelancerBody, SendFreelancerResponse} from "~types/freelancer"
- 
+import type {  Send_Freelancer_Body, Send_Freelancer_Response} from "~types/freelancer"
 //todo: Implement this, currently is just copy pasated over from the send-jobs file.
 //then need to create the backend for this endpoint.
 const handler: PlasmoMessaging.MessageHandler = async (req, res)   => {
-    const body: SendFreelancerBody = req.body;
+    const body: Send_Freelancer_Body = req.body;
     const response = await fetch(
-      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/freelancer/${body.jobId}/addFreelancers`,
+      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/freelancer/${body.job_id}/addFreelancers`,
       {
         method: "POST",
         headers: {
@@ -20,7 +19,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res)   => {
     res.send({
       ok: response.ok,
       count: response_json?.count,
-    } as SendFreelancerResponse)
+    } as Send_Freelancer_Response)
     return;
 }
  
