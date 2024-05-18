@@ -3,9 +3,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
-import { Job, Prisma, UpworkFreelancerProposal } from "@prisma/client";
+import { Job, UpworkFreelancerProposal } from "@prisma/client";
 import enableCors from "@/utils/api_utils/enable_cors";
 import { Scraped_Freelancer_Data, Send_Freelancer_Body } from "@/types/freelancer";
+import { Decimal } from "@prisma/client/runtime/library";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
