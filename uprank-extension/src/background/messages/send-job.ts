@@ -4,7 +4,7 @@ import type { ScrapedJobData, sendJobBody } from "~types/job"
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     const body: sendJobBody = req.body;
     const response = await fetch(
-      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job`,
+      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/jobs`,
       {
         method: "POST",
         headers: {

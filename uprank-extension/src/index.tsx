@@ -33,7 +33,7 @@ export default function PopUpEntry() {
       // }
 
       const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job/${id}`,
+        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/jobs/${id}`,
         {
           method: "GET",
           headers: {
