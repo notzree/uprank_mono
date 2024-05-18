@@ -5,7 +5,7 @@ import type {  Send_Freelancer_Body, Send_Freelancer_Response} from "~types/free
 const handler: PlasmoMessaging.MessageHandler = async (req, res)   => {
     const body: Send_Freelancer_Body = req.body;
     const response = await fetch(
-      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/freelancer/${body.job_id}/addFreelancers`,
+      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job/${body.job_id}/add_freelancers`,
       {
         method: "POST",
         headers: {
