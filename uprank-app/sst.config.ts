@@ -12,7 +12,7 @@ export default $config({
     const queue = new sst.aws.Queue("ScrapeRequestQueue",{
       fifo: true,
     });
-    queue.subscribe("pages/api/private/job/")
+    queue.subscribe("pages/api/private/freelancers/scrape.handler")
 
     new sst.aws.Nextjs("MyWeb",
       {
