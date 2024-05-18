@@ -9,9 +9,14 @@ export default $config({
     };
   },
   async run() {
+    const queue = new sst.aws.Queue("ScrapeRequestQueue",{
+      fifo: true,
+    });
+    queue.subscribe("pages/api/private/job/")
 
     new sst.aws.Nextjs("MyWeb",
       {
+        link: [queue]
       }
     );
   },
