@@ -15,13 +15,13 @@ import enableCors from "@/utils/api_utils/enable_cors"
     console.log("Request method", req.method);
     if (req.method === "POST") {
 
-        await handlePost(req, res);
+        await POST(req, res);
     } else {
         res.status(405).json({ message: "Method Not allowed" });
     }
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function POST(req: NextApiRequest, res: NextApiResponse) {
     try {
         const { userId } = getAuth(req);
         if (!userId && process.env.NODE_ENV === "production") {

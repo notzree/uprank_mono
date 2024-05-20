@@ -2,29 +2,29 @@
 // Path: api/private/jobs/[job_id]/add_freelancers
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/prisma/client";
-import { getAuth } from "@clerk/nextjs/server";
-import { Job, Prisma, UpworkFreelancerProposal } from "@prisma/client";
+import { Prisma, UpworkFreelancerProposal } from "@prisma/client";
 import enableCors from "@/utils/api_utils/enable_cors";
+import { Resource } from "sst";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
 import {
     Scraped_Freelancer_Data,
 } from "@/types/freelancer";
 import { Decimal } from "@prisma/client/runtime/library";
+import { getIdOr401 } from "@/utils/api_utils/auth_utils";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
-        await handlePost(req, res);
+        await POST(req, res);
     } else {
         res.status(405).json({ message: "Method Not allowed" });
     }
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function POST(req: NextApiRequest, res: NextApiResponse) {
+    const sqs = new SQSClient({});
     try {
-        const { userId } = getAuth(req);
-        if (!userId && process.env.NODE_ENV === "production") {
-            console.log("User id", userId);
-            res.status(401).json({ message: "User not authenticated" });
-        }
+        const user_id = getIdOr401(req, res);
         let { job_id } = req.query;
         try {
         } catch (error) {
@@ -41,6 +41,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         const job = await prisma.job.findUnique({
             where: {
                 id: job_id,
+                user_id: user_id as string,
             },
         });
         const is_hourly = job?.hourly;
@@ -76,11 +77,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                     invited: freelancer.invited,
                     photo_url: freelancer.photo_url,
                     recent_hours: freelancer.recent_hours,
-                    total_hours: freelancer.total_hours,
-                    total_portfolio_items: freelancer.total_portfolio_items,
-                    total_portfolio_v2_items:
-                        freelancer.total_portfolio_v2_items,
-                    upwork_total_feedback: freelancer.total_feedback,
+                    totaork_total_feedback: freelancer.total_feedback,
                     upwork_recent_feedback: freelancer.recent_feedback,
                     upwork_top_rated_status: freelancer.top_rated_status,
                     upwork_top_rated_plus_status:
@@ -116,6 +113,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         });
         if (result.count == freelancers.length) {
             console.log("All freelancers created successfully");
+            await sqs.send(new SendMessageCommand({
+                QueueUrl: Resource.ScrapeRequestQueue.url,
+                MessageBody: JSON.stringify({
+                    job_id: job_id,
+                    user_id: user_id,
+                })
+            }));
             res.status(200).json({result} as Add_Freelancers_Result);
         }
     } catch (error) {

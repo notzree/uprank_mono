@@ -8,9 +8,8 @@ import {
 } from "@/components/ui/resizable";
 import Navbar from "./components/navbar";
 import { serializeDates } from "@/utils/api_utils/serialize";
-
 export default function Dashboard({ jobs }: any) {
-    console.log(jobs);
+    
     return (
         <div className="grid min-h-screen w-full">
             <div className="flex flex-col">
