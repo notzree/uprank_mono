@@ -1,4 +1,4 @@
-export type ScrapedJobData = {
+export type Scraped_Job_Data = {
     id: string;
     title: string;
     location: string;

@@ -1,8 +1,11 @@
+// Description: This file is responsible for creating a new job in the database.
+// Path: api/private/jobs
+
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { ScrapedJobData } from "@/types/job";
+import { Scraped_Job_Data } from "@/types/job";
 import enableCors from "@/utils/api_utils/enable_cors"
 
  async function handler(
@@ -24,8 +27,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         if (!userId && process.env.NODE_ENV === "production") {
             res.status(401).json({ message: "User not authenticated" });
         }
-        console.log("User ID", userId);
-        const job = req.body as ScrapedJobData;
+
+        const body: Post_Job_Request = req.body;
+        const job = body.job;
 
         const result = await prisma.job.create({
             data: {
@@ -42,8 +46,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 user_id: userId as string,
             },
         });
-        console.log(result);
-        res.status(200).json({ message: result });
+        res.status(200).json({result} as Post_Job_Response);
     } catch (error) {
             console.log(error);
             res.status(500).json({ message: `${error}` });
@@ -51,3 +54,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default enableCors(handler);
+
+
+export interface Post_Job_Request {
+    job: Scraped_Job_Data;
+}
+
+export interface Post_Job_Response { //type this shit later 
+    result: any
+
+}

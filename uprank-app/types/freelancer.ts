@@ -96,12 +96,6 @@ export interface Attachements {
     link: string;
 };
 
-export interface Send_Freelancer_Body {
-    authentication_token: string;
-    freelancers: Scraped_Freelancer_Data[];
-    job_id: string;
-};
-
 export interface Unstable_Scraped_Freelancer_Data {
     freelancers: Scraped_Freelancer_Data[];
     missing_fields: boolean;
