@@ -329,7 +329,7 @@ func (fc *FreelancerCreate) SetNillableID(u *uuid.UUID) *FreelancerCreate {
 }
 
 // SetJobID sets the "job" edge to the Job entity by ID.
-func (fc *FreelancerCreate) SetJobID(id int) *FreelancerCreate {
+func (fc *FreelancerCreate) SetJobID(id string) *FreelancerCreate {
 	fc.mutation.SetJobID(id)
 	return fc
 }
@@ -729,7 +729,7 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 			Columns: []string{freelancer.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

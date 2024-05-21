@@ -161,14 +161,14 @@ func (ju *JobUpdate) SetNillableFixed(b *bool) *JobUpdate {
 }
 
 // SetHourlyRate sets the "hourly_rate" field.
-func (ju *JobUpdate) SetHourlyRate(i []int) *JobUpdate {
-	ju.mutation.SetHourlyRate(i)
+func (ju *JobUpdate) SetHourlyRate(f []float32) *JobUpdate {
+	ju.mutation.SetHourlyRate(f)
 	return ju
 }
 
-// AppendHourlyRate appends i to the "hourly_rate" field.
-func (ju *JobUpdate) AppendHourlyRate(i []int) *JobUpdate {
-	ju.mutation.AppendHourlyRate(i)
+// AppendHourlyRate appends f to the "hourly_rate" field.
+func (ju *JobUpdate) AppendHourlyRate(f []float32) *JobUpdate {
+	ju.mutation.AppendHourlyRate(f)
 	return ju
 }
 
@@ -393,7 +393,7 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ju.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
 	if ps := ju.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -709,14 +709,14 @@ func (juo *JobUpdateOne) SetNillableFixed(b *bool) *JobUpdateOne {
 }
 
 // SetHourlyRate sets the "hourly_rate" field.
-func (juo *JobUpdateOne) SetHourlyRate(i []int) *JobUpdateOne {
-	juo.mutation.SetHourlyRate(i)
+func (juo *JobUpdateOne) SetHourlyRate(f []float32) *JobUpdateOne {
+	juo.mutation.SetHourlyRate(f)
 	return juo
 }
 
-// AppendHourlyRate appends i to the "hourly_rate" field.
-func (juo *JobUpdateOne) AppendHourlyRate(i []int) *JobUpdateOne {
-	juo.mutation.AppendHourlyRate(i)
+// AppendHourlyRate appends f to the "hourly_rate" field.
+func (juo *JobUpdateOne) AppendHourlyRate(f []float32) *JobUpdateOne {
+	juo.mutation.AppendHourlyRate(f)
 	return juo
 }
 
@@ -954,7 +954,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	if err := juo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
 	id, ok := juo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Job.id" for update`)}

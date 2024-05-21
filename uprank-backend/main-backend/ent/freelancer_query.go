@@ -499,8 +499,8 @@ func (fq *FreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*F
 }
 
 func (fq *FreelancerQuery) loadJob(ctx context.Context, query *JobQuery, nodes []*Freelancer, init func(*Freelancer), assign func(*Freelancer, *Job)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Freelancer)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Freelancer)
 	for i := range nodes {
 		if nodes[i].job_freelancers == nil {
 			continue

@@ -724,7 +724,7 @@ func (fu *FreelancerUpdate) ClearUprankNotEnoughData() *FreelancerUpdate {
 }
 
 // SetJobID sets the "job" edge to the Job entity by ID.
-func (fu *FreelancerUpdate) SetJobID(id int) *FreelancerUpdate {
+func (fu *FreelancerUpdate) SetJobID(id string) *FreelancerUpdate {
 	fu.mutation.SetJobID(id)
 	return fu
 }
@@ -1072,7 +1072,7 @@ func (fu *FreelancerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{freelancer.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1085,7 +1085,7 @@ func (fu *FreelancerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{freelancer.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1895,7 +1895,7 @@ func (fuo *FreelancerUpdateOne) ClearUprankNotEnoughData() *FreelancerUpdateOne 
 }
 
 // SetJobID sets the "job" edge to the Job entity by ID.
-func (fuo *FreelancerUpdateOne) SetJobID(id int) *FreelancerUpdateOne {
+func (fuo *FreelancerUpdateOne) SetJobID(id string) *FreelancerUpdateOne {
 	fuo.mutation.SetJobID(id)
 	return fuo
 }
@@ -2273,7 +2273,7 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 			Columns: []string{freelancer.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -2286,7 +2286,7 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 			Columns: []string{freelancer.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

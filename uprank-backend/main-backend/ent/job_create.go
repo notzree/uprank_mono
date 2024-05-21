@@ -96,8 +96,8 @@ func (jc *JobCreate) SetFixed(b bool) *JobCreate {
 }
 
 // SetHourlyRate sets the "hourly_rate" field.
-func (jc *JobCreate) SetHourlyRate(i []int) *JobCreate {
-	jc.mutation.SetHourlyRate(i)
+func (jc *JobCreate) SetHourlyRate(f []float32) *JobCreate {
+	jc.mutation.SetHourlyRate(f)
 	return jc
 }
 
@@ -154,6 +154,12 @@ func (jc *JobCreate) SetNillableMinUprankScore(f *float64) *JobCreate {
 	if f != nil {
 		jc.SetMinUprankScore(*f)
 	}
+	return jc
+}
+
+// SetID sets the "id" field.
+func (jc *JobCreate) SetID(s string) *JobCreate {
+	jc.mutation.SetID(s)
 	return jc
 }
 
@@ -251,6 +257,11 @@ func (jc *JobCreate) check() error {
 	if _, ok := jc.mutation.Fixed(); !ok {
 		return &ValidationError{Name: "fixed", err: errors.New(`ent: missing required field "Job.fixed"`)}
 	}
+	if v, ok := jc.mutation.ID(); ok {
+		if err := job.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Job.id": %w`, err)}
+		}
+	}
 	if _, ok := jc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Job.user"`)}
 	}
@@ -268,8 +279,13 @@ func (jc *JobCreate) sqlSave(ctx context.Context) (*Job, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Job.ID type: %T", _spec.ID.Value)
+		}
+	}
 	jc.mutation.id = &_node.ID
 	jc.mutation.done = true
 	return _node, nil
@@ -278,8 +294,12 @@ func (jc *JobCreate) sqlSave(ctx context.Context) (*Job, error) {
 func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Job{config: jc.config}
-		_spec = sqlgraph.NewCreateSpec(job.Table, sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(job.Table, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
 	)
+	if id, ok := jc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := jc.mutation.Title(); ok {
 		_spec.SetField(job.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -413,10 +433,6 @@ func (jcb *JobCreateBulk) Save(ctx context.Context) ([]*Job, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

@@ -629,7 +629,7 @@ func (c *JobClient) UpdateOne(j *Job) *JobUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *JobClient) UpdateOneID(id int) *JobUpdateOne {
+func (c *JobClient) UpdateOneID(id string) *JobUpdateOne {
 	mutation := newJobMutation(c.config, OpUpdateOne, withJobID(id))
 	return &JobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -646,7 +646,7 @@ func (c *JobClient) DeleteOne(j *Job) *JobDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *JobClient) DeleteOneID(id int) *JobDeleteOne {
+func (c *JobClient) DeleteOneID(id string) *JobDeleteOne {
 	builder := c.Delete().Where(job.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -663,12 +663,12 @@ func (c *JobClient) Query() *JobQuery {
 }
 
 // Get returns a Job entity by its id.
-func (c *JobClient) Get(ctx context.Context, id int) (*Job, error) {
+func (c *JobClient) Get(ctx context.Context, id string) (*Job, error) {
 	return c.Query().Where(job.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *JobClient) GetX(ctx context.Context, id int) *Job {
+func (c *JobClient) GetX(ctx context.Context, id string) *Job {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

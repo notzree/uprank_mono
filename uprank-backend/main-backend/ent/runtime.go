@@ -43,17 +43,21 @@ func init() {
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
 	// jobDescTitle is the schema descriptor for title field.
-	jobDescTitle := jobFields[0].Descriptor()
+	jobDescTitle := jobFields[1].Descriptor()
 	// job.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	job.TitleValidator = jobDescTitle.Validators[0].(func(string) error)
 	// jobDescCreatedAt is the schema descriptor for created_at field.
-	jobDescCreatedAt := jobFields[1].Descriptor()
+	jobDescCreatedAt := jobFields[2].Descriptor()
 	// job.DefaultCreatedAt holds the default value on creation for the created_at field.
 	job.DefaultCreatedAt = jobDescCreatedAt.Default.(func() time.Time)
 	// jobDescDescription is the schema descriptor for description field.
-	jobDescDescription := jobFields[3].Descriptor()
+	jobDescDescription := jobFields[4].Descriptor()
 	// job.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	job.DescriptionValidator = jobDescDescription.Validators[0].(func(string) error)
+	// jobDescID is the schema descriptor for id field.
+	jobDescID := jobFields[0].Descriptor()
+	// job.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	job.IDValidator = jobDescID.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescFirstName is the schema descriptor for first_name field.

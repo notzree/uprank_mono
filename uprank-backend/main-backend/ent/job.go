@@ -18,7 +18,7 @@ import (
 type Job struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -36,7 +36,7 @@ type Job struct {
 	// Fixed holds the value of the "fixed" field.
 	Fixed bool `json:"fixed,omitempty"`
 	// HourlyRate holds the value of the "hourly_rate" field.
-	HourlyRate []int `json:"hourly_rate,omitempty"`
+	HourlyRate []float32 `json:"hourly_rate,omitempty"`
 	// FixedRate holds the value of the "fixed_rate" field.
 	FixedRate float64 `json:"fixed_rate,omitempty"`
 	// AverageUprankScore holds the value of the "average_uprank_score" field.
@@ -94,9 +94,7 @@ func (*Job) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case job.FieldFixedRate, job.FieldAverageUprankScore, job.FieldMaxUprankScore, job.FieldMinUprankScore:
 			values[i] = new(sql.NullFloat64)
-		case job.FieldID:
-			values[i] = new(sql.NullInt64)
-		case job.FieldTitle, job.FieldLocation, job.FieldDescription, job.FieldExperienceLevel:
+		case job.FieldID, job.FieldTitle, job.FieldLocation, job.FieldDescription, job.FieldExperienceLevel:
 			values[i] = new(sql.NullString)
 		case job.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -118,11 +116,11 @@ func (j *Job) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case job.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value.Valid {
+				j.ID = value.String
 			}
-			j.ID = int(value.Int64)
 		case job.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])

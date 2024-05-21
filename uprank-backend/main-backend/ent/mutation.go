@@ -547,7 +547,7 @@ type FreelancerMutation struct {
 	uprank_reccomended_reasons          *string
 	uprank_not_enough_data              *bool
 	clearedFields                       map[string]struct{}
-	job                                 *int
+	job                                 *string
 	clearedjob                          bool
 	attachments                         map[int]struct{}
 	removedattachments                  map[int]struct{}
@@ -2505,7 +2505,7 @@ func (m *FreelancerMutation) ResetUprankNotEnoughData() {
 }
 
 // SetJobID sets the "job" edge to the Job entity by id.
-func (m *FreelancerMutation) SetJobID(id int) {
+func (m *FreelancerMutation) SetJobID(id string) {
 	m.job = &id
 }
 
@@ -2520,7 +2520,7 @@ func (m *FreelancerMutation) JobCleared() bool {
 }
 
 // JobID returns the "job" edge ID in the mutation.
-func (m *FreelancerMutation) JobID() (id int, exists bool) {
+func (m *FreelancerMutation) JobID() (id string, exists bool) {
 	if m.job != nil {
 		return *m.job, true
 	}
@@ -2530,7 +2530,7 @@ func (m *FreelancerMutation) JobID() (id int, exists bool) {
 // JobIDs returns the "job" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // JobID instead. It exists only for internal usage by the builders.
-func (m *FreelancerMutation) JobIDs() (ids []int) {
+func (m *FreelancerMutation) JobIDs() (ids []string) {
 	if id := m.job; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3807,7 +3807,7 @@ type JobMutation struct {
 	config
 	op                      Op
 	typ                     string
-	id                      *int
+	id                      *string
 	title                   *string
 	created_at              *time.Time
 	location                *string
@@ -3817,8 +3817,8 @@ type JobMutation struct {
 	experience_level        *string
 	hourly                  *bool
 	fixed                   *bool
-	hourly_rate             *[]int
-	appendhourly_rate       []int
+	hourly_rate             *[]float32
+	appendhourly_rate       []float32
 	fixed_rate              *float64
 	addfixed_rate           *float64
 	average_uprank_score    *float64
@@ -3858,7 +3858,7 @@ func newJobMutation(c config, op Op, opts ...jobOption) *JobMutation {
 }
 
 // withJobID sets the ID field of the mutation.
-func withJobID(id int) jobOption {
+func withJobID(id string) jobOption {
 	return func(m *JobMutation) {
 		var (
 			err   error
@@ -3908,9 +3908,15 @@ func (m JobMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Job entities.
+func (m *JobMutation) SetID(id string) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *JobMutation) ID() (id int, exists bool) {
+func (m *JobMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3921,12 +3927,12 @@ func (m *JobMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *JobMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *JobMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -4280,13 +4286,13 @@ func (m *JobMutation) ResetFixed() {
 }
 
 // SetHourlyRate sets the "hourly_rate" field.
-func (m *JobMutation) SetHourlyRate(i []int) {
-	m.hourly_rate = &i
+func (m *JobMutation) SetHourlyRate(f []float32) {
+	m.hourly_rate = &f
 	m.appendhourly_rate = nil
 }
 
 // HourlyRate returns the value of the "hourly_rate" field in the mutation.
-func (m *JobMutation) HourlyRate() (r []int, exists bool) {
+func (m *JobMutation) HourlyRate() (r []float32, exists bool) {
 	v := m.hourly_rate
 	if v == nil {
 		return
@@ -4297,7 +4303,7 @@ func (m *JobMutation) HourlyRate() (r []int, exists bool) {
 // OldHourlyRate returns the old "hourly_rate" field's value of the Job entity.
 // If the Job object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldHourlyRate(ctx context.Context) (v []int, err error) {
+func (m *JobMutation) OldHourlyRate(ctx context.Context) (v []float32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldHourlyRate is only allowed on UpdateOne operations")
 	}
@@ -4311,13 +4317,13 @@ func (m *JobMutation) OldHourlyRate(ctx context.Context) (v []int, err error) {
 	return oldValue.HourlyRate, nil
 }
 
-// AppendHourlyRate adds i to the "hourly_rate" field.
-func (m *JobMutation) AppendHourlyRate(i []int) {
-	m.appendhourly_rate = append(m.appendhourly_rate, i...)
+// AppendHourlyRate adds f to the "hourly_rate" field.
+func (m *JobMutation) AppendHourlyRate(f []float32) {
+	m.appendhourly_rate = append(m.appendhourly_rate, f...)
 }
 
 // AppendedHourlyRate returns the list of values that were appended to the "hourly_rate" field in this mutation.
-func (m *JobMutation) AppendedHourlyRate() ([]int, bool) {
+func (m *JobMutation) AppendedHourlyRate() ([]float32, bool) {
 	if len(m.appendhourly_rate) == 0 {
 		return nil, false
 	}
@@ -4926,7 +4932,7 @@ func (m *JobMutation) SetField(name string, value ent.Value) error {
 		m.SetFixed(v)
 		return nil
 	case job.FieldHourlyRate:
-		v, ok := value.([]int)
+		v, ok := value.([]float32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5269,8 +5275,8 @@ type UserMutation struct {
 	updated_at    *time.Time
 	last_login    *time.Time
 	clearedFields map[string]struct{}
-	jobs          map[int]struct{}
-	removedjobs   map[int]struct{}
+	jobs          map[string]struct{}
+	removedjobs   map[string]struct{}
 	clearedjobs   bool
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -5598,9 +5604,9 @@ func (m *UserMutation) ResetLastLogin() {
 }
 
 // AddJobIDs adds the "jobs" edge to the Job entity by ids.
-func (m *UserMutation) AddJobIDs(ids ...int) {
+func (m *UserMutation) AddJobIDs(ids ...string) {
 	if m.jobs == nil {
-		m.jobs = make(map[int]struct{})
+		m.jobs = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.jobs[ids[i]] = struct{}{}
@@ -5618,9 +5624,9 @@ func (m *UserMutation) JobsCleared() bool {
 }
 
 // RemoveJobIDs removes the "jobs" edge to the Job entity by IDs.
-func (m *UserMutation) RemoveJobIDs(ids ...int) {
+func (m *UserMutation) RemoveJobIDs(ids ...string) {
 	if m.removedjobs == nil {
-		m.removedjobs = make(map[int]struct{})
+		m.removedjobs = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.jobs, ids[i])
@@ -5629,7 +5635,7 @@ func (m *UserMutation) RemoveJobIDs(ids ...int) {
 }
 
 // RemovedJobs returns the removed IDs of the "jobs" edge to the Job entity.
-func (m *UserMutation) RemovedJobsIDs() (ids []int) {
+func (m *UserMutation) RemovedJobsIDs() (ids []string) {
 	for id := range m.removedjobs {
 		ids = append(ids, id)
 	}
@@ -5637,7 +5643,7 @@ func (m *UserMutation) RemovedJobsIDs() (ids []int) {
 }
 
 // JobsIDs returns the "jobs" edge IDs in the mutation.
-func (m *UserMutation) JobsIDs() (ids []int) {
+func (m *UserMutation) JobsIDs() (ids []string) {
 	for id := range m.jobs {
 		ids = append(ids, id)
 	}

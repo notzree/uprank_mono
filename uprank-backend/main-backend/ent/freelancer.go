@@ -101,7 +101,7 @@ type Freelancer struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FreelancerQuery when eager-loading is set.
 	Edges           FreelancerEdges `json:"edges"`
-	job_freelancers *int
+	job_freelancers *string
 	selectValues    sql.SelectValues
 }
 
@@ -167,7 +167,7 @@ func (*Freelancer) scanValues(columns []string) ([]any, error) {
 		case freelancer.FieldID:
 			values[i] = new(uuid.UUID)
 		case freelancer.ForeignKeys[0]: // job_freelancers
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -426,11 +426,11 @@ func (f *Freelancer) assignValues(columns []string, values []any) error {
 				f.UprankNotEnoughData = value.Bool
 			}
 		case freelancer.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field job_freelancers", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field job_freelancers", values[i])
 			} else if value.Valid {
-				f.job_freelancers = new(int)
-				*f.job_freelancers = int(value.Int64)
+				f.job_freelancers = new(string)
+				*f.job_freelancers = value.String
 			}
 		default:
 			f.selectValues.Set(columns[i], values[i])

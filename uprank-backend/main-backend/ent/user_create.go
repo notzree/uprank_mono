@@ -104,14 +104,14 @@ func (uc *UserCreate) SetID(s string) *UserCreate {
 }
 
 // AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uc *UserCreate) AddJobIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddJobIDs(ids ...string) *UserCreate {
 	uc.mutation.AddJobIDs(ids...)
 	return uc
 }
 
 // AddJobs adds the "jobs" edges to the Job entity.
 func (uc *UserCreate) AddJobs(j ...*Job) *UserCreate {
-	ids := make([]int, len(j))
+	ids := make([]string, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
@@ -282,7 +282,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

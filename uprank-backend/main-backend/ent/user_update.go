@@ -106,14 +106,14 @@ func (uu *UserUpdate) SetNillableLastLogin(t *time.Time) *UserUpdate {
 }
 
 // AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uu *UserUpdate) AddJobIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) AddJobIDs(ids ...string) *UserUpdate {
 	uu.mutation.AddJobIDs(ids...)
 	return uu
 }
 
 // AddJobs adds the "jobs" edges to the Job entity.
 func (uu *UserUpdate) AddJobs(j ...*Job) *UserUpdate {
-	ids := make([]int, len(j))
+	ids := make([]string, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
@@ -132,14 +132,14 @@ func (uu *UserUpdate) ClearJobs() *UserUpdate {
 }
 
 // RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
-func (uu *UserUpdate) RemoveJobIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) RemoveJobIDs(ids ...string) *UserUpdate {
 	uu.mutation.RemoveJobIDs(ids...)
 	return uu
 }
 
 // RemoveJobs removes "jobs" edges to Job entities.
 func (uu *UserUpdate) RemoveJobs(j ...*Job) *UserUpdate {
-	ids := make([]int, len(j))
+	ids := make([]string, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
@@ -240,7 +240,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -253,7 +253,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -269,7 +269,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -374,14 +374,14 @@ func (uuo *UserUpdateOne) SetNillableLastLogin(t *time.Time) *UserUpdateOne {
 }
 
 // AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uuo *UserUpdateOne) AddJobIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddJobIDs(ids ...string) *UserUpdateOne {
 	uuo.mutation.AddJobIDs(ids...)
 	return uuo
 }
 
 // AddJobs adds the "jobs" edges to the Job entity.
 func (uuo *UserUpdateOne) AddJobs(j ...*Job) *UserUpdateOne {
-	ids := make([]int, len(j))
+	ids := make([]string, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
@@ -400,14 +400,14 @@ func (uuo *UserUpdateOne) ClearJobs() *UserUpdateOne {
 }
 
 // RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
-func (uuo *UserUpdateOne) RemoveJobIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveJobIDs(ids ...string) *UserUpdateOne {
 	uuo.mutation.RemoveJobIDs(ids...)
 	return uuo
 }
 
 // RemoveJobs removes "jobs" edges to Job entities.
 func (uuo *UserUpdateOne) RemoveJobs(j ...*Job) *UserUpdateOne {
-	ids := make([]int, len(j))
+	ids := make([]string, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
@@ -538,7 +538,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -551,7 +551,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -567,7 +567,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.JobsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
