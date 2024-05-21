@@ -44,7 +44,6 @@ func (s *Server) Start() error {
 				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
 					jobs_router.Post("/", Make(s.CreateJob))
 				})
-
 			})
 		})
 
