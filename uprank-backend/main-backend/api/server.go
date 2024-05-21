@@ -4,21 +4,35 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/notzree/uprank-backend/main-backend/ent"
 )
 
 type Server struct {
-	ListenAddr string
-	Router     *chi.Mux
+	Port   string
+	Router *chi.Mux
+	ent    *ent.Client
+	//remember to add clerk client here or in the middleware
 }
 
-func NewServer(listen_addr string, router *chi.Mux) *Server {
+func NewServer(listen_addr string, router *chi.Mux, Db *ent.Client) *Server {
 	return &Server{
-		ListenAddr: listen_addr,
-		Router:     router,
+		Port:   listen_addr,
+		Router: router,
+		ent:    Db,
 	}
 }
 
 func (s *Server) Start() error {
+	//public apis
+	s.Router.Group(func(r chi.Router) {
+		r.Route("/public", func(r chi.Router) {
+			r.Post("/users", Make(s.CreateUser))
+		})
 
-	return http.ListenAndServe(s.ListenAddr, s.Router)
+	})
+	//private apis
+	s.Router.Group(func(r chi.Router) {
+		// r.Use(AuthMiddleware)  todo: implement AuthMiddleware
+	})
+	return http.ListenAndServe(s.Port, s.Router)
 }
