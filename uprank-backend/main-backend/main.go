@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	clerk_secret_key := os.Getenv("CLERK_SECRET_KEY")
 	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
 	server_port := os.Getenv("SERVER_PORT")
 
@@ -47,7 +48,7 @@ func main() {
 	}
 	defer client.Close()
 
-	server := api.NewServer(server_port, router, client)
+	server := api.NewServer(server_port, router, client, clerk_secret_key)
 	fmt.Println("Server listening on port:", server_port)
 	log.Fatal(server.Start())
 }
