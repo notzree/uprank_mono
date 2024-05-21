@@ -15,6 +15,9 @@ type Job struct {
 
 func (Job) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("id").NotEmpty().
+			Unique().
+			Immutable(),
 		field.String("title").NotEmpty(),
 		field.Time("created_at").
 			Default(time.Now),
@@ -24,7 +27,7 @@ func (Job) Fields() []ent.Field {
 		field.String("experience_level").Optional(),
 		field.Bool("hourly"),
 		field.Bool("fixed"),
-		field.JSON("hourly_rate", []int{}).Optional(), // hourly rate can be an array of integers with length 1 or 2 (for a range of hourly rates)
+		field.JSON("hourly_rate", []float32{}).Optional(), // hourly rate can be an array of floats with length 1 or 2 (for a range of hourly rates)
 		field.Float("fixed_rate").
 			SchemaType(map[string]string{
 				dialect.Postgres: "numeric",

@@ -71,7 +71,7 @@ var (
 		{Name: "uprank_reccomended", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "uprank_reccomended_reasons", Type: field.TypeString, Nullable: true},
 		{Name: "uprank_not_enough_data", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "job_freelancers", Type: field.TypeInt},
+		{Name: "job_freelancers", Type: field.TypeString},
 	}
 	// FreelancersTable holds the schema information for the "freelancers" table.
 	FreelancersTable = &schema.Table{
@@ -89,7 +89,7 @@ var (
 	}
 	// JobsColumns holds the columns for the "jobs" table.
 	JobsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "location", Type: field.TypeString, Nullable: true},
