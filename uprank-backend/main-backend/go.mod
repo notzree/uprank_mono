@@ -1,13 +1,20 @@
 module github.com/notzree/uprank-backend/main-backend
 
-go 1.22.1
+go 1.22.3
 
 require (
 	entgo.io/ent v0.13.1
 	github.com/go-chi/chi/v5 v5.0.12
 )
 
-require github.com/go-chi/cors v1.2.1 // indirect
+require github.com/go-chi/cors v1.2.1
+
+require (
+	github.com/clerk/clerk-sdk-go/v2 v2.0.4 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
+	github.com/lib/pq v1.10.9 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
+)
 
 require (
 	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
@@ -20,5 +27,5 @@ require (
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 )
