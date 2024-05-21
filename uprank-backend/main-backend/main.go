@@ -5,16 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	_ "github.com/lib/pq"
 	"github.com/notzree/uprank-backend/main-backend/api"
 	"github.com/notzree/uprank-backend/main-backend/ent"
 )
 
 func main() {
-	listen_addr := flag.String("listenaddr", ":8080", "server listen address")
+	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
+	server_port := os.Getenv("SERVER_PORT")
+
 	flag.Parse()
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -36,9 +40,14 @@ func main() {
 		w.WriteHeader(405)
 		w.Write([]byte("method is not valid"))
 	})
-	client, err := ent.Open("postgres")
 
-	server := api.NewServer(*listen_addr, router)
-	fmt.Println("Server listening on port:", *listen_addr)
+	client, err := ent.Open("postgres", db_connection_string)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	defer client.Close()
+
+	server := api.NewServer(server_port, router, client)
+	fmt.Println("Server listening on port:", server_port)
 	log.Fatal(server.Start())
 }
