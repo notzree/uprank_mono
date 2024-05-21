@@ -28,7 +28,6 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) error {
 		Save(r.Context())
 	log.Printf("Finished creating user")
 	if err != nil {
-		log.Printf(err.Error())
 		return err
 	}
 
