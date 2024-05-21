@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import  craft_api_url  from "@/utils/api_utils/craft_api_url";
+import craft_api_url from "@/utils/api_utils/craft_api_url";
 import {
     Form,
     FormControl,
@@ -15,11 +15,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
-import { SyncUserBody } from "@/pages/api/private/syncUser";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
-import { Checkbox } from "@/components/ui/checkbox";
-import { User } from "@prisma/client";
+import { CreateUserBody } from "@/types/user_types";
 
 const formSchema = z.object({
     first_name: z.string().trim().min(1, {
@@ -28,15 +26,12 @@ const formSchema = z.object({
     email: z.string().email({
         message: "Please enter a valid email address",
     }),
-    company: z
-        .string()
-        .trim()
-        .min(1, {
-            message: "Company name is required",
-        }),
+    company: z.string().trim().min(1, {
+        message: "Company name is required",
+    }),
 });
 
-export default function Home( ){
+export default function Home() {
     const { isLoaded, user } = useUser();
     const { toast } = useToast();
     const router = useRouter();
@@ -52,50 +47,48 @@ export default function Home( ){
         if (isLoaded && user) {
             form.reset({
                 first_name: user.firstName || "",
-                email: user?.emailAddresses?.[0]?.emailAddress || '',
+                email: user?.emailAddresses?.[0]?.emailAddress || "",
             });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoaded, user]); // Depend on isLoaded and user
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log("Submitting");
-        if (!user){
+        if (!user) {
             return;
         }
-        const request_body: SyncUserBody = {
-            "user_data":{
-                "id": user.id,
-                "email": values.email,
-                "first_name": values.first_name,
-                "company_name": values.company,
-                "created_at": new Date(),
-                "updated_at": new Date(),
-                "last_login": new Date(),
-            } as User,
-            "metadata": {
-                "completed_onboarding": user.unsafeMetadata.completed_onboarding as boolean
+        const request_body: CreateUserBody = {
+            user: {
+                id: user.id,
+                email: values.email,
+                first_name: values.first_name,
+                company_name: values.company,
+                created_at: new Date(),
+                updated_at: new Date(),
+                last_login: new Date(),
             },
-
-        }
-        const sync_user = await fetch(craft_api_url("/api/private/syncUser"),{
-            method: "PUT",
+            completed_onboarding: user.unsafeMetadata
+                .completed_onboarding as boolean,
+        };
+        const sync_user = await fetch(craft_api_url("/public/users"), {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({request_body})
-        })
-        if (!sync_user.ok){
+            body: JSON.stringify(request_body),
+        });
+        if (!sync_user.ok) {
+            console.log(sync_user);
             alert("Failed to sync user data, please try again.");
             return;
         }
         user.update({
             unsafeMetadata: {
                 completed_onboarding: true,
-            }
-          })
-        toast({description: "success"});
+            },
+        });
+        toast({ description: "success" });
         setTimeout(() => {
-            router.push('client/dashboard');
+            router.push("client/dashboard");
         }, 500);
     }
 
@@ -123,9 +116,7 @@ export default function Home( ){
                                     <FormItem className="flex-1">
                                         <FormLabel>First Name</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -138,9 +129,7 @@ export default function Home( ){
                                     <FormItem>
                                         <FormLabel>Email</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormDescription>
                                             Your Email is used for notifying you
@@ -180,5 +169,3 @@ export default function Home( ){
         </div>
     );
 }
-
-
