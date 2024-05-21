@@ -27,18 +27,23 @@ func NewServer(listen_addr string, router *chi.Mux, ent *ent.Client, clerk_secre
 
 func (s *Server) Start() error {
 	clerk.SetKey(s.Clerk_secret_key)
-	s.Router.Route("/v1", func(r chi.Router) {
+	s.Router.Route("/v1", func(v1_router chi.Router) {
 		//public apis
-		r.Group(func(r chi.Router) {
-			r.Route("/public", func(r chi.Router) {
-				r.Post("/users", Make(s.CreateUser))
-				r.Post("/users/update", Make(s.UpdateUser))
+		v1_router.Group(func(public_router chi.Router) {
+			public_router.Route("/public", func(public_sub_router chi.Router) {
+				public_sub_router.Route("/users", func(users_router chi.Router) {
+					users_router.Post("/users", Make(s.CreateUser))
+					users_router.Post("/users/update", Make(s.UpdateUser))
+				})
 			})
 		})
 		//private apis
-		r.Group(func(r chi.Router) {
-			r.Use(clerkhttp.RequireHeaderAuthorization())
-			r.Route("/private", func(r chi.Router) {
+		v1_router.Group(func(private_router chi.Router) {
+			private_router.Use(clerkhttp.RequireHeaderAuthorization())
+			private_router.Route("/private", func(private_sub_router chi.Router) {
+				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
+					jobs_router.Post("/", Make(s.CreateJob))
+				})
 
 			})
 		})
