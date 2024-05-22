@@ -10,7 +10,6 @@ export const config: PlasmoCSConfig = {
   matches: ["https://www.upwork.com/*/applicants/*/job-details*"]
 }
 const MISSING_FIELD: string = "not found";
-console.log("LOADED UPWORK JOBS CONTENT SCRIPT");
 //todo: NEED TO ADD A CHECK TO SEE IF ALL FIELDS WERE FILLED.
 //if they were not filled out, we need a way to allow a user to fill them out manually.
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {

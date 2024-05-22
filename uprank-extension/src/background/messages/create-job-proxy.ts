@@ -1,10 +1,10 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
-import type { ScrapedJobData, sendJobBody } from "~types/job"
+import type { ScrapedJobData, CreateJobProxyBody } from "~types/job"
  
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
-    const body: sendJobBody = req.body;
+    const body: CreateJobProxyBody = req.body;
     const response = await fetch(
-      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/jobs`,
+      `${process.env.PLASMO_PUBLIC_BACKEND_URL}/v1/private/jobs`,
       {
         method: "POST",
         headers: {

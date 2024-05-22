@@ -33,7 +33,7 @@ export default function PopUpEntry() {
       // }
 
       const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/jobs/${id}`,
+        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/v1/private/jobs/${id}`,
         {
           method: "GET",
           headers: {
@@ -42,10 +42,14 @@ export default function PopUpEntry() {
           }
         }
       )
-      const data = await response.json()
-      console.log(data);
-      setIsJobValid(data.exists);
-      setJobFreelancerCount(data.job?._count.Freelancers || 0);
+        if (response.ok){
+          const data = await response.json()
+          console.log(data);
+          setIsJobValid(true);
+          setJobFreelancerCount(data.edges);
+        } else {
+          setIsJobValid(false);
+        }
 
       // Cache the data
       // setWithExpiry(id, data, 60000); //1 minute cache invalidation
@@ -87,7 +91,7 @@ export default function PopUpEntry() {
       </div>
     )
   }
-  const handleAddJob = async () => {
+  const handleCreateJob = async () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
         tabs[0].id,
@@ -98,7 +102,7 @@ export default function PopUpEntry() {
           if (!scrape_response.missingFields) {
             const db_response = await sendToBackground({
               //@ts-ignore
-              name: "send-job",
+              name: "create-job-proxy",
               body: {
                 job: scrape_response.job,
                 authentication_token: await getToken()
@@ -173,7 +177,7 @@ export default function PopUpEntry() {
           )}
           {!isJobValid && is_upwork_job(currentURL) && (
             <button
-              onClick={() => handleAddJob()}
+              onClick={() => handleCreateJob()}
               className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
               Add job
             </button>

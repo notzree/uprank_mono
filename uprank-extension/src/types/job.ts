@@ -31,7 +31,7 @@ export type Job = {
     fixed_rate: number;
   }
 
-  export type sendJobBody = {
+  export type CreateJobProxyBody = {
     authentication_token: string;
     job: ScrapedJobData;
   }
