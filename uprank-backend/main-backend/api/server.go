@@ -32,8 +32,8 @@ func (s *Server) Start() error {
 		v1_router.Group(func(public_router chi.Router) {
 			public_router.Route("/public", func(public_sub_router chi.Router) {
 				public_sub_router.Route("/users", func(users_router chi.Router) {
-					users_router.Post("/users", Make(s.CreateUser))
-					users_router.Post("/users/update", Make(s.UpdateUser))
+					users_router.Post("/", Make(s.CreateUser))
+					users_router.Post("/update", Make(s.UpdateUser))
 				})
 			})
 		})
@@ -43,6 +43,7 @@ func (s *Server) Start() error {
 			private_router.Route("/private", func(private_sub_router chi.Router) {
 				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
 					jobs_router.Post("/", Make(s.CreateJob))
+					jobs_router.Get("/{job_id}", Make(s.GetJobByID))
 				})
 			})
 		})
