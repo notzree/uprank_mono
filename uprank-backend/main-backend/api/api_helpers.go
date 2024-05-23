@@ -31,10 +31,15 @@ func InvalidJSON() APIError {
 	return NewAPIError(http.StatusBadRequest, fmt.Errorf("invalid JSON request data"))
 }
 
+func ResourceMisMatch() APIError {
+	return NewAPIError(http.StatusBadRequest, fmt.Errorf("mismatch between user_id and resource"))
+}
+
 type APIFunc func(w http.ResponseWriter, r *http.Request) error
 
 // converts an APIFunc (a function that returns an error) into a function that does not return an error http.HandlerFunc
 // Will either respond with an API error or an internal server error and log the error
+// If the function does not return an APIError, it will be treated as an internal server error (not sent to user)
 func Make(h APIFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := h(w, r); err != nil {
