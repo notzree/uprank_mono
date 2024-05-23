@@ -8,7 +8,7 @@ import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-f
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
-import type { Send_Freelancer_Body, Send_Freelancer_Response } from "~types/freelancer"
+import type { CreateFreelancerProxyRequest, ScrapeFreelancerResponse } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -130,14 +130,14 @@ export default function PopUpEntry() {
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         async function (scrape_response) {
           if (!scrape_response.missingFields && scrape_response.freelancers.length > 0 && scrape_response.freelancers.length != jobFreelancerCount){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
-            const db_response: Send_Freelancer_Response  = await sendToBackground({
+            const db_response: ScrapeFreelancerResponse  = await sendToBackground({
               //@ts-ignore
-              name: "send-freelancers",
+              name: "create-freelancer-proxy",
               body: {
                 freelancers: scrape_response.freelancers,
                 authentication_token: await getToken(),
                 job_id: extractJobId(currentURL)
-              } as Send_Freelancer_Body
+              } as CreateFreelancerProxyRequest
             });
             if (!db_response.ok){
               setMessage("Error persisting data to DB. Please try again.")

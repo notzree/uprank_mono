@@ -94,16 +94,14 @@ export interface Attachements {
   link: string
 }
 
-export interface Send_Freelancer_Body {
+export interface CreateFreelancerProxyRequest {
   authentication_token: string
   freelancers: Scraped_Freelancer_Data[]
   job_id: string
 }
-export interface Add_Freelancers_Request {
-  freelancer_data: Scraped_Freelancer_Data[]
-}
 
-export interface Add_Freelancers_Response {
+
+export interface CreateFreelancerResponse {
     result: BatchPayload
 }
 interface BatchPayload {
@@ -117,7 +115,7 @@ export interface Unstable_Scraped_Freelancer_Data {
 }
 
 
-export interface Send_Freelancer_Response {
+export interface ScrapeFreelancerResponse {
   ok: boolean
   count: number
 }
