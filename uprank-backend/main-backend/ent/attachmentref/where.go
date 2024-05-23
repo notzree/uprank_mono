@@ -58,9 +58,9 @@ func Name(v string) predicate.AttachmentRef {
 	return predicate.AttachmentRef(sql.FieldEQ(FieldName, v))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldEQ(FieldURL, v))
+// Link applies equality check predicate on the "link" field. It's identical to LinkEQ.
+func Link(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldEQ(FieldLink, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -128,69 +128,69 @@ func NameContainsFold(v string) predicate.AttachmentRef {
 	return predicate.AttachmentRef(sql.FieldContainsFold(FieldName, v))
 }
 
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldEQ(FieldURL, v))
+// LinkEQ applies the EQ predicate on the "link" field.
+func LinkEQ(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldEQ(FieldLink, v))
 }
 
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldNEQ(FieldURL, v))
+// LinkNEQ applies the NEQ predicate on the "link" field.
+func LinkNEQ(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldNEQ(FieldLink, v))
 }
 
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldIn(FieldURL, vs...))
+// LinkIn applies the In predicate on the "link" field.
+func LinkIn(vs ...string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldIn(FieldLink, vs...))
 }
 
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldNotIn(FieldURL, vs...))
+// LinkNotIn applies the NotIn predicate on the "link" field.
+func LinkNotIn(vs ...string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldNotIn(FieldLink, vs...))
 }
 
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldGT(FieldURL, v))
+// LinkGT applies the GT predicate on the "link" field.
+func LinkGT(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldGT(FieldLink, v))
 }
 
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldGTE(FieldURL, v))
+// LinkGTE applies the GTE predicate on the "link" field.
+func LinkGTE(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldGTE(FieldLink, v))
 }
 
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldLT(FieldURL, v))
+// LinkLT applies the LT predicate on the "link" field.
+func LinkLT(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldLT(FieldLink, v))
 }
 
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldLTE(FieldURL, v))
+// LinkLTE applies the LTE predicate on the "link" field.
+func LinkLTE(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldLTE(FieldLink, v))
 }
 
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldContains(FieldURL, v))
+// LinkContains applies the Contains predicate on the "link" field.
+func LinkContains(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldContains(FieldLink, v))
 }
 
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldHasPrefix(FieldURL, v))
+// LinkHasPrefix applies the HasPrefix predicate on the "link" field.
+func LinkHasPrefix(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldHasPrefix(FieldLink, v))
 }
 
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldHasSuffix(FieldURL, v))
+// LinkHasSuffix applies the HasSuffix predicate on the "link" field.
+func LinkHasSuffix(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldHasSuffix(FieldLink, v))
 }
 
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldEqualFold(FieldURL, v))
+// LinkEqualFold applies the EqualFold predicate on the "link" field.
+func LinkEqualFold(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldEqualFold(FieldLink, v))
 }
 
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.AttachmentRef {
-	return predicate.AttachmentRef(sql.FieldContainsFold(FieldURL, v))
+// LinkContainsFold applies the ContainsFold predicate on the "link" field.
+func LinkContainsFold(v string) predicate.AttachmentRef {
+	return predicate.AttachmentRef(sql.FieldContainsFold(FieldLink, v))
 }
 
 // HasFreelancer applies the HasEdge predicate on the "freelancer" edge.

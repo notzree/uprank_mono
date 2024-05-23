@@ -27,9 +27,9 @@ func (arc *AttachmentRefCreate) SetName(s string) *AttachmentRefCreate {
 	return arc
 }
 
-// SetURL sets the "url" field.
-func (arc *AttachmentRefCreate) SetURL(s string) *AttachmentRefCreate {
-	arc.mutation.SetURL(s)
+// SetLink sets the "link" field.
+func (arc *AttachmentRefCreate) SetLink(s string) *AttachmentRefCreate {
+	arc.mutation.SetLink(s)
 	return arc
 }
 
@@ -81,8 +81,8 @@ func (arc *AttachmentRefCreate) check() error {
 	if _, ok := arc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "AttachmentRef.name"`)}
 	}
-	if _, ok := arc.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "AttachmentRef.url"`)}
+	if _, ok := arc.mutation.Link(); !ok {
+		return &ValidationError{Name: "link", err: errors.New(`ent: missing required field "AttachmentRef.link"`)}
 	}
 	if _, ok := arc.mutation.FreelancerID(); !ok {
 		return &ValidationError{Name: "freelancer", err: errors.New(`ent: missing required edge "AttachmentRef.freelancer"`)}
@@ -117,9 +117,9 @@ func (arc *AttachmentRefCreate) createSpec() (*AttachmentRef, *sqlgraph.CreateSp
 		_spec.SetField(attachmentref.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := arc.mutation.URL(); ok {
-		_spec.SetField(attachmentref.FieldURL, field.TypeString, value)
-		_node.URL = value
+	if value, ok := arc.mutation.Link(); ok {
+		_spec.SetField(attachmentref.FieldLink, field.TypeString, value)
+		_node.Link = value
 	}
 	if nodes := arc.mutation.FreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

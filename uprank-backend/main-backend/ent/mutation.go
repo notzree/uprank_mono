@@ -43,7 +43,7 @@ type AttachmentRefMutation struct {
 	typ               string
 	id                *int
 	name              *string
-	url               *string
+	link              *string
 	clearedFields     map[string]struct{}
 	freelancer        *uuid.UUID
 	clearedfreelancer bool
@@ -186,40 +186,40 @@ func (m *AttachmentRefMutation) ResetName() {
 	m.name = nil
 }
 
-// SetURL sets the "url" field.
-func (m *AttachmentRefMutation) SetURL(s string) {
-	m.url = &s
+// SetLink sets the "link" field.
+func (m *AttachmentRefMutation) SetLink(s string) {
+	m.link = &s
 }
 
-// URL returns the value of the "url" field in the mutation.
-func (m *AttachmentRefMutation) URL() (r string, exists bool) {
-	v := m.url
+// Link returns the value of the "link" field in the mutation.
+func (m *AttachmentRefMutation) Link() (r string, exists bool) {
+	v := m.link
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldURL returns the old "url" field's value of the AttachmentRef entity.
+// OldLink returns the old "link" field's value of the AttachmentRef entity.
 // If the AttachmentRef object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AttachmentRefMutation) OldURL(ctx context.Context) (v string, err error) {
+func (m *AttachmentRefMutation) OldLink(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+		return v, errors.New("OldLink is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
+		return v, errors.New("OldLink requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+		return v, fmt.Errorf("querying old value for OldLink: %w", err)
 	}
-	return oldValue.URL, nil
+	return oldValue.Link, nil
 }
 
-// ResetURL resets all changes to the "url" field.
-func (m *AttachmentRefMutation) ResetURL() {
-	m.url = nil
+// ResetLink resets all changes to the "link" field.
+func (m *AttachmentRefMutation) ResetLink() {
+	m.link = nil
 }
 
 // SetFreelancerID sets the "freelancer" edge to the Freelancer entity by id.
@@ -299,8 +299,8 @@ func (m *AttachmentRefMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, attachmentref.FieldName)
 	}
-	if m.url != nil {
-		fields = append(fields, attachmentref.FieldURL)
+	if m.link != nil {
+		fields = append(fields, attachmentref.FieldLink)
 	}
 	return fields
 }
@@ -312,8 +312,8 @@ func (m *AttachmentRefMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case attachmentref.FieldName:
 		return m.Name()
-	case attachmentref.FieldURL:
-		return m.URL()
+	case attachmentref.FieldLink:
+		return m.Link()
 	}
 	return nil, false
 }
@@ -325,8 +325,8 @@ func (m *AttachmentRefMutation) OldField(ctx context.Context, name string) (ent.
 	switch name {
 	case attachmentref.FieldName:
 		return m.OldName(ctx)
-	case attachmentref.FieldURL:
-		return m.OldURL(ctx)
+	case attachmentref.FieldLink:
+		return m.OldLink(ctx)
 	}
 	return nil, fmt.Errorf("unknown AttachmentRef field %s", name)
 }
@@ -343,12 +343,12 @@ func (m *AttachmentRefMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case attachmentref.FieldURL:
+	case attachmentref.FieldLink:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetURL(v)
+		m.SetLink(v)
 		return nil
 	}
 	return fmt.Errorf("unknown AttachmentRef field %s", name)
@@ -402,8 +402,8 @@ func (m *AttachmentRefMutation) ResetField(name string) error {
 	case attachmentref.FieldName:
 		m.ResetName()
 		return nil
-	case attachmentref.FieldURL:
-		m.ResetURL()
+	case attachmentref.FieldLink:
+		m.ResetLink()
 		return nil
 	}
 	return fmt.Errorf("unknown AttachmentRef field %s", name)
@@ -498,18 +498,18 @@ type FreelancerMutation struct {
 	timezone                            *string
 	cv                                  *string
 	ai_reccomended                      *bool
-	fixed_charge_amount                 *int
-	addfixed_charge_amount              *int
+	fixed_charge_amount                 *float64
+	addfixed_charge_amount              *float64
 	fixed_charge_currency               *string
-	hourly_charge_amount                *int
-	addhourly_charge_amount             *int
+	hourly_charge_amount                *float64
+	addhourly_charge_amount             *float64
 	hourly_charge_currency              *string
 	invited                             *bool
 	photo_url                           *string
-	recent_hours                        *int
-	addrecent_hours                     *int
-	total_hours                         *int
-	addtotal_hours                      *int
+	recent_hours                        *float64
+	addrecent_hours                     *float64
+	total_hours                         *float64
+	addtotal_hours                      *float64
 	total_portfolio_items               *int
 	addtotal_portfolio_items            *int
 	total_portfolio_v2_items            *int
@@ -989,13 +989,13 @@ func (m *FreelancerMutation) ResetAiReccomended() {
 }
 
 // SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (m *FreelancerMutation) SetFixedChargeAmount(i int) {
-	m.fixed_charge_amount = &i
+func (m *FreelancerMutation) SetFixedChargeAmount(f float64) {
+	m.fixed_charge_amount = &f
 	m.addfixed_charge_amount = nil
 }
 
 // FixedChargeAmount returns the value of the "fixed_charge_amount" field in the mutation.
-func (m *FreelancerMutation) FixedChargeAmount() (r int, exists bool) {
+func (m *FreelancerMutation) FixedChargeAmount() (r float64, exists bool) {
 	v := m.fixed_charge_amount
 	if v == nil {
 		return
@@ -1006,7 +1006,7 @@ func (m *FreelancerMutation) FixedChargeAmount() (r int, exists bool) {
 // OldFixedChargeAmount returns the old "fixed_charge_amount" field's value of the Freelancer entity.
 // If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldFixedChargeAmount(ctx context.Context) (v int, err error) {
+func (m *FreelancerMutation) OldFixedChargeAmount(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFixedChargeAmount is only allowed on UpdateOne operations")
 	}
@@ -1020,17 +1020,17 @@ func (m *FreelancerMutation) OldFixedChargeAmount(ctx context.Context) (v int, e
 	return oldValue.FixedChargeAmount, nil
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (m *FreelancerMutation) AddFixedChargeAmount(i int) {
+// AddFixedChargeAmount adds f to the "fixed_charge_amount" field.
+func (m *FreelancerMutation) AddFixedChargeAmount(f float64) {
 	if m.addfixed_charge_amount != nil {
-		*m.addfixed_charge_amount += i
+		*m.addfixed_charge_amount += f
 	} else {
-		m.addfixed_charge_amount = &i
+		m.addfixed_charge_amount = &f
 	}
 }
 
 // AddedFixedChargeAmount returns the value that was added to the "fixed_charge_amount" field in this mutation.
-func (m *FreelancerMutation) AddedFixedChargeAmount() (r int, exists bool) {
+func (m *FreelancerMutation) AddedFixedChargeAmount() (r float64, exists bool) {
 	v := m.addfixed_charge_amount
 	if v == nil {
 		return
@@ -1095,13 +1095,13 @@ func (m *FreelancerMutation) ResetFixedChargeCurrency() {
 }
 
 // SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (m *FreelancerMutation) SetHourlyChargeAmount(i int) {
-	m.hourly_charge_amount = &i
+func (m *FreelancerMutation) SetHourlyChargeAmount(f float64) {
+	m.hourly_charge_amount = &f
 	m.addhourly_charge_amount = nil
 }
 
 // HourlyChargeAmount returns the value of the "hourly_charge_amount" field in the mutation.
-func (m *FreelancerMutation) HourlyChargeAmount() (r int, exists bool) {
+func (m *FreelancerMutation) HourlyChargeAmount() (r float64, exists bool) {
 	v := m.hourly_charge_amount
 	if v == nil {
 		return
@@ -1112,7 +1112,7 @@ func (m *FreelancerMutation) HourlyChargeAmount() (r int, exists bool) {
 // OldHourlyChargeAmount returns the old "hourly_charge_amount" field's value of the Freelancer entity.
 // If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldHourlyChargeAmount(ctx context.Context) (v int, err error) {
+func (m *FreelancerMutation) OldHourlyChargeAmount(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldHourlyChargeAmount is only allowed on UpdateOne operations")
 	}
@@ -1126,17 +1126,17 @@ func (m *FreelancerMutation) OldHourlyChargeAmount(ctx context.Context) (v int, 
 	return oldValue.HourlyChargeAmount, nil
 }
 
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (m *FreelancerMutation) AddHourlyChargeAmount(i int) {
+// AddHourlyChargeAmount adds f to the "hourly_charge_amount" field.
+func (m *FreelancerMutation) AddHourlyChargeAmount(f float64) {
 	if m.addhourly_charge_amount != nil {
-		*m.addhourly_charge_amount += i
+		*m.addhourly_charge_amount += f
 	} else {
-		m.addhourly_charge_amount = &i
+		m.addhourly_charge_amount = &f
 	}
 }
 
 // AddedHourlyChargeAmount returns the value that was added to the "hourly_charge_amount" field in this mutation.
-func (m *FreelancerMutation) AddedHourlyChargeAmount() (r int, exists bool) {
+func (m *FreelancerMutation) AddedHourlyChargeAmount() (r float64, exists bool) {
 	v := m.addhourly_charge_amount
 	if v == nil {
 		return
@@ -1273,13 +1273,13 @@ func (m *FreelancerMutation) ResetPhotoURL() {
 }
 
 // SetRecentHours sets the "recent_hours" field.
-func (m *FreelancerMutation) SetRecentHours(i int) {
-	m.recent_hours = &i
+func (m *FreelancerMutation) SetRecentHours(f float64) {
+	m.recent_hours = &f
 	m.addrecent_hours = nil
 }
 
 // RecentHours returns the value of the "recent_hours" field in the mutation.
-func (m *FreelancerMutation) RecentHours() (r int, exists bool) {
+func (m *FreelancerMutation) RecentHours() (r float64, exists bool) {
 	v := m.recent_hours
 	if v == nil {
 		return
@@ -1290,7 +1290,7 @@ func (m *FreelancerMutation) RecentHours() (r int, exists bool) {
 // OldRecentHours returns the old "recent_hours" field's value of the Freelancer entity.
 // If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldRecentHours(ctx context.Context) (v int, err error) {
+func (m *FreelancerMutation) OldRecentHours(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRecentHours is only allowed on UpdateOne operations")
 	}
@@ -1304,17 +1304,17 @@ func (m *FreelancerMutation) OldRecentHours(ctx context.Context) (v int, err err
 	return oldValue.RecentHours, nil
 }
 
-// AddRecentHours adds i to the "recent_hours" field.
-func (m *FreelancerMutation) AddRecentHours(i int) {
+// AddRecentHours adds f to the "recent_hours" field.
+func (m *FreelancerMutation) AddRecentHours(f float64) {
 	if m.addrecent_hours != nil {
-		*m.addrecent_hours += i
+		*m.addrecent_hours += f
 	} else {
-		m.addrecent_hours = &i
+		m.addrecent_hours = &f
 	}
 }
 
 // AddedRecentHours returns the value that was added to the "recent_hours" field in this mutation.
-func (m *FreelancerMutation) AddedRecentHours() (r int, exists bool) {
+func (m *FreelancerMutation) AddedRecentHours() (r float64, exists bool) {
 	v := m.addrecent_hours
 	if v == nil {
 		return
@@ -1329,13 +1329,13 @@ func (m *FreelancerMutation) ResetRecentHours() {
 }
 
 // SetTotalHours sets the "total_hours" field.
-func (m *FreelancerMutation) SetTotalHours(i int) {
-	m.total_hours = &i
+func (m *FreelancerMutation) SetTotalHours(f float64) {
+	m.total_hours = &f
 	m.addtotal_hours = nil
 }
 
 // TotalHours returns the value of the "total_hours" field in the mutation.
-func (m *FreelancerMutation) TotalHours() (r int, exists bool) {
+func (m *FreelancerMutation) TotalHours() (r float64, exists bool) {
 	v := m.total_hours
 	if v == nil {
 		return
@@ -1346,7 +1346,7 @@ func (m *FreelancerMutation) TotalHours() (r int, exists bool) {
 // OldTotalHours returns the old "total_hours" field's value of the Freelancer entity.
 // If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTotalHours(ctx context.Context) (v int, err error) {
+func (m *FreelancerMutation) OldTotalHours(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalHours is only allowed on UpdateOne operations")
 	}
@@ -1360,17 +1360,17 @@ func (m *FreelancerMutation) OldTotalHours(ctx context.Context) (v int, err erro
 	return oldValue.TotalHours, nil
 }
 
-// AddTotalHours adds i to the "total_hours" field.
-func (m *FreelancerMutation) AddTotalHours(i int) {
+// AddTotalHours adds f to the "total_hours" field.
+func (m *FreelancerMutation) AddTotalHours(f float64) {
 	if m.addtotal_hours != nil {
-		*m.addtotal_hours += i
+		*m.addtotal_hours += f
 	} else {
-		m.addtotal_hours = &i
+		m.addtotal_hours = &f
 	}
 }
 
 // AddedTotalHours returns the value that was added to the "total_hours" field in this mutation.
-func (m *FreelancerMutation) AddedTotalHours() (r int, exists bool) {
+func (m *FreelancerMutation) AddedTotalHours() (r float64, exists bool) {
 	v := m.addtotal_hours
 	if v == nil {
 		return
@@ -3049,7 +3049,7 @@ func (m *FreelancerMutation) SetField(name string, value ent.Value) error {
 		m.SetAiReccomended(v)
 		return nil
 	case freelancer.FieldFixedChargeAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3063,7 +3063,7 @@ func (m *FreelancerMutation) SetField(name string, value ent.Value) error {
 		m.SetFixedChargeCurrency(v)
 		return nil
 	case freelancer.FieldHourlyChargeAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3091,14 +3091,14 @@ func (m *FreelancerMutation) SetField(name string, value ent.Value) error {
 		m.SetPhotoURL(v)
 		return nil
 	case freelancer.FieldRecentHours:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRecentHours(v)
 		return nil
 	case freelancer.FieldTotalHours:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3369,28 +3369,28 @@ func (m *FreelancerMutation) AddedField(name string) (ent.Value, bool) {
 func (m *FreelancerMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case freelancer.FieldFixedChargeAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFixedChargeAmount(v)
 		return nil
 	case freelancer.FieldHourlyChargeAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddHourlyChargeAmount(v)
 		return nil
 	case freelancer.FieldRecentHours:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRecentHours(v)
 		return nil
 	case freelancer.FieldTotalHours:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

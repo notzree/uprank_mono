@@ -14,8 +14,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
+	// FieldLink holds the string denoting the link field in the database.
+	FieldLink = "link"
 	// EdgeFreelancer holds the string denoting the freelancer edge name in mutations.
 	EdgeFreelancer = "freelancer"
 	// Table holds the table name of the attachmentref in the database.
@@ -33,7 +33,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
-	FieldURL,
+	FieldLink,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "attachment_refs"
@@ -70,9 +70,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
+// ByLink orders the results by the link field.
+func ByLink(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLink, opts...).ToFunc()
 }
 
 // ByFreelancerField orders the results by freelancer field.

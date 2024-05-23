@@ -15,7 +15,7 @@ type AttachmentRef struct {
 func (AttachmentRef) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
-		field.String("url"),
+		field.String("link"),
 	}
 }
 

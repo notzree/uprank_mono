@@ -102,7 +102,7 @@ func AiReccomended(v bool) predicate.Freelancer {
 }
 
 // FixedChargeAmount applies equality check predicate on the "fixed_charge_amount" field. It's identical to FixedChargeAmountEQ.
-func FixedChargeAmount(v int) predicate.Freelancer {
+func FixedChargeAmount(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldFixedChargeAmount, v))
 }
 
@@ -112,7 +112,7 @@ func FixedChargeCurrency(v string) predicate.Freelancer {
 }
 
 // HourlyChargeAmount applies equality check predicate on the "hourly_charge_amount" field. It's identical to HourlyChargeAmountEQ.
-func HourlyChargeAmount(v int) predicate.Freelancer {
+func HourlyChargeAmount(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldHourlyChargeAmount, v))
 }
 
@@ -132,12 +132,12 @@ func PhotoURL(v string) predicate.Freelancer {
 }
 
 // RecentHours applies equality check predicate on the "recent_hours" field. It's identical to RecentHoursEQ.
-func RecentHours(v int) predicate.Freelancer {
+func RecentHours(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldRecentHours, v))
 }
 
 // TotalHours applies equality check predicate on the "total_hours" field. It's identical to TotalHoursEQ.
-func TotalHours(v int) predicate.Freelancer {
+func TotalHours(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldTotalHours, v))
 }
 
@@ -777,42 +777,42 @@ func AiReccomendedNEQ(v bool) predicate.Freelancer {
 }
 
 // FixedChargeAmountEQ applies the EQ predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountEQ(v int) predicate.Freelancer {
+func FixedChargeAmountEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldFixedChargeAmount, v))
 }
 
 // FixedChargeAmountNEQ applies the NEQ predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountNEQ(v int) predicate.Freelancer {
+func FixedChargeAmountNEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNEQ(FieldFixedChargeAmount, v))
 }
 
 // FixedChargeAmountIn applies the In predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountIn(vs ...int) predicate.Freelancer {
+func FixedChargeAmountIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldIn(FieldFixedChargeAmount, vs...))
 }
 
 // FixedChargeAmountNotIn applies the NotIn predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountNotIn(vs ...int) predicate.Freelancer {
+func FixedChargeAmountNotIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNotIn(FieldFixedChargeAmount, vs...))
 }
 
 // FixedChargeAmountGT applies the GT predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountGT(v int) predicate.Freelancer {
+func FixedChargeAmountGT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGT(FieldFixedChargeAmount, v))
 }
 
 // FixedChargeAmountGTE applies the GTE predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountGTE(v int) predicate.Freelancer {
+func FixedChargeAmountGTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGTE(FieldFixedChargeAmount, v))
 }
 
 // FixedChargeAmountLT applies the LT predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountLT(v int) predicate.Freelancer {
+func FixedChargeAmountLT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLT(FieldFixedChargeAmount, v))
 }
 
 // FixedChargeAmountLTE applies the LTE predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountLTE(v int) predicate.Freelancer {
+func FixedChargeAmountLTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLTE(FieldFixedChargeAmount, v))
 }
 
@@ -892,42 +892,42 @@ func FixedChargeCurrencyContainsFold(v string) predicate.Freelancer {
 }
 
 // HourlyChargeAmountEQ applies the EQ predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountEQ(v int) predicate.Freelancer {
+func HourlyChargeAmountEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldHourlyChargeAmount, v))
 }
 
 // HourlyChargeAmountNEQ applies the NEQ predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountNEQ(v int) predicate.Freelancer {
+func HourlyChargeAmountNEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNEQ(FieldHourlyChargeAmount, v))
 }
 
 // HourlyChargeAmountIn applies the In predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountIn(vs ...int) predicate.Freelancer {
+func HourlyChargeAmountIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldIn(FieldHourlyChargeAmount, vs...))
 }
 
 // HourlyChargeAmountNotIn applies the NotIn predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountNotIn(vs ...int) predicate.Freelancer {
+func HourlyChargeAmountNotIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNotIn(FieldHourlyChargeAmount, vs...))
 }
 
 // HourlyChargeAmountGT applies the GT predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountGT(v int) predicate.Freelancer {
+func HourlyChargeAmountGT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGT(FieldHourlyChargeAmount, v))
 }
 
 // HourlyChargeAmountGTE applies the GTE predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountGTE(v int) predicate.Freelancer {
+func HourlyChargeAmountGTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGTE(FieldHourlyChargeAmount, v))
 }
 
 // HourlyChargeAmountLT applies the LT predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountLT(v int) predicate.Freelancer {
+func HourlyChargeAmountLT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLT(FieldHourlyChargeAmount, v))
 }
 
 // HourlyChargeAmountLTE applies the LTE predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountLTE(v int) predicate.Freelancer {
+func HourlyChargeAmountLTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLTE(FieldHourlyChargeAmount, v))
 }
 
@@ -1082,82 +1082,82 @@ func PhotoURLContainsFold(v string) predicate.Freelancer {
 }
 
 // RecentHoursEQ applies the EQ predicate on the "recent_hours" field.
-func RecentHoursEQ(v int) predicate.Freelancer {
+func RecentHoursEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldRecentHours, v))
 }
 
 // RecentHoursNEQ applies the NEQ predicate on the "recent_hours" field.
-func RecentHoursNEQ(v int) predicate.Freelancer {
+func RecentHoursNEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNEQ(FieldRecentHours, v))
 }
 
 // RecentHoursIn applies the In predicate on the "recent_hours" field.
-func RecentHoursIn(vs ...int) predicate.Freelancer {
+func RecentHoursIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldIn(FieldRecentHours, vs...))
 }
 
 // RecentHoursNotIn applies the NotIn predicate on the "recent_hours" field.
-func RecentHoursNotIn(vs ...int) predicate.Freelancer {
+func RecentHoursNotIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNotIn(FieldRecentHours, vs...))
 }
 
 // RecentHoursGT applies the GT predicate on the "recent_hours" field.
-func RecentHoursGT(v int) predicate.Freelancer {
+func RecentHoursGT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGT(FieldRecentHours, v))
 }
 
 // RecentHoursGTE applies the GTE predicate on the "recent_hours" field.
-func RecentHoursGTE(v int) predicate.Freelancer {
+func RecentHoursGTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGTE(FieldRecentHours, v))
 }
 
 // RecentHoursLT applies the LT predicate on the "recent_hours" field.
-func RecentHoursLT(v int) predicate.Freelancer {
+func RecentHoursLT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLT(FieldRecentHours, v))
 }
 
 // RecentHoursLTE applies the LTE predicate on the "recent_hours" field.
-func RecentHoursLTE(v int) predicate.Freelancer {
+func RecentHoursLTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLTE(FieldRecentHours, v))
 }
 
 // TotalHoursEQ applies the EQ predicate on the "total_hours" field.
-func TotalHoursEQ(v int) predicate.Freelancer {
+func TotalHoursEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldTotalHours, v))
 }
 
 // TotalHoursNEQ applies the NEQ predicate on the "total_hours" field.
-func TotalHoursNEQ(v int) predicate.Freelancer {
+func TotalHoursNEQ(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNEQ(FieldTotalHours, v))
 }
 
 // TotalHoursIn applies the In predicate on the "total_hours" field.
-func TotalHoursIn(vs ...int) predicate.Freelancer {
+func TotalHoursIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldIn(FieldTotalHours, vs...))
 }
 
 // TotalHoursNotIn applies the NotIn predicate on the "total_hours" field.
-func TotalHoursNotIn(vs ...int) predicate.Freelancer {
+func TotalHoursNotIn(vs ...float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNotIn(FieldTotalHours, vs...))
 }
 
 // TotalHoursGT applies the GT predicate on the "total_hours" field.
-func TotalHoursGT(v int) predicate.Freelancer {
+func TotalHoursGT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGT(FieldTotalHours, v))
 }
 
 // TotalHoursGTE applies the GTE predicate on the "total_hours" field.
-func TotalHoursGTE(v int) predicate.Freelancer {
+func TotalHoursGTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGTE(FieldTotalHours, v))
 }
 
 // TotalHoursLT applies the LT predicate on the "total_hours" field.
-func TotalHoursLT(v int) predicate.Freelancer {
+func TotalHoursLT(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLT(FieldTotalHours, v))
 }
 
 // TotalHoursLTE applies the LTE predicate on the "total_hours" field.
-func TotalHoursLTE(v int) predicate.Freelancer {
+func TotalHoursLTE(v float64) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLTE(FieldTotalHours, v))
 }
 

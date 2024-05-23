@@ -159,23 +159,23 @@ func (fu *FreelancerUpdate) SetNillableAiReccomended(b *bool) *FreelancerUpdate 
 }
 
 // SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (fu *FreelancerUpdate) SetFixedChargeAmount(i int) *FreelancerUpdate {
+func (fu *FreelancerUpdate) SetFixedChargeAmount(f float64) *FreelancerUpdate {
 	fu.mutation.ResetFixedChargeAmount()
-	fu.mutation.SetFixedChargeAmount(i)
+	fu.mutation.SetFixedChargeAmount(f)
 	return fu
 }
 
 // SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (fu *FreelancerUpdate) SetNillableFixedChargeAmount(i *int) *FreelancerUpdate {
-	if i != nil {
-		fu.SetFixedChargeAmount(*i)
+func (fu *FreelancerUpdate) SetNillableFixedChargeAmount(f *float64) *FreelancerUpdate {
+	if f != nil {
+		fu.SetFixedChargeAmount(*f)
 	}
 	return fu
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (fu *FreelancerUpdate) AddFixedChargeAmount(i int) *FreelancerUpdate {
-	fu.mutation.AddFixedChargeAmount(i)
+// AddFixedChargeAmount adds f to the "fixed_charge_amount" field.
+func (fu *FreelancerUpdate) AddFixedChargeAmount(f float64) *FreelancerUpdate {
+	fu.mutation.AddFixedChargeAmount(f)
 	return fu
 }
 
@@ -200,23 +200,23 @@ func (fu *FreelancerUpdate) SetNillableFixedChargeCurrency(s *string) *Freelance
 }
 
 // SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (fu *FreelancerUpdate) SetHourlyChargeAmount(i int) *FreelancerUpdate {
+func (fu *FreelancerUpdate) SetHourlyChargeAmount(f float64) *FreelancerUpdate {
 	fu.mutation.ResetHourlyChargeAmount()
-	fu.mutation.SetHourlyChargeAmount(i)
+	fu.mutation.SetHourlyChargeAmount(f)
 	return fu
 }
 
 // SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (fu *FreelancerUpdate) SetNillableHourlyChargeAmount(i *int) *FreelancerUpdate {
-	if i != nil {
-		fu.SetHourlyChargeAmount(*i)
+func (fu *FreelancerUpdate) SetNillableHourlyChargeAmount(f *float64) *FreelancerUpdate {
+	if f != nil {
+		fu.SetHourlyChargeAmount(*f)
 	}
 	return fu
 }
 
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (fu *FreelancerUpdate) AddHourlyChargeAmount(i int) *FreelancerUpdate {
-	fu.mutation.AddHourlyChargeAmount(i)
+// AddHourlyChargeAmount adds f to the "hourly_charge_amount" field.
+func (fu *FreelancerUpdate) AddHourlyChargeAmount(f float64) *FreelancerUpdate {
+	fu.mutation.AddHourlyChargeAmount(f)
 	return fu
 }
 
@@ -269,44 +269,44 @@ func (fu *FreelancerUpdate) SetNillablePhotoURL(s *string) *FreelancerUpdate {
 }
 
 // SetRecentHours sets the "recent_hours" field.
-func (fu *FreelancerUpdate) SetRecentHours(i int) *FreelancerUpdate {
+func (fu *FreelancerUpdate) SetRecentHours(f float64) *FreelancerUpdate {
 	fu.mutation.ResetRecentHours()
-	fu.mutation.SetRecentHours(i)
+	fu.mutation.SetRecentHours(f)
 	return fu
 }
 
 // SetNillableRecentHours sets the "recent_hours" field if the given value is not nil.
-func (fu *FreelancerUpdate) SetNillableRecentHours(i *int) *FreelancerUpdate {
-	if i != nil {
-		fu.SetRecentHours(*i)
+func (fu *FreelancerUpdate) SetNillableRecentHours(f *float64) *FreelancerUpdate {
+	if f != nil {
+		fu.SetRecentHours(*f)
 	}
 	return fu
 }
 
-// AddRecentHours adds i to the "recent_hours" field.
-func (fu *FreelancerUpdate) AddRecentHours(i int) *FreelancerUpdate {
-	fu.mutation.AddRecentHours(i)
+// AddRecentHours adds f to the "recent_hours" field.
+func (fu *FreelancerUpdate) AddRecentHours(f float64) *FreelancerUpdate {
+	fu.mutation.AddRecentHours(f)
 	return fu
 }
 
 // SetTotalHours sets the "total_hours" field.
-func (fu *FreelancerUpdate) SetTotalHours(i int) *FreelancerUpdate {
+func (fu *FreelancerUpdate) SetTotalHours(f float64) *FreelancerUpdate {
 	fu.mutation.ResetTotalHours()
-	fu.mutation.SetTotalHours(i)
+	fu.mutation.SetTotalHours(f)
 	return fu
 }
 
 // SetNillableTotalHours sets the "total_hours" field if the given value is not nil.
-func (fu *FreelancerUpdate) SetNillableTotalHours(i *int) *FreelancerUpdate {
-	if i != nil {
-		fu.SetTotalHours(*i)
+func (fu *FreelancerUpdate) SetNillableTotalHours(f *float64) *FreelancerUpdate {
+	if f != nil {
+		fu.SetTotalHours(*f)
 	}
 	return fu
 }
 
-// AddTotalHours adds i to the "total_hours" field.
-func (fu *FreelancerUpdate) AddTotalHours(i int) *FreelancerUpdate {
-	fu.mutation.AddTotalHours(i)
+// AddTotalHours adds f to the "total_hours" field.
+func (fu *FreelancerUpdate) AddTotalHours(f float64) *FreelancerUpdate {
+	fu.mutation.AddTotalHours(f)
 	return fu
 }
 
@@ -901,25 +901,25 @@ func (fu *FreelancerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(freelancer.FieldAiReccomended, field.TypeBool, value)
 	}
 	if value, ok := fu.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(freelancer.FieldFixedChargeAmount, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldFixedChargeAmount, field.TypeFloat64, value)
 	}
 	if fu.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(freelancer.FieldFixedChargeAmount, field.TypeInt)
+		_spec.ClearField(freelancer.FieldFixedChargeAmount, field.TypeFloat64)
 	}
 	if value, ok := fu.mutation.FixedChargeCurrency(); ok {
 		_spec.SetField(freelancer.FieldFixedChargeCurrency, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(freelancer.FieldHourlyChargeAmount, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64, value)
 	}
 	if fu.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(freelancer.FieldHourlyChargeAmount, field.TypeInt)
+		_spec.ClearField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64)
 	}
 	if value, ok := fu.mutation.HourlyChargeCurrency(); ok {
 		_spec.SetField(freelancer.FieldHourlyChargeCurrency, field.TypeString, value)
@@ -931,16 +931,16 @@ func (fu *FreelancerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(freelancer.FieldPhotoURL, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.RecentHours(); ok {
-		_spec.SetField(freelancer.FieldRecentHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldRecentHours, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.AddedRecentHours(); ok {
-		_spec.AddField(freelancer.FieldRecentHours, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldRecentHours, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.TotalHours(); ok {
-		_spec.SetField(freelancer.FieldTotalHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldTotalHours, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.AddedTotalHours(); ok {
-		_spec.AddField(freelancer.FieldTotalHours, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldTotalHours, field.TypeFloat64, value)
 	}
 	if value, ok := fu.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(freelancer.FieldTotalPortfolioItems, field.TypeInt, value)
@@ -1330,23 +1330,23 @@ func (fuo *FreelancerUpdateOne) SetNillableAiReccomended(b *bool) *FreelancerUpd
 }
 
 // SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (fuo *FreelancerUpdateOne) SetFixedChargeAmount(i int) *FreelancerUpdateOne {
+func (fuo *FreelancerUpdateOne) SetFixedChargeAmount(f float64) *FreelancerUpdateOne {
 	fuo.mutation.ResetFixedChargeAmount()
-	fuo.mutation.SetFixedChargeAmount(i)
+	fuo.mutation.SetFixedChargeAmount(f)
 	return fuo
 }
 
 // SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (fuo *FreelancerUpdateOne) SetNillableFixedChargeAmount(i *int) *FreelancerUpdateOne {
-	if i != nil {
-		fuo.SetFixedChargeAmount(*i)
+func (fuo *FreelancerUpdateOne) SetNillableFixedChargeAmount(f *float64) *FreelancerUpdateOne {
+	if f != nil {
+		fuo.SetFixedChargeAmount(*f)
 	}
 	return fuo
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (fuo *FreelancerUpdateOne) AddFixedChargeAmount(i int) *FreelancerUpdateOne {
-	fuo.mutation.AddFixedChargeAmount(i)
+// AddFixedChargeAmount adds f to the "fixed_charge_amount" field.
+func (fuo *FreelancerUpdateOne) AddFixedChargeAmount(f float64) *FreelancerUpdateOne {
+	fuo.mutation.AddFixedChargeAmount(f)
 	return fuo
 }
 
@@ -1371,23 +1371,23 @@ func (fuo *FreelancerUpdateOne) SetNillableFixedChargeCurrency(s *string) *Freel
 }
 
 // SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (fuo *FreelancerUpdateOne) SetHourlyChargeAmount(i int) *FreelancerUpdateOne {
+func (fuo *FreelancerUpdateOne) SetHourlyChargeAmount(f float64) *FreelancerUpdateOne {
 	fuo.mutation.ResetHourlyChargeAmount()
-	fuo.mutation.SetHourlyChargeAmount(i)
+	fuo.mutation.SetHourlyChargeAmount(f)
 	return fuo
 }
 
 // SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (fuo *FreelancerUpdateOne) SetNillableHourlyChargeAmount(i *int) *FreelancerUpdateOne {
-	if i != nil {
-		fuo.SetHourlyChargeAmount(*i)
+func (fuo *FreelancerUpdateOne) SetNillableHourlyChargeAmount(f *float64) *FreelancerUpdateOne {
+	if f != nil {
+		fuo.SetHourlyChargeAmount(*f)
 	}
 	return fuo
 }
 
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (fuo *FreelancerUpdateOne) AddHourlyChargeAmount(i int) *FreelancerUpdateOne {
-	fuo.mutation.AddHourlyChargeAmount(i)
+// AddHourlyChargeAmount adds f to the "hourly_charge_amount" field.
+func (fuo *FreelancerUpdateOne) AddHourlyChargeAmount(f float64) *FreelancerUpdateOne {
+	fuo.mutation.AddHourlyChargeAmount(f)
 	return fuo
 }
 
@@ -1440,44 +1440,44 @@ func (fuo *FreelancerUpdateOne) SetNillablePhotoURL(s *string) *FreelancerUpdate
 }
 
 // SetRecentHours sets the "recent_hours" field.
-func (fuo *FreelancerUpdateOne) SetRecentHours(i int) *FreelancerUpdateOne {
+func (fuo *FreelancerUpdateOne) SetRecentHours(f float64) *FreelancerUpdateOne {
 	fuo.mutation.ResetRecentHours()
-	fuo.mutation.SetRecentHours(i)
+	fuo.mutation.SetRecentHours(f)
 	return fuo
 }
 
 // SetNillableRecentHours sets the "recent_hours" field if the given value is not nil.
-func (fuo *FreelancerUpdateOne) SetNillableRecentHours(i *int) *FreelancerUpdateOne {
-	if i != nil {
-		fuo.SetRecentHours(*i)
+func (fuo *FreelancerUpdateOne) SetNillableRecentHours(f *float64) *FreelancerUpdateOne {
+	if f != nil {
+		fuo.SetRecentHours(*f)
 	}
 	return fuo
 }
 
-// AddRecentHours adds i to the "recent_hours" field.
-func (fuo *FreelancerUpdateOne) AddRecentHours(i int) *FreelancerUpdateOne {
-	fuo.mutation.AddRecentHours(i)
+// AddRecentHours adds f to the "recent_hours" field.
+func (fuo *FreelancerUpdateOne) AddRecentHours(f float64) *FreelancerUpdateOne {
+	fuo.mutation.AddRecentHours(f)
 	return fuo
 }
 
 // SetTotalHours sets the "total_hours" field.
-func (fuo *FreelancerUpdateOne) SetTotalHours(i int) *FreelancerUpdateOne {
+func (fuo *FreelancerUpdateOne) SetTotalHours(f float64) *FreelancerUpdateOne {
 	fuo.mutation.ResetTotalHours()
-	fuo.mutation.SetTotalHours(i)
+	fuo.mutation.SetTotalHours(f)
 	return fuo
 }
 
 // SetNillableTotalHours sets the "total_hours" field if the given value is not nil.
-func (fuo *FreelancerUpdateOne) SetNillableTotalHours(i *int) *FreelancerUpdateOne {
-	if i != nil {
-		fuo.SetTotalHours(*i)
+func (fuo *FreelancerUpdateOne) SetNillableTotalHours(f *float64) *FreelancerUpdateOne {
+	if f != nil {
+		fuo.SetTotalHours(*f)
 	}
 	return fuo
 }
 
-// AddTotalHours adds i to the "total_hours" field.
-func (fuo *FreelancerUpdateOne) AddTotalHours(i int) *FreelancerUpdateOne {
-	fuo.mutation.AddTotalHours(i)
+// AddTotalHours adds f to the "total_hours" field.
+func (fuo *FreelancerUpdateOne) AddTotalHours(f float64) *FreelancerUpdateOne {
+	fuo.mutation.AddTotalHours(f)
 	return fuo
 }
 
@@ -2102,25 +2102,25 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 		_spec.SetField(freelancer.FieldAiReccomended, field.TypeBool, value)
 	}
 	if value, ok := fuo.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(freelancer.FieldFixedChargeAmount, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldFixedChargeAmount, field.TypeFloat64, value)
 	}
 	if fuo.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(freelancer.FieldFixedChargeAmount, field.TypeInt)
+		_spec.ClearField(freelancer.FieldFixedChargeAmount, field.TypeFloat64)
 	}
 	if value, ok := fuo.mutation.FixedChargeCurrency(); ok {
 		_spec.SetField(freelancer.FieldFixedChargeCurrency, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(freelancer.FieldHourlyChargeAmount, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64, value)
 	}
 	if fuo.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(freelancer.FieldHourlyChargeAmount, field.TypeInt)
+		_spec.ClearField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64)
 	}
 	if value, ok := fuo.mutation.HourlyChargeCurrency(); ok {
 		_spec.SetField(freelancer.FieldHourlyChargeCurrency, field.TypeString, value)
@@ -2132,16 +2132,16 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 		_spec.SetField(freelancer.FieldPhotoURL, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.RecentHours(); ok {
-		_spec.SetField(freelancer.FieldRecentHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldRecentHours, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.AddedRecentHours(); ok {
-		_spec.AddField(freelancer.FieldRecentHours, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldRecentHours, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.TotalHours(); ok {
-		_spec.SetField(freelancer.FieldTotalHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldTotalHours, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.AddedTotalHours(); ok {
-		_spec.AddField(freelancer.FieldTotalHours, field.TypeInt, value)
+		_spec.AddField(freelancer.FieldTotalHours, field.TypeFloat64, value)
 	}
 	if value, ok := fuo.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(freelancer.FieldTotalPortfolioItems, field.TypeInt, value)

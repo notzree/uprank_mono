@@ -79,15 +79,15 @@ func (fc *FreelancerCreate) SetAiReccomended(b bool) *FreelancerCreate {
 }
 
 // SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (fc *FreelancerCreate) SetFixedChargeAmount(i int) *FreelancerCreate {
-	fc.mutation.SetFixedChargeAmount(i)
+func (fc *FreelancerCreate) SetFixedChargeAmount(f float64) *FreelancerCreate {
+	fc.mutation.SetFixedChargeAmount(f)
 	return fc
 }
 
 // SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (fc *FreelancerCreate) SetNillableFixedChargeAmount(i *int) *FreelancerCreate {
-	if i != nil {
-		fc.SetFixedChargeAmount(*i)
+func (fc *FreelancerCreate) SetNillableFixedChargeAmount(f *float64) *FreelancerCreate {
+	if f != nil {
+		fc.SetFixedChargeAmount(*f)
 	}
 	return fc
 }
@@ -99,15 +99,15 @@ func (fc *FreelancerCreate) SetFixedChargeCurrency(s string) *FreelancerCreate {
 }
 
 // SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (fc *FreelancerCreate) SetHourlyChargeAmount(i int) *FreelancerCreate {
-	fc.mutation.SetHourlyChargeAmount(i)
+func (fc *FreelancerCreate) SetHourlyChargeAmount(f float64) *FreelancerCreate {
+	fc.mutation.SetHourlyChargeAmount(f)
 	return fc
 }
 
 // SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (fc *FreelancerCreate) SetNillableHourlyChargeAmount(i *int) *FreelancerCreate {
-	if i != nil {
-		fc.SetHourlyChargeAmount(*i)
+func (fc *FreelancerCreate) SetNillableHourlyChargeAmount(f *float64) *FreelancerCreate {
+	if f != nil {
+		fc.SetHourlyChargeAmount(*f)
 	}
 	return fc
 }
@@ -131,14 +131,14 @@ func (fc *FreelancerCreate) SetPhotoURL(s string) *FreelancerCreate {
 }
 
 // SetRecentHours sets the "recent_hours" field.
-func (fc *FreelancerCreate) SetRecentHours(i int) *FreelancerCreate {
-	fc.mutation.SetRecentHours(i)
+func (fc *FreelancerCreate) SetRecentHours(f float64) *FreelancerCreate {
+	fc.mutation.SetRecentHours(f)
 	return fc
 }
 
 // SetTotalHours sets the "total_hours" field.
-func (fc *FreelancerCreate) SetTotalHours(i int) *FreelancerCreate {
-	fc.mutation.SetTotalHours(i)
+func (fc *FreelancerCreate) SetTotalHours(f float64) *FreelancerCreate {
+	fc.mutation.SetTotalHours(f)
 	return fc
 }
 
@@ -602,7 +602,7 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 		_node.AiReccomended = value
 	}
 	if value, ok := fc.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldFixedChargeAmount, field.TypeFloat64, value)
 		_node.FixedChargeAmount = value
 	}
 	if value, ok := fc.mutation.FixedChargeCurrency(); ok {
@@ -610,7 +610,7 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 		_node.FixedChargeCurrency = value
 	}
 	if value, ok := fc.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldHourlyChargeAmount, field.TypeFloat64, value)
 		_node.HourlyChargeAmount = value
 	}
 	if value, ok := fc.mutation.HourlyChargeCurrency(); ok {
@@ -626,11 +626,11 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 		_node.PhotoURL = value
 	}
 	if value, ok := fc.mutation.RecentHours(); ok {
-		_spec.SetField(freelancer.FieldRecentHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldRecentHours, field.TypeFloat64, value)
 		_node.RecentHours = value
 	}
 	if value, ok := fc.mutation.TotalHours(); ok {
-		_spec.SetField(freelancer.FieldTotalHours, field.TypeInt, value)
+		_spec.SetField(freelancer.FieldTotalHours, field.TypeFloat64, value)
 		_node.TotalHours = value
 	}
 	if value, ok := fc.mutation.TotalPortfolioItems(); ok {

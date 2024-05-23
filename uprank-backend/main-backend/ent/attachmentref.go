@@ -20,8 +20,8 @@ type AttachmentRef struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
+	// Link holds the value of the "link" field.
+	Link string `json:"link,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AttachmentRefQuery when eager-loading is set.
 	Edges                  AttachmentRefEdges `json:"edges"`
@@ -56,7 +56,7 @@ func (*AttachmentRef) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case attachmentref.FieldID:
 			values[i] = new(sql.NullInt64)
-		case attachmentref.FieldName, attachmentref.FieldURL:
+		case attachmentref.FieldName, attachmentref.FieldLink:
 			values[i] = new(sql.NullString)
 		case attachmentref.ForeignKeys[0]: // freelancer_attachments
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
@@ -87,11 +87,11 @@ func (ar *AttachmentRef) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ar.Name = value.String
 			}
-		case attachmentref.FieldURL:
+		case attachmentref.FieldLink:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
+				return fmt.Errorf("unexpected type %T for field link", values[i])
 			} else if value.Valid {
-				ar.URL = value.String
+				ar.Link = value.String
 			}
 		case attachmentref.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -144,8 +144,8 @@ func (ar *AttachmentRef) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ar.Name)
 	builder.WriteString(", ")
-	builder.WriteString("url=")
-	builder.WriteString(ar.URL)
+	builder.WriteString("link=")
+	builder.WriteString(ar.Link)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -43,16 +43,16 @@ func (aru *AttachmentRefUpdate) SetNillableName(s *string) *AttachmentRefUpdate 
 	return aru
 }
 
-// SetURL sets the "url" field.
-func (aru *AttachmentRefUpdate) SetURL(s string) *AttachmentRefUpdate {
-	aru.mutation.SetURL(s)
+// SetLink sets the "link" field.
+func (aru *AttachmentRefUpdate) SetLink(s string) *AttachmentRefUpdate {
+	aru.mutation.SetLink(s)
 	return aru
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (aru *AttachmentRefUpdate) SetNillableURL(s *string) *AttachmentRefUpdate {
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (aru *AttachmentRefUpdate) SetNillableLink(s *string) *AttachmentRefUpdate {
 	if s != nil {
-		aru.SetURL(*s)
+		aru.SetLink(*s)
 	}
 	return aru
 }
@@ -129,8 +129,8 @@ func (aru *AttachmentRefUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := aru.mutation.Name(); ok {
 		_spec.SetField(attachmentref.FieldName, field.TypeString, value)
 	}
-	if value, ok := aru.mutation.URL(); ok {
-		_spec.SetField(attachmentref.FieldURL, field.TypeString, value)
+	if value, ok := aru.mutation.Link(); ok {
+		_spec.SetField(attachmentref.FieldLink, field.TypeString, value)
 	}
 	if aru.mutation.FreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -195,16 +195,16 @@ func (aruo *AttachmentRefUpdateOne) SetNillableName(s *string) *AttachmentRefUpd
 	return aruo
 }
 
-// SetURL sets the "url" field.
-func (aruo *AttachmentRefUpdateOne) SetURL(s string) *AttachmentRefUpdateOne {
-	aruo.mutation.SetURL(s)
+// SetLink sets the "link" field.
+func (aruo *AttachmentRefUpdateOne) SetLink(s string) *AttachmentRefUpdateOne {
+	aruo.mutation.SetLink(s)
 	return aruo
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (aruo *AttachmentRefUpdateOne) SetNillableURL(s *string) *AttachmentRefUpdateOne {
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (aruo *AttachmentRefUpdateOne) SetNillableLink(s *string) *AttachmentRefUpdateOne {
 	if s != nil {
-		aruo.SetURL(*s)
+		aruo.SetLink(*s)
 	}
 	return aruo
 }
@@ -311,8 +311,8 @@ func (aruo *AttachmentRefUpdateOne) sqlSave(ctx context.Context) (_node *Attachm
 	if value, ok := aruo.mutation.Name(); ok {
 		_spec.SetField(attachmentref.FieldName, field.TypeString, value)
 	}
-	if value, ok := aruo.mutation.URL(); ok {
-		_spec.SetField(attachmentref.FieldURL, field.TypeString, value)
+	if value, ok := aruo.mutation.Link(); ok {
+		_spec.SetField(attachmentref.FieldLink, field.TypeString, value)
 	}
 	if aruo.mutation.FreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
