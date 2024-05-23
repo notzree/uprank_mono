@@ -43,7 +43,10 @@ func (s *Server) Start() error {
 			private_router.Route("/private", func(private_sub_router chi.Router) {
 				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
 					jobs_router.Post("/", Make(s.CreateJob))
-					jobs_router.Get("/{job_id}", Make(s.GetJobByID))
+					jobs_router.Route("/{job_id}", func(job_id_router chi.Router) {
+						job_id_router.Post("/freelancers", Make(s.CreateFreelancers))
+						job_id_router.Get("/", Make(s.GetJobByID))
+					})
 				})
 			})
 		})
