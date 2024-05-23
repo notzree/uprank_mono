@@ -25,8 +25,6 @@ func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
 	if errors := req.Validate(); len(errors) > 0 {
 		return InvalidRequestData(errors)
 	}
-	//THIS ACTUALLY WON'T CREATE A JOB PROEPRLY BECAUSE IT NEEDS TO BE ASSOCIATED WITH A USER BEFORE BEING CREATED.
-	//NEED TO USE CLERK TO FETCH USER ID AND THEN MAKE AN EDGE WITH A USER
 	new_job, err := s.ent.Job.Create().
 		SetID(req.Id).
 		SetTitle(req.Title).
@@ -52,10 +50,8 @@ func (s *Server) GetJobByID(w http.ResponseWriter, r *http.Request) error {
 	job_id := chi.URLParam(r, "job_id")
 	job, err := s.ent.Job.Query().
 		Where(
-			job.And(
-				job.IDEQ(job_id),
-				job.HasUserWith(user.IDEQ(user_id)),
-			),
+			job.IDEQ(job_id),
+			job.HasUserWith(user.IDEQ(user_id)),
 		).
 		WithFreelancers().
 		Only(context.Background())
