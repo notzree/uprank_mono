@@ -5,7 +5,6 @@ import prisma from "@/prisma/client";
 import { Prisma, UpworkFreelancerProposal } from "@prisma/client";
 import enableCors from "@/utils/api_utils/enable_cors";
 import { Resource } from "sst";
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 import {
     Scraped_Freelancer_Data,
@@ -22,7 +21,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function POST(req: NextApiRequest, res: NextApiResponse) {
-    const sqs = new SQSClient({});
     try {
         const user_id = getIdOr401(req, res);
         let { job_id } = req.query;
