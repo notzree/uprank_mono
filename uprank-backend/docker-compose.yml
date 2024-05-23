@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   server:
     image: notzree/uprank/uprank-backend/main-backend:1.0
