@@ -39,11 +39,11 @@ type Freelancer struct {
 	// AiReccomended holds the value of the "ai_reccomended" field.
 	AiReccomended bool `json:"ai_reccomended,omitempty"`
 	// FixedChargeAmount holds the value of the "fixed_charge_amount" field.
-	FixedChargeAmount int `json:"fixed_charge_amount,omitempty"`
+	FixedChargeAmount float64 `json:"fixed_charge_amount,omitempty"`
 	// FixedChargeCurrency holds the value of the "fixed_charge_currency" field.
 	FixedChargeCurrency string `json:"fixed_charge_currency,omitempty"`
 	// HourlyChargeAmount holds the value of the "hourly_charge_amount" field.
-	HourlyChargeAmount int `json:"hourly_charge_amount,omitempty"`
+	HourlyChargeAmount float64 `json:"hourly_charge_amount,omitempty"`
 	// HourlyChargeCurrency holds the value of the "hourly_charge_currency" field.
 	HourlyChargeCurrency string `json:"hourly_charge_currency,omitempty"`
 	// Invited holds the value of the "invited" field.
@@ -51,9 +51,9 @@ type Freelancer struct {
 	// PhotoURL holds the value of the "photo_url" field.
 	PhotoURL string `json:"photo_url,omitempty"`
 	// RecentHours holds the value of the "recent_hours" field.
-	RecentHours int `json:"recent_hours,omitempty"`
+	RecentHours float64 `json:"recent_hours,omitempty"`
 	// TotalHours holds the value of the "total_hours" field.
-	TotalHours int `json:"total_hours,omitempty"`
+	TotalHours float64 `json:"total_hours,omitempty"`
 	// TotalPortfolioItems holds the value of the "total_portfolio_items" field.
 	TotalPortfolioItems int `json:"total_portfolio_items,omitempty"`
 	// TotalPortfolioV2Items holds the value of the "total_portfolio_v2_items" field.
@@ -156,9 +156,9 @@ func (*Freelancer) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case freelancer.FieldAiReccomended, freelancer.FieldInvited, freelancer.FieldUpworkTopRatedStatus, freelancer.FieldUpworkTopRatedPlusStatus, freelancer.FieldUpworkSponsored, freelancer.FieldUpworkReccomended, freelancer.FieldUprankReccomended, freelancer.FieldUprankNotEnoughData:
 			values[i] = new(sql.NullBool)
-		case freelancer.FieldUpworkTotalFeedback, freelancer.FieldUpworkRecentFeedback, freelancer.FieldUpworkJobSuccessScore, freelancer.FieldAverageRecentEarnings, freelancer.FieldCombinedAverageRecentEarnings, freelancer.FieldCombinedRecentEarnings, freelancer.FieldCombinedTotalEarnings, freelancer.FieldCombinedTotalRevenue, freelancer.FieldRecentEarnings, freelancer.FieldTotalRevenue:
+		case freelancer.FieldFixedChargeAmount, freelancer.FieldHourlyChargeAmount, freelancer.FieldRecentHours, freelancer.FieldTotalHours, freelancer.FieldUpworkTotalFeedback, freelancer.FieldUpworkRecentFeedback, freelancer.FieldUpworkJobSuccessScore, freelancer.FieldAverageRecentEarnings, freelancer.FieldCombinedAverageRecentEarnings, freelancer.FieldCombinedRecentEarnings, freelancer.FieldCombinedTotalEarnings, freelancer.FieldCombinedTotalRevenue, freelancer.FieldRecentEarnings, freelancer.FieldTotalRevenue:
 			values[i] = new(sql.NullFloat64)
-		case freelancer.FieldFixedChargeAmount, freelancer.FieldHourlyChargeAmount, freelancer.FieldRecentHours, freelancer.FieldTotalHours, freelancer.FieldTotalPortfolioItems, freelancer.FieldTotalPortfolioV2Items, freelancer.FieldUprankScore:
+		case freelancer.FieldTotalPortfolioItems, freelancer.FieldTotalPortfolioV2Items, freelancer.FieldUprankScore:
 			values[i] = new(sql.NullInt64)
 		case freelancer.FieldURL, freelancer.FieldName, freelancer.FieldTitle, freelancer.FieldDescription, freelancer.FieldCity, freelancer.FieldCountry, freelancer.FieldTimezone, freelancer.FieldCv, freelancer.FieldFixedChargeCurrency, freelancer.FieldHourlyChargeCurrency, freelancer.FieldPhotoURL, freelancer.FieldUprankReccomendedReasons:
 			values[i] = new(sql.NullString)
@@ -244,10 +244,10 @@ func (f *Freelancer) assignValues(columns []string, values []any) error {
 				f.AiReccomended = value.Bool
 			}
 		case freelancer.FieldFixedChargeAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field fixed_charge_amount", values[i])
 			} else if value.Valid {
-				f.FixedChargeAmount = int(value.Int64)
+				f.FixedChargeAmount = value.Float64
 			}
 		case freelancer.FieldFixedChargeCurrency:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -256,10 +256,10 @@ func (f *Freelancer) assignValues(columns []string, values []any) error {
 				f.FixedChargeCurrency = value.String
 			}
 		case freelancer.FieldHourlyChargeAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field hourly_charge_amount", values[i])
 			} else if value.Valid {
-				f.HourlyChargeAmount = int(value.Int64)
+				f.HourlyChargeAmount = value.Float64
 			}
 		case freelancer.FieldHourlyChargeCurrency:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -280,16 +280,16 @@ func (f *Freelancer) assignValues(columns []string, values []any) error {
 				f.PhotoURL = value.String
 			}
 		case freelancer.FieldRecentHours:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field recent_hours", values[i])
 			} else if value.Valid {
-				f.RecentHours = int(value.Int64)
+				f.RecentHours = value.Float64
 			}
 		case freelancer.FieldTotalHours:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_hours", values[i])
 			} else if value.Valid {
-				f.TotalHours = int(value.Int64)
+				f.TotalHours = value.Float64
 			}
 		case freelancer.FieldTotalPortfolioItems:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

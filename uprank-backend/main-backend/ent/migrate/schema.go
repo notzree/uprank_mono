@@ -12,7 +12,7 @@ var (
 	AttachmentRefsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "url", Type: field.TypeString},
+		{Name: "link", Type: field.TypeString},
 		{Name: "freelancer_attachments", Type: field.TypeUUID},
 	}
 	// AttachmentRefsTable holds the schema information for the "attachment_refs" table.
@@ -41,14 +41,14 @@ var (
 		{Name: "timezone", Type: field.TypeString},
 		{Name: "cv", Type: field.TypeString, SchemaType: map[string]string{"postgres": "TEXT"}},
 		{Name: "ai_reccomended", Type: field.TypeBool},
-		{Name: "fixed_charge_amount", Type: field.TypeInt, Nullable: true},
+		{Name: "fixed_charge_amount", Type: field.TypeFloat64, Nullable: true},
 		{Name: "fixed_charge_currency", Type: field.TypeString},
-		{Name: "hourly_charge_amount", Type: field.TypeInt, Nullable: true},
+		{Name: "hourly_charge_amount", Type: field.TypeFloat64, Nullable: true},
 		{Name: "hourly_charge_currency", Type: field.TypeString},
 		{Name: "invited", Type: field.TypeBool},
 		{Name: "photo_url", Type: field.TypeString},
-		{Name: "recent_hours", Type: field.TypeInt},
-		{Name: "total_hours", Type: field.TypeInt},
+		{Name: "recent_hours", Type: field.TypeFloat64},
+		{Name: "total_hours", Type: field.TypeFloat64},
 		{Name: "total_portfolio_items", Type: field.TypeInt},
 		{Name: "total_portfolio_v2_items", Type: field.TypeInt},
 		{Name: "upwork_total_feedback", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
