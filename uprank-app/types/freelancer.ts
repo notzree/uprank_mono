@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/library";
+
 //This is the backend DB Schema
 type Upwork_Freelancer_Proposal = {
     url: string;
@@ -9,9 +11,9 @@ type Upwork_Freelancer_Proposal = {
     timezone: string;
     cv: string;
     ai_reccomended: boolean;
-    fixed_charge_amount: number | null;
+    fixed_charge_amount: Decimal | null;
     fixed_charge_currency: string;
-    hourly_charge_amount: number;
+    hourly_charge_amount: Decimal;
     hourly_charge_currency: string;
     invited: boolean;
     photo_url: string;
@@ -19,22 +21,22 @@ type Upwork_Freelancer_Proposal = {
     total_hours: number;
     total_portfolio_items: number;
     total_portfolio_v2_items: number;
-    upwork_total_feedback: number;
-    upwork_recent_feedback: number;
+    upwork_total_feedback: Decimal;
+    upwork_recent_feedback: Decimal;
     upwork_top_rated_status: boolean;
     upwork_top_rated_plus_status: boolean;
     upwork_sponsored: boolean;
-    upwork_job_success_score: number;
+    upwork_job_success_score: Decimal;
     upwork_reccomended: boolean;
     skills: string[];
-    average_recent_earnings: number;
-    combined_average_recent_earnings: number;
-    combined_recent_earnings: number;
-    combined_total_earnings: number;
-    combined_total_revenue: number;
-    recent_earnings: number;
-    total_revenue: number;
-    uprank_score: number | null;
+    average_recent_earnings: Decimal;
+    combined_average_recent_earnings: Decimal;
+    combined_recent_earnings: Decimal;
+    combined_total_earnings: Decimal;
+    combined_total_revenue: Decimal;
+    recent_earnings: Decimal;
+    total_revenue: Decimal;
+    uprank_score: Decimal | null;
     uprank_updated_at: Date | null;
     uprank_reccomended: boolean | null;
     uprank_reccomended_reasons: string | null;
@@ -61,12 +63,12 @@ export interface Scraped_Freelancer_Data {
     total_hours: number;
     total_portfolio_items: number;
     total_portfolio_v2_items: number;
-    total_feedback: number;
-    recent_feedback: number;
+    total_feedback: Decimal;
+    recent_feedback: Decimal;
     top_rated_status: boolean;
     top_rated_plus_status: boolean;
     sponsored: boolean;
-    job_success_score: number;
+    job_success_score: Decimal;
     reccomended: boolean;
     skills: string[];
     earnings_info: Earnings_Info;
@@ -80,24 +82,18 @@ export interface Location {
 };
 
 export interface Earnings_Info {
-    average_recent_earnings: number;
-    combined_average_recent_earnings: number;
-    combined_recent_earnings: number;
-    combined_total_earnings: number;
-    combined_total_revenue: number;
-    recent_earnings: number;
-    total_revenue: number;
+    average_recent_earnings: Decimal;
+    combined_average_recent_earnings: Decimal;
+    combined_recent_earnings: Decimal;
+    combined_total_earnings: Decimal;
+    combined_total_revenue: Decimal;
+    recent_earnings: Decimal;
+    total_revenue: Decimal;
 };
 
 export interface Attachements {
     name: string;
     link: string;
-};
-
-export interface Send_Freelancer_Body {
-    authentication_token: string;
-    freelancers: Scraped_Freelancer_Data[];
-    job_id: string;
 };
 
 export interface Unstable_Scraped_Freelancer_Data {

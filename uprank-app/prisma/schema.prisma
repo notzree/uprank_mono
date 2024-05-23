@@ -77,7 +77,7 @@ model UpworkFreelancerProposal {
   combined_total_revenue           Decimal
   recent_earnings                  Decimal
   total_revenue                    Decimal
-  uprank_score                     Decimal?  @default(0)
+  uprank_score                     Int?  @default(0)
   uprank_updated_at                DateTime?
   uprank_reccomended               Boolean?  @default(false)
   uprank_reccomended_reasons       String?
