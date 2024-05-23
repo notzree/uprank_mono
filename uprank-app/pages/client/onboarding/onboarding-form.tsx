@@ -69,7 +69,7 @@ export default function Home() {
             completed_onboarding: user.unsafeMetadata
                 .completed_onboarding as boolean,
         };
-        const sync_user = await fetch(craft_api_url("/public/users"), {
+        const sync_user = await fetch(craft_api_url("/v1/public/users"), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
