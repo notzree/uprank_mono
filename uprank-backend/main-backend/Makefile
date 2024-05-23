@@ -8,7 +8,7 @@ migration_gen:
 	--to "ent://ent/schema" \
 	--dev-url "docker://postgres/15/test?search_path=public"
 
-apply_migration:
+migration_apply:
 	@if [ -z "$(PASSWORD)" ]; then \
 		echo "PASSWORD is required"; \
 		exit 1; \
