@@ -8,7 +8,7 @@ import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-f
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
-import type { Send_Freelancer_Body, Send_Freelancer_Response } from "~types/freelancer"
+import type { CreateFreelancerProxyRequest, ScrapeFreelancerResponse } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -33,7 +33,7 @@ export default function PopUpEntry() {
       // }
 
       const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/api/private/job/${id}`,
+        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/v1/private/jobs/${id}`,
         {
           method: "GET",
           headers: {
@@ -42,10 +42,14 @@ export default function PopUpEntry() {
           }
         }
       )
-      const data = await response.json()
-      console.log(data);
-      setIsJobValid(data.exists);
-      setJobFreelancerCount(data.job?._count.Freelancers || 0);
+        if (response.ok){
+          const data = await response.json()
+          console.log(data);
+          setIsJobValid(true);
+          setJobFreelancerCount(data.edges);
+        } else {
+          setIsJobValid(false);
+        }
 
       // Cache the data
       // setWithExpiry(id, data, 60000); //1 minute cache invalidation
@@ -87,7 +91,7 @@ export default function PopUpEntry() {
       </div>
     )
   }
-  const handleAddJob = async () => {
+  const handleCreateJob = async () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
         tabs[0].id,
@@ -98,7 +102,7 @@ export default function PopUpEntry() {
           if (!scrape_response.missingFields) {
             const db_response = await sendToBackground({
               //@ts-ignore
-              name: "send-job",
+              name: "create-job-proxy",
               body: {
                 job: scrape_response.job,
                 authentication_token: await getToken()
@@ -126,14 +130,14 @@ export default function PopUpEntry() {
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         async function (scrape_response) {
           if (!scrape_response.missingFields && scrape_response.freelancers.length > 0 && scrape_response.freelancers.length != jobFreelancerCount){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
-            const db_response: Send_Freelancer_Response  = await sendToBackground({
+            const db_response: ScrapeFreelancerResponse  = await sendToBackground({
               //@ts-ignore
-              name: "send-freelancers",
+              name: "create-freelancer-proxy",
               body: {
                 freelancers: scrape_response.freelancers,
                 authentication_token: await getToken(),
                 job_id: extractJobId(currentURL)
-              } as Send_Freelancer_Body
+              } as CreateFreelancerProxyRequest
             });
             if (!db_response.ok){
               setMessage("Error persisting data to DB. Please try again.")
@@ -173,7 +177,7 @@ export default function PopUpEntry() {
           )}
           {!isJobValid && is_upwork_job(currentURL) && (
             <button
-              onClick={() => handleAddJob()}
+              onClick={() => handleCreateJob()}
               className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
               Add job
             </button>

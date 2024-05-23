@@ -1,0 +1,17 @@
+services:
+  server:
+    image: notzree/uprank/uprank-backend/main-backend:1.0
+    container_name: uprank-main-backend
+    stdin_open: true
+    tty: true
+    ports:
+      - ${EXPOSED_SERVER_PORT}:${EXPOSED_SERVER_PORT}
+    build:
+      context: ./main-backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./main-backend:/app
+    environment:
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
+      - SERVER_PORT=${SERVER_PORT}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}

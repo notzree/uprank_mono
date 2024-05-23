@@ -1,6 +1,5 @@
 import * as React from "react";
 import { InferGetServerSidePropsType } from "next";
-import prisma from "@/prisma/client";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -8,9 +7,8 @@ import {
 } from "@/components/ui/resizable";
 import Navbar from "./components/navbar";
 import { serializeDates } from "@/utils/api_utils/serialize";
-
 export default function Dashboard({ jobs }: any) {
-    console.log(jobs);
+    
     return (
         <div className="grid min-h-screen w-full">
             <div className="flex flex-col">
@@ -20,7 +18,7 @@ export default function Dashboard({ jobs }: any) {
                         <div className=" flex flex-col flex-1">
                             <h2>Your current job postings</h2>
                             <div className="flex-1">
-                            {
+                            {/* {
                                 jobs.map((job: any) => {
                                     return (
                                         <div key={job.id} className="flex flex-row justify-between">
@@ -35,7 +33,7 @@ export default function Dashboard({ jobs }: any) {
                                         </div>
                                     );
                                 })
-                            }
+                            } */}
                             </div>
                         </div>
                         <div className="flex-1">
@@ -53,32 +51,32 @@ export default function Dashboard({ jobs }: any) {
 
 
 
-import { getAuth } from "@clerk/nextjs/server";
-import { GetServerSideProps } from "next";
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// import { getAuth } from "@clerk/nextjs/server";
+// import { GetServerSideProps } from "next";
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-    const { userId } = getAuth(ctx.req);
-    if (!userId) {
-        return {
-            redirect: {
-                destination: "/",
-                permanent: false,
-            },
-        };
-    }
+//     const { userId } = getAuth(ctx.req);
+//     if (!userId) {
+//         return {
+//             redirect: {
+//                 destination: "/",
+//                 permanent: false,
+//             },
+//         };
+//     }
 
-    const jobs = await prisma.job.findMany({
-        where: {
-            user_id: userId,
-        },
-    });
-    jobs.forEach((job) => {
-        job = serializeDates(job);
-    });
+//     const jobs = await prisma.job.findMany({
+//         where: {
+//             user_id: userId,
+//         },
+//     });
+//     jobs.forEach((job) => {
+//         job = serializeDates(job);
+//     });
 
-    return {
-        props: {
-            jobs: jobs,
-        },
-    };
-}
+//     return {
+//         props: {
+//             jobs: jobs,
+//         },
+//     };
+// }

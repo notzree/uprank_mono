@@ -9,7 +9,7 @@ export const config: PlasmoCSConfig = {
 
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
   if (request.action === scrape_freelancers_action) {
-      const unstableFreelancers: Unstable_Scraped_Freelancer_Data = await scrapeFreelancers();
+      const unstableFreelancers: Unstable_Scraped_Freelancer_Data = await scrapeFreelancers();  
       sendResponse({ freelancers: unstableFreelancers.freelancers, missingFields: unstableFreelancers.missing_fields, missingFreelancers: unstableFreelancers.missing_freelancers});
   }
   return true;
@@ -121,11 +121,10 @@ function filterLocalStorage() {
 async function loadLocalStorageData() {
   await clickLoadMore();
   
-  const clickableDivs = document.querySelectorAll('div[data-ev-tab="applicants"][data-v-9cb7f262]');
+  const clickableDivs = document.querySelectorAll('div[data-ev-tab="applicants"][data-test="ProposalTile"]');
 
   for (const div  of clickableDivs as any) {
     div.click();
-
     // Wait for the popup to appear
     await waitForPopupAndClickClose('.air3-card.air3-card-sections.air3-card-outline.profile-outer-card.mb-4x', 'button.m-0.p-0.air3-btn.air3-btn-link.d-none.d-md-block');
 
@@ -140,7 +139,6 @@ function waitForPopupAndClickClose(popupSelector, closeButtonSelector) {
     const intervalId = setInterval(() => {
       const popup = document.querySelector(popupSelector);
       const closeButton = document.querySelector(closeButtonSelector);
-      console.log(popup, closeButton);
       if (popup && closeButton) {
         closeButton.click();
         clearInterval(intervalId);
