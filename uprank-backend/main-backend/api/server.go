@@ -52,5 +52,6 @@ func (s *Server) Start() error {
 		})
 
 	})
+	s.Router.Get("/healthz", Make(s.HealthCheck))
 	return http.ListenAndServe(s.Port, s.Router)
 }
