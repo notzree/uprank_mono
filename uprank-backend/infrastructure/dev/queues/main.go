@@ -31,8 +31,8 @@ func main() {
 			return err
 		}
 
-		ctx.Export("scraperQueue", scraper_queue.Url)
-		ctx.Export("notificationQueue", notification_queue.Url)
+		ctx.Export("scraper_queue_url", scraper_queue.Url)
+		ctx.Export("notification_queue_url", notification_queue.Url)
 		return nil
 	})
 }
