@@ -5,7 +5,6 @@ import (
 
 	awsec2 "github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ecs"
-	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/sqs"
 	ecrx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/ecr"
 	ecsx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/ecs"
 	lbx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/lb"
@@ -53,7 +52,7 @@ func main() {
 			memory = param
 		}
 
-		securityGroup, err := awsec2.NewSecurityGroup(ctx, "securityGroup", &awsec2.SecurityGroupArgs{
+		securityGroup, err := awsec2.NewSecurityGroup(ctx, "security_group", &awsec2.SecurityGroupArgs{
 			VpcId: pulumi.StringOutput(vpc_id),
 			Egress: awsec2.SecurityGroupEgressArray{
 				&awsec2.SecurityGroupEgressArgs{
@@ -101,7 +100,7 @@ func main() {
 
 		// Deploy an ECS Service on Fargate to host the application container
 		// https://stackoverflow.com/questions/61265108/aws-ecs-fargate-resourceinitializationerror-unable-to-pull-secrets-or-registry
-		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "fargateService"), &ecsx.FargateServiceArgs{
+		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "fargate_service"), &ecsx.FargateServiceArgs{
 			Cluster: cluster.Arn,
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
 				AssignPublicIp: pulumi.Bool(true),
@@ -130,26 +129,6 @@ func main() {
 		if err != nil {
 			return err
 		}
-
-		scraper_queue, err := sqs.NewQueue(ctx, "scraperQueue", &sqs.QueueArgs{
-			FifoQueue:                 pulumi.Bool(true),
-			ContentBasedDeduplication: pulumi.Bool(true),
-			SqsManagedSseEnabled:      pulumi.Bool(true),
-		})
-		if err != nil {
-			return err
-		}
-		notification_queue, err := sqs.NewQueue(ctx, "notificationQueue", &sqs.QueueArgs{
-			FifoQueue:                 pulumi.Bool(true),
-			ContentBasedDeduplication: pulumi.Bool(true),
-			SqsManagedSseEnabled:      pulumi.Bool(true),
-		})
-		if err != nil {
-			return err
-		}
-
-		ctx.Export("scraperQueue", scraper_queue.Url)
-		ctx.Export("notificationQueue", notification_queue.Url)
 		// The URL at which the container's HTTP endpoint will be available
 		ctx.Export("url", pulumi.Sprintf("http://%s", loadbalancer.LoadBalancer.DnsName()))
 		return nil
