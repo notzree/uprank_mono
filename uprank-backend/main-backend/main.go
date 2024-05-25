@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,7 +19,6 @@ func main() {
 	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
 	server_port := os.Getenv("SERVER_PORT")
 
-	flag.Parse()
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(cors.Handler(cors.Options{

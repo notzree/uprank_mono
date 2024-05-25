@@ -1,0 +1,7 @@
+name: queues
+runtime: go
+description: pulumi project to manage our sqs queues
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-go
