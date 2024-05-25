@@ -3,11 +3,11 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"log/slog"
 	"net/http"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/notzree/uprank-backend/main-backend/ent"
@@ -17,6 +17,7 @@ import (
 )
 
 func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error {
+
 	claims, _ := clerk.SessionClaimsFromContext(r.Context())
 	user_id := claims.Subject
 	job_id := chi.URLParam(r, "job_id")
@@ -92,9 +93,12 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 	if createFreelancerErr != nil {
 		return createFreelancerErr
 	}
-
+	err := queueScraperJob(s, job_id)
+	if err != nil {
+		return err
+	}
+	//itrating over freelancers to write attachements + edges into the db
 	for i, freelancer := range req {
-		log.Println(i)
 		if len(freelancer.Attachements) == 0 {
 			attachements[i] = nil
 			continue
@@ -113,5 +117,29 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 	}
 
 	return writeJSON(w, http.StatusCreated, freelancers)
+}
 
+// queueScraperJob queues the scraping job for the given job_id into our aws sqs queue for the scraper server to pick up
+func queueScraperJob(s *Server, job_id string) error {
+	messageGroupId := "my-group-id"
+	message_body := job_id
+	send_message_input := &sqs.SendMessageInput{
+		MessageBody:    &message_body,
+		MessageGroupId: &messageGroupId,
+		QueueUrl:       &s.scraper_queue_url,
+	}
+	result, err := s.scraper_queue_client.SendMessage(context.TODO(), send_message_input)
+	if err != nil {
+		return err
+	}
+	slog.Info("Sent message to queue", "message_id", *result.MessageId)
+	return nil
+}
+
+func (s *Server) TestQueue(w http.ResponseWriter, r *http.Request) error {
+	err := queueScraperJob(s, "test")
+	if err != nil {
+		return err
+	}
+	return writeJSON(w, http.StatusOK, "success")
 }
