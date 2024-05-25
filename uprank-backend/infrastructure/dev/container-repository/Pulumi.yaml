@@ -1,0 +1,7 @@
+name: container-repository
+runtime: go
+description: Maintains the aws ecr instance for uprank
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-go

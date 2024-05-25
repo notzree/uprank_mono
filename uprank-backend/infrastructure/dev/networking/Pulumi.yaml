@@ -1,0 +1,7 @@
+name: networking
+runtime: go
+description: Uprank network infrastructure
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-go
