@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/clerk/clerk-sdk-go/v2"
 	clerkhttp "github.com/clerk/clerk-sdk-go/v2/http"
 	"github.com/go-chi/chi/v5"
@@ -10,23 +11,27 @@ import (
 )
 
 type Server struct {
-	Port             string
-	Router           *chi.Mux
-	ent              *ent.Client
-	Clerk_secret_key string
+	Port                 string
+	clerk_secret_key     string
+	scraper_queue_url    string
+	Router               *chi.Mux
+	ent                  *ent.Client
+	scraper_queue_client *sqs.Client
 }
 
-func NewServer(listen_addr string, router *chi.Mux, ent *ent.Client, clerk_secret_key string) *Server {
+func NewServer(listen_addr string, router *chi.Mux, ent *ent.Client, clerk_secret_key string, scraper_queue_url string, scraper_queue_client *sqs.Client) *Server {
 	return &Server{
-		Port:             listen_addr,
-		Router:           router,
-		ent:              ent,
-		Clerk_secret_key: clerk_secret_key,
+		Port:                 listen_addr,
+		Router:               router,
+		ent:                  ent,
+		clerk_secret_key:     clerk_secret_key,
+		scraper_queue_url:    scraper_queue_url,
+		scraper_queue_client: scraper_queue_client,
 	}
 }
 
 func (s *Server) Start() error {
-	clerk.SetKey(s.Clerk_secret_key)
+	clerk.SetKey(s.clerk_secret_key)
 	s.Router.Route("/v1", func(v1_router chi.Router) {
 		//public apis
 		v1_router.Group(func(public_router chi.Router) {
@@ -35,6 +40,7 @@ func (s *Server) Start() error {
 					users_router.Post("/", Make(s.CreateUser))
 					users_router.Post("/update", Make(s.UpdateUser))
 				})
+				public_sub_router.Get("/test", Make(s.TestQueue))
 			})
 		})
 		//private apis
