@@ -67,19 +67,22 @@ append_outputs_to_env() {
     if [ $STACK_DEPLOYED -eq 1 ]; then
         # Remove existing values for keys that will be overwritten
         for key in $(echo "$OUTPUTS" | jq -r 'keys[]'); do
-            sed -i "/^$key=/d" $RELATIVE_ENV_PATH
+            UPPER_KEY=$(echo "$key" | tr '[:lower:]' '[:upper:]')
+            sed -i "/^$UPPER_KEY=/d" $RELATIVE_ENV_PATH
         done
     fi
     
     printf "\n" >> $RELATIVE_ENV_PATH
     for key in $(echo "$OUTPUTS" | jq -r 'keys[]'); do
         value=$(echo "$OUTPUTS" | jq -r --arg key "$key" '.[$key]')
+        UPPER_KEY=$(echo "$key" | tr '[:lower:]' '[:upper:]')
         # Check if the key already exists in the .env file
-        if ! grep -q "^$key=" $RELATIVE_ENV_PATH; then
-            echo "$key=$value" >> $RELATIVE_ENV_PATH
+        if ! grep -q "^$UPPER_KEY=" $RELATIVE_ENV_PATH; then
+            echo "$UPPER_KEY=$value" >> $RELATIVE_ENV_PATH
         fi
     done
 }
+
 
 # Check if the Pulumi stack is deployed
 if ! is_queue_deployed; then
