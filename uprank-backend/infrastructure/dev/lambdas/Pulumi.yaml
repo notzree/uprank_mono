@@ -1,0 +1,7 @@
+name: lambdas
+runtime: go
+description: Creates lambda functions for scraping
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: https://www.pulumi.com/ai/api/project/41f43108-aa8b-434b-bfcf-ab743216f8ac.zip

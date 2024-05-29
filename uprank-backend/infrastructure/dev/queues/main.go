@@ -18,6 +18,7 @@ func main() {
 			FifoQueue:                 pulumi.Bool(true),
 			ContentBasedDeduplication: pulumi.Bool(true),
 			SqsManagedSseEnabled:      pulumi.Bool(true),
+			VisibilityTimeoutSeconds:  pulumi.Int(300),
 		})
 		if err != nil {
 			return err
@@ -32,6 +33,7 @@ func main() {
 		}
 
 		ctx.Export("scraper_queue_url", scraper_queue.Url)
+		ctx.Export("scraper_queue_arn", scraper_queue.Arn)
 		ctx.Export("notification_queue_url", notification_queue.Url)
 		return nil
 	})
