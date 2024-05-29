@@ -1,0 +1,35 @@
+{
+    "name": "scraper",
+    "version": "0.0.1",
+    "type": "module",
+    "description": "This is an example of a Crawlee project.",
+    "dependencies": {
+        "@sparticuz/chromium": "^123.0.1",
+        "crawlee": "^3.0.0",
+        "playwright": "*"
+    },
+    "devDependencies": {
+        "@apify/tsconfig": "^0.1.0",
+        "@types/node": "^20.0.0",
+        "tsx": "^4.4.0",
+        "typescript": "~5.4.0"
+    },
+    "scripts": {
+        "start": "npm run start:dev",
+        "start:prod": "node dist/main.js",
+        "start:dev": "tsx src/main.ts",
+        "prebuild": "rm -rf dist",
+        "build": "tsc",
+        "postbuild": "cd dist && zip -r ./index.zip . ",
+        "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
+        "postinstall": "npx crawlee install-playwright-browsers",
+        "prepackagedeps": "rm -rf layers",
+        "packagedeps": "mkdir -p layers/nodejs/node_modules && cp package.json layers/nodejs && cp -r node_modules layers/nodejs/node_modules && cd layers/nodejs && npm i && cd ..",
+        "postpackagedeps": "cd layers && zip -r dependencies.zip ./nodejs"
+    },
+
+    "author": "It's not you it's me",
+    "license": "ISC"
+}
+
+
