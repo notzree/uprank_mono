@@ -33,6 +33,7 @@ type CreateFreelancersRequest struct {
 	Skills                   []string                      `json:"skills"`
 	Earnings_info            ScrapedFreelancerEarningsData `json:"earnings_info"`
 	Attachements             []ScrapedAttachementData      `json:"attachements"`
+	Work_history             []ScrapedWorkHistoryData      `json:"work_history"`
 }
 
 type ScrapedFreelancerLocationData struct {
@@ -42,17 +43,29 @@ type ScrapedFreelancerLocationData struct {
 }
 
 type ScrapedFreelancerEarningsData struct {
-	Average_recent_earnings          float64 `json:"average_recent_earnings"`
-	Combined_average_recent_earnings float64 `json:"combined_average_recent_earnings"`
-	Combined_recent_earnings         float64 `json:"combined_recent_earnings"`
-	Combined_total_earnings          float64 `json:"combined_total_earnings"`
-	Combined_total_revenue           float64 `json:"combined_total_revenue"`
-	Recent_earnings                  float64 `json:"recent_eaernings"`
-	Total_revenue                    float64 `json:"total_revenue"`
+	Average_recent_earnings          float64 `json:"averageRecentEarnings"`
+	Combined_average_recent_earnings float64 `json:"combinedAverageRecentEarnings"`
+	Combined_recent_earnings         float64 `json:"combinedRecentEarnings"`
+	Combined_total_earnings          float64 `json:"combinedTotalEarnings"`
+	Combined_total_revenue           float64 `json:"combinedTotalRevenue"`
+	Recent_earnings                  float64 `json:"recentEarnings"`
+	Total_revenue                    float64 `json:"totalRevenue"`
 }
 type ScrapedAttachementData struct {
 	Name string `json:"name"`
 	Link string `json:"link"`
+}
+
+type ScrapedWorkHistoryData struct {
+	Title              string  `json:"title"`
+	Date               string  `json:"date"`
+	Description        string  `json:"description"`
+	Budget             string  `json:"budget"`
+	Total_earned       float64 `json:"total_earned"`
+	Client_total_spend string  `json:"client_total_spend"`
+	Client_total_hires string  `json:"client_total_hires"`
+	Client_feedback    string  `json:"client_feedback"`
+	Client_rating      float64 `json:"client_rating"`
 }
 
 func (req *CreateFreelancersRequest) Validate() map[string]string {
