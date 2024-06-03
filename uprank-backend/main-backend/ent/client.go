@@ -9,7 +9,6 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/migrate"
 
 	"entgo.io/ent"
@@ -448,7 +447,7 @@ func (c *FreelancerClient) UpdateOne(f *Freelancer) *FreelancerUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FreelancerClient) UpdateOneID(id uuid.UUID) *FreelancerUpdateOne {
+func (c *FreelancerClient) UpdateOneID(id string) *FreelancerUpdateOne {
 	mutation := newFreelancerMutation(c.config, OpUpdateOne, withFreelancerID(id))
 	return &FreelancerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -465,7 +464,7 @@ func (c *FreelancerClient) DeleteOne(f *Freelancer) *FreelancerDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *FreelancerClient) DeleteOneID(id uuid.UUID) *FreelancerDeleteOne {
+func (c *FreelancerClient) DeleteOneID(id string) *FreelancerDeleteOne {
 	builder := c.Delete().Where(freelancer.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -482,12 +481,12 @@ func (c *FreelancerClient) Query() *FreelancerQuery {
 }
 
 // Get returns a Freelancer entity by its id.
-func (c *FreelancerClient) Get(ctx context.Context, id uuid.UUID) (*Freelancer, error) {
+func (c *FreelancerClient) Get(ctx context.Context, id string) (*Freelancer, error) {
 	return c.Query().Where(freelancer.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FreelancerClient) GetX(ctx context.Context, id uuid.UUID) *Freelancer {
+func (c *FreelancerClient) GetX(ctx context.Context, id string) *Freelancer {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

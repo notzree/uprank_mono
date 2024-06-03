@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
 )
 
 const (
@@ -15,8 +14,6 @@ const (
 	Label = "freelancer"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldTitle holds the string denoting the title field in the database.
@@ -127,7 +124,6 @@ const (
 // Columns holds all SQL columns for freelancer fields.
 var Columns = []string{
 	FieldID,
-	FieldURL,
 	FieldName,
 	FieldTitle,
 	FieldDescription,
@@ -200,8 +196,8 @@ var (
 	DefaultUprankReccomended bool
 	// DefaultUprankNotEnoughData holds the default value on creation for the "uprank_not_enough_data" field.
 	DefaultUprankNotEnoughData bool
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Freelancer queries.
@@ -210,11 +206,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

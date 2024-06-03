@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 )
@@ -34,7 +33,7 @@ func (arc *AttachmentRefCreate) SetLink(s string) *AttachmentRefCreate {
 }
 
 // SetFreelancerID sets the "freelancer" edge to the Freelancer entity by ID.
-func (arc *AttachmentRefCreate) SetFreelancerID(id uuid.UUID) *AttachmentRefCreate {
+func (arc *AttachmentRefCreate) SetFreelancerID(id string) *AttachmentRefCreate {
 	arc.mutation.SetFreelancerID(id)
 	return arc
 }
@@ -129,7 +128,7 @@ func (arc *AttachmentRefCreate) createSpec() (*AttachmentRef, *sqlgraph.CreateSp
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

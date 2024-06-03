@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
@@ -410,8 +409,8 @@ func (arq *AttachmentRefQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 }
 
 func (arq *AttachmentRefQuery) loadFreelancer(ctx context.Context, query *FreelancerQuery, nodes []*AttachmentRef, init func(*AttachmentRef), assign func(*AttachmentRef, *Freelancer)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*AttachmentRef)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*AttachmentRef)
 	for i := range nodes {
 		if nodes[i].freelancer_attachments == nil {
 			continue

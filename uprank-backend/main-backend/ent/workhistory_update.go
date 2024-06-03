@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
@@ -496,7 +495,7 @@ func (whu *WorkHistoryUpdate) ClearClientCompanySize() *WorkHistoryUpdate {
 }
 
 // SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by ID.
-func (whu *WorkHistoryUpdate) SetUpworkFreelancerProposalID(id uuid.UUID) *WorkHistoryUpdate {
+func (whu *WorkHistoryUpdate) SetUpworkFreelancerProposalID(id string) *WorkHistoryUpdate {
 	whu.mutation.SetUpworkFreelancerProposalID(id)
 	return whu
 }
@@ -712,7 +711,7 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -725,7 +724,7 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1218,7 +1217,7 @@ func (whuo *WorkHistoryUpdateOne) ClearClientCompanySize() *WorkHistoryUpdateOne
 }
 
 // SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by ID.
-func (whuo *WorkHistoryUpdateOne) SetUpworkFreelancerProposalID(id uuid.UUID) *WorkHistoryUpdateOne {
+func (whuo *WorkHistoryUpdateOne) SetUpworkFreelancerProposalID(id string) *WorkHistoryUpdateOne {
 	whuo.mutation.SetUpworkFreelancerProposalID(id)
 	return whuo
 }
@@ -1464,7 +1463,7 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1477,7 +1476,7 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

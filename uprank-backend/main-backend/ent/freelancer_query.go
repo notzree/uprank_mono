@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
@@ -156,8 +155,8 @@ func (fq *FreelancerQuery) FirstX(ctx context.Context) *Freelancer {
 
 // FirstID returns the first Freelancer ID from the query.
 // Returns a *NotFoundError when no Freelancer ID was found.
-func (fq *FreelancerQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (fq *FreelancerQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = fq.Limit(1).IDs(setContextOp(ctx, fq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -169,7 +168,7 @@ func (fq *FreelancerQuery) FirstID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (fq *FreelancerQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (fq *FreelancerQuery) FirstIDX(ctx context.Context) string {
 	id, err := fq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -207,8 +206,8 @@ func (fq *FreelancerQuery) OnlyX(ctx context.Context) *Freelancer {
 // OnlyID is like Only, but returns the only Freelancer ID in the query.
 // Returns a *NotSingularError when more than one Freelancer ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (fq *FreelancerQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (fq *FreelancerQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = fq.Limit(2).IDs(setContextOp(ctx, fq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -224,7 +223,7 @@ func (fq *FreelancerQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error)
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (fq *FreelancerQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (fq *FreelancerQuery) OnlyIDX(ctx context.Context) string {
 	id, err := fq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -252,7 +251,7 @@ func (fq *FreelancerQuery) AllX(ctx context.Context) []*Freelancer {
 }
 
 // IDs executes the query and returns a list of Freelancer IDs.
-func (fq *FreelancerQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (fq *FreelancerQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if fq.ctx.Unique == nil && fq.path != nil {
 		fq.Unique(true)
 	}
@@ -264,7 +263,7 @@ func (fq *FreelancerQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error)
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (fq *FreelancerQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (fq *FreelancerQuery) IDsX(ctx context.Context) []string {
 	ids, err := fq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -372,12 +371,12 @@ func (fq *FreelancerQuery) WithWorkHistories(opts ...func(*WorkHistoryQuery)) *F
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Freelancer.Query().
-//		GroupBy(freelancer.FieldURL).
+//		GroupBy(freelancer.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (fq *FreelancerQuery) GroupBy(field string, fields ...string) *FreelancerGroupBy {
@@ -395,11 +394,11 @@ func (fq *FreelancerQuery) GroupBy(field string, fields ...string) *FreelancerGr
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Freelancer.Query().
-//		Select(freelancer.FieldURL).
+//		Select(freelancer.FieldName).
 //		Scan(ctx, &v)
 func (fq *FreelancerQuery) Select(fields ...string) *FreelancerSelect {
 	fq.ctx.Fields = append(fq.ctx.Fields, fields...)
@@ -532,7 +531,7 @@ func (fq *FreelancerQuery) loadJob(ctx context.Context, query *JobQuery, nodes [
 }
 func (fq *FreelancerQuery) loadAttachments(ctx context.Context, query *AttachmentRefQuery, nodes []*Freelancer, init func(*Freelancer), assign func(*Freelancer, *AttachmentRef)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Freelancer)
+	nodeids := make(map[string]*Freelancer)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -563,7 +562,7 @@ func (fq *FreelancerQuery) loadAttachments(ctx context.Context, query *Attachmen
 }
 func (fq *FreelancerQuery) loadWorkHistories(ctx context.Context, query *WorkHistoryQuery, nodes []*Freelancer, init func(*Freelancer), assign func(*Freelancer, *WorkHistory)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Freelancer)
+	nodeids := make(map[string]*Freelancer)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -603,7 +602,7 @@ func (fq *FreelancerQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (fq *FreelancerQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString))
 	_spec.From = fq.sql
 	if unique := fq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

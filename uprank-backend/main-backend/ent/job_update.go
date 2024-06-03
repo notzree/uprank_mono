@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
@@ -298,14 +297,14 @@ func (ju *JobUpdate) SetUser(u *User) *JobUpdate {
 }
 
 // AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
-func (ju *JobUpdate) AddFreelancerIDs(ids ...uuid.UUID) *JobUpdate {
+func (ju *JobUpdate) AddFreelancerIDs(ids ...string) *JobUpdate {
 	ju.mutation.AddFreelancerIDs(ids...)
 	return ju
 }
 
 // AddFreelancers adds the "freelancers" edges to the Freelancer entity.
 func (ju *JobUpdate) AddFreelancers(f ...*Freelancer) *JobUpdate {
-	ids := make([]uuid.UUID, len(f))
+	ids := make([]string, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
@@ -330,14 +329,14 @@ func (ju *JobUpdate) ClearFreelancers() *JobUpdate {
 }
 
 // RemoveFreelancerIDs removes the "freelancers" edge to Freelancer entities by IDs.
-func (ju *JobUpdate) RemoveFreelancerIDs(ids ...uuid.UUID) *JobUpdate {
+func (ju *JobUpdate) RemoveFreelancerIDs(ids ...string) *JobUpdate {
 	ju.mutation.RemoveFreelancerIDs(ids...)
 	return ju
 }
 
 // RemoveFreelancers removes "freelancers" edges to Freelancer entities.
 func (ju *JobUpdate) RemoveFreelancers(f ...*Freelancer) *JobUpdate {
-	ids := make([]uuid.UUID, len(f))
+	ids := make([]string, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
@@ -523,7 +522,7 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -536,7 +535,7 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -552,7 +551,7 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -846,14 +845,14 @@ func (juo *JobUpdateOne) SetUser(u *User) *JobUpdateOne {
 }
 
 // AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
-func (juo *JobUpdateOne) AddFreelancerIDs(ids ...uuid.UUID) *JobUpdateOne {
+func (juo *JobUpdateOne) AddFreelancerIDs(ids ...string) *JobUpdateOne {
 	juo.mutation.AddFreelancerIDs(ids...)
 	return juo
 }
 
 // AddFreelancers adds the "freelancers" edges to the Freelancer entity.
 func (juo *JobUpdateOne) AddFreelancers(f ...*Freelancer) *JobUpdateOne {
-	ids := make([]uuid.UUID, len(f))
+	ids := make([]string, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
@@ -878,14 +877,14 @@ func (juo *JobUpdateOne) ClearFreelancers() *JobUpdateOne {
 }
 
 // RemoveFreelancerIDs removes the "freelancers" edge to Freelancer entities by IDs.
-func (juo *JobUpdateOne) RemoveFreelancerIDs(ids ...uuid.UUID) *JobUpdateOne {
+func (juo *JobUpdateOne) RemoveFreelancerIDs(ids ...string) *JobUpdateOne {
 	juo.mutation.RemoveFreelancerIDs(ids...)
 	return juo
 }
 
 // RemoveFreelancers removes "freelancers" edges to Freelancer entities.
 func (juo *JobUpdateOne) RemoveFreelancers(f ...*Freelancer) *JobUpdateOne {
-	ids := make([]uuid.UUID, len(f))
+	ids := make([]string, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
@@ -1101,7 +1100,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1114,7 +1113,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1130,7 +1129,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

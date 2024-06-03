@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
@@ -58,7 +57,7 @@ func (aru *AttachmentRefUpdate) SetNillableLink(s *string) *AttachmentRefUpdate 
 }
 
 // SetFreelancerID sets the "freelancer" edge to the Freelancer entity by ID.
-func (aru *AttachmentRefUpdate) SetFreelancerID(id uuid.UUID) *AttachmentRefUpdate {
+func (aru *AttachmentRefUpdate) SetFreelancerID(id string) *AttachmentRefUpdate {
 	aru.mutation.SetFreelancerID(id)
 	return aru
 }
@@ -140,7 +139,7 @@ func (aru *AttachmentRefUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -153,7 +152,7 @@ func (aru *AttachmentRefUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -210,7 +209,7 @@ func (aruo *AttachmentRefUpdateOne) SetNillableLink(s *string) *AttachmentRefUpd
 }
 
 // SetFreelancerID sets the "freelancer" edge to the Freelancer entity by ID.
-func (aruo *AttachmentRefUpdateOne) SetFreelancerID(id uuid.UUID) *AttachmentRefUpdateOne {
+func (aruo *AttachmentRefUpdateOne) SetFreelancerID(id string) *AttachmentRefUpdateOne {
 	aruo.mutation.SetFreelancerID(id)
 	return aruo
 }
@@ -322,7 +321,7 @@ func (aruo *AttachmentRefUpdateOne) sqlSave(ctx context.Context) (_node *Attachm
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -335,7 +334,7 @@ func (aruo *AttachmentRefUpdateOne) sqlSave(ctx context.Context) (_node *Attachm
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

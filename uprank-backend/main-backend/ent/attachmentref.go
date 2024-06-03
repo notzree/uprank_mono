@@ -8,7 +8,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 )
@@ -25,7 +24,7 @@ type AttachmentRef struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AttachmentRefQuery when eager-loading is set.
 	Edges                  AttachmentRefEdges `json:"edges"`
-	freelancer_attachments *uuid.UUID
+	freelancer_attachments *string
 	selectValues           sql.SelectValues
 }
 
@@ -59,7 +58,7 @@ func (*AttachmentRef) scanValues(columns []string) ([]any, error) {
 		case attachmentref.FieldName, attachmentref.FieldLink:
 			values[i] = new(sql.NullString)
 		case attachmentref.ForeignKeys[0]: // freelancer_attachments
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,11 +93,11 @@ func (ar *AttachmentRef) assignValues(columns []string, values []any) error {
 				ar.Link = value.String
 			}
 		case attachmentref.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field freelancer_attachments", values[i])
 			} else if value.Valid {
-				ar.freelancer_attachments = new(uuid.UUID)
-				*ar.freelancer_attachments = *value.S.(*uuid.UUID)
+				ar.freelancer_attachments = new(string)
+				*ar.freelancer_attachments = value.String
 			}
 		default:
 			ar.selectValues.Set(columns[i], values[i])
