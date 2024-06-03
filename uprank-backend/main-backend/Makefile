@@ -20,5 +20,5 @@ migration_apply:
 		--revisions-schema public
 
 generate_ent:
-	go generate ./ent
+	go run -mod=mod entgo.io/ent/cmd/ent generate --feature sql/upsert  ./ent/schema
 		
