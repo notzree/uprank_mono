@@ -93,11 +93,9 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 	if createFreelancerErr != nil {
 		return createFreelancerErr
 	}
-	// err := queueScraperJob(s, job_id)
-	// if err != nil {
-	// 	return err
-	// }
-	//itrating over freelancers to write attachements + edges into the db
+
+	//TODO: CREATE JOB HISTORIES
+	//need to fix type so the json parses correctly, then handle the creation of job histories
 	for i, freelancer := range req {
 		if len(freelancer.Attachements) == 0 {
 			attachements[i] = nil
@@ -120,19 +118,17 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 }
 
 // this shit doesn't work lol. I prob need to use CreateBulk with upserts again gg
-// TODO: Use .onConflict w/ CreateBulk to actually update them properly, then maybe combine this route with the /create one.
 func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error {
 	claims, _ := clerk.SessionClaimsFromContext(r.Context())
 	user_id := claims.Subject
 	job_id := chi.URLParam(r, "job_id")
 
 	//check if job exists and belongs to user
-	_, getJobErr := s.ent.Job.Query().
+	job, getJobErr := s.ent.Job.Query().
 		Where(
 			job.IDEQ(job_id),
 			job.HasUserWith(user.IDEQ(user_id)),
-		).
-		Only(context.Background())
+		).QueryFreelancers().All(r.Context())
 	if getJobErr != nil && ent.IsNotFound(getJobErr) {
 		return ResourceMisMatch()
 	}
@@ -144,15 +140,28 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 		return InvalidJSON()
 	}
 	defer r.Body.Close()
+
 	for _, freelancer := range req {
 		if errors := freelancer.Validate(); len(errors) > 0 {
 			return InvalidRequestData(errors)
 		}
 	}
-	for _, freelancer := range req {
+
+	//We need to compare with the freelancers currently in the db.
+	//We need to split them into 3 categories.
+	// 1. Freelancers that are already in the db and need to be updated (don't need to update attachements or job histories)
+	// 2. Freelancers that are not in the db but in the request and need to be created (with attachements + job histories created)
+	// 3. Freelancers that are in the db but not in the request and need to be deleted (with attachements + job histories deleted)
+
+	//Plan: find the intersections of the two sets, then for each array, remove the intersection. Then we are left with the 3 categories
+
+	createFreelancerErr := s.ent.Freelancer.MapCreateBulk(req, func(c *ent.FreelancerCreate, i int) {
+		freelancer := req[i]
+		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
 		parse_hourly_charge_amount, _ := strconv.ParseFloat(freelancer.Hourly_charge_amount, 64)
-		_, err := s.ent.Freelancer.UpdateOneID(freelancer.Url).SetName(freelancer.Name).
+		c.SetID(freelancer.Url).
+			SetName(freelancer.Name).
 			SetTitle(freelancer.Title).
 			SetDescription(freelancer.Description).
 			SetCity(freelancer.Location.City).
@@ -185,13 +194,13 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 			SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue).
 			SetRecentEarnings(freelancer.Earnings_info.Recent_earnings).
 			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).
-			Save(context.Background())
-		if err != nil {
-			return err
-		}
+			SetJobID(job_id)
+	}).OnConflict().UpdateNewValues().Exec(r.Context())
+	if createFreelancerErr != nil {
+		return createFreelancerErr
 	}
-	return writeJSON(w, http.StatusOK, "success")
 
+	return writeJSON(w, http.StatusCreated, nil)
 }
 
 // queueScraperJob queues the scraping job for the given job_id into our aws sqs queue for the scraper server to pick up

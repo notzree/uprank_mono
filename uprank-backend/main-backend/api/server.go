@@ -51,12 +51,12 @@ func (s *Server) Start() error {
 					jobs_router.Post("/", Make(s.CreateJob))
 					jobs_router.Route("/{job_id}", func(job_id_router chi.Router) {
 						job_id_router.Post("/freelancers", Make(s.CreateFreelancers))
+						job_id_router.Post("/freelancers/update", Make(s.UpdateFreelancers))
 						job_id_router.Get("/", Make(s.GetJobByID))
 					})
 				})
 			})
 		})
-
 	})
 	s.Router.Get("/healthz", Make(s.HealthCheck))
 	return http.ListenAndServe(s.Port, s.Router)

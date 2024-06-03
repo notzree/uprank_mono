@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
@@ -21,6 +23,7 @@ type FreelancerCreate struct {
 	config
 	mutation *FreelancerMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetName sets the "name" field.
@@ -544,6 +547,7 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 		_node = &Freelancer{config: fc.config}
 		_spec = sqlgraph.NewCreateSpec(freelancer.Table, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = fc.conflict
 	if id, ok := fc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -752,11 +756,1434 @@ func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Freelancer.Create().
+//		SetName(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FreelancerUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (fc *FreelancerCreate) OnConflict(opts ...sql.ConflictOption) *FreelancerUpsertOne {
+	fc.conflict = opts
+	return &FreelancerUpsertOne{
+		create: fc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (fc *FreelancerCreate) OnConflictColumns(columns ...string) *FreelancerUpsertOne {
+	fc.conflict = append(fc.conflict, sql.ConflictColumns(columns...))
+	return &FreelancerUpsertOne{
+		create: fc,
+	}
+}
+
+type (
+	// FreelancerUpsertOne is the builder for "upsert"-ing
+	//  one Freelancer node.
+	FreelancerUpsertOne struct {
+		create *FreelancerCreate
+	}
+
+	// FreelancerUpsert is the "OnConflict" setter.
+	FreelancerUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetName sets the "name" field.
+func (u *FreelancerUpsert) SetName(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateName() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldName)
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *FreelancerUpsert) SetTitle(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldTitle, v)
+	return u
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTitle() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTitle)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *FreelancerUpsert) SetDescription(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateDescription() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldDescription)
+	return u
+}
+
+// SetCity sets the "city" field.
+func (u *FreelancerUpsert) SetCity(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldCity, v)
+	return u
+}
+
+// UpdateCity sets the "city" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCity() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCity)
+	return u
+}
+
+// SetCountry sets the "country" field.
+func (u *FreelancerUpsert) SetCountry(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldCountry, v)
+	return u
+}
+
+// UpdateCountry sets the "country" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCountry() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCountry)
+	return u
+}
+
+// SetTimezone sets the "timezone" field.
+func (u *FreelancerUpsert) SetTimezone(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldTimezone, v)
+	return u
+}
+
+// UpdateTimezone sets the "timezone" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTimezone() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTimezone)
+	return u
+}
+
+// SetCv sets the "cv" field.
+func (u *FreelancerUpsert) SetCv(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldCv, v)
+	return u
+}
+
+// UpdateCv sets the "cv" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCv() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCv)
+	return u
+}
+
+// SetAiReccomended sets the "ai_reccomended" field.
+func (u *FreelancerUpsert) SetAiReccomended(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldAiReccomended, v)
+	return u
+}
+
+// UpdateAiReccomended sets the "ai_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateAiReccomended() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldAiReccomended)
+	return u
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *FreelancerUpsert) SetFixedChargeAmount(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldFixedChargeAmount, v)
+	return u
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateFixedChargeAmount() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldFixedChargeAmount)
+	return u
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *FreelancerUpsert) AddFixedChargeAmount(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldFixedChargeAmount, v)
+	return u
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *FreelancerUpsert) ClearFixedChargeAmount() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldFixedChargeAmount)
+	return u
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *FreelancerUpsert) SetFixedChargeCurrency(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldFixedChargeCurrency, v)
+	return u
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateFixedChargeCurrency() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldFixedChargeCurrency)
+	return u
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *FreelancerUpsert) SetHourlyChargeAmount(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldHourlyChargeAmount, v)
+	return u
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateHourlyChargeAmount() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldHourlyChargeAmount)
+	return u
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *FreelancerUpsert) AddHourlyChargeAmount(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldHourlyChargeAmount, v)
+	return u
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *FreelancerUpsert) ClearHourlyChargeAmount() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldHourlyChargeAmount)
+	return u
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *FreelancerUpsert) SetHourlyChargeCurrency(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldHourlyChargeCurrency, v)
+	return u
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateHourlyChargeCurrency() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldHourlyChargeCurrency)
+	return u
+}
+
+// SetInvited sets the "invited" field.
+func (u *FreelancerUpsert) SetInvited(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldInvited, v)
+	return u
+}
+
+// UpdateInvited sets the "invited" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateInvited() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldInvited)
+	return u
+}
+
+// SetPhotoURL sets the "photo_url" field.
+func (u *FreelancerUpsert) SetPhotoURL(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldPhotoURL, v)
+	return u
+}
+
+// UpdatePhotoURL sets the "photo_url" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdatePhotoURL() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldPhotoURL)
+	return u
+}
+
+// SetRecentHours sets the "recent_hours" field.
+func (u *FreelancerUpsert) SetRecentHours(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldRecentHours, v)
+	return u
+}
+
+// UpdateRecentHours sets the "recent_hours" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateRecentHours() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldRecentHours)
+	return u
+}
+
+// AddRecentHours adds v to the "recent_hours" field.
+func (u *FreelancerUpsert) AddRecentHours(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldRecentHours, v)
+	return u
+}
+
+// SetTotalHours sets the "total_hours" field.
+func (u *FreelancerUpsert) SetTotalHours(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldTotalHours, v)
+	return u
+}
+
+// UpdateTotalHours sets the "total_hours" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTotalHours() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTotalHours)
+	return u
+}
+
+// AddTotalHours adds v to the "total_hours" field.
+func (u *FreelancerUpsert) AddTotalHours(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldTotalHours, v)
+	return u
+}
+
+// SetTotalPortfolioItems sets the "total_portfolio_items" field.
+func (u *FreelancerUpsert) SetTotalPortfolioItems(v int) *FreelancerUpsert {
+	u.Set(freelancer.FieldTotalPortfolioItems, v)
+	return u
+}
+
+// UpdateTotalPortfolioItems sets the "total_portfolio_items" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTotalPortfolioItems() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTotalPortfolioItems)
+	return u
+}
+
+// AddTotalPortfolioItems adds v to the "total_portfolio_items" field.
+func (u *FreelancerUpsert) AddTotalPortfolioItems(v int) *FreelancerUpsert {
+	u.Add(freelancer.FieldTotalPortfolioItems, v)
+	return u
+}
+
+// SetTotalPortfolioV2Items sets the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsert) SetTotalPortfolioV2Items(v int) *FreelancerUpsert {
+	u.Set(freelancer.FieldTotalPortfolioV2Items, v)
+	return u
+}
+
+// UpdateTotalPortfolioV2Items sets the "total_portfolio_v2_items" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTotalPortfolioV2Items() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTotalPortfolioV2Items)
+	return u
+}
+
+// AddTotalPortfolioV2Items adds v to the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsert) AddTotalPortfolioV2Items(v int) *FreelancerUpsert {
+	u.Add(freelancer.FieldTotalPortfolioV2Items, v)
+	return u
+}
+
+// SetUpworkTotalFeedback sets the "upwork_total_feedback" field.
+func (u *FreelancerUpsert) SetUpworkTotalFeedback(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkTotalFeedback, v)
+	return u
+}
+
+// UpdateUpworkTotalFeedback sets the "upwork_total_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkTotalFeedback() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkTotalFeedback)
+	return u
+}
+
+// AddUpworkTotalFeedback adds v to the "upwork_total_feedback" field.
+func (u *FreelancerUpsert) AddUpworkTotalFeedback(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldUpworkTotalFeedback, v)
+	return u
+}
+
+// SetUpworkRecentFeedback sets the "upwork_recent_feedback" field.
+func (u *FreelancerUpsert) SetUpworkRecentFeedback(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkRecentFeedback, v)
+	return u
+}
+
+// UpdateUpworkRecentFeedback sets the "upwork_recent_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkRecentFeedback() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkRecentFeedback)
+	return u
+}
+
+// AddUpworkRecentFeedback adds v to the "upwork_recent_feedback" field.
+func (u *FreelancerUpsert) AddUpworkRecentFeedback(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldUpworkRecentFeedback, v)
+	return u
+}
+
+// SetUpworkTopRatedStatus sets the "upwork_top_rated_status" field.
+func (u *FreelancerUpsert) SetUpworkTopRatedStatus(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkTopRatedStatus, v)
+	return u
+}
+
+// UpdateUpworkTopRatedStatus sets the "upwork_top_rated_status" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkTopRatedStatus() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkTopRatedStatus)
+	return u
+}
+
+// SetUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field.
+func (u *FreelancerUpsert) SetUpworkTopRatedPlusStatus(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkTopRatedPlusStatus, v)
+	return u
+}
+
+// UpdateUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkTopRatedPlusStatus() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkTopRatedPlusStatus)
+	return u
+}
+
+// SetUpworkSponsored sets the "upwork_sponsored" field.
+func (u *FreelancerUpsert) SetUpworkSponsored(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkSponsored, v)
+	return u
+}
+
+// UpdateUpworkSponsored sets the "upwork_sponsored" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkSponsored() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkSponsored)
+	return u
+}
+
+// SetUpworkJobSuccessScore sets the "upwork_job_success_score" field.
+func (u *FreelancerUpsert) SetUpworkJobSuccessScore(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkJobSuccessScore, v)
+	return u
+}
+
+// UpdateUpworkJobSuccessScore sets the "upwork_job_success_score" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkJobSuccessScore() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkJobSuccessScore)
+	return u
+}
+
+// AddUpworkJobSuccessScore adds v to the "upwork_job_success_score" field.
+func (u *FreelancerUpsert) AddUpworkJobSuccessScore(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldUpworkJobSuccessScore, v)
+	return u
+}
+
+// SetUpworkReccomended sets the "upwork_reccomended" field.
+func (u *FreelancerUpsert) SetUpworkReccomended(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUpworkReccomended, v)
+	return u
+}
+
+// UpdateUpworkReccomended sets the "upwork_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUpworkReccomended() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUpworkReccomended)
+	return u
+}
+
+// SetSkills sets the "skills" field.
+func (u *FreelancerUpsert) SetSkills(v []string) *FreelancerUpsert {
+	u.Set(freelancer.FieldSkills, v)
+	return u
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateSkills() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldSkills)
+	return u
+}
+
+// SetAverageRecentEarnings sets the "average_recent_earnings" field.
+func (u *FreelancerUpsert) SetAverageRecentEarnings(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldAverageRecentEarnings, v)
+	return u
+}
+
+// UpdateAverageRecentEarnings sets the "average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateAverageRecentEarnings() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldAverageRecentEarnings)
+	return u
+}
+
+// AddAverageRecentEarnings adds v to the "average_recent_earnings" field.
+func (u *FreelancerUpsert) AddAverageRecentEarnings(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldAverageRecentEarnings, v)
+	return u
+}
+
+// SetCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsert) SetCombinedAverageRecentEarnings(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldCombinedAverageRecentEarnings, v)
+	return u
+}
+
+// UpdateCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCombinedAverageRecentEarnings() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCombinedAverageRecentEarnings)
+	return u
+}
+
+// AddCombinedAverageRecentEarnings adds v to the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsert) AddCombinedAverageRecentEarnings(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldCombinedAverageRecentEarnings, v)
+	return u
+}
+
+// SetCombinedRecentEarnings sets the "combined_recent_earnings" field.
+func (u *FreelancerUpsert) SetCombinedRecentEarnings(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldCombinedRecentEarnings, v)
+	return u
+}
+
+// UpdateCombinedRecentEarnings sets the "combined_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCombinedRecentEarnings() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCombinedRecentEarnings)
+	return u
+}
+
+// AddCombinedRecentEarnings adds v to the "combined_recent_earnings" field.
+func (u *FreelancerUpsert) AddCombinedRecentEarnings(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldCombinedRecentEarnings, v)
+	return u
+}
+
+// SetCombinedTotalEarnings sets the "combined_total_earnings" field.
+func (u *FreelancerUpsert) SetCombinedTotalEarnings(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldCombinedTotalEarnings, v)
+	return u
+}
+
+// UpdateCombinedTotalEarnings sets the "combined_total_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCombinedTotalEarnings() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCombinedTotalEarnings)
+	return u
+}
+
+// AddCombinedTotalEarnings adds v to the "combined_total_earnings" field.
+func (u *FreelancerUpsert) AddCombinedTotalEarnings(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldCombinedTotalEarnings, v)
+	return u
+}
+
+// SetCombinedTotalRevenue sets the "combined_total_revenue" field.
+func (u *FreelancerUpsert) SetCombinedTotalRevenue(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldCombinedTotalRevenue, v)
+	return u
+}
+
+// UpdateCombinedTotalRevenue sets the "combined_total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateCombinedTotalRevenue() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldCombinedTotalRevenue)
+	return u
+}
+
+// AddCombinedTotalRevenue adds v to the "combined_total_revenue" field.
+func (u *FreelancerUpsert) AddCombinedTotalRevenue(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldCombinedTotalRevenue, v)
+	return u
+}
+
+// SetRecentEarnings sets the "recent_earnings" field.
+func (u *FreelancerUpsert) SetRecentEarnings(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldRecentEarnings, v)
+	return u
+}
+
+// UpdateRecentEarnings sets the "recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateRecentEarnings() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldRecentEarnings)
+	return u
+}
+
+// AddRecentEarnings adds v to the "recent_earnings" field.
+func (u *FreelancerUpsert) AddRecentEarnings(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldRecentEarnings, v)
+	return u
+}
+
+// SetTotalRevenue sets the "total_revenue" field.
+func (u *FreelancerUpsert) SetTotalRevenue(v float64) *FreelancerUpsert {
+	u.Set(freelancer.FieldTotalRevenue, v)
+	return u
+}
+
+// UpdateTotalRevenue sets the "total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateTotalRevenue() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldTotalRevenue)
+	return u
+}
+
+// AddTotalRevenue adds v to the "total_revenue" field.
+func (u *FreelancerUpsert) AddTotalRevenue(v float64) *FreelancerUpsert {
+	u.Add(freelancer.FieldTotalRevenue, v)
+	return u
+}
+
+// SetUprankScore sets the "uprank_score" field.
+func (u *FreelancerUpsert) SetUprankScore(v int) *FreelancerUpsert {
+	u.Set(freelancer.FieldUprankScore, v)
+	return u
+}
+
+// UpdateUprankScore sets the "uprank_score" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUprankScore() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUprankScore)
+	return u
+}
+
+// AddUprankScore adds v to the "uprank_score" field.
+func (u *FreelancerUpsert) AddUprankScore(v int) *FreelancerUpsert {
+	u.Add(freelancer.FieldUprankScore, v)
+	return u
+}
+
+// ClearUprankScore clears the value of the "uprank_score" field.
+func (u *FreelancerUpsert) ClearUprankScore() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldUprankScore)
+	return u
+}
+
+// SetUprankUpdatedAt sets the "uprank_updated_at" field.
+func (u *FreelancerUpsert) SetUprankUpdatedAt(v time.Time) *FreelancerUpsert {
+	u.Set(freelancer.FieldUprankUpdatedAt, v)
+	return u
+}
+
+// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUprankUpdatedAt() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUprankUpdatedAt)
+	return u
+}
+
+// SetUprankReccomended sets the "uprank_reccomended" field.
+func (u *FreelancerUpsert) SetUprankReccomended(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUprankReccomended, v)
+	return u
+}
+
+// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUprankReccomended() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUprankReccomended)
+	return u
+}
+
+// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
+func (u *FreelancerUpsert) ClearUprankReccomended() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldUprankReccomended)
+	return u
+}
+
+// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsert) SetUprankReccomendedReasons(v string) *FreelancerUpsert {
+	u.Set(freelancer.FieldUprankReccomendedReasons, v)
+	return u
+}
+
+// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUprankReccomendedReasons() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUprankReccomendedReasons)
+	return u
+}
+
+// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsert) ClearUprankReccomendedReasons() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldUprankReccomendedReasons)
+	return u
+}
+
+// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
+func (u *FreelancerUpsert) SetUprankNotEnoughData(v bool) *FreelancerUpsert {
+	u.Set(freelancer.FieldUprankNotEnoughData, v)
+	return u
+}
+
+// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
+func (u *FreelancerUpsert) UpdateUprankNotEnoughData() *FreelancerUpsert {
+	u.SetExcluded(freelancer.FieldUprankNotEnoughData)
+	return u
+}
+
+// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
+func (u *FreelancerUpsert) ClearUprankNotEnoughData() *FreelancerUpsert {
+	u.SetNull(freelancer.FieldUprankNotEnoughData)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(freelancer.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FreelancerUpsertOne) UpdateNewValues() *FreelancerUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(freelancer.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *FreelancerUpsertOne) Ignore() *FreelancerUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FreelancerUpsertOne) DoNothing() *FreelancerUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FreelancerCreate.OnConflict
+// documentation for more info.
+func (u *FreelancerUpsertOne) Update(set func(*FreelancerUpsert)) *FreelancerUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FreelancerUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *FreelancerUpsertOne) SetName(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateName() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetTitle sets the "title" field.
+func (u *FreelancerUpsertOne) SetTitle(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTitle() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *FreelancerUpsertOne) SetDescription(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateDescription() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// SetCity sets the "city" field.
+func (u *FreelancerUpsertOne) SetCity(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCity(v)
+	})
+}
+
+// UpdateCity sets the "city" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCity() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCity()
+	})
+}
+
+// SetCountry sets the "country" field.
+func (u *FreelancerUpsertOne) SetCountry(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCountry(v)
+	})
+}
+
+// UpdateCountry sets the "country" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCountry() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCountry()
+	})
+}
+
+// SetTimezone sets the "timezone" field.
+func (u *FreelancerUpsertOne) SetTimezone(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTimezone(v)
+	})
+}
+
+// UpdateTimezone sets the "timezone" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTimezone() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTimezone()
+	})
+}
+
+// SetCv sets the "cv" field.
+func (u *FreelancerUpsertOne) SetCv(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCv(v)
+	})
+}
+
+// UpdateCv sets the "cv" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCv() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCv()
+	})
+}
+
+// SetAiReccomended sets the "ai_reccomended" field.
+func (u *FreelancerUpsertOne) SetAiReccomended(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetAiReccomended(v)
+	})
+}
+
+// UpdateAiReccomended sets the "ai_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateAiReccomended() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateAiReccomended()
+	})
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *FreelancerUpsertOne) SetFixedChargeAmount(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetFixedChargeAmount(v)
+	})
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *FreelancerUpsertOne) AddFixedChargeAmount(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddFixedChargeAmount(v)
+	})
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateFixedChargeAmount() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateFixedChargeAmount()
+	})
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *FreelancerUpsertOne) ClearFixedChargeAmount() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearFixedChargeAmount()
+	})
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *FreelancerUpsertOne) SetFixedChargeCurrency(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetFixedChargeCurrency(v)
+	})
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateFixedChargeCurrency() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateFixedChargeCurrency()
+	})
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *FreelancerUpsertOne) SetHourlyChargeAmount(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetHourlyChargeAmount(v)
+	})
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *FreelancerUpsertOne) AddHourlyChargeAmount(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddHourlyChargeAmount(v)
+	})
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateHourlyChargeAmount() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateHourlyChargeAmount()
+	})
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *FreelancerUpsertOne) ClearHourlyChargeAmount() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearHourlyChargeAmount()
+	})
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *FreelancerUpsertOne) SetHourlyChargeCurrency(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetHourlyChargeCurrency(v)
+	})
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateHourlyChargeCurrency() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateHourlyChargeCurrency()
+	})
+}
+
+// SetInvited sets the "invited" field.
+func (u *FreelancerUpsertOne) SetInvited(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetInvited(v)
+	})
+}
+
+// UpdateInvited sets the "invited" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateInvited() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateInvited()
+	})
+}
+
+// SetPhotoURL sets the "photo_url" field.
+func (u *FreelancerUpsertOne) SetPhotoURL(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetPhotoURL(v)
+	})
+}
+
+// UpdatePhotoURL sets the "photo_url" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdatePhotoURL() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdatePhotoURL()
+	})
+}
+
+// SetRecentHours sets the "recent_hours" field.
+func (u *FreelancerUpsertOne) SetRecentHours(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetRecentHours(v)
+	})
+}
+
+// AddRecentHours adds v to the "recent_hours" field.
+func (u *FreelancerUpsertOne) AddRecentHours(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddRecentHours(v)
+	})
+}
+
+// UpdateRecentHours sets the "recent_hours" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateRecentHours() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateRecentHours()
+	})
+}
+
+// SetTotalHours sets the "total_hours" field.
+func (u *FreelancerUpsertOne) SetTotalHours(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalHours(v)
+	})
+}
+
+// AddTotalHours adds v to the "total_hours" field.
+func (u *FreelancerUpsertOne) AddTotalHours(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalHours(v)
+	})
+}
+
+// UpdateTotalHours sets the "total_hours" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTotalHours() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalHours()
+	})
+}
+
+// SetTotalPortfolioItems sets the "total_portfolio_items" field.
+func (u *FreelancerUpsertOne) SetTotalPortfolioItems(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalPortfolioItems(v)
+	})
+}
+
+// AddTotalPortfolioItems adds v to the "total_portfolio_items" field.
+func (u *FreelancerUpsertOne) AddTotalPortfolioItems(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalPortfolioItems(v)
+	})
+}
+
+// UpdateTotalPortfolioItems sets the "total_portfolio_items" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTotalPortfolioItems() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalPortfolioItems()
+	})
+}
+
+// SetTotalPortfolioV2Items sets the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsertOne) SetTotalPortfolioV2Items(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalPortfolioV2Items(v)
+	})
+}
+
+// AddTotalPortfolioV2Items adds v to the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsertOne) AddTotalPortfolioV2Items(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalPortfolioV2Items(v)
+	})
+}
+
+// UpdateTotalPortfolioV2Items sets the "total_portfolio_v2_items" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTotalPortfolioV2Items() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalPortfolioV2Items()
+	})
+}
+
+// SetUpworkTotalFeedback sets the "upwork_total_feedback" field.
+func (u *FreelancerUpsertOne) SetUpworkTotalFeedback(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTotalFeedback(v)
+	})
+}
+
+// AddUpworkTotalFeedback adds v to the "upwork_total_feedback" field.
+func (u *FreelancerUpsertOne) AddUpworkTotalFeedback(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkTotalFeedback(v)
+	})
+}
+
+// UpdateUpworkTotalFeedback sets the "upwork_total_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkTotalFeedback() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTotalFeedback()
+	})
+}
+
+// SetUpworkRecentFeedback sets the "upwork_recent_feedback" field.
+func (u *FreelancerUpsertOne) SetUpworkRecentFeedback(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkRecentFeedback(v)
+	})
+}
+
+// AddUpworkRecentFeedback adds v to the "upwork_recent_feedback" field.
+func (u *FreelancerUpsertOne) AddUpworkRecentFeedback(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkRecentFeedback(v)
+	})
+}
+
+// UpdateUpworkRecentFeedback sets the "upwork_recent_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkRecentFeedback() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkRecentFeedback()
+	})
+}
+
+// SetUpworkTopRatedStatus sets the "upwork_top_rated_status" field.
+func (u *FreelancerUpsertOne) SetUpworkTopRatedStatus(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTopRatedStatus(v)
+	})
+}
+
+// UpdateUpworkTopRatedStatus sets the "upwork_top_rated_status" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkTopRatedStatus() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTopRatedStatus()
+	})
+}
+
+// SetUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field.
+func (u *FreelancerUpsertOne) SetUpworkTopRatedPlusStatus(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTopRatedPlusStatus(v)
+	})
+}
+
+// UpdateUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkTopRatedPlusStatus() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTopRatedPlusStatus()
+	})
+}
+
+// SetUpworkSponsored sets the "upwork_sponsored" field.
+func (u *FreelancerUpsertOne) SetUpworkSponsored(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkSponsored(v)
+	})
+}
+
+// UpdateUpworkSponsored sets the "upwork_sponsored" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkSponsored() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkSponsored()
+	})
+}
+
+// SetUpworkJobSuccessScore sets the "upwork_job_success_score" field.
+func (u *FreelancerUpsertOne) SetUpworkJobSuccessScore(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkJobSuccessScore(v)
+	})
+}
+
+// AddUpworkJobSuccessScore adds v to the "upwork_job_success_score" field.
+func (u *FreelancerUpsertOne) AddUpworkJobSuccessScore(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkJobSuccessScore(v)
+	})
+}
+
+// UpdateUpworkJobSuccessScore sets the "upwork_job_success_score" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkJobSuccessScore() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkJobSuccessScore()
+	})
+}
+
+// SetUpworkReccomended sets the "upwork_reccomended" field.
+func (u *FreelancerUpsertOne) SetUpworkReccomended(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkReccomended(v)
+	})
+}
+
+// UpdateUpworkReccomended sets the "upwork_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUpworkReccomended() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkReccomended()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *FreelancerUpsertOne) SetSkills(v []string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateSkills() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// SetAverageRecentEarnings sets the "average_recent_earnings" field.
+func (u *FreelancerUpsertOne) SetAverageRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetAverageRecentEarnings(v)
+	})
+}
+
+// AddAverageRecentEarnings adds v to the "average_recent_earnings" field.
+func (u *FreelancerUpsertOne) AddAverageRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddAverageRecentEarnings(v)
+	})
+}
+
+// UpdateAverageRecentEarnings sets the "average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateAverageRecentEarnings() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateAverageRecentEarnings()
+	})
+}
+
+// SetCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsertOne) SetCombinedAverageRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedAverageRecentEarnings(v)
+	})
+}
+
+// AddCombinedAverageRecentEarnings adds v to the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsertOne) AddCombinedAverageRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedAverageRecentEarnings(v)
+	})
+}
+
+// UpdateCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCombinedAverageRecentEarnings() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedAverageRecentEarnings()
+	})
+}
+
+// SetCombinedRecentEarnings sets the "combined_recent_earnings" field.
+func (u *FreelancerUpsertOne) SetCombinedRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedRecentEarnings(v)
+	})
+}
+
+// AddCombinedRecentEarnings adds v to the "combined_recent_earnings" field.
+func (u *FreelancerUpsertOne) AddCombinedRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedRecentEarnings(v)
+	})
+}
+
+// UpdateCombinedRecentEarnings sets the "combined_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCombinedRecentEarnings() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedRecentEarnings()
+	})
+}
+
+// SetCombinedTotalEarnings sets the "combined_total_earnings" field.
+func (u *FreelancerUpsertOne) SetCombinedTotalEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedTotalEarnings(v)
+	})
+}
+
+// AddCombinedTotalEarnings adds v to the "combined_total_earnings" field.
+func (u *FreelancerUpsertOne) AddCombinedTotalEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedTotalEarnings(v)
+	})
+}
+
+// UpdateCombinedTotalEarnings sets the "combined_total_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCombinedTotalEarnings() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedTotalEarnings()
+	})
+}
+
+// SetCombinedTotalRevenue sets the "combined_total_revenue" field.
+func (u *FreelancerUpsertOne) SetCombinedTotalRevenue(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedTotalRevenue(v)
+	})
+}
+
+// AddCombinedTotalRevenue adds v to the "combined_total_revenue" field.
+func (u *FreelancerUpsertOne) AddCombinedTotalRevenue(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedTotalRevenue(v)
+	})
+}
+
+// UpdateCombinedTotalRevenue sets the "combined_total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateCombinedTotalRevenue() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedTotalRevenue()
+	})
+}
+
+// SetRecentEarnings sets the "recent_earnings" field.
+func (u *FreelancerUpsertOne) SetRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetRecentEarnings(v)
+	})
+}
+
+// AddRecentEarnings adds v to the "recent_earnings" field.
+func (u *FreelancerUpsertOne) AddRecentEarnings(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddRecentEarnings(v)
+	})
+}
+
+// UpdateRecentEarnings sets the "recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateRecentEarnings() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateRecentEarnings()
+	})
+}
+
+// SetTotalRevenue sets the "total_revenue" field.
+func (u *FreelancerUpsertOne) SetTotalRevenue(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalRevenue(v)
+	})
+}
+
+// AddTotalRevenue adds v to the "total_revenue" field.
+func (u *FreelancerUpsertOne) AddTotalRevenue(v float64) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalRevenue(v)
+	})
+}
+
+// UpdateTotalRevenue sets the "total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateTotalRevenue() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalRevenue()
+	})
+}
+
+// SetUprankScore sets the "uprank_score" field.
+func (u *FreelancerUpsertOne) SetUprankScore(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankScore(v)
+	})
+}
+
+// AddUprankScore adds v to the "uprank_score" field.
+func (u *FreelancerUpsertOne) AddUprankScore(v int) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUprankScore(v)
+	})
+}
+
+// UpdateUprankScore sets the "uprank_score" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUprankScore() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankScore()
+	})
+}
+
+// ClearUprankScore clears the value of the "uprank_score" field.
+func (u *FreelancerUpsertOne) ClearUprankScore() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankScore()
+	})
+}
+
+// SetUprankUpdatedAt sets the "uprank_updated_at" field.
+func (u *FreelancerUpsertOne) SetUprankUpdatedAt(v time.Time) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankUpdatedAt(v)
+	})
+}
+
+// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUprankUpdatedAt() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankUpdatedAt()
+	})
+}
+
+// SetUprankReccomended sets the "uprank_reccomended" field.
+func (u *FreelancerUpsertOne) SetUprankReccomended(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankReccomended(v)
+	})
+}
+
+// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUprankReccomended() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankReccomended()
+	})
+}
+
+// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
+func (u *FreelancerUpsertOne) ClearUprankReccomended() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankReccomended()
+	})
+}
+
+// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsertOne) SetUprankReccomendedReasons(v string) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankReccomendedReasons(v)
+	})
+}
+
+// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUprankReccomendedReasons() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankReccomendedReasons()
+	})
+}
+
+// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsertOne) ClearUprankReccomendedReasons() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankReccomendedReasons()
+	})
+}
+
+// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
+func (u *FreelancerUpsertOne) SetUprankNotEnoughData(v bool) *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankNotEnoughData(v)
+	})
+}
+
+// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
+func (u *FreelancerUpsertOne) UpdateUprankNotEnoughData() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankNotEnoughData()
+	})
+}
+
+// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
+func (u *FreelancerUpsertOne) ClearUprankNotEnoughData() *FreelancerUpsertOne {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankNotEnoughData()
+	})
+}
+
+// Exec executes the query.
+func (u *FreelancerUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FreelancerCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FreelancerUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *FreelancerUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: FreelancerUpsertOne.ID is not supported by MySQL driver. Use FreelancerUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *FreelancerUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // FreelancerCreateBulk is the builder for creating many Freelancer entities in bulk.
 type FreelancerCreateBulk struct {
 	config
 	err      error
 	builders []*FreelancerCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Freelancer entities in the database.
@@ -786,6 +2213,7 @@ func (fcb *FreelancerCreateBulk) Save(ctx context.Context) ([]*Freelancer, error
 					_, err = mutators[i+1].Mutate(root, fcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = fcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, fcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -832,6 +2260,813 @@ func (fcb *FreelancerCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (fcb *FreelancerCreateBulk) ExecX(ctx context.Context) {
 	if err := fcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Freelancer.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FreelancerUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (fcb *FreelancerCreateBulk) OnConflict(opts ...sql.ConflictOption) *FreelancerUpsertBulk {
+	fcb.conflict = opts
+	return &FreelancerUpsertBulk{
+		create: fcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (fcb *FreelancerCreateBulk) OnConflictColumns(columns ...string) *FreelancerUpsertBulk {
+	fcb.conflict = append(fcb.conflict, sql.ConflictColumns(columns...))
+	return &FreelancerUpsertBulk{
+		create: fcb,
+	}
+}
+
+// FreelancerUpsertBulk is the builder for "upsert"-ing
+// a bulk of Freelancer nodes.
+type FreelancerUpsertBulk struct {
+	create *FreelancerCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(freelancer.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FreelancerUpsertBulk) UpdateNewValues() *FreelancerUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(freelancer.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Freelancer.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *FreelancerUpsertBulk) Ignore() *FreelancerUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FreelancerUpsertBulk) DoNothing() *FreelancerUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FreelancerCreateBulk.OnConflict
+// documentation for more info.
+func (u *FreelancerUpsertBulk) Update(set func(*FreelancerUpsert)) *FreelancerUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FreelancerUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *FreelancerUpsertBulk) SetName(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateName() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetTitle sets the "title" field.
+func (u *FreelancerUpsertBulk) SetTitle(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTitle() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *FreelancerUpsertBulk) SetDescription(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateDescription() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// SetCity sets the "city" field.
+func (u *FreelancerUpsertBulk) SetCity(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCity(v)
+	})
+}
+
+// UpdateCity sets the "city" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCity() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCity()
+	})
+}
+
+// SetCountry sets the "country" field.
+func (u *FreelancerUpsertBulk) SetCountry(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCountry(v)
+	})
+}
+
+// UpdateCountry sets the "country" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCountry() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCountry()
+	})
+}
+
+// SetTimezone sets the "timezone" field.
+func (u *FreelancerUpsertBulk) SetTimezone(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTimezone(v)
+	})
+}
+
+// UpdateTimezone sets the "timezone" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTimezone() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTimezone()
+	})
+}
+
+// SetCv sets the "cv" field.
+func (u *FreelancerUpsertBulk) SetCv(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCv(v)
+	})
+}
+
+// UpdateCv sets the "cv" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCv() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCv()
+	})
+}
+
+// SetAiReccomended sets the "ai_reccomended" field.
+func (u *FreelancerUpsertBulk) SetAiReccomended(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetAiReccomended(v)
+	})
+}
+
+// UpdateAiReccomended sets the "ai_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateAiReccomended() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateAiReccomended()
+	})
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *FreelancerUpsertBulk) SetFixedChargeAmount(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetFixedChargeAmount(v)
+	})
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *FreelancerUpsertBulk) AddFixedChargeAmount(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddFixedChargeAmount(v)
+	})
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateFixedChargeAmount() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateFixedChargeAmount()
+	})
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *FreelancerUpsertBulk) ClearFixedChargeAmount() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearFixedChargeAmount()
+	})
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *FreelancerUpsertBulk) SetFixedChargeCurrency(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetFixedChargeCurrency(v)
+	})
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateFixedChargeCurrency() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateFixedChargeCurrency()
+	})
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *FreelancerUpsertBulk) SetHourlyChargeAmount(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetHourlyChargeAmount(v)
+	})
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *FreelancerUpsertBulk) AddHourlyChargeAmount(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddHourlyChargeAmount(v)
+	})
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateHourlyChargeAmount() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateHourlyChargeAmount()
+	})
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *FreelancerUpsertBulk) ClearHourlyChargeAmount() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearHourlyChargeAmount()
+	})
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *FreelancerUpsertBulk) SetHourlyChargeCurrency(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetHourlyChargeCurrency(v)
+	})
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateHourlyChargeCurrency() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateHourlyChargeCurrency()
+	})
+}
+
+// SetInvited sets the "invited" field.
+func (u *FreelancerUpsertBulk) SetInvited(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetInvited(v)
+	})
+}
+
+// UpdateInvited sets the "invited" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateInvited() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateInvited()
+	})
+}
+
+// SetPhotoURL sets the "photo_url" field.
+func (u *FreelancerUpsertBulk) SetPhotoURL(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetPhotoURL(v)
+	})
+}
+
+// UpdatePhotoURL sets the "photo_url" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdatePhotoURL() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdatePhotoURL()
+	})
+}
+
+// SetRecentHours sets the "recent_hours" field.
+func (u *FreelancerUpsertBulk) SetRecentHours(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetRecentHours(v)
+	})
+}
+
+// AddRecentHours adds v to the "recent_hours" field.
+func (u *FreelancerUpsertBulk) AddRecentHours(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddRecentHours(v)
+	})
+}
+
+// UpdateRecentHours sets the "recent_hours" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateRecentHours() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateRecentHours()
+	})
+}
+
+// SetTotalHours sets the "total_hours" field.
+func (u *FreelancerUpsertBulk) SetTotalHours(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalHours(v)
+	})
+}
+
+// AddTotalHours adds v to the "total_hours" field.
+func (u *FreelancerUpsertBulk) AddTotalHours(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalHours(v)
+	})
+}
+
+// UpdateTotalHours sets the "total_hours" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTotalHours() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalHours()
+	})
+}
+
+// SetTotalPortfolioItems sets the "total_portfolio_items" field.
+func (u *FreelancerUpsertBulk) SetTotalPortfolioItems(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalPortfolioItems(v)
+	})
+}
+
+// AddTotalPortfolioItems adds v to the "total_portfolio_items" field.
+func (u *FreelancerUpsertBulk) AddTotalPortfolioItems(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalPortfolioItems(v)
+	})
+}
+
+// UpdateTotalPortfolioItems sets the "total_portfolio_items" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTotalPortfolioItems() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalPortfolioItems()
+	})
+}
+
+// SetTotalPortfolioV2Items sets the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsertBulk) SetTotalPortfolioV2Items(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalPortfolioV2Items(v)
+	})
+}
+
+// AddTotalPortfolioV2Items adds v to the "total_portfolio_v2_items" field.
+func (u *FreelancerUpsertBulk) AddTotalPortfolioV2Items(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalPortfolioV2Items(v)
+	})
+}
+
+// UpdateTotalPortfolioV2Items sets the "total_portfolio_v2_items" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTotalPortfolioV2Items() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalPortfolioV2Items()
+	})
+}
+
+// SetUpworkTotalFeedback sets the "upwork_total_feedback" field.
+func (u *FreelancerUpsertBulk) SetUpworkTotalFeedback(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTotalFeedback(v)
+	})
+}
+
+// AddUpworkTotalFeedback adds v to the "upwork_total_feedback" field.
+func (u *FreelancerUpsertBulk) AddUpworkTotalFeedback(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkTotalFeedback(v)
+	})
+}
+
+// UpdateUpworkTotalFeedback sets the "upwork_total_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkTotalFeedback() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTotalFeedback()
+	})
+}
+
+// SetUpworkRecentFeedback sets the "upwork_recent_feedback" field.
+func (u *FreelancerUpsertBulk) SetUpworkRecentFeedback(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkRecentFeedback(v)
+	})
+}
+
+// AddUpworkRecentFeedback adds v to the "upwork_recent_feedback" field.
+func (u *FreelancerUpsertBulk) AddUpworkRecentFeedback(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkRecentFeedback(v)
+	})
+}
+
+// UpdateUpworkRecentFeedback sets the "upwork_recent_feedback" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkRecentFeedback() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkRecentFeedback()
+	})
+}
+
+// SetUpworkTopRatedStatus sets the "upwork_top_rated_status" field.
+func (u *FreelancerUpsertBulk) SetUpworkTopRatedStatus(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTopRatedStatus(v)
+	})
+}
+
+// UpdateUpworkTopRatedStatus sets the "upwork_top_rated_status" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkTopRatedStatus() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTopRatedStatus()
+	})
+}
+
+// SetUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field.
+func (u *FreelancerUpsertBulk) SetUpworkTopRatedPlusStatus(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkTopRatedPlusStatus(v)
+	})
+}
+
+// UpdateUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkTopRatedPlusStatus() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkTopRatedPlusStatus()
+	})
+}
+
+// SetUpworkSponsored sets the "upwork_sponsored" field.
+func (u *FreelancerUpsertBulk) SetUpworkSponsored(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkSponsored(v)
+	})
+}
+
+// UpdateUpworkSponsored sets the "upwork_sponsored" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkSponsored() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkSponsored()
+	})
+}
+
+// SetUpworkJobSuccessScore sets the "upwork_job_success_score" field.
+func (u *FreelancerUpsertBulk) SetUpworkJobSuccessScore(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkJobSuccessScore(v)
+	})
+}
+
+// AddUpworkJobSuccessScore adds v to the "upwork_job_success_score" field.
+func (u *FreelancerUpsertBulk) AddUpworkJobSuccessScore(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUpworkJobSuccessScore(v)
+	})
+}
+
+// UpdateUpworkJobSuccessScore sets the "upwork_job_success_score" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkJobSuccessScore() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkJobSuccessScore()
+	})
+}
+
+// SetUpworkReccomended sets the "upwork_reccomended" field.
+func (u *FreelancerUpsertBulk) SetUpworkReccomended(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUpworkReccomended(v)
+	})
+}
+
+// UpdateUpworkReccomended sets the "upwork_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUpworkReccomended() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUpworkReccomended()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *FreelancerUpsertBulk) SetSkills(v []string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateSkills() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// SetAverageRecentEarnings sets the "average_recent_earnings" field.
+func (u *FreelancerUpsertBulk) SetAverageRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetAverageRecentEarnings(v)
+	})
+}
+
+// AddAverageRecentEarnings adds v to the "average_recent_earnings" field.
+func (u *FreelancerUpsertBulk) AddAverageRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddAverageRecentEarnings(v)
+	})
+}
+
+// UpdateAverageRecentEarnings sets the "average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateAverageRecentEarnings() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateAverageRecentEarnings()
+	})
+}
+
+// SetCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsertBulk) SetCombinedAverageRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedAverageRecentEarnings(v)
+	})
+}
+
+// AddCombinedAverageRecentEarnings adds v to the "combined_average_recent_earnings" field.
+func (u *FreelancerUpsertBulk) AddCombinedAverageRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedAverageRecentEarnings(v)
+	})
+}
+
+// UpdateCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCombinedAverageRecentEarnings() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedAverageRecentEarnings()
+	})
+}
+
+// SetCombinedRecentEarnings sets the "combined_recent_earnings" field.
+func (u *FreelancerUpsertBulk) SetCombinedRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedRecentEarnings(v)
+	})
+}
+
+// AddCombinedRecentEarnings adds v to the "combined_recent_earnings" field.
+func (u *FreelancerUpsertBulk) AddCombinedRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedRecentEarnings(v)
+	})
+}
+
+// UpdateCombinedRecentEarnings sets the "combined_recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCombinedRecentEarnings() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedRecentEarnings()
+	})
+}
+
+// SetCombinedTotalEarnings sets the "combined_total_earnings" field.
+func (u *FreelancerUpsertBulk) SetCombinedTotalEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedTotalEarnings(v)
+	})
+}
+
+// AddCombinedTotalEarnings adds v to the "combined_total_earnings" field.
+func (u *FreelancerUpsertBulk) AddCombinedTotalEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedTotalEarnings(v)
+	})
+}
+
+// UpdateCombinedTotalEarnings sets the "combined_total_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCombinedTotalEarnings() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedTotalEarnings()
+	})
+}
+
+// SetCombinedTotalRevenue sets the "combined_total_revenue" field.
+func (u *FreelancerUpsertBulk) SetCombinedTotalRevenue(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetCombinedTotalRevenue(v)
+	})
+}
+
+// AddCombinedTotalRevenue adds v to the "combined_total_revenue" field.
+func (u *FreelancerUpsertBulk) AddCombinedTotalRevenue(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddCombinedTotalRevenue(v)
+	})
+}
+
+// UpdateCombinedTotalRevenue sets the "combined_total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateCombinedTotalRevenue() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateCombinedTotalRevenue()
+	})
+}
+
+// SetRecentEarnings sets the "recent_earnings" field.
+func (u *FreelancerUpsertBulk) SetRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetRecentEarnings(v)
+	})
+}
+
+// AddRecentEarnings adds v to the "recent_earnings" field.
+func (u *FreelancerUpsertBulk) AddRecentEarnings(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddRecentEarnings(v)
+	})
+}
+
+// UpdateRecentEarnings sets the "recent_earnings" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateRecentEarnings() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateRecentEarnings()
+	})
+}
+
+// SetTotalRevenue sets the "total_revenue" field.
+func (u *FreelancerUpsertBulk) SetTotalRevenue(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetTotalRevenue(v)
+	})
+}
+
+// AddTotalRevenue adds v to the "total_revenue" field.
+func (u *FreelancerUpsertBulk) AddTotalRevenue(v float64) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddTotalRevenue(v)
+	})
+}
+
+// UpdateTotalRevenue sets the "total_revenue" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateTotalRevenue() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateTotalRevenue()
+	})
+}
+
+// SetUprankScore sets the "uprank_score" field.
+func (u *FreelancerUpsertBulk) SetUprankScore(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankScore(v)
+	})
+}
+
+// AddUprankScore adds v to the "uprank_score" field.
+func (u *FreelancerUpsertBulk) AddUprankScore(v int) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.AddUprankScore(v)
+	})
+}
+
+// UpdateUprankScore sets the "uprank_score" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUprankScore() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankScore()
+	})
+}
+
+// ClearUprankScore clears the value of the "uprank_score" field.
+func (u *FreelancerUpsertBulk) ClearUprankScore() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankScore()
+	})
+}
+
+// SetUprankUpdatedAt sets the "uprank_updated_at" field.
+func (u *FreelancerUpsertBulk) SetUprankUpdatedAt(v time.Time) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankUpdatedAt(v)
+	})
+}
+
+// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUprankUpdatedAt() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankUpdatedAt()
+	})
+}
+
+// SetUprankReccomended sets the "uprank_reccomended" field.
+func (u *FreelancerUpsertBulk) SetUprankReccomended(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankReccomended(v)
+	})
+}
+
+// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUprankReccomended() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankReccomended()
+	})
+}
+
+// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
+func (u *FreelancerUpsertBulk) ClearUprankReccomended() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankReccomended()
+	})
+}
+
+// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsertBulk) SetUprankReccomendedReasons(v string) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankReccomendedReasons(v)
+	})
+}
+
+// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUprankReccomendedReasons() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankReccomendedReasons()
+	})
+}
+
+// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
+func (u *FreelancerUpsertBulk) ClearUprankReccomendedReasons() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankReccomendedReasons()
+	})
+}
+
+// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
+func (u *FreelancerUpsertBulk) SetUprankNotEnoughData(v bool) *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.SetUprankNotEnoughData(v)
+	})
+}
+
+// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
+func (u *FreelancerUpsertBulk) UpdateUprankNotEnoughData() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.UpdateUprankNotEnoughData()
+	})
+}
+
+// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
+func (u *FreelancerUpsertBulk) ClearUprankNotEnoughData() *FreelancerUpsertBulk {
+	return u.Update(func(s *FreelancerUpsert) {
+		s.ClearUprankNotEnoughData()
+	})
+}
+
+// Exec executes the query.
+func (u *FreelancerUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the FreelancerCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FreelancerCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FreelancerUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
