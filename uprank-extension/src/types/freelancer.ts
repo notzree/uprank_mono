@@ -71,6 +71,7 @@ export interface Scraped_Freelancer_Data {
   skills: string[]
   earnings_info: Earnings_Info
   attachements: Attachements[]
+  work_history: FreelancerJobHistory[] | null
 }
 
 export interface Location {
@@ -95,6 +96,7 @@ export interface Attachements {
 }
 
 export interface CreateFreelancerProxyRequest {
+  update: boolean
   authentication_token: string
   freelancers: Scraped_Freelancer_Data[]
   job_id: string
@@ -108,14 +110,32 @@ interface BatchPayload {
     count: number;  
 }
 
-export interface Unstable_Scraped_Freelancer_Data {
+export interface ScrapeFreelancerResponse {
   freelancers: Scraped_Freelancer_Data[]
   missing_fields: boolean
   missing_freelancers: number
 }
 
 
-export interface ScrapeFreelancerResponse {
+export interface CreateFreelancerResponse {
   ok: boolean
   count: number
+}
+
+
+export type FreelancerJobHistory = {
+  title: string;
+  date: string;
+  description: string;
+  budget: string;
+  total_earned: number;
+  client_total_spend: string;
+  client_total_hires: string;
+  client_feedback: string;
+  client_rating: number;
+}
+
+export type ProcessFreelancerJobHistoryResult = {
+  name: string;
+  jobs: FreelancerJobHistory[];
 }

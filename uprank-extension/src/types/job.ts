@@ -29,6 +29,7 @@ export type Job = {
     fixed: boolean;
     hourly_rate: number[];
     fixed_rate: number;
+
   }
 
   export type CreateJobProxyRequest = {
@@ -40,4 +41,8 @@ export type Job = {
     job: ScrapedJobData;
     missingFields: boolean;
   }
+
+
+
+
   
