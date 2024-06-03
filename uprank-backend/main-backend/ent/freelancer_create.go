@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
@@ -22,12 +21,6 @@ type FreelancerCreate struct {
 	config
 	mutation *FreelancerMutation
 	hooks    []Hook
-}
-
-// SetURL sets the "url" field.
-func (fc *FreelancerCreate) SetURL(s string) *FreelancerCreate {
-	fc.mutation.SetURL(s)
-	return fc
 }
 
 // SetName sets the "name" field.
@@ -315,16 +308,8 @@ func (fc *FreelancerCreate) SetNillableUprankNotEnoughData(b *bool) *FreelancerC
 }
 
 // SetID sets the "id" field.
-func (fc *FreelancerCreate) SetID(u uuid.UUID) *FreelancerCreate {
-	fc.mutation.SetID(u)
-	return fc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (fc *FreelancerCreate) SetNillableID(u *uuid.UUID) *FreelancerCreate {
-	if u != nil {
-		fc.SetID(*u)
-	}
+func (fc *FreelancerCreate) SetID(s string) *FreelancerCreate {
+	fc.mutation.SetID(s)
 	return fc
 }
 
@@ -420,17 +405,10 @@ func (fc *FreelancerCreate) defaults() {
 		v := freelancer.DefaultUprankNotEnoughData
 		fc.mutation.SetUprankNotEnoughData(v)
 	}
-	if _, ok := fc.mutation.ID(); !ok {
-		v := freelancer.DefaultID()
-		fc.mutation.SetID(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (fc *FreelancerCreate) check() error {
-	if _, ok := fc.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Freelancer.url"`)}
-	}
 	if _, ok := fc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Freelancer.name"`)}
 	}
@@ -527,6 +505,11 @@ func (fc *FreelancerCreate) check() error {
 	if _, ok := fc.mutation.UprankUpdatedAt(); !ok {
 		return &ValidationError{Name: "uprank_updated_at", err: errors.New(`ent: missing required field "Freelancer.uprank_updated_at"`)}
 	}
+	if v, ok := fc.mutation.ID(); ok {
+		if err := freelancer.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Freelancer.id": %w`, err)}
+		}
+	}
 	if _, ok := fc.mutation.JobID(); !ok {
 		return &ValidationError{Name: "job", err: errors.New(`ent: missing required edge "Freelancer.job"`)}
 	}
@@ -545,10 +528,10 @@ func (fc *FreelancerCreate) sqlSave(ctx context.Context) (*Freelancer, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Freelancer.ID type: %T", _spec.ID.Value)
 		}
 	}
 	fc.mutation.id = &_node.ID
@@ -559,15 +542,11 @@ func (fc *FreelancerCreate) sqlSave(ctx context.Context) (*Freelancer, error) {
 func (fc *FreelancerCreate) createSpec() (*Freelancer, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Freelancer{config: fc.config}
-		_spec = sqlgraph.NewCreateSpec(freelancer.Table, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(freelancer.Table, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString))
 	)
 	if id, ok := fc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
-	}
-	if value, ok := fc.mutation.URL(); ok {
-		_spec.SetField(freelancer.FieldURL, field.TypeString, value)
-		_node.URL = value
+		_spec.ID.Value = id
 	}
 	if value, ok := fc.mutation.Name(); ok {
 		_spec.SetField(freelancer.FieldName, field.TypeString, value)

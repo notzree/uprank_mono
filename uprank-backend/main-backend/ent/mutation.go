@@ -11,7 +11,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
@@ -45,7 +44,7 @@ type AttachmentRefMutation struct {
 	name              *string
 	link              *string
 	clearedFields     map[string]struct{}
-	freelancer        *uuid.UUID
+	freelancer        *string
 	clearedfreelancer bool
 	done              bool
 	oldValue          func(context.Context) (*AttachmentRef, error)
@@ -223,7 +222,7 @@ func (m *AttachmentRefMutation) ResetLink() {
 }
 
 // SetFreelancerID sets the "freelancer" edge to the Freelancer entity by id.
-func (m *AttachmentRefMutation) SetFreelancerID(id uuid.UUID) {
+func (m *AttachmentRefMutation) SetFreelancerID(id string) {
 	m.freelancer = &id
 }
 
@@ -238,7 +237,7 @@ func (m *AttachmentRefMutation) FreelancerCleared() bool {
 }
 
 // FreelancerID returns the "freelancer" edge ID in the mutation.
-func (m *AttachmentRefMutation) FreelancerID() (id uuid.UUID, exists bool) {
+func (m *AttachmentRefMutation) FreelancerID() (id string, exists bool) {
 	if m.freelancer != nil {
 		return *m.freelancer, true
 	}
@@ -248,7 +247,7 @@ func (m *AttachmentRefMutation) FreelancerID() (id uuid.UUID, exists bool) {
 // FreelancerIDs returns the "freelancer" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // FreelancerID instead. It exists only for internal usage by the builders.
-func (m *AttachmentRefMutation) FreelancerIDs() (ids []uuid.UUID) {
+func (m *AttachmentRefMutation) FreelancerIDs() (ids []string) {
 	if id := m.freelancer; id != nil {
 		ids = append(ids, *id)
 	}
@@ -488,8 +487,7 @@ type FreelancerMutation struct {
 	config
 	op                                  Op
 	typ                                 string
-	id                                  *uuid.UUID
-	url                                 *string
+	id                                  *string
 	name                                *string
 	title                               *string
 	description                         *string
@@ -580,7 +578,7 @@ func newFreelancerMutation(c config, op Op, opts ...freelancerOption) *Freelance
 }
 
 // withFreelancerID sets the ID field of the mutation.
-func withFreelancerID(id uuid.UUID) freelancerOption {
+func withFreelancerID(id string) freelancerOption {
 	return func(m *FreelancerMutation) {
 		var (
 			err   error
@@ -632,13 +630,13 @@ func (m FreelancerMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Freelancer entities.
-func (m *FreelancerMutation) SetID(id uuid.UUID) {
+func (m *FreelancerMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *FreelancerMutation) ID() (id uuid.UUID, exists bool) {
+func (m *FreelancerMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -649,12 +647,12 @@ func (m *FreelancerMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *FreelancerMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *FreelancerMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -662,42 +660,6 @@ func (m *FreelancerMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetURL sets the "url" field.
-func (m *FreelancerMutation) SetURL(s string) {
-	m.url = &s
-}
-
-// URL returns the value of the "url" field in the mutation.
-func (m *FreelancerMutation) URL() (r string, exists bool) {
-	v := m.url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURL returns the old "url" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
-	}
-	return oldValue.URL, nil
-}
-
-// ResetURL resets all changes to the "url" field.
-func (m *FreelancerMutation) ResetURL() {
-	m.url = nil
 }
 
 // SetName sets the "name" field.
@@ -2685,10 +2647,7 @@ func (m *FreelancerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 39)
-	if m.url != nil {
-		fields = append(fields, freelancer.FieldURL)
-	}
+	fields := make([]string, 0, 38)
 	if m.name != nil {
 		fields = append(fields, freelancer.FieldName)
 	}
@@ -2811,8 +2770,6 @@ func (m *FreelancerMutation) Fields() []string {
 // schema.
 func (m *FreelancerMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case freelancer.FieldURL:
-		return m.URL()
 	case freelancer.FieldName:
 		return m.Name()
 	case freelancer.FieldTitle:
@@ -2898,8 +2855,6 @@ func (m *FreelancerMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *FreelancerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case freelancer.FieldURL:
-		return m.OldURL(ctx)
 	case freelancer.FieldName:
 		return m.OldName(ctx)
 	case freelancer.FieldTitle:
@@ -2985,13 +2940,6 @@ func (m *FreelancerMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *FreelancerMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case freelancer.FieldURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURL(v)
-		return nil
 	case freelancer.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -3553,9 +3501,6 @@ func (m *FreelancerMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *FreelancerMutation) ResetField(name string) error {
 	switch name {
-	case freelancer.FieldURL:
-		m.ResetURL()
-		return nil
 	case freelancer.FieldName:
 		m.ResetName()
 		return nil
@@ -3830,8 +3775,8 @@ type JobMutation struct {
 	clearedFields           map[string]struct{}
 	user                    *string
 	cleareduser             bool
-	freelancers             map[uuid.UUID]struct{}
-	removedfreelancers      map[uuid.UUID]struct{}
+	freelancers             map[string]struct{}
+	removedfreelancers      map[string]struct{}
 	clearedfreelancers      bool
 	done                    bool
 	oldValue                func(context.Context) (*Job, error)
@@ -4670,9 +4615,9 @@ func (m *JobMutation) ResetUser() {
 }
 
 // AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by ids.
-func (m *JobMutation) AddFreelancerIDs(ids ...uuid.UUID) {
+func (m *JobMutation) AddFreelancerIDs(ids ...string) {
 	if m.freelancers == nil {
-		m.freelancers = make(map[uuid.UUID]struct{})
+		m.freelancers = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.freelancers[ids[i]] = struct{}{}
@@ -4690,9 +4635,9 @@ func (m *JobMutation) FreelancersCleared() bool {
 }
 
 // RemoveFreelancerIDs removes the "freelancers" edge to the Freelancer entity by IDs.
-func (m *JobMutation) RemoveFreelancerIDs(ids ...uuid.UUID) {
+func (m *JobMutation) RemoveFreelancerIDs(ids ...string) {
 	if m.removedfreelancers == nil {
-		m.removedfreelancers = make(map[uuid.UUID]struct{})
+		m.removedfreelancers = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.freelancers, ids[i])
@@ -4701,7 +4646,7 @@ func (m *JobMutation) RemoveFreelancerIDs(ids ...uuid.UUID) {
 }
 
 // RemovedFreelancers returns the removed IDs of the "freelancers" edge to the Freelancer entity.
-func (m *JobMutation) RemovedFreelancersIDs() (ids []uuid.UUID) {
+func (m *JobMutation) RemovedFreelancersIDs() (ids []string) {
 	for id := range m.removedfreelancers {
 		ids = append(ids, id)
 	}
@@ -4709,7 +4654,7 @@ func (m *JobMutation) RemovedFreelancersIDs() (ids []uuid.UUID) {
 }
 
 // FreelancersIDs returns the "freelancers" edge IDs in the mutation.
-func (m *JobMutation) FreelancersIDs() (ids []uuid.UUID) {
+func (m *JobMutation) FreelancersIDs() (ids []string) {
 	for id := range m.freelancers {
 		ids = append(ids, id)
 	}
@@ -6000,7 +5945,7 @@ type WorkHistoryMutation struct {
 	client_company_category            *string
 	client_company_size                *string
 	clearedFields                      map[string]struct{}
-	upwork_Freelancer_Proposal         *uuid.UUID
+	upwork_Freelancer_Proposal         *string
 	clearedupwork_Freelancer_Proposal  bool
 	done                               bool
 	oldValue                           func(context.Context) (*WorkHistory, error)
@@ -7324,7 +7269,7 @@ func (m *WorkHistoryMutation) ResetClientCompanySize() {
 }
 
 // SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by id.
-func (m *WorkHistoryMutation) SetUpworkFreelancerProposalID(id uuid.UUID) {
+func (m *WorkHistoryMutation) SetUpworkFreelancerProposalID(id string) {
 	m.upwork_Freelancer_Proposal = &id
 }
 
@@ -7339,7 +7284,7 @@ func (m *WorkHistoryMutation) UpworkFreelancerProposalCleared() bool {
 }
 
 // UpworkFreelancerProposalID returns the "upwork_Freelancer_Proposal" edge ID in the mutation.
-func (m *WorkHistoryMutation) UpworkFreelancerProposalID() (id uuid.UUID, exists bool) {
+func (m *WorkHistoryMutation) UpworkFreelancerProposalID() (id string, exists bool) {
 	if m.upwork_Freelancer_Proposal != nil {
 		return *m.upwork_Freelancer_Proposal, true
 	}
@@ -7349,7 +7294,7 @@ func (m *WorkHistoryMutation) UpworkFreelancerProposalID() (id uuid.UUID, exists
 // UpworkFreelancerProposalIDs returns the "upwork_Freelancer_Proposal" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // UpworkFreelancerProposalID instead. It exists only for internal usage by the builders.
-func (m *WorkHistoryMutation) UpworkFreelancerProposalIDs() (ids []uuid.UUID) {
+func (m *WorkHistoryMutation) UpworkFreelancerProposalIDs() (ids []string) {
 	if id := m.upwork_Freelancer_Proposal; id != nil {
 		ids = append(ids, *id)
 	}

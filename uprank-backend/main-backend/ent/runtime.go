@@ -5,7 +5,6 @@ package ent
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/schema"
@@ -19,27 +18,27 @@ func init() {
 	freelancerFields := schema.Freelancer{}.Fields()
 	_ = freelancerFields
 	// freelancerDescUprankScore is the schema descriptor for uprank_score field.
-	freelancerDescUprankScore := freelancerFields[35].Descriptor()
+	freelancerDescUprankScore := freelancerFields[34].Descriptor()
 	// freelancer.DefaultUprankScore holds the default value on creation for the uprank_score field.
 	freelancer.DefaultUprankScore = freelancerDescUprankScore.Default.(int)
 	// freelancerDescUprankUpdatedAt is the schema descriptor for uprank_updated_at field.
-	freelancerDescUprankUpdatedAt := freelancerFields[36].Descriptor()
+	freelancerDescUprankUpdatedAt := freelancerFields[35].Descriptor()
 	// freelancer.DefaultUprankUpdatedAt holds the default value on creation for the uprank_updated_at field.
 	freelancer.DefaultUprankUpdatedAt = freelancerDescUprankUpdatedAt.Default.(func() time.Time)
 	// freelancer.UpdateDefaultUprankUpdatedAt holds the default value on update for the uprank_updated_at field.
 	freelancer.UpdateDefaultUprankUpdatedAt = freelancerDescUprankUpdatedAt.UpdateDefault.(func() time.Time)
 	// freelancerDescUprankReccomended is the schema descriptor for uprank_reccomended field.
-	freelancerDescUprankReccomended := freelancerFields[37].Descriptor()
+	freelancerDescUprankReccomended := freelancerFields[36].Descriptor()
 	// freelancer.DefaultUprankReccomended holds the default value on creation for the uprank_reccomended field.
 	freelancer.DefaultUprankReccomended = freelancerDescUprankReccomended.Default.(bool)
 	// freelancerDescUprankNotEnoughData is the schema descriptor for uprank_not_enough_data field.
-	freelancerDescUprankNotEnoughData := freelancerFields[39].Descriptor()
+	freelancerDescUprankNotEnoughData := freelancerFields[38].Descriptor()
 	// freelancer.DefaultUprankNotEnoughData holds the default value on creation for the uprank_not_enough_data field.
 	freelancer.DefaultUprankNotEnoughData = freelancerDescUprankNotEnoughData.Default.(bool)
 	// freelancerDescID is the schema descriptor for id field.
 	freelancerDescID := freelancerFields[0].Descriptor()
-	// freelancer.DefaultID holds the default value on creation for the id field.
-	freelancer.DefaultID = freelancerDescID.Default.(func() uuid.UUID)
+	// freelancer.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	freelancer.IDValidator = freelancerDescID.Validators[0].(func(string) error)
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
 	// jobDescTitle is the schema descriptor for title field.

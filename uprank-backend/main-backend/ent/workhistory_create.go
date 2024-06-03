@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -241,7 +240,7 @@ func (whc *WorkHistoryCreate) SetNillableClientCompanySize(s *string) *WorkHisto
 }
 
 // SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by ID.
-func (whc *WorkHistoryCreate) SetUpworkFreelancerProposalID(id uuid.UUID) *WorkHistoryCreate {
+func (whc *WorkHistoryCreate) SetUpworkFreelancerProposalID(id string) *WorkHistoryCreate {
 	whc.mutation.SetUpworkFreelancerProposalID(id)
 	return whc
 }
@@ -453,7 +452,7 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
@@ -175,14 +174,14 @@ func (jc *JobCreate) SetUser(u *User) *JobCreate {
 }
 
 // AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
-func (jc *JobCreate) AddFreelancerIDs(ids ...uuid.UUID) *JobCreate {
+func (jc *JobCreate) AddFreelancerIDs(ids ...string) *JobCreate {
 	jc.mutation.AddFreelancerIDs(ids...)
 	return jc
 }
 
 // AddFreelancers adds the "freelancers" edges to the Freelancer entity.
 func (jc *JobCreate) AddFreelancers(f ...*Freelancer) *JobCreate {
-	ids := make([]uuid.UUID, len(f))
+	ids := make([]string, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
@@ -377,7 +376,7 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 			Columns: []string{job.FreelancersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

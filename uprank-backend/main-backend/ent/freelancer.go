@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 )
@@ -19,9 +18,7 @@ import (
 type Freelancer struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
+	ID string `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Title holds the value of the "title" field.
@@ -160,12 +157,10 @@ func (*Freelancer) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case freelancer.FieldTotalPortfolioItems, freelancer.FieldTotalPortfolioV2Items, freelancer.FieldUprankScore:
 			values[i] = new(sql.NullInt64)
-		case freelancer.FieldURL, freelancer.FieldName, freelancer.FieldTitle, freelancer.FieldDescription, freelancer.FieldCity, freelancer.FieldCountry, freelancer.FieldTimezone, freelancer.FieldCv, freelancer.FieldFixedChargeCurrency, freelancer.FieldHourlyChargeCurrency, freelancer.FieldPhotoURL, freelancer.FieldUprankReccomendedReasons:
+		case freelancer.FieldID, freelancer.FieldName, freelancer.FieldTitle, freelancer.FieldDescription, freelancer.FieldCity, freelancer.FieldCountry, freelancer.FieldTimezone, freelancer.FieldCv, freelancer.FieldFixedChargeCurrency, freelancer.FieldHourlyChargeCurrency, freelancer.FieldPhotoURL, freelancer.FieldUprankReccomendedReasons:
 			values[i] = new(sql.NullString)
 		case freelancer.FieldUprankUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case freelancer.FieldID:
-			values[i] = new(uuid.UUID)
 		case freelancer.ForeignKeys[0]: // job_freelancers
 			values[i] = new(sql.NullString)
 		default:
@@ -184,16 +179,10 @@ func (f *Freelancer) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case freelancer.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				f.ID = *value
-			}
-		case freelancer.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
+				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				f.URL = value.String
+				f.ID = value.String
 			}
 		case freelancer.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -483,9 +472,6 @@ func (f *Freelancer) String() string {
 	var builder strings.Builder
 	builder.WriteString("Freelancer(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
-	builder.WriteString("url=")
-	builder.WriteString(f.URL)
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(f.Name)
 	builder.WriteString(", ")

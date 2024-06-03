@@ -32,20 +32,6 @@ func (fu *FreelancerUpdate) Where(ps ...predicate.Freelancer) *FreelancerUpdate 
 	return fu
 }
 
-// SetURL sets the "url" field.
-func (fu *FreelancerUpdate) SetURL(s string) *FreelancerUpdate {
-	fu.mutation.SetURL(s)
-	return fu
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (fu *FreelancerUpdate) SetNillableURL(s *string) *FreelancerUpdate {
-	if s != nil {
-		fu.SetURL(*s)
-	}
-	return fu
-}
-
 // SetName sets the "name" field.
 func (fu *FreelancerUpdate) SetName(s string) *FreelancerUpdate {
 	fu.mutation.SetName(s)
@@ -865,16 +851,13 @@ func (fu *FreelancerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := fu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString))
 	if ps := fu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := fu.mutation.URL(); ok {
-		_spec.SetField(freelancer.FieldURL, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.Name(); ok {
 		_spec.SetField(freelancer.FieldName, field.TypeString, value)
@@ -1201,20 +1184,6 @@ type FreelancerUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *FreelancerMutation
-}
-
-// SetURL sets the "url" field.
-func (fuo *FreelancerUpdateOne) SetURL(s string) *FreelancerUpdateOne {
-	fuo.mutation.SetURL(s)
-	return fuo
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (fuo *FreelancerUpdateOne) SetNillableURL(s *string) *FreelancerUpdateOne {
-	if s != nil {
-		fuo.SetURL(*s)
-	}
-	return fuo
 }
 
 // SetName sets the "name" field.
@@ -2049,7 +2018,7 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 	if err := fuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(freelancer.Table, freelancer.Columns, sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString))
 	id, ok := fuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Freelancer.id" for update`)}
@@ -2073,9 +2042,6 @@ func (fuo *FreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Freelancer,
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := fuo.mutation.URL(); ok {
-		_spec.SetField(freelancer.FieldURL, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.Name(); ok {
 		_spec.SetField(freelancer.FieldName, field.TypeString, value)

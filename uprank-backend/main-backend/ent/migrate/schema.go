@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "link", Type: field.TypeString},
-		{Name: "freelancer_attachments", Type: field.TypeUUID},
+		{Name: "freelancer_attachments", Type: field.TypeString},
 	}
 	// AttachmentRefsTable holds the schema information for the "attachment_refs" table.
 	AttachmentRefsTable = &schema.Table{
@@ -31,8 +31,7 @@ var (
 	}
 	// FreelancersColumns holds the columns for the "freelancers" table.
 	FreelancersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "url", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
@@ -81,7 +80,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "freelancers_jobs_freelancers",
-				Columns:    []*schema.Column{FreelancersColumns[40]},
+				Columns:    []*schema.Column{FreelancersColumns[39]},
 				RefColumns: []*schema.Column{JobsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -161,7 +160,7 @@ var (
 		{Name: "client_average_hourly_rate_paid", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "client_company_category", Type: field.TypeString, Nullable: true},
 		{Name: "client_company_size", Type: field.TypeString, Nullable: true},
-		{Name: "freelancer_work_histories", Type: field.TypeUUID},
+		{Name: "freelancer_work_histories", Type: field.TypeString},
 	}
 	// WorkHistoriesTable holds the schema information for the "work_histories" table.
 	WorkHistoriesTable = &schema.Table{

@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -69,7 +68,7 @@ type WorkHistory struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkHistoryQuery when eager-loading is set.
 	Edges                     WorkHistoryEdges `json:"edges"`
-	freelancer_work_histories *uuid.UUID
+	freelancer_work_histories *string
 	selectValues              sql.SelectValues
 }
 
@@ -109,7 +108,7 @@ func (*WorkHistory) scanValues(columns []string) ([]any, error) {
 		case workhistory.FieldStartDate, workhistory.FieldEndDate:
 			values[i] = new(sql.NullTime)
 		case workhistory.ForeignKeys[0]: // freelancer_work_histories
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -272,11 +271,11 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 				wh.ClientCompanySize = value.String
 			}
 		case workhistory.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field freelancer_work_histories", values[i])
 			} else if value.Valid {
-				wh.freelancer_work_histories = new(uuid.UUID)
-				*wh.freelancer_work_histories = *value.S.(*uuid.UUID)
+				wh.freelancer_work_histories = new(string)
+				*wh.freelancer_work_histories = value.String
 			}
 		default:
 			wh.selectValues.Set(columns[i], values[i])

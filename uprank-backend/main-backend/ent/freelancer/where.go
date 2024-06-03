@@ -7,58 +7,62 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Freelancer {
+func ID(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Freelancer {
+func IDEQ(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Freelancer {
+func IDNEQ(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Freelancer {
+func IDIn(ids ...string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Freelancer {
+func IDNotIn(ids ...string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Freelancer {
+func IDGT(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Freelancer {
+func IDGTE(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Freelancer {
+func IDLT(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Freelancer {
+func IDLTE(id string) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldLTE(FieldID, id))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldEQ(FieldURL, v))
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Freelancer {
+	return predicate.Freelancer(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Freelancer {
+	return predicate.Freelancer(sql.FieldContainsFold(FieldID, id))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -244,71 +248,6 @@ func UprankReccomendedReasons(v string) predicate.Freelancer {
 // UprankNotEnoughData applies equality check predicate on the "uprank_not_enough_data" field. It's identical to UprankNotEnoughDataEQ.
 func UprankNotEnoughData(v bool) predicate.Freelancer {
 	return predicate.Freelancer(sql.FieldEQ(FieldUprankNotEnoughData, v))
-}
-
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldEQ(FieldURL, v))
-}
-
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldNEQ(FieldURL, v))
-}
-
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldIn(FieldURL, vs...))
-}
-
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldNotIn(FieldURL, vs...))
-}
-
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldGT(FieldURL, v))
-}
-
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldGTE(FieldURL, v))
-}
-
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldLT(FieldURL, v))
-}
-
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldLTE(FieldURL, v))
-}
-
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldContains(FieldURL, v))
-}
-
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldHasPrefix(FieldURL, v))
-}
-
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldHasSuffix(FieldURL, v))
-}
-
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldEqualFold(FieldURL, v))
-}
-
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.Freelancer {
-	return predicate.Freelancer(sql.FieldContainsFold(FieldURL, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

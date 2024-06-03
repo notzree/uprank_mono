@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
@@ -410,8 +409,8 @@ func (whq *WorkHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 }
 
 func (whq *WorkHistoryQuery) loadUpworkFreelancerProposal(ctx context.Context, query *FreelancerQuery, nodes []*WorkHistory, init func(*WorkHistory), assign func(*WorkHistory, *Freelancer)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*WorkHistory)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*WorkHistory)
 	for i := range nodes {
 		if nodes[i].freelancer_work_histories == nil {
 			continue
