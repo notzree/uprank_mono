@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
@@ -19,6 +20,7 @@ type WorkHistoryCreate struct {
 	config
 	mutation *WorkHistoryMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetTitle sets the "title" field.
@@ -352,6 +354,7 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 		_node = &WorkHistory{config: whc.config}
 		_spec = sqlgraph.NewCreateSpec(workhistory.Table, sqlgraph.NewFieldSpec(workhistory.FieldID, field.TypeInt))
 	)
+	_spec.OnConflict = whc.conflict
 	if value, ok := whc.mutation.Title(); ok {
 		_spec.SetField(workhistory.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -464,11 +467,1018 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WorkHistory.Create().
+//		SetTitle(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WorkHistoryUpsert) {
+//			SetTitle(v+v).
+//		}).
+//		Exec(ctx)
+func (whc *WorkHistoryCreate) OnConflict(opts ...sql.ConflictOption) *WorkHistoryUpsertOne {
+	whc.conflict = opts
+	return &WorkHistoryUpsertOne{
+		create: whc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (whc *WorkHistoryCreate) OnConflictColumns(columns ...string) *WorkHistoryUpsertOne {
+	whc.conflict = append(whc.conflict, sql.ConflictColumns(columns...))
+	return &WorkHistoryUpsertOne{
+		create: whc,
+	}
+}
+
+type (
+	// WorkHistoryUpsertOne is the builder for "upsert"-ing
+	//  one WorkHistory node.
+	WorkHistoryUpsertOne struct {
+		create *WorkHistoryCreate
+	}
+
+	// WorkHistoryUpsert is the "OnConflict" setter.
+	WorkHistoryUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetTitle sets the "title" field.
+func (u *WorkHistoryUpsert) SetTitle(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldTitle, v)
+	return u
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateTitle() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldTitle)
+	return u
+}
+
+// SetClientFeedback sets the "client_feedback" field.
+func (u *WorkHistoryUpsert) SetClientFeedback(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientFeedback, v)
+	return u
+}
+
+// UpdateClientFeedback sets the "client_feedback" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientFeedback() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientFeedback)
+	return u
+}
+
+// SetOverallRating sets the "overall_rating" field.
+func (u *WorkHistoryUpsert) SetOverallRating(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldOverallRating, v)
+	return u
+}
+
+// UpdateOverallRating sets the "overall_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateOverallRating() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldOverallRating)
+	return u
+}
+
+// AddOverallRating adds v to the "overall_rating" field.
+func (u *WorkHistoryUpsert) AddOverallRating(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldOverallRating, v)
+	return u
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsert) SetFixedChargeAmount(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldFixedChargeAmount, v)
+	return u
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateFixedChargeAmount() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldFixedChargeAmount)
+	return u
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsert) AddFixedChargeAmount(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldFixedChargeAmount, v)
+	return u
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsert) ClearFixedChargeAmount() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldFixedChargeAmount)
+	return u
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsert) SetFixedChargeCurrency(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldFixedChargeCurrency, v)
+	return u
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateFixedChargeCurrency() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldFixedChargeCurrency)
+	return u
+}
+
+// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsert) ClearFixedChargeCurrency() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldFixedChargeCurrency)
+	return u
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsert) SetHourlyChargeAmount(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldHourlyChargeAmount, v)
+	return u
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateHourlyChargeAmount() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldHourlyChargeAmount)
+	return u
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsert) AddHourlyChargeAmount(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldHourlyChargeAmount, v)
+	return u
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsert) ClearHourlyChargeAmount() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldHourlyChargeAmount)
+	return u
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsert) SetHourlyChargeCurrency(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldHourlyChargeCurrency, v)
+	return u
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateHourlyChargeCurrency() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldHourlyChargeCurrency)
+	return u
+}
+
+// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsert) ClearHourlyChargeCurrency() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldHourlyChargeCurrency)
+	return u
+}
+
+// SetStartDate sets the "start_date" field.
+func (u *WorkHistoryUpsert) SetStartDate(v time.Time) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldStartDate, v)
+	return u
+}
+
+// UpdateStartDate sets the "start_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateStartDate() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldStartDate)
+	return u
+}
+
+// SetEndDate sets the "end_date" field.
+func (u *WorkHistoryUpsert) SetEndDate(v time.Time) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldEndDate, v)
+	return u
+}
+
+// UpdateEndDate sets the "end_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateEndDate() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldEndDate)
+	return u
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (u *WorkHistoryUpsert) ClearEndDate() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldEndDate)
+	return u
+}
+
+// SetJobDescription sets the "job_description" field.
+func (u *WorkHistoryUpsert) SetJobDescription(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldJobDescription, v)
+	return u
+}
+
+// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateJobDescription() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldJobDescription)
+	return u
+}
+
+// SetTotalProposals sets the "total_proposals" field.
+func (u *WorkHistoryUpsert) SetTotalProposals(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldTotalProposals, v)
+	return u
+}
+
+// UpdateTotalProposals sets the "total_proposals" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateTotalProposals() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldTotalProposals)
+	return u
+}
+
+// AddTotalProposals adds v to the "total_proposals" field.
+func (u *WorkHistoryUpsert) AddTotalProposals(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldTotalProposals, v)
+	return u
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (u *WorkHistoryUpsert) SetNumberOfInterviews(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldNumberOfInterviews, v)
+	return u
+}
+
+// UpdateNumberOfInterviews sets the "number_of_interviews" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateNumberOfInterviews() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldNumberOfInterviews)
+	return u
+}
+
+// AddNumberOfInterviews adds v to the "number_of_interviews" field.
+func (u *WorkHistoryUpsert) AddNumberOfInterviews(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldNumberOfInterviews, v)
+	return u
+}
+
+// SetSkills sets the "skills" field.
+func (u *WorkHistoryUpsert) SetSkills(v []string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldSkills, v)
+	return u
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateSkills() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldSkills)
+	return u
+}
+
+// SetClientRating sets the "client_rating" field.
+func (u *WorkHistoryUpsert) SetClientRating(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientRating, v)
+	return u
+}
+
+// UpdateClientRating sets the "client_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientRating() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientRating)
+	return u
+}
+
+// AddClientRating adds v to the "client_rating" field.
+func (u *WorkHistoryUpsert) AddClientRating(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientRating, v)
+	return u
+}
+
+// SetClientReviewCount sets the "client_review_count" field.
+func (u *WorkHistoryUpsert) SetClientReviewCount(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientReviewCount, v)
+	return u
+}
+
+// UpdateClientReviewCount sets the "client_review_count" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientReviewCount() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientReviewCount)
+	return u
+}
+
+// AddClientReviewCount adds v to the "client_review_count" field.
+func (u *WorkHistoryUpsert) AddClientReviewCount(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientReviewCount, v)
+	return u
+}
+
+// SetClientCountry sets the "client_country" field.
+func (u *WorkHistoryUpsert) SetClientCountry(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientCountry, v)
+	return u
+}
+
+// UpdateClientCountry sets the "client_country" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientCountry() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientCountry)
+	return u
+}
+
+// SetClientTotalJobsPosted sets the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsert) SetClientTotalJobsPosted(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientTotalJobsPosted, v)
+	return u
+}
+
+// UpdateClientTotalJobsPosted sets the "client_total_jobs_posted" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientTotalJobsPosted() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientTotalJobsPosted)
+	return u
+}
+
+// AddClientTotalJobsPosted adds v to the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsert) AddClientTotalJobsPosted(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientTotalJobsPosted, v)
+	return u
+}
+
+// SetClientTotalSpend sets the "client_total_spend" field.
+func (u *WorkHistoryUpsert) SetClientTotalSpend(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientTotalSpend, v)
+	return u
+}
+
+// UpdateClientTotalSpend sets the "client_total_spend" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientTotalSpend() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientTotalSpend)
+	return u
+}
+
+// AddClientTotalSpend adds v to the "client_total_spend" field.
+func (u *WorkHistoryUpsert) AddClientTotalSpend(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientTotalSpend, v)
+	return u
+}
+
+// SetClientTotalHires sets the "client_total_hires" field.
+func (u *WorkHistoryUpsert) SetClientTotalHires(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientTotalHires, v)
+	return u
+}
+
+// UpdateClientTotalHires sets the "client_total_hires" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientTotalHires() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientTotalHires)
+	return u
+}
+
+// AddClientTotalHires adds v to the "client_total_hires" field.
+func (u *WorkHistoryUpsert) AddClientTotalHires(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientTotalHires, v)
+	return u
+}
+
+// ClearClientTotalHires clears the value of the "client_total_hires" field.
+func (u *WorkHistoryUpsert) ClearClientTotalHires() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldClientTotalHires)
+	return u
+}
+
+// SetClientTotalPaidHours sets the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsert) SetClientTotalPaidHours(v int) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientTotalPaidHours, v)
+	return u
+}
+
+// UpdateClientTotalPaidHours sets the "client_total_paid_hours" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientTotalPaidHours() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientTotalPaidHours)
+	return u
+}
+
+// AddClientTotalPaidHours adds v to the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsert) AddClientTotalPaidHours(v int) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientTotalPaidHours, v)
+	return u
+}
+
+// ClearClientTotalPaidHours clears the value of the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsert) ClearClientTotalPaidHours() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldClientTotalPaidHours)
+	return u
+}
+
+// SetClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsert) SetClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientAverageHourlyRatePaid, v)
+	return u
+}
+
+// UpdateClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientAverageHourlyRatePaid() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientAverageHourlyRatePaid)
+	return u
+}
+
+// AddClientAverageHourlyRatePaid adds v to the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsert) AddClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldClientAverageHourlyRatePaid, v)
+	return u
+}
+
+// ClearClientAverageHourlyRatePaid clears the value of the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsert) ClearClientAverageHourlyRatePaid() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldClientAverageHourlyRatePaid)
+	return u
+}
+
+// SetClientCompanyCategory sets the "client_company_category" field.
+func (u *WorkHistoryUpsert) SetClientCompanyCategory(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientCompanyCategory, v)
+	return u
+}
+
+// UpdateClientCompanyCategory sets the "client_company_category" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientCompanyCategory() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientCompanyCategory)
+	return u
+}
+
+// ClearClientCompanyCategory clears the value of the "client_company_category" field.
+func (u *WorkHistoryUpsert) ClearClientCompanyCategory() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldClientCompanyCategory)
+	return u
+}
+
+// SetClientCompanySize sets the "client_company_size" field.
+func (u *WorkHistoryUpsert) SetClientCompanySize(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldClientCompanySize, v)
+	return u
+}
+
+// UpdateClientCompanySize sets the "client_company_size" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateClientCompanySize() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldClientCompanySize)
+	return u
+}
+
+// ClearClientCompanySize clears the value of the "client_company_size" field.
+func (u *WorkHistoryUpsert) ClearClientCompanySize() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldClientCompanySize)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *WorkHistoryUpsertOne) UpdateNewValues() *WorkHistoryUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *WorkHistoryUpsertOne) Ignore() *WorkHistoryUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WorkHistoryUpsertOne) DoNothing() *WorkHistoryUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WorkHistoryCreate.OnConflict
+// documentation for more info.
+func (u *WorkHistoryUpsertOne) Update(set func(*WorkHistoryUpsert)) *WorkHistoryUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WorkHistoryUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *WorkHistoryUpsertOne) SetTitle(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateTitle() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetClientFeedback sets the "client_feedback" field.
+func (u *WorkHistoryUpsertOne) SetClientFeedback(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientFeedback(v)
+	})
+}
+
+// UpdateClientFeedback sets the "client_feedback" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientFeedback() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientFeedback()
+	})
+}
+
+// SetOverallRating sets the "overall_rating" field.
+func (u *WorkHistoryUpsertOne) SetOverallRating(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetOverallRating(v)
+	})
+}
+
+// AddOverallRating adds v to the "overall_rating" field.
+func (u *WorkHistoryUpsertOne) AddOverallRating(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddOverallRating(v)
+	})
+}
+
+// UpdateOverallRating sets the "overall_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateOverallRating() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateOverallRating()
+	})
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertOne) SetFixedChargeAmount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetFixedChargeAmount(v)
+	})
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertOne) AddFixedChargeAmount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddFixedChargeAmount(v)
+	})
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateFixedChargeAmount() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateFixedChargeAmount()
+	})
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertOne) ClearFixedChargeAmount() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearFixedChargeAmount()
+	})
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsertOne) SetFixedChargeCurrency(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetFixedChargeCurrency(v)
+	})
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateFixedChargeCurrency() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateFixedChargeCurrency()
+	})
+}
+
+// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsertOne) ClearFixedChargeCurrency() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearFixedChargeCurrency()
+	})
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertOne) SetHourlyChargeAmount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetHourlyChargeAmount(v)
+	})
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertOne) AddHourlyChargeAmount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddHourlyChargeAmount(v)
+	})
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateHourlyChargeAmount() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateHourlyChargeAmount()
+	})
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertOne) ClearHourlyChargeAmount() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearHourlyChargeAmount()
+	})
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsertOne) SetHourlyChargeCurrency(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetHourlyChargeCurrency(v)
+	})
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateHourlyChargeCurrency() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateHourlyChargeCurrency()
+	})
+}
+
+// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsertOne) ClearHourlyChargeCurrency() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearHourlyChargeCurrency()
+	})
+}
+
+// SetStartDate sets the "start_date" field.
+func (u *WorkHistoryUpsertOne) SetStartDate(v time.Time) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetStartDate(v)
+	})
+}
+
+// UpdateStartDate sets the "start_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateStartDate() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateStartDate()
+	})
+}
+
+// SetEndDate sets the "end_date" field.
+func (u *WorkHistoryUpsertOne) SetEndDate(v time.Time) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetEndDate(v)
+	})
+}
+
+// UpdateEndDate sets the "end_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateEndDate() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateEndDate()
+	})
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (u *WorkHistoryUpsertOne) ClearEndDate() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearEndDate()
+	})
+}
+
+// SetJobDescription sets the "job_description" field.
+func (u *WorkHistoryUpsertOne) SetJobDescription(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetJobDescription(v)
+	})
+}
+
+// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateJobDescription() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateJobDescription()
+	})
+}
+
+// SetTotalProposals sets the "total_proposals" field.
+func (u *WorkHistoryUpsertOne) SetTotalProposals(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetTotalProposals(v)
+	})
+}
+
+// AddTotalProposals adds v to the "total_proposals" field.
+func (u *WorkHistoryUpsertOne) AddTotalProposals(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddTotalProposals(v)
+	})
+}
+
+// UpdateTotalProposals sets the "total_proposals" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateTotalProposals() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateTotalProposals()
+	})
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (u *WorkHistoryUpsertOne) SetNumberOfInterviews(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetNumberOfInterviews(v)
+	})
+}
+
+// AddNumberOfInterviews adds v to the "number_of_interviews" field.
+func (u *WorkHistoryUpsertOne) AddNumberOfInterviews(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddNumberOfInterviews(v)
+	})
+}
+
+// UpdateNumberOfInterviews sets the "number_of_interviews" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateNumberOfInterviews() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateNumberOfInterviews()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *WorkHistoryUpsertOne) SetSkills(v []string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateSkills() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// SetClientRating sets the "client_rating" field.
+func (u *WorkHistoryUpsertOne) SetClientRating(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientRating(v)
+	})
+}
+
+// AddClientRating adds v to the "client_rating" field.
+func (u *WorkHistoryUpsertOne) AddClientRating(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientRating(v)
+	})
+}
+
+// UpdateClientRating sets the "client_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientRating() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientRating()
+	})
+}
+
+// SetClientReviewCount sets the "client_review_count" field.
+func (u *WorkHistoryUpsertOne) SetClientReviewCount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientReviewCount(v)
+	})
+}
+
+// AddClientReviewCount adds v to the "client_review_count" field.
+func (u *WorkHistoryUpsertOne) AddClientReviewCount(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientReviewCount(v)
+	})
+}
+
+// UpdateClientReviewCount sets the "client_review_count" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientReviewCount() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientReviewCount()
+	})
+}
+
+// SetClientCountry sets the "client_country" field.
+func (u *WorkHistoryUpsertOne) SetClientCountry(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCountry(v)
+	})
+}
+
+// UpdateClientCountry sets the "client_country" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientCountry() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCountry()
+	})
+}
+
+// SetClientTotalJobsPosted sets the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsertOne) SetClientTotalJobsPosted(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalJobsPosted(v)
+	})
+}
+
+// AddClientTotalJobsPosted adds v to the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsertOne) AddClientTotalJobsPosted(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalJobsPosted(v)
+	})
+}
+
+// UpdateClientTotalJobsPosted sets the "client_total_jobs_posted" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientTotalJobsPosted() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalJobsPosted()
+	})
+}
+
+// SetClientTotalSpend sets the "client_total_spend" field.
+func (u *WorkHistoryUpsertOne) SetClientTotalSpend(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalSpend(v)
+	})
+}
+
+// AddClientTotalSpend adds v to the "client_total_spend" field.
+func (u *WorkHistoryUpsertOne) AddClientTotalSpend(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalSpend(v)
+	})
+}
+
+// UpdateClientTotalSpend sets the "client_total_spend" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientTotalSpend() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalSpend()
+	})
+}
+
+// SetClientTotalHires sets the "client_total_hires" field.
+func (u *WorkHistoryUpsertOne) SetClientTotalHires(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalHires(v)
+	})
+}
+
+// AddClientTotalHires adds v to the "client_total_hires" field.
+func (u *WorkHistoryUpsertOne) AddClientTotalHires(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalHires(v)
+	})
+}
+
+// UpdateClientTotalHires sets the "client_total_hires" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientTotalHires() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalHires()
+	})
+}
+
+// ClearClientTotalHires clears the value of the "client_total_hires" field.
+func (u *WorkHistoryUpsertOne) ClearClientTotalHires() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientTotalHires()
+	})
+}
+
+// SetClientTotalPaidHours sets the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertOne) SetClientTotalPaidHours(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalPaidHours(v)
+	})
+}
+
+// AddClientTotalPaidHours adds v to the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertOne) AddClientTotalPaidHours(v int) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalPaidHours(v)
+	})
+}
+
+// UpdateClientTotalPaidHours sets the "client_total_paid_hours" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientTotalPaidHours() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalPaidHours()
+	})
+}
+
+// ClearClientTotalPaidHours clears the value of the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertOne) ClearClientTotalPaidHours() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientTotalPaidHours()
+	})
+}
+
+// SetClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertOne) SetClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientAverageHourlyRatePaid(v)
+	})
+}
+
+// AddClientAverageHourlyRatePaid adds v to the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertOne) AddClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientAverageHourlyRatePaid(v)
+	})
+}
+
+// UpdateClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientAverageHourlyRatePaid() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientAverageHourlyRatePaid()
+	})
+}
+
+// ClearClientAverageHourlyRatePaid clears the value of the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertOne) ClearClientAverageHourlyRatePaid() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientAverageHourlyRatePaid()
+	})
+}
+
+// SetClientCompanyCategory sets the "client_company_category" field.
+func (u *WorkHistoryUpsertOne) SetClientCompanyCategory(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCompanyCategory(v)
+	})
+}
+
+// UpdateClientCompanyCategory sets the "client_company_category" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientCompanyCategory() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCompanyCategory()
+	})
+}
+
+// ClearClientCompanyCategory clears the value of the "client_company_category" field.
+func (u *WorkHistoryUpsertOne) ClearClientCompanyCategory() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientCompanyCategory()
+	})
+}
+
+// SetClientCompanySize sets the "client_company_size" field.
+func (u *WorkHistoryUpsertOne) SetClientCompanySize(v string) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCompanySize(v)
+	})
+}
+
+// UpdateClientCompanySize sets the "client_company_size" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateClientCompanySize() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCompanySize()
+	})
+}
+
+// ClearClientCompanySize clears the value of the "client_company_size" field.
+func (u *WorkHistoryUpsertOne) ClearClientCompanySize() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientCompanySize()
+	})
+}
+
+// Exec executes the query.
+func (u *WorkHistoryUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WorkHistoryCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WorkHistoryUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *WorkHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *WorkHistoryUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // WorkHistoryCreateBulk is the builder for creating many WorkHistory entities in bulk.
 type WorkHistoryCreateBulk struct {
 	config
 	err      error
 	builders []*WorkHistoryCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the WorkHistory entities in the database.
@@ -497,6 +1507,7 @@ func (whcb *WorkHistoryCreateBulk) Save(ctx context.Context) ([]*WorkHistory, er
 					_, err = mutators[i+1].Mutate(root, whcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = whcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, whcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -547,6 +1558,586 @@ func (whcb *WorkHistoryCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (whcb *WorkHistoryCreateBulk) ExecX(ctx context.Context) {
 	if err := whcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WorkHistory.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WorkHistoryUpsert) {
+//			SetTitle(v+v).
+//		}).
+//		Exec(ctx)
+func (whcb *WorkHistoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *WorkHistoryUpsertBulk {
+	whcb.conflict = opts
+	return &WorkHistoryUpsertBulk{
+		create: whcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (whcb *WorkHistoryCreateBulk) OnConflictColumns(columns ...string) *WorkHistoryUpsertBulk {
+	whcb.conflict = append(whcb.conflict, sql.ConflictColumns(columns...))
+	return &WorkHistoryUpsertBulk{
+		create: whcb,
+	}
+}
+
+// WorkHistoryUpsertBulk is the builder for "upsert"-ing
+// a bulk of WorkHistory nodes.
+type WorkHistoryUpsertBulk struct {
+	create *WorkHistoryCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *WorkHistoryUpsertBulk) UpdateNewValues() *WorkHistoryUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WorkHistory.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *WorkHistoryUpsertBulk) Ignore() *WorkHistoryUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WorkHistoryUpsertBulk) DoNothing() *WorkHistoryUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WorkHistoryCreateBulk.OnConflict
+// documentation for more info.
+func (u *WorkHistoryUpsertBulk) Update(set func(*WorkHistoryUpsert)) *WorkHistoryUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WorkHistoryUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *WorkHistoryUpsertBulk) SetTitle(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateTitle() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetClientFeedback sets the "client_feedback" field.
+func (u *WorkHistoryUpsertBulk) SetClientFeedback(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientFeedback(v)
+	})
+}
+
+// UpdateClientFeedback sets the "client_feedback" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientFeedback() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientFeedback()
+	})
+}
+
+// SetOverallRating sets the "overall_rating" field.
+func (u *WorkHistoryUpsertBulk) SetOverallRating(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetOverallRating(v)
+	})
+}
+
+// AddOverallRating adds v to the "overall_rating" field.
+func (u *WorkHistoryUpsertBulk) AddOverallRating(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddOverallRating(v)
+	})
+}
+
+// UpdateOverallRating sets the "overall_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateOverallRating() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateOverallRating()
+	})
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) SetFixedChargeAmount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetFixedChargeAmount(v)
+	})
+}
+
+// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) AddFixedChargeAmount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddFixedChargeAmount(v)
+	})
+}
+
+// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateFixedChargeAmount() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateFixedChargeAmount()
+	})
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) ClearFixedChargeAmount() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearFixedChargeAmount()
+	})
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsertBulk) SetFixedChargeCurrency(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetFixedChargeCurrency(v)
+	})
+}
+
+// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateFixedChargeCurrency() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateFixedChargeCurrency()
+	})
+}
+
+// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
+func (u *WorkHistoryUpsertBulk) ClearFixedChargeCurrency() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearFixedChargeCurrency()
+	})
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) SetHourlyChargeAmount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetHourlyChargeAmount(v)
+	})
+}
+
+// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) AddHourlyChargeAmount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddHourlyChargeAmount(v)
+	})
+}
+
+// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateHourlyChargeAmount() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateHourlyChargeAmount()
+	})
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (u *WorkHistoryUpsertBulk) ClearHourlyChargeAmount() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearHourlyChargeAmount()
+	})
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsertBulk) SetHourlyChargeCurrency(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetHourlyChargeCurrency(v)
+	})
+}
+
+// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateHourlyChargeCurrency() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateHourlyChargeCurrency()
+	})
+}
+
+// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
+func (u *WorkHistoryUpsertBulk) ClearHourlyChargeCurrency() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearHourlyChargeCurrency()
+	})
+}
+
+// SetStartDate sets the "start_date" field.
+func (u *WorkHistoryUpsertBulk) SetStartDate(v time.Time) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetStartDate(v)
+	})
+}
+
+// UpdateStartDate sets the "start_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateStartDate() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateStartDate()
+	})
+}
+
+// SetEndDate sets the "end_date" field.
+func (u *WorkHistoryUpsertBulk) SetEndDate(v time.Time) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetEndDate(v)
+	})
+}
+
+// UpdateEndDate sets the "end_date" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateEndDate() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateEndDate()
+	})
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (u *WorkHistoryUpsertBulk) ClearEndDate() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearEndDate()
+	})
+}
+
+// SetJobDescription sets the "job_description" field.
+func (u *WorkHistoryUpsertBulk) SetJobDescription(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetJobDescription(v)
+	})
+}
+
+// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateJobDescription() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateJobDescription()
+	})
+}
+
+// SetTotalProposals sets the "total_proposals" field.
+func (u *WorkHistoryUpsertBulk) SetTotalProposals(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetTotalProposals(v)
+	})
+}
+
+// AddTotalProposals adds v to the "total_proposals" field.
+func (u *WorkHistoryUpsertBulk) AddTotalProposals(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddTotalProposals(v)
+	})
+}
+
+// UpdateTotalProposals sets the "total_proposals" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateTotalProposals() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateTotalProposals()
+	})
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (u *WorkHistoryUpsertBulk) SetNumberOfInterviews(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetNumberOfInterviews(v)
+	})
+}
+
+// AddNumberOfInterviews adds v to the "number_of_interviews" field.
+func (u *WorkHistoryUpsertBulk) AddNumberOfInterviews(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddNumberOfInterviews(v)
+	})
+}
+
+// UpdateNumberOfInterviews sets the "number_of_interviews" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateNumberOfInterviews() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateNumberOfInterviews()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *WorkHistoryUpsertBulk) SetSkills(v []string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateSkills() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// SetClientRating sets the "client_rating" field.
+func (u *WorkHistoryUpsertBulk) SetClientRating(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientRating(v)
+	})
+}
+
+// AddClientRating adds v to the "client_rating" field.
+func (u *WorkHistoryUpsertBulk) AddClientRating(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientRating(v)
+	})
+}
+
+// UpdateClientRating sets the "client_rating" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientRating() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientRating()
+	})
+}
+
+// SetClientReviewCount sets the "client_review_count" field.
+func (u *WorkHistoryUpsertBulk) SetClientReviewCount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientReviewCount(v)
+	})
+}
+
+// AddClientReviewCount adds v to the "client_review_count" field.
+func (u *WorkHistoryUpsertBulk) AddClientReviewCount(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientReviewCount(v)
+	})
+}
+
+// UpdateClientReviewCount sets the "client_review_count" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientReviewCount() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientReviewCount()
+	})
+}
+
+// SetClientCountry sets the "client_country" field.
+func (u *WorkHistoryUpsertBulk) SetClientCountry(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCountry(v)
+	})
+}
+
+// UpdateClientCountry sets the "client_country" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientCountry() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCountry()
+	})
+}
+
+// SetClientTotalJobsPosted sets the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsertBulk) SetClientTotalJobsPosted(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalJobsPosted(v)
+	})
+}
+
+// AddClientTotalJobsPosted adds v to the "client_total_jobs_posted" field.
+func (u *WorkHistoryUpsertBulk) AddClientTotalJobsPosted(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalJobsPosted(v)
+	})
+}
+
+// UpdateClientTotalJobsPosted sets the "client_total_jobs_posted" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientTotalJobsPosted() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalJobsPosted()
+	})
+}
+
+// SetClientTotalSpend sets the "client_total_spend" field.
+func (u *WorkHistoryUpsertBulk) SetClientTotalSpend(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalSpend(v)
+	})
+}
+
+// AddClientTotalSpend adds v to the "client_total_spend" field.
+func (u *WorkHistoryUpsertBulk) AddClientTotalSpend(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalSpend(v)
+	})
+}
+
+// UpdateClientTotalSpend sets the "client_total_spend" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientTotalSpend() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalSpend()
+	})
+}
+
+// SetClientTotalHires sets the "client_total_hires" field.
+func (u *WorkHistoryUpsertBulk) SetClientTotalHires(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalHires(v)
+	})
+}
+
+// AddClientTotalHires adds v to the "client_total_hires" field.
+func (u *WorkHistoryUpsertBulk) AddClientTotalHires(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalHires(v)
+	})
+}
+
+// UpdateClientTotalHires sets the "client_total_hires" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientTotalHires() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalHires()
+	})
+}
+
+// ClearClientTotalHires clears the value of the "client_total_hires" field.
+func (u *WorkHistoryUpsertBulk) ClearClientTotalHires() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientTotalHires()
+	})
+}
+
+// SetClientTotalPaidHours sets the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertBulk) SetClientTotalPaidHours(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientTotalPaidHours(v)
+	})
+}
+
+// AddClientTotalPaidHours adds v to the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertBulk) AddClientTotalPaidHours(v int) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientTotalPaidHours(v)
+	})
+}
+
+// UpdateClientTotalPaidHours sets the "client_total_paid_hours" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientTotalPaidHours() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientTotalPaidHours()
+	})
+}
+
+// ClearClientTotalPaidHours clears the value of the "client_total_paid_hours" field.
+func (u *WorkHistoryUpsertBulk) ClearClientTotalPaidHours() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientTotalPaidHours()
+	})
+}
+
+// SetClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertBulk) SetClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientAverageHourlyRatePaid(v)
+	})
+}
+
+// AddClientAverageHourlyRatePaid adds v to the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertBulk) AddClientAverageHourlyRatePaid(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddClientAverageHourlyRatePaid(v)
+	})
+}
+
+// UpdateClientAverageHourlyRatePaid sets the "client_average_hourly_rate_paid" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientAverageHourlyRatePaid() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientAverageHourlyRatePaid()
+	})
+}
+
+// ClearClientAverageHourlyRatePaid clears the value of the "client_average_hourly_rate_paid" field.
+func (u *WorkHistoryUpsertBulk) ClearClientAverageHourlyRatePaid() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientAverageHourlyRatePaid()
+	})
+}
+
+// SetClientCompanyCategory sets the "client_company_category" field.
+func (u *WorkHistoryUpsertBulk) SetClientCompanyCategory(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCompanyCategory(v)
+	})
+}
+
+// UpdateClientCompanyCategory sets the "client_company_category" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientCompanyCategory() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCompanyCategory()
+	})
+}
+
+// ClearClientCompanyCategory clears the value of the "client_company_category" field.
+func (u *WorkHistoryUpsertBulk) ClearClientCompanyCategory() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientCompanyCategory()
+	})
+}
+
+// SetClientCompanySize sets the "client_company_size" field.
+func (u *WorkHistoryUpsertBulk) SetClientCompanySize(v string) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetClientCompanySize(v)
+	})
+}
+
+// UpdateClientCompanySize sets the "client_company_size" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateClientCompanySize() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateClientCompanySize()
+	})
+}
+
+// ClearClientCompanySize clears the value of the "client_company_size" field.
+func (u *WorkHistoryUpsertBulk) ClearClientCompanySize() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearClientCompanySize()
+	})
+}
+
+// Exec executes the query.
+func (u *WorkHistoryUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the WorkHistoryCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WorkHistoryCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WorkHistoryUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
