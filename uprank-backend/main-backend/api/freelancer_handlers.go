@@ -47,7 +47,6 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 			return InvalidRequestData(errors)
 		}
 	}
-	attachements := make([][]*ent.AttachmentRef, len(req))
 
 	freelancers, createFreelancerErr := s.ent.Freelancer.MapCreateBulk(req, func(c *ent.FreelancerCreate, i int) {
 		freelancer := req[i]
@@ -96,22 +95,20 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 
 	//TODO: CREATE JOB HISTORIES
 	//need to fix type so the json parses correctly, then handle the creation of job histories
-	for i, freelancer := range req {
+	for _, freelancer := range req {
 		if len(freelancer.Attachements) == 0 {
-			attachements[i] = nil
 			continue
 		}
-		attch, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
+		_, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
 			c.SetName(freelancer.Attachements[j].Name).
 				SetLink(freelancer.Attachements[j].Link).
-				SetFreelancerID(freelancers[i].ID)
+				SetFreelancerID(freelancer.Url)
 		}).Save(r.Context())
 
 		if createAttachementErr != nil {
 			return createAttachementErr
 		}
 
-		attachements[i] = attch
 	}
 
 	return writeJSON(w, http.StatusCreated, freelancers)
@@ -124,7 +121,7 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	job_id := chi.URLParam(r, "job_id")
 
 	//check if job exists and belongs to user
-	job, getJobErr := s.ent.Job.Query().
+	current_freelancers, getJobErr := s.ent.Job.Query().
 		Where(
 			job.IDEQ(job_id),
 			job.HasUserWith(user.IDEQ(user_id)),
@@ -133,7 +130,12 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 		return ResourceMisMatch()
 	}
 
-	var req []types.CreateFreelancersRequest
+	var (
+		req                   []types.CreateFreelancersRequest
+		freelancers_to_create []types.CreateFreelancersRequest
+		freelancers_to_update []types.CreateFreelancersRequest
+		freelancers_to_delete []string
+	)
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		slog.Error("failed to decode request", "err", err)
@@ -155,8 +157,101 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 
 	//Plan: find the intersections of the two sets, then for each array, remove the intersection. Then we are left with the 3 categories
 
-	createFreelancerErr := s.ent.Freelancer.MapCreateBulk(req, func(c *ent.FreelancerCreate, i int) {
-		freelancer := req[i]
+	incoming_freelancer_dict := make(map[string]types.CreateFreelancersRequest)
+	for _, freelancer := range req {
+		incoming_freelancer_dict[freelancer.Url] = freelancer
+	}
+	current_freelancer_dict := make(map[string]ent.Freelancer)
+	for _, freelancer := range current_freelancers {
+		current_freelancer_dict[freelancer.ID] = *freelancer
+	}
+
+	for _, freelancer := range current_freelancers {
+		if _, ok := incoming_freelancer_dict[freelancer.ID]; ok {
+			//the freelancer is in the db and in the request
+			freelancers_to_update = append(freelancers_to_update, incoming_freelancer_dict[freelancer.ID])
+		} else {
+			//the freelancer is in the db but not in the request
+			freelancers_to_delete = append(freelancers_to_delete, freelancer.ID)
+		}
+	}
+	for _, freelancer := range req {
+		if _, ok := current_freelancer_dict[freelancer.Url]; !ok {
+			//the freelancer is in the request but not in the db
+			freelancers_to_create = append(freelancers_to_create, freelancer)
+		}
+	}
+
+	//create new freelancers
+	_, createFreelancerErr := s.ent.Freelancer.MapCreateBulk(freelancers_to_create, func(c *ent.FreelancerCreate, i int) {
+		freelancer := freelancers_to_create[i]
+		//guaranteed to be valid by freelancer.Validate()
+		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
+		parse_hourly_charge_amount, _ := strconv.ParseFloat(freelancer.Hourly_charge_amount, 64)
+		c.SetID(freelancer.Url).
+			SetName(freelancer.Name).
+			SetTitle(freelancer.Title).
+			SetDescription(freelancer.Description).
+			SetCity(freelancer.Location.City).
+			SetCountry(freelancer.Location.Country).
+			SetTimezone(freelancer.Location.Timezone).
+			SetCv(freelancer.Cv).
+			SetAiReccomended(freelancer.Ai_reccomended).
+			SetFixedChargeAmount(parsed_fixed_charge_amount).
+			SetFixedChargeCurrency(freelancer.Fixed_charge_currency).
+			SetHourlyChargeAmount(parse_hourly_charge_amount).
+			SetHourlyChargeCurrency(freelancer.Hourly_charge_currency).
+			SetInvited(freelancer.Invited).
+			SetPhotoURL(freelancer.Photo_url).
+			SetRecentHours(freelancer.Recent_hours).
+			SetTotalHours(freelancer.Total_hours).
+			SetTotalPortfolioItems(freelancer.Total_portfolio_items).
+			SetTotalPortfolioV2Items(freelancer.Total_portfolio_v2_items).
+			SetUpworkTotalFeedback(freelancer.Total_feedback).
+			SetUpworkRecentFeedback(freelancer.Recent_feedback).
+			SetUpworkTopRatedStatus(freelancer.Top_rated_status).
+			SetUpworkTopRatedPlusStatus(freelancer.Top_rated_plus_status).
+			SetUpworkSponsored(freelancer.Sponsored).
+			SetUpworkJobSuccessScore(freelancer.Job_success_score).
+			SetUpworkReccomended(freelancer.Reccomended).
+			SetSkills(freelancer.Skills).
+			SetAverageRecentEarnings(freelancer.Earnings_info.Average_recent_earnings).
+			SetCombinedAverageRecentEarnings(freelancer.Earnings_info.Combined_average_recent_earnings).
+			SetCombinedRecentEarnings(freelancer.Earnings_info.Combined_recent_earnings).
+			SetCombinedTotalEarnings(freelancer.Earnings_info.Combined_total_earnings).
+			SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue).
+			SetRecentEarnings(freelancer.Earnings_info.Recent_earnings).
+			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).
+			SetJobID(job_id)
+
+	}).Save(r.Context())
+
+	if createFreelancerErr != nil {
+		return createFreelancerErr
+	}
+	//add the work history
+	for _, freelancer := range freelancers_to_create {
+		if len(freelancer.Attachements) == 0 {
+			continue
+		}
+		_, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
+			c.SetName(freelancer.Attachements[j].Name).
+				SetLink(freelancer.Attachements[j].Link).
+				SetFreelancerID(freelancer.Url)
+		}).Save(r.Context())
+
+		if createAttachementErr != nil {
+			return createAttachementErr
+		}
+		if len(freelancer.Work_history) == 0 {
+			continue
+		}
+		//todo: create work history
+
+	}
+	//update freelancers
+	updateFreelancerErr := s.ent.Freelancer.MapCreateBulk(freelancers_to_update, func(c *ent.FreelancerCreate, i int) {
+		freelancer := freelancers_to_update[i]
 		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
 		parse_hourly_charge_amount, _ := strconv.ParseFloat(freelancer.Hourly_charge_amount, 64)
@@ -199,6 +294,8 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	if createFreelancerErr != nil {
 		return createFreelancerErr
 	}
+
+	//delete freelancers
 
 	return writeJSON(w, http.StatusCreated, nil)
 }
