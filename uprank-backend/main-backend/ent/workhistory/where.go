@@ -100,9 +100,9 @@ func EndDate(v time.Time) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldEndDate, v))
 }
 
-// JobDescription applies equality check predicate on the "job_description" field. It's identical to JobDescriptionEQ.
-func JobDescription(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldJobDescription, v))
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldDescription, v))
 }
 
 // TotalProposals applies equality check predicate on the "total_proposals" field. It's identical to TotalProposalsEQ.
@@ -675,69 +675,69 @@ func EndDateNotNil() predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldNotNull(FieldEndDate))
 }
 
-// JobDescriptionEQ applies the EQ predicate on the "job_description" field.
-func JobDescriptionEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldJobDescription, v))
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldDescription, v))
 }
 
-// JobDescriptionNEQ applies the NEQ predicate on the "job_description" field.
-func JobDescriptionNEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldJobDescription, v))
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldDescription, v))
 }
 
-// JobDescriptionIn applies the In predicate on the "job_description" field.
-func JobDescriptionIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldJobDescription, vs...))
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldDescription, vs...))
 }
 
-// JobDescriptionNotIn applies the NotIn predicate on the "job_description" field.
-func JobDescriptionNotIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldJobDescription, vs...))
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldDescription, vs...))
 }
 
-// JobDescriptionGT applies the GT predicate on the "job_description" field.
-func JobDescriptionGT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldJobDescription, v))
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldDescription, v))
 }
 
-// JobDescriptionGTE applies the GTE predicate on the "job_description" field.
-func JobDescriptionGTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldJobDescription, v))
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldDescription, v))
 }
 
-// JobDescriptionLT applies the LT predicate on the "job_description" field.
-func JobDescriptionLT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldJobDescription, v))
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldDescription, v))
 }
 
-// JobDescriptionLTE applies the LTE predicate on the "job_description" field.
-func JobDescriptionLTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldJobDescription, v))
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldDescription, v))
 }
 
-// JobDescriptionContains applies the Contains predicate on the "job_description" field.
-func JobDescriptionContains(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContains(FieldJobDescription, v))
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldContains(FieldDescription, v))
 }
 
-// JobDescriptionHasPrefix applies the HasPrefix predicate on the "job_description" field.
-func JobDescriptionHasPrefix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasPrefix(FieldJobDescription, v))
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldHasPrefix(FieldDescription, v))
 }
 
-// JobDescriptionHasSuffix applies the HasSuffix predicate on the "job_description" field.
-func JobDescriptionHasSuffix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasSuffix(FieldJobDescription, v))
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldHasSuffix(FieldDescription, v))
 }
 
-// JobDescriptionEqualFold applies the EqualFold predicate on the "job_description" field.
-func JobDescriptionEqualFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEqualFold(FieldJobDescription, v))
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEqualFold(FieldDescription, v))
 }
 
-// JobDescriptionContainsFold applies the ContainsFold predicate on the "job_description" field.
-func JobDescriptionContainsFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContainsFold(FieldJobDescription, v))
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldContainsFold(FieldDescription, v))
 }
 
 // TotalProposalsEQ applies the EQ predicate on the "total_proposals" field.

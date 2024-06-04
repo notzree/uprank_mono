@@ -30,8 +30,8 @@ const (
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
 	FieldEndDate = "end_date"
-	// FieldJobDescription holds the string denoting the job_description field in the database.
-	FieldJobDescription = "job_description"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// FieldTotalProposals holds the string denoting the total_proposals field in the database.
 	FieldTotalProposals = "total_proposals"
 	// FieldNumberOfInterviews holds the string denoting the number_of_interviews field in the database.
@@ -83,7 +83,7 @@ var Columns = []string{
 	FieldHourlyChargeCurrency,
 	FieldStartDate,
 	FieldEndDate,
-	FieldJobDescription,
+	FieldDescription,
 	FieldTotalProposals,
 	FieldNumberOfInterviews,
 	FieldSkills,
@@ -173,9 +173,9 @@ func ByEndDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndDate, opts...).ToFunc()
 }
 
-// ByJobDescription orders the results by the job_description field.
-func ByJobDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldJobDescription, opts...).ToFunc()
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
 // ByTotalProposals orders the results by the total_proposals field.

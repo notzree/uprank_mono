@@ -37,8 +37,8 @@ type WorkHistory struct {
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
 	EndDate time.Time `json:"end_date,omitempty"`
-	// JobDescription holds the value of the "job_description" field.
-	JobDescription string `json:"job_description,omitempty"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description,omitempty"`
 	// TotalProposals holds the value of the "total_proposals" field.
 	TotalProposals int `json:"total_proposals,omitempty"`
 	// NumberOfInterviews holds the value of the "number_of_interviews" field.
@@ -103,7 +103,7 @@ func (*WorkHistory) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case workhistory.FieldID, workhistory.FieldFixedChargeAmount, workhistory.FieldHourlyChargeAmount, workhistory.FieldTotalProposals, workhistory.FieldNumberOfInterviews, workhistory.FieldClientReviewCount, workhistory.FieldClientTotalJobsPosted, workhistory.FieldClientTotalHires, workhistory.FieldClientTotalPaidHours:
 			values[i] = new(sql.NullInt64)
-		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldFixedChargeCurrency, workhistory.FieldHourlyChargeCurrency, workhistory.FieldJobDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
+		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldFixedChargeCurrency, workhistory.FieldHourlyChargeCurrency, workhistory.FieldDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
 			values[i] = new(sql.NullString)
 		case workhistory.FieldStartDate, workhistory.FieldEndDate:
 			values[i] = new(sql.NullTime)
@@ -184,11 +184,11 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wh.EndDate = value.Time
 			}
-		case workhistory.FieldJobDescription:
+		case workhistory.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field job_description", values[i])
+				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				wh.JobDescription = value.String
+				wh.Description = value.String
 			}
 		case workhistory.FieldTotalProposals:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -345,8 +345,8 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString("end_date=")
 	builder.WriteString(wh.EndDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("job_description=")
-	builder.WriteString(wh.JobDescription)
+	builder.WriteString("description=")
+	builder.WriteString(wh.Description)
 	builder.WriteString(", ")
 	builder.WriteString("total_proposals=")
 	builder.WriteString(fmt.Sprintf("%v", wh.TotalProposals))

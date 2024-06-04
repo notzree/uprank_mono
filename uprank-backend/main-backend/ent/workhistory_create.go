@@ -117,9 +117,9 @@ func (whc *WorkHistoryCreate) SetNillableEndDate(t *time.Time) *WorkHistoryCreat
 	return whc
 }
 
-// SetJobDescription sets the "job_description" field.
-func (whc *WorkHistoryCreate) SetJobDescription(s string) *WorkHistoryCreate {
-	whc.mutation.SetJobDescription(s)
+// SetDescription sets the "description" field.
+func (whc *WorkHistoryCreate) SetDescription(s string) *WorkHistoryCreate {
+	whc.mutation.SetDescription(s)
 	return whc
 }
 
@@ -298,8 +298,8 @@ func (whc *WorkHistoryCreate) check() error {
 	if _, ok := whc.mutation.StartDate(); !ok {
 		return &ValidationError{Name: "start_date", err: errors.New(`ent: missing required field "WorkHistory.start_date"`)}
 	}
-	if _, ok := whc.mutation.JobDescription(); !ok {
-		return &ValidationError{Name: "job_description", err: errors.New(`ent: missing required field "WorkHistory.job_description"`)}
+	if _, ok := whc.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "WorkHistory.description"`)}
 	}
 	if _, ok := whc.mutation.TotalProposals(); !ok {
 		return &ValidationError{Name: "total_proposals", err: errors.New(`ent: missing required field "WorkHistory.total_proposals"`)}
@@ -391,9 +391,9 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 		_spec.SetField(workhistory.FieldEndDate, field.TypeTime, value)
 		_node.EndDate = value
 	}
-	if value, ok := whc.mutation.JobDescription(); ok {
-		_spec.SetField(workhistory.FieldJobDescription, field.TypeString, value)
-		_node.JobDescription = value
+	if value, ok := whc.mutation.Description(); ok {
+		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
+		_node.Description = value
 	}
 	if value, ok := whc.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
@@ -672,15 +672,15 @@ func (u *WorkHistoryUpsert) ClearEndDate() *WorkHistoryUpsert {
 	return u
 }
 
-// SetJobDescription sets the "job_description" field.
-func (u *WorkHistoryUpsert) SetJobDescription(v string) *WorkHistoryUpsert {
-	u.Set(workhistory.FieldJobDescription, v)
+// SetDescription sets the "description" field.
+func (u *WorkHistoryUpsert) SetDescription(v string) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldDescription, v)
 	return u
 }
 
-// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
-func (u *WorkHistoryUpsert) UpdateJobDescription() *WorkHistoryUpsert {
-	u.SetExcluded(workhistory.FieldJobDescription)
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateDescription() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldDescription)
 	return u
 }
 
@@ -1146,17 +1146,17 @@ func (u *WorkHistoryUpsertOne) ClearEndDate() *WorkHistoryUpsertOne {
 	})
 }
 
-// SetJobDescription sets the "job_description" field.
-func (u *WorkHistoryUpsertOne) SetJobDescription(v string) *WorkHistoryUpsertOne {
+// SetDescription sets the "description" field.
+func (u *WorkHistoryUpsertOne) SetDescription(v string) *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetJobDescription(v)
+		s.SetDescription(v)
 	})
 }
 
-// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
-func (u *WorkHistoryUpsertOne) UpdateJobDescription() *WorkHistoryUpsertOne {
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateDescription() *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateJobDescription()
+		s.UpdateDescription()
 	})
 }
 
@@ -1825,17 +1825,17 @@ func (u *WorkHistoryUpsertBulk) ClearEndDate() *WorkHistoryUpsertBulk {
 	})
 }
 
-// SetJobDescription sets the "job_description" field.
-func (u *WorkHistoryUpsertBulk) SetJobDescription(v string) *WorkHistoryUpsertBulk {
+// SetDescription sets the "description" field.
+func (u *WorkHistoryUpsertBulk) SetDescription(v string) *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetJobDescription(v)
+		s.SetDescription(v)
 	})
 }
 
-// UpdateJobDescription sets the "job_description" field to the value that was provided on create.
-func (u *WorkHistoryUpsertBulk) UpdateJobDescription() *WorkHistoryUpsertBulk {
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateDescription() *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateJobDescription()
+		s.UpdateDescription()
 	})
 }
 

@@ -58,7 +58,8 @@ type ScrapedAttachementData struct {
 
 type ScrapedWorkHistoryData struct {
 	Title              string  `json:"title"`
-	Date               string  `json:"date"`
+	Start_Date         string  `json:"start_date"`
+	End_Date           string  `json:"end_date"`
 	Description        string  `json:"description"`
 	Budget             string  `json:"budget"`
 	Total_earned       float64 `json:"total_earned"`

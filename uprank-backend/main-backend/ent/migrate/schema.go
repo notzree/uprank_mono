@@ -146,7 +146,7 @@ var (
 		{Name: "hourly_charge_currency", Type: field.TypeString, Nullable: true},
 		{Name: "start_date", Type: field.TypeTime},
 		{Name: "end_date", Type: field.TypeTime, Nullable: true},
-		{Name: "job_description", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
 		{Name: "total_proposals", Type: field.TypeInt},
 		{Name: "number_of_interviews", Type: field.TypeInt},
 		{Name: "skills", Type: field.TypeJSON},
