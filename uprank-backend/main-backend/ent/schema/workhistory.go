@@ -24,7 +24,7 @@ func (WorkHistory) Fields() []ent.Field {
 		field.String("hourly_charge_currency").Optional(),
 		field.Time("start_date"),
 		field.Time("end_date").Optional(),
-		field.String("job_description"),
+		field.String("description"),
 		field.Int("total_proposals"),
 		field.Int("number_of_interviews"),
 		field.Strings("skills"),

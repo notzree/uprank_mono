@@ -207,16 +207,16 @@ func (whu *WorkHistoryUpdate) ClearEndDate() *WorkHistoryUpdate {
 	return whu
 }
 
-// SetJobDescription sets the "job_description" field.
-func (whu *WorkHistoryUpdate) SetJobDescription(s string) *WorkHistoryUpdate {
-	whu.mutation.SetJobDescription(s)
+// SetDescription sets the "description" field.
+func (whu *WorkHistoryUpdate) SetDescription(s string) *WorkHistoryUpdate {
+	whu.mutation.SetDescription(s)
 	return whu
 }
 
-// SetNillableJobDescription sets the "job_description" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableJobDescription(s *string) *WorkHistoryUpdate {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableDescription(s *string) *WorkHistoryUpdate {
 	if s != nil {
-		whu.SetJobDescription(*s)
+		whu.SetDescription(*s)
 	}
 	return whu
 }
@@ -614,8 +614,8 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if whu.mutation.EndDateCleared() {
 		_spec.ClearField(workhistory.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := whu.mutation.JobDescription(); ok {
-		_spec.SetField(workhistory.FieldJobDescription, field.TypeString, value)
+	if value, ok := whu.mutation.Description(); ok {
+		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := whu.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
@@ -929,16 +929,16 @@ func (whuo *WorkHistoryUpdateOne) ClearEndDate() *WorkHistoryUpdateOne {
 	return whuo
 }
 
-// SetJobDescription sets the "job_description" field.
-func (whuo *WorkHistoryUpdateOne) SetJobDescription(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetJobDescription(s)
+// SetDescription sets the "description" field.
+func (whuo *WorkHistoryUpdateOne) SetDescription(s string) *WorkHistoryUpdateOne {
+	whuo.mutation.SetDescription(s)
 	return whuo
 }
 
-// SetNillableJobDescription sets the "job_description" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableJobDescription(s *string) *WorkHistoryUpdateOne {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableDescription(s *string) *WorkHistoryUpdateOne {
 	if s != nil {
-		whuo.SetJobDescription(*s)
+		whuo.SetDescription(*s)
 	}
 	return whuo
 }
@@ -1366,8 +1366,8 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if whuo.mutation.EndDateCleared() {
 		_spec.ClearField(workhistory.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := whuo.mutation.JobDescription(); ok {
-		_spec.SetField(workhistory.FieldJobDescription, field.TypeString, value)
+	if value, ok := whuo.mutation.Description(); ok {
+		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := whuo.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)

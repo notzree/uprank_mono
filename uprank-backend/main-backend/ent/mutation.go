@@ -5920,7 +5920,7 @@ type WorkHistoryMutation struct {
 	hourly_charge_currency             *string
 	start_date                         *time.Time
 	end_date                           *time.Time
-	job_description                    *string
+	description                        *string
 	total_proposals                    *int
 	addtotal_proposals                 *int
 	number_of_interviews               *int
@@ -6501,40 +6501,40 @@ func (m *WorkHistoryMutation) ResetEndDate() {
 	delete(m.clearedFields, workhistory.FieldEndDate)
 }
 
-// SetJobDescription sets the "job_description" field.
-func (m *WorkHistoryMutation) SetJobDescription(s string) {
-	m.job_description = &s
+// SetDescription sets the "description" field.
+func (m *WorkHistoryMutation) SetDescription(s string) {
+	m.description = &s
 }
 
-// JobDescription returns the value of the "job_description" field in the mutation.
-func (m *WorkHistoryMutation) JobDescription() (r string, exists bool) {
-	v := m.job_description
+// Description returns the value of the "description" field in the mutation.
+func (m *WorkHistoryMutation) Description() (r string, exists bool) {
+	v := m.description
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldJobDescription returns the old "job_description" field's value of the WorkHistory entity.
+// OldDescription returns the old "description" field's value of the WorkHistory entity.
 // If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldJobDescription(ctx context.Context) (v string, err error) {
+func (m *WorkHistoryMutation) OldDescription(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldJobDescription is only allowed on UpdateOne operations")
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldJobDescription requires an ID field in the mutation")
+		return v, errors.New("OldDescription requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldJobDescription: %w", err)
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
 	}
-	return oldValue.JobDescription, nil
+	return oldValue.Description, nil
 }
 
-// ResetJobDescription resets all changes to the "job_description" field.
-func (m *WorkHistoryMutation) ResetJobDescription() {
-	m.job_description = nil
+// ResetDescription resets all changes to the "description" field.
+func (m *WorkHistoryMutation) ResetDescription() {
+	m.description = nil
 }
 
 // SetTotalProposals sets the "total_proposals" field.
@@ -7369,8 +7369,8 @@ func (m *WorkHistoryMutation) Fields() []string {
 	if m.end_date != nil {
 		fields = append(fields, workhistory.FieldEndDate)
 	}
-	if m.job_description != nil {
-		fields = append(fields, workhistory.FieldJobDescription)
+	if m.description != nil {
+		fields = append(fields, workhistory.FieldDescription)
 	}
 	if m.total_proposals != nil {
 		fields = append(fields, workhistory.FieldTotalProposals)
@@ -7437,8 +7437,8 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.StartDate()
 	case workhistory.FieldEndDate:
 		return m.EndDate()
-	case workhistory.FieldJobDescription:
-		return m.JobDescription()
+	case workhistory.FieldDescription:
+		return m.Description()
 	case workhistory.FieldTotalProposals:
 		return m.TotalProposals()
 	case workhistory.FieldNumberOfInterviews:
@@ -7492,8 +7492,8 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldStartDate(ctx)
 	case workhistory.FieldEndDate:
 		return m.OldEndDate(ctx)
-	case workhistory.FieldJobDescription:
-		return m.OldJobDescription(ctx)
+	case workhistory.FieldDescription:
+		return m.OldDescription(ctx)
 	case workhistory.FieldTotalProposals:
 		return m.OldTotalProposals(ctx)
 	case workhistory.FieldNumberOfInterviews:
@@ -7592,12 +7592,12 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEndDate(v)
 		return nil
-	case workhistory.FieldJobDescription:
+	case workhistory.FieldDescription:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetJobDescription(v)
+		m.SetDescription(v)
 		return nil
 	case workhistory.FieldTotalProposals:
 		v, ok := value.(int)
@@ -7976,8 +7976,8 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 	case workhistory.FieldEndDate:
 		m.ResetEndDate()
 		return nil
-	case workhistory.FieldJobDescription:
-		m.ResetJobDescription()
+	case workhistory.FieldDescription:
+		m.ResetDescription()
 		return nil
 	case workhistory.FieldTotalProposals:
 		m.ResetTotalProposals()
