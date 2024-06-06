@@ -62,11 +62,11 @@ type ScrapedWorkHistoryData struct {
 	End_Date           string  `json:"end_date"`
 	Description        string  `json:"description"`
 	Budget             string  `json:"budget"`
-	Total_earned       float64 `json:"total_earned"`
-	Client_total_spend string  `json:"client_total_spend"`
-	Client_total_hires string  `json:"client_total_hires"`
-	Client_feedback    string  `json:"client_feedback"`
-	Client_rating      float64 `json:"client_rating"`
+	Total_Earned       float64 `json:"total_earned"`
+	Client_Total_Spend string  `json:"client_total_spend"`
+	Client_Total_Hires string  `json:"client_total_hires"`
+	Client_Feedback    string  `json:"client_feedback"`
+	Client_Rating      float64 `json:"client_rating"`
 }
 
 func (req *CreateFreelancersRequest) Validate() map[string]string {
