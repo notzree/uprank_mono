@@ -70,24 +70,14 @@ func OverallRating(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldOverallRating, v))
 }
 
-// FixedChargeAmount applies equality check predicate on the "fixed_charge_amount" field. It's identical to FixedChargeAmountEQ.
-func FixedChargeAmount(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldFixedChargeAmount, v))
+// IsHourly applies equality check predicate on the "is_hourly" field. It's identical to IsHourlyEQ.
+func IsHourly(v bool) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldIsHourly, v))
 }
 
-// FixedChargeCurrency applies equality check predicate on the "fixed_charge_currency" field. It's identical to FixedChargeCurrencyEQ.
-func FixedChargeCurrency(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldFixedChargeCurrency, v))
-}
-
-// HourlyChargeAmount applies equality check predicate on the "hourly_charge_amount" field. It's identical to HourlyChargeAmountEQ.
-func HourlyChargeAmount(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeCurrency applies equality check predicate on the "hourly_charge_currency" field. It's identical to HourlyChargeCurrencyEQ.
-func HourlyChargeCurrency(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldHourlyChargeCurrency, v))
+// FreelancerEarnings applies equality check predicate on the "freelancer_earnings" field. It's identical to FreelancerEarningsEQ.
+func FreelancerEarnings(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldFreelancerEarnings, v))
 }
 
 // StartDate applies equality check predicate on the "start_date" field. It's identical to StartDateEQ.
@@ -103,6 +93,11 @@ func EndDate(v time.Time) predicate.WorkHistory {
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldDescription, v))
+}
+
+// Budget applies equality check predicate on the "budget" field. It's identical to BudgetEQ.
+func Budget(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldBudget, v))
 }
 
 // TotalProposals applies equality check predicate on the "total_proposals" field. It's identical to TotalProposalsEQ.
@@ -335,254 +330,54 @@ func OverallRatingLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldOverallRating, v))
 }
 
-// FixedChargeAmountEQ applies the EQ predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldFixedChargeAmount, v))
+// IsHourlyEQ applies the EQ predicate on the "is_hourly" field.
+func IsHourlyEQ(v bool) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldIsHourly, v))
 }
 
-// FixedChargeAmountNEQ applies the NEQ predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountNEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldFixedChargeAmount, v))
+// IsHourlyNEQ applies the NEQ predicate on the "is_hourly" field.
+func IsHourlyNEQ(v bool) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldIsHourly, v))
 }
 
-// FixedChargeAmountIn applies the In predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldFixedChargeAmount, vs...))
+// FreelancerEarningsEQ applies the EQ predicate on the "freelancer_earnings" field.
+func FreelancerEarningsEQ(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldFreelancerEarnings, v))
 }
 
-// FixedChargeAmountNotIn applies the NotIn predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountNotIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldFixedChargeAmount, vs...))
+// FreelancerEarningsNEQ applies the NEQ predicate on the "freelancer_earnings" field.
+func FreelancerEarningsNEQ(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldFreelancerEarnings, v))
 }
 
-// FixedChargeAmountGT applies the GT predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountGT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldFixedChargeAmount, v))
+// FreelancerEarningsIn applies the In predicate on the "freelancer_earnings" field.
+func FreelancerEarningsIn(vs ...float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldFreelancerEarnings, vs...))
 }
 
-// FixedChargeAmountGTE applies the GTE predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountGTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldFixedChargeAmount, v))
+// FreelancerEarningsNotIn applies the NotIn predicate on the "freelancer_earnings" field.
+func FreelancerEarningsNotIn(vs ...float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldFreelancerEarnings, vs...))
 }
 
-// FixedChargeAmountLT applies the LT predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountLT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldFixedChargeAmount, v))
+// FreelancerEarningsGT applies the GT predicate on the "freelancer_earnings" field.
+func FreelancerEarningsGT(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldFreelancerEarnings, v))
 }
 
-// FixedChargeAmountLTE applies the LTE predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountLTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldFixedChargeAmount, v))
+// FreelancerEarningsGTE applies the GTE predicate on the "freelancer_earnings" field.
+func FreelancerEarningsGTE(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldFreelancerEarnings, v))
 }
 
-// FixedChargeAmountIsNil applies the IsNil predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountIsNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIsNull(FieldFixedChargeAmount))
+// FreelancerEarningsLT applies the LT predicate on the "freelancer_earnings" field.
+func FreelancerEarningsLT(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldFreelancerEarnings, v))
 }
 
-// FixedChargeAmountNotNil applies the NotNil predicate on the "fixed_charge_amount" field.
-func FixedChargeAmountNotNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotNull(FieldFixedChargeAmount))
-}
-
-// FixedChargeCurrencyEQ applies the EQ predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyNEQ applies the NEQ predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyNEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyIn applies the In predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldFixedChargeCurrency, vs...))
-}
-
-// FixedChargeCurrencyNotIn applies the NotIn predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyNotIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldFixedChargeCurrency, vs...))
-}
-
-// FixedChargeCurrencyGT applies the GT predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyGT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyGTE applies the GTE predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyGTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyLT applies the LT predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyLT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyLTE applies the LTE predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyLTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyContains applies the Contains predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyContains(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContains(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyHasPrefix applies the HasPrefix predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyHasPrefix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasPrefix(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyHasSuffix applies the HasSuffix predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyHasSuffix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasSuffix(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyIsNil applies the IsNil predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyIsNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIsNull(FieldFixedChargeCurrency))
-}
-
-// FixedChargeCurrencyNotNil applies the NotNil predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyNotNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotNull(FieldFixedChargeCurrency))
-}
-
-// FixedChargeCurrencyEqualFold applies the EqualFold predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyEqualFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEqualFold(FieldFixedChargeCurrency, v))
-}
-
-// FixedChargeCurrencyContainsFold applies the ContainsFold predicate on the "fixed_charge_currency" field.
-func FixedChargeCurrencyContainsFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContainsFold(FieldFixedChargeCurrency, v))
-}
-
-// HourlyChargeAmountEQ applies the EQ predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountNEQ applies the NEQ predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountNEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountIn applies the In predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldHourlyChargeAmount, vs...))
-}
-
-// HourlyChargeAmountNotIn applies the NotIn predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountNotIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldHourlyChargeAmount, vs...))
-}
-
-// HourlyChargeAmountGT applies the GT predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountGT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountGTE applies the GTE predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountGTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountLT applies the LT predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountLT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountLTE applies the LTE predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountLTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldHourlyChargeAmount, v))
-}
-
-// HourlyChargeAmountIsNil applies the IsNil predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountIsNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIsNull(FieldHourlyChargeAmount))
-}
-
-// HourlyChargeAmountNotNil applies the NotNil predicate on the "hourly_charge_amount" field.
-func HourlyChargeAmountNotNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotNull(FieldHourlyChargeAmount))
-}
-
-// HourlyChargeCurrencyEQ applies the EQ predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyNEQ applies the NEQ predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyNEQ(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyIn applies the In predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldHourlyChargeCurrency, vs...))
-}
-
-// HourlyChargeCurrencyNotIn applies the NotIn predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyNotIn(vs ...string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldHourlyChargeCurrency, vs...))
-}
-
-// HourlyChargeCurrencyGT applies the GT predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyGT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyGTE applies the GTE predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyGTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyLT applies the LT predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyLT(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyLTE applies the LTE predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyLTE(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyContains applies the Contains predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyContains(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContains(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyHasPrefix applies the HasPrefix predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyHasPrefix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasPrefix(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyHasSuffix applies the HasSuffix predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyHasSuffix(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldHasSuffix(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyIsNil applies the IsNil predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyIsNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIsNull(FieldHourlyChargeCurrency))
-}
-
-// HourlyChargeCurrencyNotNil applies the NotNil predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyNotNil() predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotNull(FieldHourlyChargeCurrency))
-}
-
-// HourlyChargeCurrencyEqualFold applies the EqualFold predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyEqualFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEqualFold(FieldHourlyChargeCurrency, v))
-}
-
-// HourlyChargeCurrencyContainsFold applies the ContainsFold predicate on the "hourly_charge_currency" field.
-func HourlyChargeCurrencyContainsFold(v string) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldContainsFold(FieldHourlyChargeCurrency, v))
+// FreelancerEarningsLTE applies the LTE predicate on the "freelancer_earnings" field.
+func FreelancerEarningsLTE(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldFreelancerEarnings, v))
 }
 
 // StartDateEQ applies the EQ predicate on the "start_date" field.
@@ -738,6 +533,46 @@ func DescriptionEqualFold(v string) predicate.WorkHistory {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// BudgetEQ applies the EQ predicate on the "budget" field.
+func BudgetEQ(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldBudget, v))
+}
+
+// BudgetNEQ applies the NEQ predicate on the "budget" field.
+func BudgetNEQ(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldBudget, v))
+}
+
+// BudgetIn applies the In predicate on the "budget" field.
+func BudgetIn(vs ...float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldBudget, vs...))
+}
+
+// BudgetNotIn applies the NotIn predicate on the "budget" field.
+func BudgetNotIn(vs ...float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldBudget, vs...))
+}
+
+// BudgetGT applies the GT predicate on the "budget" field.
+func BudgetGT(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldBudget, v))
+}
+
+// BudgetGTE applies the GTE predicate on the "budget" field.
+func BudgetGTE(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldBudget, v))
+}
+
+// BudgetLT applies the LT predicate on the "budget" field.
+func BudgetLT(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldBudget, v))
+}
+
+// BudgetLTE applies the LTE predicate on the "budget" field.
+func BudgetLTE(v float64) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldBudget, v))
 }
 
 // TotalProposalsEQ applies the EQ predicate on the "total_proposals" field.

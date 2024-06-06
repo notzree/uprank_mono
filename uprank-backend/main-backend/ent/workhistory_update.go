@@ -79,97 +79,38 @@ func (whu *WorkHistoryUpdate) AddOverallRating(f float64) *WorkHistoryUpdate {
 	return whu
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) SetFixedChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetFixedChargeAmount()
-	whu.mutation.SetFixedChargeAmount(i)
+// SetIsHourly sets the "is_hourly" field.
+func (whu *WorkHistoryUpdate) SetIsHourly(b bool) *WorkHistoryUpdate {
+	whu.mutation.SetIsHourly(b)
 	return whu
 }
 
-// SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableFixedChargeAmount(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetFixedChargeAmount(*i)
+// SetNillableIsHourly sets the "is_hourly" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableIsHourly(b *bool) *WorkHistoryUpdate {
+	if b != nil {
+		whu.SetIsHourly(*b)
 	}
 	return whu
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) AddFixedChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.AddFixedChargeAmount(i)
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (whu *WorkHistoryUpdate) SetFreelancerEarnings(f float64) *WorkHistoryUpdate {
+	whu.mutation.ResetFreelancerEarnings()
+	whu.mutation.SetFreelancerEarnings(f)
 	return whu
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) ClearFixedChargeAmount() *WorkHistoryUpdate {
-	whu.mutation.ClearFixedChargeAmount()
-	return whu
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (whu *WorkHistoryUpdate) SetFixedChargeCurrency(s string) *WorkHistoryUpdate {
-	whu.mutation.SetFixedChargeCurrency(s)
-	return whu
-}
-
-// SetNillableFixedChargeCurrency sets the "fixed_charge_currency" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableFixedChargeCurrency(s *string) *WorkHistoryUpdate {
-	if s != nil {
-		whu.SetFixedChargeCurrency(*s)
+// SetNillableFreelancerEarnings sets the "freelancer_earnings" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableFreelancerEarnings(f *float64) *WorkHistoryUpdate {
+	if f != nil {
+		whu.SetFreelancerEarnings(*f)
 	}
 	return whu
 }
 
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (whu *WorkHistoryUpdate) ClearFixedChargeCurrency() *WorkHistoryUpdate {
-	whu.mutation.ClearFixedChargeCurrency()
-	return whu
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) SetHourlyChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetHourlyChargeAmount()
-	whu.mutation.SetHourlyChargeAmount(i)
-	return whu
-}
-
-// SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableHourlyChargeAmount(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetHourlyChargeAmount(*i)
-	}
-	return whu
-}
-
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) AddHourlyChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.AddHourlyChargeAmount(i)
-	return whu
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) ClearHourlyChargeAmount() *WorkHistoryUpdate {
-	whu.mutation.ClearHourlyChargeAmount()
-	return whu
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (whu *WorkHistoryUpdate) SetHourlyChargeCurrency(s string) *WorkHistoryUpdate {
-	whu.mutation.SetHourlyChargeCurrency(s)
-	return whu
-}
-
-// SetNillableHourlyChargeCurrency sets the "hourly_charge_currency" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableHourlyChargeCurrency(s *string) *WorkHistoryUpdate {
-	if s != nil {
-		whu.SetHourlyChargeCurrency(*s)
-	}
-	return whu
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (whu *WorkHistoryUpdate) ClearHourlyChargeCurrency() *WorkHistoryUpdate {
-	whu.mutation.ClearHourlyChargeCurrency()
+// AddFreelancerEarnings adds f to the "freelancer_earnings" field.
+func (whu *WorkHistoryUpdate) AddFreelancerEarnings(f float64) *WorkHistoryUpdate {
+	whu.mutation.AddFreelancerEarnings(f)
 	return whu
 }
 
@@ -218,6 +159,27 @@ func (whu *WorkHistoryUpdate) SetNillableDescription(s *string) *WorkHistoryUpda
 	if s != nil {
 		whu.SetDescription(*s)
 	}
+	return whu
+}
+
+// SetBudget sets the "budget" field.
+func (whu *WorkHistoryUpdate) SetBudget(f float64) *WorkHistoryUpdate {
+	whu.mutation.ResetBudget()
+	whu.mutation.SetBudget(f)
+	return whu
+}
+
+// SetNillableBudget sets the "budget" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableBudget(f *float64) *WorkHistoryUpdate {
+	if f != nil {
+		whu.SetBudget(*f)
+	}
+	return whu
+}
+
+// AddBudget adds f to the "budget" field.
+func (whu *WorkHistoryUpdate) AddBudget(f float64) *WorkHistoryUpdate {
+	whu.mutation.AddBudget(f)
 	return whu
 }
 
@@ -575,35 +537,14 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := whu.mutation.AddedOverallRating(); ok {
 		_spec.AddField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
-	if value, ok := whu.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whu.mutation.IsHourly(); ok {
+		_spec.SetField(workhistory.FieldIsHourly, field.TypeBool, value)
 	}
-	if value, ok := whu.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whu.mutation.FreelancerEarnings(); ok {
+		_spec.SetField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if whu.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeAmount, field.TypeInt)
-	}
-	if value, ok := whu.mutation.FixedChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeCurrency, field.TypeString, value)
-	}
-	if whu.mutation.FixedChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeCurrency, field.TypeString)
-	}
-	if value, ok := whu.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if value, ok := whu.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if whu.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeAmount, field.TypeInt)
-	}
-	if value, ok := whu.mutation.HourlyChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeCurrency, field.TypeString, value)
-	}
-	if whu.mutation.HourlyChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeCurrency, field.TypeString)
+	if value, ok := whu.mutation.AddedFreelancerEarnings(); ok {
+		_spec.AddField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
 	if value, ok := whu.mutation.StartDate(); ok {
 		_spec.SetField(workhistory.FieldStartDate, field.TypeTime, value)
@@ -616,6 +557,12 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := whu.mutation.Description(); ok {
 		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := whu.mutation.Budget(); ok {
+		_spec.SetField(workhistory.FieldBudget, field.TypeFloat64, value)
+	}
+	if value, ok := whu.mutation.AddedBudget(); ok {
+		_spec.AddField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
 	if value, ok := whu.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
@@ -801,97 +748,38 @@ func (whuo *WorkHistoryUpdateOne) AddOverallRating(f float64) *WorkHistoryUpdate
 	return whuo
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) SetFixedChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetFixedChargeAmount()
-	whuo.mutation.SetFixedChargeAmount(i)
+// SetIsHourly sets the "is_hourly" field.
+func (whuo *WorkHistoryUpdateOne) SetIsHourly(b bool) *WorkHistoryUpdateOne {
+	whuo.mutation.SetIsHourly(b)
 	return whuo
 }
 
-// SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableFixedChargeAmount(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetFixedChargeAmount(*i)
+// SetNillableIsHourly sets the "is_hourly" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableIsHourly(b *bool) *WorkHistoryUpdateOne {
+	if b != nil {
+		whuo.SetIsHourly(*b)
 	}
 	return whuo
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) AddFixedChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddFixedChargeAmount(i)
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (whuo *WorkHistoryUpdateOne) SetFreelancerEarnings(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetFreelancerEarnings()
+	whuo.mutation.SetFreelancerEarnings(f)
 	return whuo
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) ClearFixedChargeAmount() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearFixedChargeAmount()
-	return whuo
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) SetFixedChargeCurrency(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetFixedChargeCurrency(s)
-	return whuo
-}
-
-// SetNillableFixedChargeCurrency sets the "fixed_charge_currency" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableFixedChargeCurrency(s *string) *WorkHistoryUpdateOne {
-	if s != nil {
-		whuo.SetFixedChargeCurrency(*s)
+// SetNillableFreelancerEarnings sets the "freelancer_earnings" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableFreelancerEarnings(f *float64) *WorkHistoryUpdateOne {
+	if f != nil {
+		whuo.SetFreelancerEarnings(*f)
 	}
 	return whuo
 }
 
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) ClearFixedChargeCurrency() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearFixedChargeCurrency()
-	return whuo
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) SetHourlyChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetHourlyChargeAmount()
-	whuo.mutation.SetHourlyChargeAmount(i)
-	return whuo
-}
-
-// SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableHourlyChargeAmount(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetHourlyChargeAmount(*i)
-	}
-	return whuo
-}
-
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) AddHourlyChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddHourlyChargeAmount(i)
-	return whuo
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) ClearHourlyChargeAmount() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearHourlyChargeAmount()
-	return whuo
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) SetHourlyChargeCurrency(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetHourlyChargeCurrency(s)
-	return whuo
-}
-
-// SetNillableHourlyChargeCurrency sets the "hourly_charge_currency" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableHourlyChargeCurrency(s *string) *WorkHistoryUpdateOne {
-	if s != nil {
-		whuo.SetHourlyChargeCurrency(*s)
-	}
-	return whuo
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) ClearHourlyChargeCurrency() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearHourlyChargeCurrency()
+// AddFreelancerEarnings adds f to the "freelancer_earnings" field.
+func (whuo *WorkHistoryUpdateOne) AddFreelancerEarnings(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.AddFreelancerEarnings(f)
 	return whuo
 }
 
@@ -940,6 +828,27 @@ func (whuo *WorkHistoryUpdateOne) SetNillableDescription(s *string) *WorkHistory
 	if s != nil {
 		whuo.SetDescription(*s)
 	}
+	return whuo
+}
+
+// SetBudget sets the "budget" field.
+func (whuo *WorkHistoryUpdateOne) SetBudget(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetBudget()
+	whuo.mutation.SetBudget(f)
+	return whuo
+}
+
+// SetNillableBudget sets the "budget" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableBudget(f *float64) *WorkHistoryUpdateOne {
+	if f != nil {
+		whuo.SetBudget(*f)
+	}
+	return whuo
+}
+
+// AddBudget adds f to the "budget" field.
+func (whuo *WorkHistoryUpdateOne) AddBudget(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.AddBudget(f)
 	return whuo
 }
 
@@ -1327,35 +1236,14 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if value, ok := whuo.mutation.AddedOverallRating(); ok {
 		_spec.AddField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
-	if value, ok := whuo.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whuo.mutation.IsHourly(); ok {
+		_spec.SetField(workhistory.FieldIsHourly, field.TypeBool, value)
 	}
-	if value, ok := whuo.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whuo.mutation.FreelancerEarnings(); ok {
+		_spec.SetField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if whuo.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeAmount, field.TypeInt)
-	}
-	if value, ok := whuo.mutation.FixedChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeCurrency, field.TypeString, value)
-	}
-	if whuo.mutation.FixedChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeCurrency, field.TypeString)
-	}
-	if value, ok := whuo.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if value, ok := whuo.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if whuo.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeAmount, field.TypeInt)
-	}
-	if value, ok := whuo.mutation.HourlyChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeCurrency, field.TypeString, value)
-	}
-	if whuo.mutation.HourlyChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeCurrency, field.TypeString)
+	if value, ok := whuo.mutation.AddedFreelancerEarnings(); ok {
+		_spec.AddField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
 	if value, ok := whuo.mutation.StartDate(); ok {
 		_spec.SetField(workhistory.FieldStartDate, field.TypeTime, value)
@@ -1368,6 +1256,12 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	}
 	if value, ok := whuo.mutation.Description(); ok {
 		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := whuo.mutation.Budget(); ok {
+		_spec.SetField(workhistory.FieldBudget, field.TypeFloat64, value)
+	}
+	if value, ok := whuo.mutation.AddedBudget(); ok {
+		_spec.AddField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
 	if value, ok := whuo.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)

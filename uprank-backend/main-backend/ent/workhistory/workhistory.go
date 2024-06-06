@@ -18,20 +18,18 @@ const (
 	FieldClientFeedback = "client_feedback"
 	// FieldOverallRating holds the string denoting the overall_rating field in the database.
 	FieldOverallRating = "overall_rating"
-	// FieldFixedChargeAmount holds the string denoting the fixed_charge_amount field in the database.
-	FieldFixedChargeAmount = "fixed_charge_amount"
-	// FieldFixedChargeCurrency holds the string denoting the fixed_charge_currency field in the database.
-	FieldFixedChargeCurrency = "fixed_charge_currency"
-	// FieldHourlyChargeAmount holds the string denoting the hourly_charge_amount field in the database.
-	FieldHourlyChargeAmount = "hourly_charge_amount"
-	// FieldHourlyChargeCurrency holds the string denoting the hourly_charge_currency field in the database.
-	FieldHourlyChargeCurrency = "hourly_charge_currency"
+	// FieldIsHourly holds the string denoting the is_hourly field in the database.
+	FieldIsHourly = "is_hourly"
+	// FieldFreelancerEarnings holds the string denoting the freelancer_earnings field in the database.
+	FieldFreelancerEarnings = "freelancer_earnings"
 	// FieldStartDate holds the string denoting the start_date field in the database.
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
 	FieldEndDate = "end_date"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldBudget holds the string denoting the budget field in the database.
+	FieldBudget = "budget"
 	// FieldTotalProposals holds the string denoting the total_proposals field in the database.
 	FieldTotalProposals = "total_proposals"
 	// FieldNumberOfInterviews holds the string denoting the number_of_interviews field in the database.
@@ -77,13 +75,12 @@ var Columns = []string{
 	FieldTitle,
 	FieldClientFeedback,
 	FieldOverallRating,
-	FieldFixedChargeAmount,
-	FieldFixedChargeCurrency,
-	FieldHourlyChargeAmount,
-	FieldHourlyChargeCurrency,
+	FieldIsHourly,
+	FieldFreelancerEarnings,
 	FieldStartDate,
 	FieldEndDate,
 	FieldDescription,
+	FieldBudget,
 	FieldTotalProposals,
 	FieldNumberOfInterviews,
 	FieldSkills,
@@ -143,24 +140,14 @@ func ByOverallRating(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOverallRating, opts...).ToFunc()
 }
 
-// ByFixedChargeAmount orders the results by the fixed_charge_amount field.
-func ByFixedChargeAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixedChargeAmount, opts...).ToFunc()
+// ByIsHourly orders the results by the is_hourly field.
+func ByIsHourly(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsHourly, opts...).ToFunc()
 }
 
-// ByFixedChargeCurrency orders the results by the fixed_charge_currency field.
-func ByFixedChargeCurrency(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixedChargeCurrency, opts...).ToFunc()
-}
-
-// ByHourlyChargeAmount orders the results by the hourly_charge_amount field.
-func ByHourlyChargeAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHourlyChargeAmount, opts...).ToFunc()
-}
-
-// ByHourlyChargeCurrency orders the results by the hourly_charge_currency field.
-func ByHourlyChargeCurrency(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHourlyChargeCurrency, opts...).ToFunc()
+// ByFreelancerEarnings orders the results by the freelancer_earnings field.
+func ByFreelancerEarnings(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFreelancerEarnings, opts...).ToFunc()
 }
 
 // ByStartDate orders the results by the start_date field.
@@ -176,6 +163,11 @@ func ByEndDate(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByBudget orders the results by the budget field.
+func ByBudget(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBudget, opts...).ToFunc()
 }
 
 // ByTotalProposals orders the results by the total_proposals field.
