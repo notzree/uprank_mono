@@ -114,7 +114,6 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 	return writeJSON(w, http.StatusCreated, freelancers)
 }
 
-// this shit doesn't work lol. I prob need to use CreateBulk with upserts again gg
 func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error {
 	claims, _ := clerk.SessionClaimsFromContext(r.Context())
 	user_id := claims.Subject
@@ -148,14 +147,6 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 			return InvalidRequestData(errors)
 		}
 	}
-
-	//We need to compare with the freelancers currently in the db.
-	//We need to split them into 3 categories.
-	// 1. Freelancers that are already in the db and need to be updated (don't need to update attachements or job histories)
-	// 2. Freelancers that are not in the db but in the request and need to be created (with attachements + job histories created)
-	// 3. Freelancers that are in the db but not in the request and need to be deleted (with attachements + job histories deleted)
-
-	//Plan: find the intersections of the two sets, then for each array, remove the intersection. Then we are left with the 3 categories
 
 	incoming_freelancer_dict := make(map[string]types.CreateFreelancersRequest)
 	for _, freelancer := range req {
@@ -229,7 +220,7 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	if createFreelancerErr != nil {
 		return createFreelancerErr
 	}
-	//add the work history
+
 	for _, freelancer := range freelancers_to_create {
 		if len(freelancer.Attachements) == 0 {
 			continue
@@ -246,11 +237,24 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 		if len(freelancer.Work_history) == 0 {
 			continue
 		}
-		//todo: create work history
-
+		// _, createWorkHistoryErr := s.ent.WorkHistory.MapCreateBulk(freelancer.Work_history, func(c *ent.WorkHistoryCreate, j int) {
+		// 	c.SetTitle(freelancer.Work_history[j].Title).
+		// 		SetStartDate(freelancer.Work_history[j].Start_Date).
+		// 		SetEndDate(freelancer.Work_history[j].EndDate).
+		// 		SetDescription(freelancer.Work_history[j].Description).
+		// 		SetClientFeedback(freelancer.Work_history[j].Client_Feedback).
+		// 		SetOverallRating(freelancer.Work_history[j].Client_Rating).
+		// 		SetClientTotalSpend(freelancer.Work_history[j].Client_Total_Spend).
+		// 		SetClientTotalHires(freelancer.Work_history[j].Client_Total_Hires).
+		// 		SetBudget(freelancer.Work_history[j].Budget).
+		// 		SetFreelancerEarnings(freelancer.Work_history[j].Total_Earned)
+		// 	//todo: need to scrape the rest of the fields
+		// 	//missing fields: fixed / hourly, hours billed (if hourly), # of proposals, # of interviews, client company stuff, (need to determine if that is even worth using as I need to open a whole new thing)
+		// }).Save(r.Context())
 	}
+
 	//update freelancers
-	updateFreelancerErr := s.ent.Freelancer.MapCreateBulk(freelancers_to_update, func(c *ent.FreelancerCreate, i int) {
+	_ = s.ent.Freelancer.MapCreateBulk(freelancers_to_update, func(c *ent.FreelancerCreate, i int) {
 		freelancer := freelancers_to_update[i]
 		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
@@ -298,6 +302,7 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	//delete freelancers
 
 	return writeJSON(w, http.StatusCreated, nil)
+
 }
 
 // queueScraperJob queues the scraping job for the given job_id into our aws sqs queue for the scraper server to pick up
