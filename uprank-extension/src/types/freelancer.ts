@@ -125,7 +125,8 @@ export interface CreateFreelancerResponse {
 
 export type FreelancerJobHistory = {
   title: string;
-  date: string;
+  start_date: string;
+  end_date: string;
   description: string;
   budget: string;
   total_earned: number;
@@ -133,6 +134,7 @@ export type FreelancerJobHistory = {
   client_total_hires: string;
   client_feedback: string;
   client_rating: number;
+  client_location: string;
 }
 
 export type ProcessFreelancerJobHistoryResult = {
