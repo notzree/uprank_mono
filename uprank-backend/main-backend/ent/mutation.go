@@ -5912,15 +5912,14 @@ type WorkHistoryMutation struct {
 	client_feedback                    *string
 	overall_rating                     *float64
 	addoverall_rating                  *float64
-	fixed_charge_amount                *int
-	addfixed_charge_amount             *int
-	fixed_charge_currency              *string
-	hourly_charge_amount               *int
-	addhourly_charge_amount            *int
-	hourly_charge_currency             *string
+	is_hourly                          *bool
+	freelancer_earnings                *float64
+	addfreelancer_earnings             *float64
 	start_date                         *time.Time
 	end_date                           *time.Time
 	description                        *string
+	budget                             *float64
+	addbudget                          *float64
 	total_proposals                    *int
 	addtotal_proposals                 *int
 	number_of_interviews               *int
@@ -6178,242 +6177,96 @@ func (m *WorkHistoryMutation) ResetOverallRating() {
 	m.addoverall_rating = nil
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (m *WorkHistoryMutation) SetFixedChargeAmount(i int) {
-	m.fixed_charge_amount = &i
-	m.addfixed_charge_amount = nil
+// SetIsHourly sets the "is_hourly" field.
+func (m *WorkHistoryMutation) SetIsHourly(b bool) {
+	m.is_hourly = &b
 }
 
-// FixedChargeAmount returns the value of the "fixed_charge_amount" field in the mutation.
-func (m *WorkHistoryMutation) FixedChargeAmount() (r int, exists bool) {
-	v := m.fixed_charge_amount
+// IsHourly returns the value of the "is_hourly" field in the mutation.
+func (m *WorkHistoryMutation) IsHourly() (r bool, exists bool) {
+	v := m.is_hourly
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldFixedChargeAmount returns the old "fixed_charge_amount" field's value of the WorkHistory entity.
+// OldIsHourly returns the old "is_hourly" field's value of the WorkHistory entity.
 // If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldFixedChargeAmount(ctx context.Context) (v int, err error) {
+func (m *WorkHistoryMutation) OldIsHourly(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixedChargeAmount is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsHourly is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixedChargeAmount requires an ID field in the mutation")
+		return v, errors.New("OldIsHourly requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixedChargeAmount: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsHourly: %w", err)
 	}
-	return oldValue.FixedChargeAmount, nil
+	return oldValue.IsHourly, nil
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (m *WorkHistoryMutation) AddFixedChargeAmount(i int) {
-	if m.addfixed_charge_amount != nil {
-		*m.addfixed_charge_amount += i
+// ResetIsHourly resets all changes to the "is_hourly" field.
+func (m *WorkHistoryMutation) ResetIsHourly() {
+	m.is_hourly = nil
+}
+
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (m *WorkHistoryMutation) SetFreelancerEarnings(f float64) {
+	m.freelancer_earnings = &f
+	m.addfreelancer_earnings = nil
+}
+
+// FreelancerEarnings returns the value of the "freelancer_earnings" field in the mutation.
+func (m *WorkHistoryMutation) FreelancerEarnings() (r float64, exists bool) {
+	v := m.freelancer_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFreelancerEarnings returns the old "freelancer_earnings" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldFreelancerEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFreelancerEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFreelancerEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFreelancerEarnings: %w", err)
+	}
+	return oldValue.FreelancerEarnings, nil
+}
+
+// AddFreelancerEarnings adds f to the "freelancer_earnings" field.
+func (m *WorkHistoryMutation) AddFreelancerEarnings(f float64) {
+	if m.addfreelancer_earnings != nil {
+		*m.addfreelancer_earnings += f
 	} else {
-		m.addfixed_charge_amount = &i
+		m.addfreelancer_earnings = &f
 	}
 }
 
-// AddedFixedChargeAmount returns the value that was added to the "fixed_charge_amount" field in this mutation.
-func (m *WorkHistoryMutation) AddedFixedChargeAmount() (r int, exists bool) {
-	v := m.addfixed_charge_amount
+// AddedFreelancerEarnings returns the value that was added to the "freelancer_earnings" field in this mutation.
+func (m *WorkHistoryMutation) AddedFreelancerEarnings() (r float64, exists bool) {
+	v := m.addfreelancer_earnings
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (m *WorkHistoryMutation) ClearFixedChargeAmount() {
-	m.fixed_charge_amount = nil
-	m.addfixed_charge_amount = nil
-	m.clearedFields[workhistory.FieldFixedChargeAmount] = struct{}{}
-}
-
-// FixedChargeAmountCleared returns if the "fixed_charge_amount" field was cleared in this mutation.
-func (m *WorkHistoryMutation) FixedChargeAmountCleared() bool {
-	_, ok := m.clearedFields[workhistory.FieldFixedChargeAmount]
-	return ok
-}
-
-// ResetFixedChargeAmount resets all changes to the "fixed_charge_amount" field.
-func (m *WorkHistoryMutation) ResetFixedChargeAmount() {
-	m.fixed_charge_amount = nil
-	m.addfixed_charge_amount = nil
-	delete(m.clearedFields, workhistory.FieldFixedChargeAmount)
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (m *WorkHistoryMutation) SetFixedChargeCurrency(s string) {
-	m.fixed_charge_currency = &s
-}
-
-// FixedChargeCurrency returns the value of the "fixed_charge_currency" field in the mutation.
-func (m *WorkHistoryMutation) FixedChargeCurrency() (r string, exists bool) {
-	v := m.fixed_charge_currency
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFixedChargeCurrency returns the old "fixed_charge_currency" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldFixedChargeCurrency(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixedChargeCurrency is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixedChargeCurrency requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixedChargeCurrency: %w", err)
-	}
-	return oldValue.FixedChargeCurrency, nil
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (m *WorkHistoryMutation) ClearFixedChargeCurrency() {
-	m.fixed_charge_currency = nil
-	m.clearedFields[workhistory.FieldFixedChargeCurrency] = struct{}{}
-}
-
-// FixedChargeCurrencyCleared returns if the "fixed_charge_currency" field was cleared in this mutation.
-func (m *WorkHistoryMutation) FixedChargeCurrencyCleared() bool {
-	_, ok := m.clearedFields[workhistory.FieldFixedChargeCurrency]
-	return ok
-}
-
-// ResetFixedChargeCurrency resets all changes to the "fixed_charge_currency" field.
-func (m *WorkHistoryMutation) ResetFixedChargeCurrency() {
-	m.fixed_charge_currency = nil
-	delete(m.clearedFields, workhistory.FieldFixedChargeCurrency)
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (m *WorkHistoryMutation) SetHourlyChargeAmount(i int) {
-	m.hourly_charge_amount = &i
-	m.addhourly_charge_amount = nil
-}
-
-// HourlyChargeAmount returns the value of the "hourly_charge_amount" field in the mutation.
-func (m *WorkHistoryMutation) HourlyChargeAmount() (r int, exists bool) {
-	v := m.hourly_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourlyChargeAmount returns the old "hourly_charge_amount" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldHourlyChargeAmount(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourlyChargeAmount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourlyChargeAmount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourlyChargeAmount: %w", err)
-	}
-	return oldValue.HourlyChargeAmount, nil
-}
-
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (m *WorkHistoryMutation) AddHourlyChargeAmount(i int) {
-	if m.addhourly_charge_amount != nil {
-		*m.addhourly_charge_amount += i
-	} else {
-		m.addhourly_charge_amount = &i
-	}
-}
-
-// AddedHourlyChargeAmount returns the value that was added to the "hourly_charge_amount" field in this mutation.
-func (m *WorkHistoryMutation) AddedHourlyChargeAmount() (r int, exists bool) {
-	v := m.addhourly_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (m *WorkHistoryMutation) ClearHourlyChargeAmount() {
-	m.hourly_charge_amount = nil
-	m.addhourly_charge_amount = nil
-	m.clearedFields[workhistory.FieldHourlyChargeAmount] = struct{}{}
-}
-
-// HourlyChargeAmountCleared returns if the "hourly_charge_amount" field was cleared in this mutation.
-func (m *WorkHistoryMutation) HourlyChargeAmountCleared() bool {
-	_, ok := m.clearedFields[workhistory.FieldHourlyChargeAmount]
-	return ok
-}
-
-// ResetHourlyChargeAmount resets all changes to the "hourly_charge_amount" field.
-func (m *WorkHistoryMutation) ResetHourlyChargeAmount() {
-	m.hourly_charge_amount = nil
-	m.addhourly_charge_amount = nil
-	delete(m.clearedFields, workhistory.FieldHourlyChargeAmount)
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (m *WorkHistoryMutation) SetHourlyChargeCurrency(s string) {
-	m.hourly_charge_currency = &s
-}
-
-// HourlyChargeCurrency returns the value of the "hourly_charge_currency" field in the mutation.
-func (m *WorkHistoryMutation) HourlyChargeCurrency() (r string, exists bool) {
-	v := m.hourly_charge_currency
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourlyChargeCurrency returns the old "hourly_charge_currency" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldHourlyChargeCurrency(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourlyChargeCurrency is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourlyChargeCurrency requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourlyChargeCurrency: %w", err)
-	}
-	return oldValue.HourlyChargeCurrency, nil
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (m *WorkHistoryMutation) ClearHourlyChargeCurrency() {
-	m.hourly_charge_currency = nil
-	m.clearedFields[workhistory.FieldHourlyChargeCurrency] = struct{}{}
-}
-
-// HourlyChargeCurrencyCleared returns if the "hourly_charge_currency" field was cleared in this mutation.
-func (m *WorkHistoryMutation) HourlyChargeCurrencyCleared() bool {
-	_, ok := m.clearedFields[workhistory.FieldHourlyChargeCurrency]
-	return ok
-}
-
-// ResetHourlyChargeCurrency resets all changes to the "hourly_charge_currency" field.
-func (m *WorkHistoryMutation) ResetHourlyChargeCurrency() {
-	m.hourly_charge_currency = nil
-	delete(m.clearedFields, workhistory.FieldHourlyChargeCurrency)
+// ResetFreelancerEarnings resets all changes to the "freelancer_earnings" field.
+func (m *WorkHistoryMutation) ResetFreelancerEarnings() {
+	m.freelancer_earnings = nil
+	m.addfreelancer_earnings = nil
 }
 
 // SetStartDate sets the "start_date" field.
@@ -6535,6 +6388,62 @@ func (m *WorkHistoryMutation) OldDescription(ctx context.Context) (v string, err
 // ResetDescription resets all changes to the "description" field.
 func (m *WorkHistoryMutation) ResetDescription() {
 	m.description = nil
+}
+
+// SetBudget sets the "budget" field.
+func (m *WorkHistoryMutation) SetBudget(f float64) {
+	m.budget = &f
+	m.addbudget = nil
+}
+
+// Budget returns the value of the "budget" field in the mutation.
+func (m *WorkHistoryMutation) Budget() (r float64, exists bool) {
+	v := m.budget
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBudget returns the old "budget" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldBudget(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBudget is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBudget requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBudget: %w", err)
+	}
+	return oldValue.Budget, nil
+}
+
+// AddBudget adds f to the "budget" field.
+func (m *WorkHistoryMutation) AddBudget(f float64) {
+	if m.addbudget != nil {
+		*m.addbudget += f
+	} else {
+		m.addbudget = &f
+	}
+}
+
+// AddedBudget returns the value that was added to the "budget" field in this mutation.
+func (m *WorkHistoryMutation) AddedBudget() (r float64, exists bool) {
+	v := m.addbudget
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetBudget resets all changes to the "budget" field.
+func (m *WorkHistoryMutation) ResetBudget() {
+	m.budget = nil
+	m.addbudget = nil
 }
 
 // SetTotalProposals sets the "total_proposals" field.
@@ -7341,7 +7250,7 @@ func (m *WorkHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 23)
+	fields := make([]string, 0, 22)
 	if m.title != nil {
 		fields = append(fields, workhistory.FieldTitle)
 	}
@@ -7351,17 +7260,11 @@ func (m *WorkHistoryMutation) Fields() []string {
 	if m.overall_rating != nil {
 		fields = append(fields, workhistory.FieldOverallRating)
 	}
-	if m.fixed_charge_amount != nil {
-		fields = append(fields, workhistory.FieldFixedChargeAmount)
+	if m.is_hourly != nil {
+		fields = append(fields, workhistory.FieldIsHourly)
 	}
-	if m.fixed_charge_currency != nil {
-		fields = append(fields, workhistory.FieldFixedChargeCurrency)
-	}
-	if m.hourly_charge_amount != nil {
-		fields = append(fields, workhistory.FieldHourlyChargeAmount)
-	}
-	if m.hourly_charge_currency != nil {
-		fields = append(fields, workhistory.FieldHourlyChargeCurrency)
+	if m.freelancer_earnings != nil {
+		fields = append(fields, workhistory.FieldFreelancerEarnings)
 	}
 	if m.start_date != nil {
 		fields = append(fields, workhistory.FieldStartDate)
@@ -7371,6 +7274,9 @@ func (m *WorkHistoryMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, workhistory.FieldDescription)
+	}
+	if m.budget != nil {
+		fields = append(fields, workhistory.FieldBudget)
 	}
 	if m.total_proposals != nil {
 		fields = append(fields, workhistory.FieldTotalProposals)
@@ -7425,20 +7331,18 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.ClientFeedback()
 	case workhistory.FieldOverallRating:
 		return m.OverallRating()
-	case workhistory.FieldFixedChargeAmount:
-		return m.FixedChargeAmount()
-	case workhistory.FieldFixedChargeCurrency:
-		return m.FixedChargeCurrency()
-	case workhistory.FieldHourlyChargeAmount:
-		return m.HourlyChargeAmount()
-	case workhistory.FieldHourlyChargeCurrency:
-		return m.HourlyChargeCurrency()
+	case workhistory.FieldIsHourly:
+		return m.IsHourly()
+	case workhistory.FieldFreelancerEarnings:
+		return m.FreelancerEarnings()
 	case workhistory.FieldStartDate:
 		return m.StartDate()
 	case workhistory.FieldEndDate:
 		return m.EndDate()
 	case workhistory.FieldDescription:
 		return m.Description()
+	case workhistory.FieldBudget:
+		return m.Budget()
 	case workhistory.FieldTotalProposals:
 		return m.TotalProposals()
 	case workhistory.FieldNumberOfInterviews:
@@ -7480,20 +7384,18 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldClientFeedback(ctx)
 	case workhistory.FieldOverallRating:
 		return m.OldOverallRating(ctx)
-	case workhistory.FieldFixedChargeAmount:
-		return m.OldFixedChargeAmount(ctx)
-	case workhistory.FieldFixedChargeCurrency:
-		return m.OldFixedChargeCurrency(ctx)
-	case workhistory.FieldHourlyChargeAmount:
-		return m.OldHourlyChargeAmount(ctx)
-	case workhistory.FieldHourlyChargeCurrency:
-		return m.OldHourlyChargeCurrency(ctx)
+	case workhistory.FieldIsHourly:
+		return m.OldIsHourly(ctx)
+	case workhistory.FieldFreelancerEarnings:
+		return m.OldFreelancerEarnings(ctx)
 	case workhistory.FieldStartDate:
 		return m.OldStartDate(ctx)
 	case workhistory.FieldEndDate:
 		return m.OldEndDate(ctx)
 	case workhistory.FieldDescription:
 		return m.OldDescription(ctx)
+	case workhistory.FieldBudget:
+		return m.OldBudget(ctx)
 	case workhistory.FieldTotalProposals:
 		return m.OldTotalProposals(ctx)
 	case workhistory.FieldNumberOfInterviews:
@@ -7550,33 +7452,19 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetOverallRating(v)
 		return nil
-	case workhistory.FieldFixedChargeAmount:
-		v, ok := value.(int)
+	case workhistory.FieldIsHourly:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetFixedChargeAmount(v)
+		m.SetIsHourly(v)
 		return nil
-	case workhistory.FieldFixedChargeCurrency:
-		v, ok := value.(string)
+	case workhistory.FieldFreelancerEarnings:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetFixedChargeCurrency(v)
-		return nil
-	case workhistory.FieldHourlyChargeAmount:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourlyChargeAmount(v)
-		return nil
-	case workhistory.FieldHourlyChargeCurrency:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourlyChargeCurrency(v)
+		m.SetFreelancerEarnings(v)
 		return nil
 	case workhistory.FieldStartDate:
 		v, ok := value.(time.Time)
@@ -7598,6 +7486,13 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case workhistory.FieldBudget:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBudget(v)
 		return nil
 	case workhistory.FieldTotalProposals:
 		v, ok := value.(int)
@@ -7701,11 +7596,11 @@ func (m *WorkHistoryMutation) AddedFields() []string {
 	if m.addoverall_rating != nil {
 		fields = append(fields, workhistory.FieldOverallRating)
 	}
-	if m.addfixed_charge_amount != nil {
-		fields = append(fields, workhistory.FieldFixedChargeAmount)
+	if m.addfreelancer_earnings != nil {
+		fields = append(fields, workhistory.FieldFreelancerEarnings)
 	}
-	if m.addhourly_charge_amount != nil {
-		fields = append(fields, workhistory.FieldHourlyChargeAmount)
+	if m.addbudget != nil {
+		fields = append(fields, workhistory.FieldBudget)
 	}
 	if m.addtotal_proposals != nil {
 		fields = append(fields, workhistory.FieldTotalProposals)
@@ -7744,10 +7639,10 @@ func (m *WorkHistoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case workhistory.FieldOverallRating:
 		return m.AddedOverallRating()
-	case workhistory.FieldFixedChargeAmount:
-		return m.AddedFixedChargeAmount()
-	case workhistory.FieldHourlyChargeAmount:
-		return m.AddedHourlyChargeAmount()
+	case workhistory.FieldFreelancerEarnings:
+		return m.AddedFreelancerEarnings()
+	case workhistory.FieldBudget:
+		return m.AddedBudget()
 	case workhistory.FieldTotalProposals:
 		return m.AddedTotalProposals()
 	case workhistory.FieldNumberOfInterviews:
@@ -7782,19 +7677,19 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddOverallRating(v)
 		return nil
-	case workhistory.FieldFixedChargeAmount:
-		v, ok := value.(int)
+	case workhistory.FieldFreelancerEarnings:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddFixedChargeAmount(v)
+		m.AddFreelancerEarnings(v)
 		return nil
-	case workhistory.FieldHourlyChargeAmount:
-		v, ok := value.(int)
+	case workhistory.FieldBudget:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddHourlyChargeAmount(v)
+		m.AddBudget(v)
 		return nil
 	case workhistory.FieldTotalProposals:
 		v, ok := value.(int)
@@ -7867,18 +7762,6 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *WorkHistoryMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(workhistory.FieldFixedChargeAmount) {
-		fields = append(fields, workhistory.FieldFixedChargeAmount)
-	}
-	if m.FieldCleared(workhistory.FieldFixedChargeCurrency) {
-		fields = append(fields, workhistory.FieldFixedChargeCurrency)
-	}
-	if m.FieldCleared(workhistory.FieldHourlyChargeAmount) {
-		fields = append(fields, workhistory.FieldHourlyChargeAmount)
-	}
-	if m.FieldCleared(workhistory.FieldHourlyChargeCurrency) {
-		fields = append(fields, workhistory.FieldHourlyChargeCurrency)
-	}
 	if m.FieldCleared(workhistory.FieldEndDate) {
 		fields = append(fields, workhistory.FieldEndDate)
 	}
@@ -7911,18 +7794,6 @@ func (m *WorkHistoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *WorkHistoryMutation) ClearField(name string) error {
 	switch name {
-	case workhistory.FieldFixedChargeAmount:
-		m.ClearFixedChargeAmount()
-		return nil
-	case workhistory.FieldFixedChargeCurrency:
-		m.ClearFixedChargeCurrency()
-		return nil
-	case workhistory.FieldHourlyChargeAmount:
-		m.ClearHourlyChargeAmount()
-		return nil
-	case workhistory.FieldHourlyChargeCurrency:
-		m.ClearHourlyChargeCurrency()
-		return nil
 	case workhistory.FieldEndDate:
 		m.ClearEndDate()
 		return nil
@@ -7958,17 +7829,11 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 	case workhistory.FieldOverallRating:
 		m.ResetOverallRating()
 		return nil
-	case workhistory.FieldFixedChargeAmount:
-		m.ResetFixedChargeAmount()
+	case workhistory.FieldIsHourly:
+		m.ResetIsHourly()
 		return nil
-	case workhistory.FieldFixedChargeCurrency:
-		m.ResetFixedChargeCurrency()
-		return nil
-	case workhistory.FieldHourlyChargeAmount:
-		m.ResetHourlyChargeAmount()
-		return nil
-	case workhistory.FieldHourlyChargeCurrency:
-		m.ResetHourlyChargeCurrency()
+	case workhistory.FieldFreelancerEarnings:
+		m.ResetFreelancerEarnings()
 		return nil
 	case workhistory.FieldStartDate:
 		m.ResetStartDate()
@@ -7978,6 +7843,9 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 		return nil
 	case workhistory.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case workhistory.FieldBudget:
+		m.ResetBudget()
 		return nil
 	case workhistory.FieldTotalProposals:
 		m.ResetTotalProposals()

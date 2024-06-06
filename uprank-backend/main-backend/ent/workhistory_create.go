@@ -41,59 +41,15 @@ func (whc *WorkHistoryCreate) SetOverallRating(f float64) *WorkHistoryCreate {
 	return whc
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (whc *WorkHistoryCreate) SetFixedChargeAmount(i int) *WorkHistoryCreate {
-	whc.mutation.SetFixedChargeAmount(i)
+// SetIsHourly sets the "is_hourly" field.
+func (whc *WorkHistoryCreate) SetIsHourly(b bool) *WorkHistoryCreate {
+	whc.mutation.SetIsHourly(b)
 	return whc
 }
 
-// SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (whc *WorkHistoryCreate) SetNillableFixedChargeAmount(i *int) *WorkHistoryCreate {
-	if i != nil {
-		whc.SetFixedChargeAmount(*i)
-	}
-	return whc
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (whc *WorkHistoryCreate) SetFixedChargeCurrency(s string) *WorkHistoryCreate {
-	whc.mutation.SetFixedChargeCurrency(s)
-	return whc
-}
-
-// SetNillableFixedChargeCurrency sets the "fixed_charge_currency" field if the given value is not nil.
-func (whc *WorkHistoryCreate) SetNillableFixedChargeCurrency(s *string) *WorkHistoryCreate {
-	if s != nil {
-		whc.SetFixedChargeCurrency(*s)
-	}
-	return whc
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (whc *WorkHistoryCreate) SetHourlyChargeAmount(i int) *WorkHistoryCreate {
-	whc.mutation.SetHourlyChargeAmount(i)
-	return whc
-}
-
-// SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (whc *WorkHistoryCreate) SetNillableHourlyChargeAmount(i *int) *WorkHistoryCreate {
-	if i != nil {
-		whc.SetHourlyChargeAmount(*i)
-	}
-	return whc
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (whc *WorkHistoryCreate) SetHourlyChargeCurrency(s string) *WorkHistoryCreate {
-	whc.mutation.SetHourlyChargeCurrency(s)
-	return whc
-}
-
-// SetNillableHourlyChargeCurrency sets the "hourly_charge_currency" field if the given value is not nil.
-func (whc *WorkHistoryCreate) SetNillableHourlyChargeCurrency(s *string) *WorkHistoryCreate {
-	if s != nil {
-		whc.SetHourlyChargeCurrency(*s)
-	}
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (whc *WorkHistoryCreate) SetFreelancerEarnings(f float64) *WorkHistoryCreate {
+	whc.mutation.SetFreelancerEarnings(f)
 	return whc
 }
 
@@ -120,6 +76,12 @@ func (whc *WorkHistoryCreate) SetNillableEndDate(t *time.Time) *WorkHistoryCreat
 // SetDescription sets the "description" field.
 func (whc *WorkHistoryCreate) SetDescription(s string) *WorkHistoryCreate {
 	whc.mutation.SetDescription(s)
+	return whc
+}
+
+// SetBudget sets the "budget" field.
+func (whc *WorkHistoryCreate) SetBudget(f float64) *WorkHistoryCreate {
+	whc.mutation.SetBudget(f)
 	return whc
 }
 
@@ -295,11 +257,20 @@ func (whc *WorkHistoryCreate) check() error {
 	if _, ok := whc.mutation.OverallRating(); !ok {
 		return &ValidationError{Name: "overall_rating", err: errors.New(`ent: missing required field "WorkHistory.overall_rating"`)}
 	}
+	if _, ok := whc.mutation.IsHourly(); !ok {
+		return &ValidationError{Name: "is_hourly", err: errors.New(`ent: missing required field "WorkHistory.is_hourly"`)}
+	}
+	if _, ok := whc.mutation.FreelancerEarnings(); !ok {
+		return &ValidationError{Name: "freelancer_earnings", err: errors.New(`ent: missing required field "WorkHistory.freelancer_earnings"`)}
+	}
 	if _, ok := whc.mutation.StartDate(); !ok {
 		return &ValidationError{Name: "start_date", err: errors.New(`ent: missing required field "WorkHistory.start_date"`)}
 	}
 	if _, ok := whc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "WorkHistory.description"`)}
+	}
+	if _, ok := whc.mutation.Budget(); !ok {
+		return &ValidationError{Name: "budget", err: errors.New(`ent: missing required field "WorkHistory.budget"`)}
 	}
 	if _, ok := whc.mutation.TotalProposals(); !ok {
 		return &ValidationError{Name: "total_proposals", err: errors.New(`ent: missing required field "WorkHistory.total_proposals"`)}
@@ -367,21 +338,13 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 		_spec.SetField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 		_node.OverallRating = value
 	}
-	if value, ok := whc.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
-		_node.FixedChargeAmount = value
+	if value, ok := whc.mutation.IsHourly(); ok {
+		_spec.SetField(workhistory.FieldIsHourly, field.TypeBool, value)
+		_node.IsHourly = value
 	}
-	if value, ok := whc.mutation.FixedChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeCurrency, field.TypeString, value)
-		_node.FixedChargeCurrency = value
-	}
-	if value, ok := whc.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-		_node.HourlyChargeAmount = value
-	}
-	if value, ok := whc.mutation.HourlyChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeCurrency, field.TypeString, value)
-		_node.HourlyChargeCurrency = value
+	if value, ok := whc.mutation.FreelancerEarnings(); ok {
+		_spec.SetField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
+		_node.FreelancerEarnings = value
 	}
 	if value, ok := whc.mutation.StartDate(); ok {
 		_spec.SetField(workhistory.FieldStartDate, field.TypeTime, value)
@@ -394,6 +357,10 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 	if value, ok := whc.mutation.Description(); ok {
 		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := whc.mutation.Budget(); ok {
+		_spec.SetField(workhistory.FieldBudget, field.TypeFloat64, value)
+		_node.Budget = value
 	}
 	if value, ok := whc.mutation.TotalProposals(); ok {
 		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
@@ -558,87 +525,33 @@ func (u *WorkHistoryUpsert) AddOverallRating(v float64) *WorkHistoryUpsert {
 	return u
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsert) SetFixedChargeAmount(v int) *WorkHistoryUpsert {
-	u.Set(workhistory.FieldFixedChargeAmount, v)
+// SetIsHourly sets the "is_hourly" field.
+func (u *WorkHistoryUpsert) SetIsHourly(v bool) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldIsHourly, v)
 	return u
 }
 
-// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsert) UpdateFixedChargeAmount() *WorkHistoryUpsert {
-	u.SetExcluded(workhistory.FieldFixedChargeAmount)
+// UpdateIsHourly sets the "is_hourly" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateIsHourly() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldIsHourly)
 	return u
 }
 
-// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsert) AddFixedChargeAmount(v int) *WorkHistoryUpsert {
-	u.Add(workhistory.FieldFixedChargeAmount, v)
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (u *WorkHistoryUpsert) SetFreelancerEarnings(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldFreelancerEarnings, v)
 	return u
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsert) ClearFixedChargeAmount() *WorkHistoryUpsert {
-	u.SetNull(workhistory.FieldFixedChargeAmount)
+// UpdateFreelancerEarnings sets the "freelancer_earnings" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateFreelancerEarnings() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldFreelancerEarnings)
 	return u
 }
 
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsert) SetFixedChargeCurrency(v string) *WorkHistoryUpsert {
-	u.Set(workhistory.FieldFixedChargeCurrency, v)
-	return u
-}
-
-// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsert) UpdateFixedChargeCurrency() *WorkHistoryUpsert {
-	u.SetExcluded(workhistory.FieldFixedChargeCurrency)
-	return u
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsert) ClearFixedChargeCurrency() *WorkHistoryUpsert {
-	u.SetNull(workhistory.FieldFixedChargeCurrency)
-	return u
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsert) SetHourlyChargeAmount(v int) *WorkHistoryUpsert {
-	u.Set(workhistory.FieldHourlyChargeAmount, v)
-	return u
-}
-
-// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsert) UpdateHourlyChargeAmount() *WorkHistoryUpsert {
-	u.SetExcluded(workhistory.FieldHourlyChargeAmount)
-	return u
-}
-
-// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsert) AddHourlyChargeAmount(v int) *WorkHistoryUpsert {
-	u.Add(workhistory.FieldHourlyChargeAmount, v)
-	return u
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsert) ClearHourlyChargeAmount() *WorkHistoryUpsert {
-	u.SetNull(workhistory.FieldHourlyChargeAmount)
-	return u
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsert) SetHourlyChargeCurrency(v string) *WorkHistoryUpsert {
-	u.Set(workhistory.FieldHourlyChargeCurrency, v)
-	return u
-}
-
-// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsert) UpdateHourlyChargeCurrency() *WorkHistoryUpsert {
-	u.SetExcluded(workhistory.FieldHourlyChargeCurrency)
-	return u
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsert) ClearHourlyChargeCurrency() *WorkHistoryUpsert {
-	u.SetNull(workhistory.FieldHourlyChargeCurrency)
+// AddFreelancerEarnings adds v to the "freelancer_earnings" field.
+func (u *WorkHistoryUpsert) AddFreelancerEarnings(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldFreelancerEarnings, v)
 	return u
 }
 
@@ -681,6 +594,24 @@ func (u *WorkHistoryUpsert) SetDescription(v string) *WorkHistoryUpsert {
 // UpdateDescription sets the "description" field to the value that was provided on create.
 func (u *WorkHistoryUpsert) UpdateDescription() *WorkHistoryUpsert {
 	u.SetExcluded(workhistory.FieldDescription)
+	return u
+}
+
+// SetBudget sets the "budget" field.
+func (u *WorkHistoryUpsert) SetBudget(v float64) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldBudget, v)
+	return u
+}
+
+// UpdateBudget sets the "budget" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateBudget() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldBudget)
+	return u
+}
+
+// AddBudget adds v to the "budget" field.
+func (u *WorkHistoryUpsert) AddBudget(v float64) *WorkHistoryUpsert {
+	u.Add(workhistory.FieldBudget, v)
 	return u
 }
 
@@ -1013,101 +944,38 @@ func (u *WorkHistoryUpsertOne) UpdateOverallRating() *WorkHistoryUpsertOne {
 	})
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertOne) SetFixedChargeAmount(v int) *WorkHistoryUpsertOne {
+// SetIsHourly sets the "is_hourly" field.
+func (u *WorkHistoryUpsertOne) SetIsHourly(v bool) *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetFixedChargeAmount(v)
+		s.SetIsHourly(v)
 	})
 }
 
-// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertOne) AddFixedChargeAmount(v int) *WorkHistoryUpsertOne {
+// UpdateIsHourly sets the "is_hourly" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateIsHourly() *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.AddFixedChargeAmount(v)
+		s.UpdateIsHourly()
 	})
 }
 
-// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsertOne) UpdateFixedChargeAmount() *WorkHistoryUpsertOne {
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (u *WorkHistoryUpsertOne) SetFreelancerEarnings(v float64) *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateFixedChargeAmount()
+		s.SetFreelancerEarnings(v)
 	})
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertOne) ClearFixedChargeAmount() *WorkHistoryUpsertOne {
+// AddFreelancerEarnings adds v to the "freelancer_earnings" field.
+func (u *WorkHistoryUpsertOne) AddFreelancerEarnings(v float64) *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearFixedChargeAmount()
+		s.AddFreelancerEarnings(v)
 	})
 }
 
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsertOne) SetFixedChargeCurrency(v string) *WorkHistoryUpsertOne {
+// UpdateFreelancerEarnings sets the "freelancer_earnings" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateFreelancerEarnings() *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetFixedChargeCurrency(v)
-	})
-}
-
-// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsertOne) UpdateFixedChargeCurrency() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateFixedChargeCurrency()
-	})
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsertOne) ClearFixedChargeCurrency() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearFixedChargeCurrency()
-	})
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertOne) SetHourlyChargeAmount(v int) *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetHourlyChargeAmount(v)
-	})
-}
-
-// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertOne) AddHourlyChargeAmount(v int) *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.AddHourlyChargeAmount(v)
-	})
-}
-
-// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsertOne) UpdateHourlyChargeAmount() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateHourlyChargeAmount()
-	})
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertOne) ClearHourlyChargeAmount() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearHourlyChargeAmount()
-	})
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsertOne) SetHourlyChargeCurrency(v string) *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetHourlyChargeCurrency(v)
-	})
-}
-
-// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsertOne) UpdateHourlyChargeCurrency() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateHourlyChargeCurrency()
-	})
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsertOne) ClearHourlyChargeCurrency() *WorkHistoryUpsertOne {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearHourlyChargeCurrency()
+		s.UpdateFreelancerEarnings()
 	})
 }
 
@@ -1157,6 +1025,27 @@ func (u *WorkHistoryUpsertOne) SetDescription(v string) *WorkHistoryUpsertOne {
 func (u *WorkHistoryUpsertOne) UpdateDescription() *WorkHistoryUpsertOne {
 	return u.Update(func(s *WorkHistoryUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetBudget sets the "budget" field.
+func (u *WorkHistoryUpsertOne) SetBudget(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetBudget(v)
+	})
+}
+
+// AddBudget adds v to the "budget" field.
+func (u *WorkHistoryUpsertOne) AddBudget(v float64) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddBudget(v)
+	})
+}
+
+// UpdateBudget sets the "budget" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateBudget() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateBudget()
 	})
 }
 
@@ -1692,101 +1581,38 @@ func (u *WorkHistoryUpsertBulk) UpdateOverallRating() *WorkHistoryUpsertBulk {
 	})
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) SetFixedChargeAmount(v int) *WorkHistoryUpsertBulk {
+// SetIsHourly sets the "is_hourly" field.
+func (u *WorkHistoryUpsertBulk) SetIsHourly(v bool) *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetFixedChargeAmount(v)
+		s.SetIsHourly(v)
 	})
 }
 
-// AddFixedChargeAmount adds v to the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) AddFixedChargeAmount(v int) *WorkHistoryUpsertBulk {
+// UpdateIsHourly sets the "is_hourly" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateIsHourly() *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.AddFixedChargeAmount(v)
+		s.UpdateIsHourly()
 	})
 }
 
-// UpdateFixedChargeAmount sets the "fixed_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsertBulk) UpdateFixedChargeAmount() *WorkHistoryUpsertBulk {
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (u *WorkHistoryUpsertBulk) SetFreelancerEarnings(v float64) *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateFixedChargeAmount()
+		s.SetFreelancerEarnings(v)
 	})
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) ClearFixedChargeAmount() *WorkHistoryUpsertBulk {
+// AddFreelancerEarnings adds v to the "freelancer_earnings" field.
+func (u *WorkHistoryUpsertBulk) AddFreelancerEarnings(v float64) *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearFixedChargeAmount()
+		s.AddFreelancerEarnings(v)
 	})
 }
 
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsertBulk) SetFixedChargeCurrency(v string) *WorkHistoryUpsertBulk {
+// UpdateFreelancerEarnings sets the "freelancer_earnings" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateFreelancerEarnings() *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetFixedChargeCurrency(v)
-	})
-}
-
-// UpdateFixedChargeCurrency sets the "fixed_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsertBulk) UpdateFixedChargeCurrency() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateFixedChargeCurrency()
-	})
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (u *WorkHistoryUpsertBulk) ClearFixedChargeCurrency() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearFixedChargeCurrency()
-	})
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) SetHourlyChargeAmount(v int) *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetHourlyChargeAmount(v)
-	})
-}
-
-// AddHourlyChargeAmount adds v to the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) AddHourlyChargeAmount(v int) *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.AddHourlyChargeAmount(v)
-	})
-}
-
-// UpdateHourlyChargeAmount sets the "hourly_charge_amount" field to the value that was provided on create.
-func (u *WorkHistoryUpsertBulk) UpdateHourlyChargeAmount() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateHourlyChargeAmount()
-	})
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (u *WorkHistoryUpsertBulk) ClearHourlyChargeAmount() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearHourlyChargeAmount()
-	})
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsertBulk) SetHourlyChargeCurrency(v string) *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.SetHourlyChargeCurrency(v)
-	})
-}
-
-// UpdateHourlyChargeCurrency sets the "hourly_charge_currency" field to the value that was provided on create.
-func (u *WorkHistoryUpsertBulk) UpdateHourlyChargeCurrency() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.UpdateHourlyChargeCurrency()
-	})
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (u *WorkHistoryUpsertBulk) ClearHourlyChargeCurrency() *WorkHistoryUpsertBulk {
-	return u.Update(func(s *WorkHistoryUpsert) {
-		s.ClearHourlyChargeCurrency()
+		s.UpdateFreelancerEarnings()
 	})
 }
 
@@ -1836,6 +1662,27 @@ func (u *WorkHistoryUpsertBulk) SetDescription(v string) *WorkHistoryUpsertBulk 
 func (u *WorkHistoryUpsertBulk) UpdateDescription() *WorkHistoryUpsertBulk {
 	return u.Update(func(s *WorkHistoryUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetBudget sets the "budget" field.
+func (u *WorkHistoryUpsertBulk) SetBudget(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetBudget(v)
+	})
+}
+
+// AddBudget adds v to the "budget" field.
+func (u *WorkHistoryUpsertBulk) AddBudget(v float64) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.AddBudget(v)
+	})
+}
+
+// UpdateBudget sets the "budget" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateBudget() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateBudget()
 	})
 }
 

@@ -25,20 +25,18 @@ type WorkHistory struct {
 	ClientFeedback string `json:"client_feedback,omitempty"`
 	// OverallRating holds the value of the "overall_rating" field.
 	OverallRating float64 `json:"overall_rating,omitempty"`
-	// FixedChargeAmount holds the value of the "fixed_charge_amount" field.
-	FixedChargeAmount int `json:"fixed_charge_amount,omitempty"`
-	// FixedChargeCurrency holds the value of the "fixed_charge_currency" field.
-	FixedChargeCurrency string `json:"fixed_charge_currency,omitempty"`
-	// HourlyChargeAmount holds the value of the "hourly_charge_amount" field.
-	HourlyChargeAmount int `json:"hourly_charge_amount,omitempty"`
-	// HourlyChargeCurrency holds the value of the "hourly_charge_currency" field.
-	HourlyChargeCurrency string `json:"hourly_charge_currency,omitempty"`
+	// IsHourly holds the value of the "is_hourly" field.
+	IsHourly bool `json:"is_hourly,omitempty"`
+	// FreelancerEarnings holds the value of the "freelancer_earnings" field.
+	FreelancerEarnings float64 `json:"freelancer_earnings,omitempty"`
 	// StartDate holds the value of the "start_date" field.
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
 	EndDate time.Time `json:"end_date,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Budget holds the value of the "budget" field.
+	Budget float64 `json:"budget,omitempty"`
 	// TotalProposals holds the value of the "total_proposals" field.
 	TotalProposals int `json:"total_proposals,omitempty"`
 	// NumberOfInterviews holds the value of the "number_of_interviews" field.
@@ -99,11 +97,13 @@ func (*WorkHistory) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case workhistory.FieldSkills:
 			values[i] = new([]byte)
-		case workhistory.FieldOverallRating, workhistory.FieldClientRating, workhistory.FieldClientTotalSpend, workhistory.FieldClientAverageHourlyRatePaid:
+		case workhistory.FieldIsHourly:
+			values[i] = new(sql.NullBool)
+		case workhistory.FieldOverallRating, workhistory.FieldFreelancerEarnings, workhistory.FieldBudget, workhistory.FieldClientRating, workhistory.FieldClientTotalSpend, workhistory.FieldClientAverageHourlyRatePaid:
 			values[i] = new(sql.NullFloat64)
-		case workhistory.FieldID, workhistory.FieldFixedChargeAmount, workhistory.FieldHourlyChargeAmount, workhistory.FieldTotalProposals, workhistory.FieldNumberOfInterviews, workhistory.FieldClientReviewCount, workhistory.FieldClientTotalJobsPosted, workhistory.FieldClientTotalHires, workhistory.FieldClientTotalPaidHours:
+		case workhistory.FieldID, workhistory.FieldTotalProposals, workhistory.FieldNumberOfInterviews, workhistory.FieldClientReviewCount, workhistory.FieldClientTotalJobsPosted, workhistory.FieldClientTotalHires, workhistory.FieldClientTotalPaidHours:
 			values[i] = new(sql.NullInt64)
-		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldFixedChargeCurrency, workhistory.FieldHourlyChargeCurrency, workhistory.FieldDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
+		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
 			values[i] = new(sql.NullString)
 		case workhistory.FieldStartDate, workhistory.FieldEndDate:
 			values[i] = new(sql.NullTime)
@@ -148,29 +148,17 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wh.OverallRating = value.Float64
 			}
-		case workhistory.FieldFixedChargeAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field fixed_charge_amount", values[i])
+		case workhistory.FieldIsHourly:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_hourly", values[i])
 			} else if value.Valid {
-				wh.FixedChargeAmount = int(value.Int64)
+				wh.IsHourly = value.Bool
 			}
-		case workhistory.FieldFixedChargeCurrency:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field fixed_charge_currency", values[i])
+		case workhistory.FieldFreelancerEarnings:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field freelancer_earnings", values[i])
 			} else if value.Valid {
-				wh.FixedChargeCurrency = value.String
-			}
-		case workhistory.FieldHourlyChargeAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field hourly_charge_amount", values[i])
-			} else if value.Valid {
-				wh.HourlyChargeAmount = int(value.Int64)
-			}
-		case workhistory.FieldHourlyChargeCurrency:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field hourly_charge_currency", values[i])
-			} else if value.Valid {
-				wh.HourlyChargeCurrency = value.String
+				wh.FreelancerEarnings = value.Float64
 			}
 		case workhistory.FieldStartDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -189,6 +177,12 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				wh.Description = value.String
+			}
+		case workhistory.FieldBudget:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field budget", values[i])
+			} else if value.Valid {
+				wh.Budget = value.Float64
 			}
 		case workhistory.FieldTotalProposals:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -327,17 +321,11 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString("overall_rating=")
 	builder.WriteString(fmt.Sprintf("%v", wh.OverallRating))
 	builder.WriteString(", ")
-	builder.WriteString("fixed_charge_amount=")
-	builder.WriteString(fmt.Sprintf("%v", wh.FixedChargeAmount))
+	builder.WriteString("is_hourly=")
+	builder.WriteString(fmt.Sprintf("%v", wh.IsHourly))
 	builder.WriteString(", ")
-	builder.WriteString("fixed_charge_currency=")
-	builder.WriteString(wh.FixedChargeCurrency)
-	builder.WriteString(", ")
-	builder.WriteString("hourly_charge_amount=")
-	builder.WriteString(fmt.Sprintf("%v", wh.HourlyChargeAmount))
-	builder.WriteString(", ")
-	builder.WriteString("hourly_charge_currency=")
-	builder.WriteString(wh.HourlyChargeCurrency)
+	builder.WriteString("freelancer_earnings=")
+	builder.WriteString(fmt.Sprintf("%v", wh.FreelancerEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("start_date=")
 	builder.WriteString(wh.StartDate.Format(time.ANSIC))
@@ -347,6 +335,9 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(wh.Description)
+	builder.WriteString(", ")
+	builder.WriteString("budget=")
+	builder.WriteString(fmt.Sprintf("%v", wh.Budget))
 	builder.WriteString(", ")
 	builder.WriteString("total_proposals=")
 	builder.WriteString(fmt.Sprintf("%v", wh.TotalProposals))
