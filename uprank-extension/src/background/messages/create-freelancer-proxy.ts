@@ -19,6 +19,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res)   => {
       }
     )
     const response_json = await response.json()
+
     res.send({
       ok: response.ok,
       count: response_json.result.count

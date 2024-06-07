@@ -43,68 +43,7 @@ const scrapeFreelancers = async (): Promise<ScrapeFreelancerResponse> => {
     if (freelancer_url_cipher in unstableFreelancerMap || !freelancer_job_map[freelancer_data[i].application.profile.shortName]  ) {
       continue
     } else {
-      const scraped_freelancer_data: Scraped_Freelancer_Data = {
-        name: freelancer_data[i].application.profile.shortName,
-        location: {
-          city: freelancer_data[i].application.profile.location.city,
-          country: freelancer_data[i].application.profile.location.country,
-          timezone: freelancer_data[i].application.profile.location.timezone
-        },
-        title: freelancer_data[i].application.profile.title,
-        description: freelancer_data[i].application.profile.description,
-        photo_url: freelancer_data[i].application.profile.photoUrl,
-        hourly_charge_amount:
-          freelancer_data[i].application.hourlyChargeRate.amount,
-        hourly_charge_currency:
-          freelancer_data[i].application.hourlyChargeRate.currencyCode,
-        fixed_charge_amount:
-          freelancer_data[i].application.fixedChargeAmount.amount,
-        fixed_charge_currency:
-          freelancer_data[i].application.fixedChargeAmount.currencyCode,
-        earnings_info: flattenEarningsInfo(
-          freelancer_data[i].application.profile.earningsInfo
-        ),
-        cv: freelancer_data[i].application.coverLetter,
-        url: `https://www.upwork.com/freelancers/${freelancer_data[i].application.profile.ciphertext}`,
-        ai_reccomended: freelancer_data[i].application.aiRecommended,
-        invited: freelancer_data[i].application.invited,
-        recent_hours: freelancer_data[i].application.profile.recentHours,
-        total_hours: freelancer_data[i].application.profile.totalHours,
-        total_portfolio_items:
-          freelancer_data[i].application.profile.totalPortfolioItems,
-        total_portfolio_v2_items:
-          freelancer_data[i].application.profile.totalPortfolioV2Items,
-        total_feedback: freelancer_data[i].application.profile.totalFeedback,
-        recent_feedback: freelancer_data[i].application.profile.recentFeedback,
-        top_rated_status:
-          freelancer_data[i].application.profile.topRatedStatus ==
-          "not_eligible"
-            ? false
-            : true,
-        top_rated_plus_status:
-          freelancer_data[i].application.profile.topRatedPlusStatus ==
-          "not_eligible"
-            ? false
-            : true,
-        sponsored: freelancer_data[i].application.sponsored,
-        job_success_score:
-          freelancer_data[i].application.profile.jobSuccessScore,
-        reccomended: freelancer_data[i].application.recommended,
-        skills: freelancer_data[i].application.profile.skills.map(
-          (skill) => skill.prettyName
-        ),
-        attachements: freelancer_data[i].application.attachments.map(
-          (attachment) => {
-            return {
-              name: attachment.name,
-              link: `https://www.upwork.com${attachment.link}`
-            }
-          }
-        ),
-        work_history: null
-      }
-
-      unstableFreelancerMap[freelancer_url_cipher] = scraped_freelancer_data
+      unstableFreelancerMap[freelancer_url_cipher] = TransformFreelancerData(freelancer_data[i])
     }
   }
 
@@ -256,9 +195,9 @@ async function processFreelancerJobHistory(
         const jobDetailDivSelector = 'div[data-test="job-details"]'
         const jobDescriptionElementSelector =
           'div[data-ev-sublocation="!line_clamp"]'
-        const jobBudgetElementSelector = 'div[data-test="job-details"] strong'
+        const jobBudgetElementSelector = 'div[data-test="job-details"] div.air3-grid-container strong'
         const totalEarnedElementSelector =
-          'div[data-test="assignment-summary"] strong'
+          'div[data-test="assignment-summary"] div.mb-3x span'
         const clientTotalSpendElementSelector = "div.mt-6x strong.d-block"
         const clientTotalHiresElementSelector =
           "div.mt-6x small.text-light-on-inverse"
@@ -273,8 +212,8 @@ async function processFreelancerJobHistory(
             [jobCloseButtonSelector]: [querySelector],
             [jobDetailDivSelector]: [nestedSelector, jobPopupModal],
             [jobDescriptionElementSelector]: [nestedSelector, jobPopupModal],
-            [jobBudgetElementSelector]: [nestedSelector, jobPopupModal],
-            [totalEarnedElementSelector]: [nestedSelector, jobPopupModal],
+            [jobBudgetElementSelector]: [nestedSelectorAll, jobPopupModal],
+            [totalEarnedElementSelector]: [nestedSelectorAll, jobPopupModal],
             [clientTotalSpendElementSelector]: [nestedSelector, jobPopupModal],
             [clientTotalHiresElementSelector]: [nestedSelector, jobPopupModal],
             [clientFeedbackElementSelector]: [nestedSelector, jobPopupModal],
@@ -304,14 +243,15 @@ async function processFreelancerJobHistory(
             title: jobTitle,
             start_date: start_date.toISOString(),
             end_date: end_date.toISOString(),
-            description: "No job description found",
-            budget: "No budget found",
-            total_earned: -1,
-            client_total_spend: "",
-            client_total_hires: "",
-            client_rating: -1,
-            client_feedback: "",
-            client_location: ""
+            description: null,
+            budget: null,
+            total_earned: null,
+            client_total_spend: null,
+            client_total_hires: null,
+            client_active_hires: null,
+            client_rating: null,
+            client_feedback: null,
+            client_location: null
           }
           jobs.push(job)
           jobCloseButton.click()
@@ -321,42 +261,57 @@ async function processFreelancerJobHistory(
         const jobDescriptionElement = result[jobDescriptionElementSelector]
         const jobDescription = jobDescriptionElement
           ? jobDescriptionElement.getAttribute("data-test-key")
-          : ""
+          : null
 
-        const jobBudgetElement = result[jobBudgetElementSelector]
-        const jobBudget = jobBudgetElement
-          ? jobBudgetElement.textContent.trim()
-          : ""
+        const jobBudgetElementAll = result[jobBudgetElementSelector]
+        var jobBudget = null
+        for (const jobBudgetElement of jobBudgetElementAll) {
+          if (jobBudgetElement.textContent.includes("$")){
+            jobBudget = parseFloat(jobBudgetElement.textContent.trim().replace("$","").replace(",",""))
+            break
+          }
+        }
+        // console.log(jobBudget);
+        
+        const totalEarnedElementAll = result[totalEarnedElementSelector]
+        var totalEarned = null
+        for (const totalEarnedElement of totalEarnedElementAll) {
+          if (totalEarnedElement.textContent.includes("$") && totalEarnedElement.textContent.includes("earned")){
+            
+            totalEarned = parseFloat(totalEarnedElement.textContent.trim().replace("$", "").replace("earned", "").replace(",", ""))
+            break
+          }
+        }
+        console.log(totalEarned);
+      
 
-        const totalEarnedElement = result[totalEarnedElementSelector]
-        const totalEarned = totalEarnedElement
-          ? parseFloat(totalEarnedElement.textContent.trim().replace("$", ""))
-          : -1
 
         const clientTotalSpendElement = result[clientTotalSpendElementSelector]
         const clientTotalSpend = clientTotalSpendElement
-          ? clientTotalSpendElement.textContent.trim()
-          : ""
+          ? parseFloat(clientTotalSpendElement.textContent.trim().replace("$", "").replace(",", ""))
+          : null
 
         const clientTotalHiresElement = result[clientTotalHiresElementSelector]
-        const clientTotalHires = clientTotalHiresElement
+        const clientTotalHiresString = clientTotalHiresElement
           ? clientTotalHiresElement.textContent.trim()
-          : ""
+          : null
+        const clientTotalHires = parseHireString(clientTotalHiresString).total_hires
+        const clientActiveHires = parseHireString(clientTotalHiresString).active_hire
 
         const clientFeedbackElement = result[clientFeedbackElementSelector]
         const clientFeedback = clientFeedbackElement
           ? clientFeedbackElement.textContent.trim()
-          : ""
+          : null
 
         const clientRatingElement = result[clientRatingElementSelector]
         const clientRating = clientRatingElement
           ? parseFloat(clientRatingElement.textContent.trim().split(" ")[2])
-          : -1
+          : null
 
         const clientLocationElement = result[clientLocationElementSelector]
         const clientLocation = clientLocationElement
           ? clientLocationElement.textContent.trim()
-          : ""
+          : null
 
         jobCloseButton.click()
         await waitForClose('button.air3-modal-close[data-test="UpCModalClose"]')
@@ -370,6 +325,7 @@ async function processFreelancerJobHistory(
           total_earned: totalEarned,
           client_total_spend: clientTotalSpend,
           client_total_hires: clientTotalHires,
+          client_active_hires: clientActiveHires,
           client_rating: clientRating,
           client_feedback: clientFeedback,
           client_location: clientLocation
@@ -393,6 +349,49 @@ async function processFreelancerJobHistory(
     }
   }
 
+}
+
+const TransformFreelancerData = (freelancerData: any): Scraped_Freelancer_Data => {
+  const scraped_freelancer_data: Scraped_Freelancer_Data = {
+    name: freelancerData.application.profile.shortName,
+    location: {
+      city: freelancerData.application.profile.location.city,
+      country: freelancerData.application.profile.location.country,
+      timezone: freelancerData.application.profile.location.timezone
+    },
+    title: freelancerData.application.profile.title,
+    description: freelancerData.application.profile.description,
+    photo_url: freelancerData.application.profile.photoUrl,
+    hourly_charge_amount: freelancerData.application.hourlyChargeRate.amount,
+    hourly_charge_currency: freelancerData.application.hourlyChargeRate.currencyCode,
+    fixed_charge_amount: freelancerData.application.fixedChargeAmount.amount,
+    fixed_charge_currency: freelancerData.application.fixedChargeAmount.currencyCode,
+    earnings_info: flattenEarningsInfo(freelancerData.application.profile.earningsInfo),
+    cv: freelancerData.application.coverLetter,
+    url: `https://www.upwork.com/freelancers/${freelancerData.application.profile.ciphertext}`,
+    ai_reccomended: freelancerData.application.aiRecommended,
+    invited: freelancerData.application.invited,
+    recent_hours: freelancerData.application.profile.recentHours,
+    total_hours: freelancerData.application.profile.totalHours,
+    total_portfolio_items: freelancerData.application.profile.totalPortfolioItems,
+    total_portfolio_v2_items: freelancerData.application.profile.totalPortfolioV2Items,
+    total_feedback: freelancerData.application.profile.totalFeedback,
+    recent_feedback: freelancerData.application.profile.recentFeedback,
+    top_rated_status: freelancerData.application.profile.topRatedStatus == "not_eligible" ? false : true,
+    top_rated_plus_status: freelancerData.application.profile.topRatedPlusStatus == "not_eligible" ? false : true,
+    sponsored: freelancerData.application.sponsored,
+    job_success_score: freelancerData.application.profile.jobSuccessScore,
+    reccomended: freelancerData.application.recommended,
+    skills: freelancerData.application.profile.skills.map((skill) => skill.prettyName),
+    attachements: freelancerData.application.attachments.map((attachment) => {
+      return {
+        name: attachment.name,
+        link: `https://www.upwork.com${attachment.link}`
+      }
+    }),
+    work_history: null
+  }
+  return scraped_freelancer_data;
 }
 
 const flattenEarningsInfo = (earningsInfo): Earnings_Info => {
@@ -563,4 +562,23 @@ async function waitForClose(selector: string): Promise<void> {
       }
     }, 100)
   })
+}
+
+function parseHireString(input: string): { total_hires: number, active_hire: number } {
+  const regex = /(\d+)\s*Hires?\s*(\d+)\s*Active/;
+  const match = input.match(regex);
+
+  if (!match) {
+      throw new Error("Input string is not in the expected format");
+  }
+
+  // Extract the numbers from the match result
+  const totalHires = parseInt(match[1], 10);
+  const activeHire = parseInt(match[2], 10);
+
+  // Return the result as an object
+  return {
+      total_hires: totalHires,
+      active_hire: activeHire
+  };
 }

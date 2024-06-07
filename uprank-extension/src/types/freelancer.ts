@@ -125,16 +125,17 @@ export interface CreateFreelancerResponse {
 
 export type FreelancerJobHistory = {
   title: string;
-  start_date: string;
-  end_date: string;
-  description: string;
-  budget: string;
-  total_earned: number;
-  client_total_spend: string;
-  client_total_hires: string;
-  client_feedback: string;
-  client_rating: number;
-  client_location: string;
+  start_date: string | null;
+  end_date: string | null;
+  description: string | null;
+  budget: number | null;
+  total_earned: number | null;
+  client_total_spend: number | null;
+  client_total_hires: number | null;
+  client_active_hires: number | null;
+  client_feedback: string | null;
+  client_rating: number | null;
+  client_location: string | null;
 }
 
 export type ProcessFreelancerJobHistoryResult = {
