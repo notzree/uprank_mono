@@ -43,10 +43,11 @@ export default function PopUpEntry() {
         }
       )
         if (response.ok){
-          const data = await response.json()
-          console.log(data);
+          const data = await response.json() as GetJobResponse
           setIsJobValid(true);
-          setJobFreelancerCount(data.edges.freelancers.length);
+          if (data.edges.freelancers != null){
+            setJobFreelancerCount(data.edges.freelancers.length);
+          }
         } else {
           setIsJobValid(false);
         }
@@ -200,8 +201,19 @@ export default function PopUpEntry() {
 
 
 
+type EdgeFreelancers = {
+  freelancers: any[];
+};
 
-interface getJobResult {
-  exists: boolean
-  job: Job | null
-}
+type GetJobResponse = {
+  id: string;
+  title: string;
+  created_at: string;
+  location: string;
+  description: string;
+  skills: string[];
+  experience_level: string;
+  hourly: boolean;
+  hourly_rate: number[];
+  edges: EdgeFreelancers | null;
+};

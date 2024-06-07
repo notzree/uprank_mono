@@ -12,12 +12,13 @@ export const config: PlasmoCSConfig = {
 const MISSING_FIELD: string = "not found";
 //todo: NEED TO ADD A CHECK TO SEE IF ALL FIELDS WERE FILLED.
 //if they were not filled out, we need a way to allow a user to fill them out manually.
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === scrape_job_action) {
     const jobId = request.jobId;
-    let unstableJobData: UnstableScrapedJobData = await scrapeJob();
-    unstableJobData.job.id = jobId;
-    sendResponse({ job: unstableJobData.job, missingFields: unstableJobData.missingFields});
+    scrapeJob().then((unstableJobData) => {
+      unstableJobData.job.id = jobId;
+      sendResponse({ job: unstableJobData.job, missingFields: unstableJobData.missingFields});
+    })
   }
   return true; // Ensure to return true for asynchronous response handling
 });
