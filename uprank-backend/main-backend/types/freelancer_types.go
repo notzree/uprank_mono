@@ -5,57 +5,73 @@ import (
 	"strings"
 )
 
-type CreateFreelancersRequest struct {
-	Name                     string                        `json:"name"`
-	Title                    string                        `json:"title"`
-	Description              string                        `json:"description"`
-	Location                 ScrapedFreelancerLocationData `json:"location"`
-	Cv                       string                        `json:"cv"`
-	Url                      string                        `json:"url"`
-	Ai_reccomended           bool                          `json:"ai_reccomended"`
-	Fixed_charge_amount      string                        `json:"fixed_charge_amount"`
-	Fixed_charge_currency    string                        `json:"fixed_charge_currency"`
-	Hourly_charge_amount     string                        `json:"hourly_charge_amount"`
-	Hourly_charge_currency   string                        `json:"hourly_charge_currency"`
-	Invited                  bool                          `json:"invited"`
-	Photo_url                string                        `json:"photo_url"`
-	Recent_hours             float64                       `json:"recent_hours"`
-	Total_hours              float64                       `json:"total_hours"`
-	Total_portfolio_items    int                           `json:"total_portfolio_items"`
-	Total_portfolio_v2_items int                           `json:"total_portfolio_v2_items"`
-	Total_feedback           float64                       `json:"total_feedback"`
-	Recent_feedback          float64                       `json:"recent_feedback"`
-	Top_rated_status         bool                          `json:"top_rated_status"`
-	Top_rated_plus_status    bool                          `json:"top_rated_plus_status"`
-	Sponsored                bool                          `json:"sponsored"`
-	Job_success_score        float64                       `json:"job_success_score"`
-	Reccomended              bool                          `json:"reccomended"`
-	Skills                   []string                      `json:"skills"`
-	Earnings_info            ScrapedFreelancerEarningsData `json:"earnings_info"`
-	Attachements             []ScrapedAttachementData      `json:"attachements"`
+type CreateUpworkFreelancerRequest struct {
+	Name                     string                              `json:"name"`
+	Title                    string                              `json:"title"`
+	Description              string                              `json:"description"`
+	Location                 ScrapedUpworkFreelancerLocationData `json:"location"`
+	Cv                       string                              `json:"cv"`
+	Url                      string                              `json:"url"`
+	Ai_reccomended           bool                                `json:"ai_reccomended"`
+	Fixed_charge_amount      string                              `json:"fixed_charge_amount"`
+	Fixed_charge_currency    string                              `json:"fixed_charge_currency"`
+	Hourly_charge_amount     string                              `json:"hourly_charge_amount"`
+	Hourly_charge_currency   string                              `json:"hourly_charge_currency"`
+	Invited                  bool                                `json:"invited"`
+	Photo_url                string                              `json:"photo_url"`
+	Recent_hours             float64                             `json:"recent_hours"`
+	Total_hours              float64                             `json:"total_hours"`
+	Total_portfolio_items    int                                 `json:"total_portfolio_items"`
+	Total_portfolio_v2_items int                                 `json:"total_portfolio_v2_items"`
+	Total_feedback           float64                             `json:"total_feedback"`
+	Recent_feedback          float64                             `json:"recent_feedback"`
+	Top_rated_status         bool                                `json:"top_rated_status"`
+	Top_rated_plus_status    bool                                `json:"top_rated_plus_status"`
+	Sponsored                bool                                `json:"sponsored"`
+	Job_success_score        float64                             `json:"job_success_score"`
+	Reccomended              bool                                `json:"reccomended"`
+	Skills                   []string                            `json:"skills"`
+	Earnings_info            ScrapedUpworkFreelancerEarningsData `json:"earnings_info"`
+	Attachements             []ScrapedUpworkAttachementData      `json:"attachements"`
+	Work_history             []ScrapedUpworkWorkHistoryData      `json:"work_history"`
 }
 
-type ScrapedFreelancerLocationData struct {
+type ScrapedUpworkFreelancerLocationData struct {
 	City     string `json:"city"`
 	Country  string `json:"country"`
 	Timezone string `json:"timezone"`
 }
 
-type ScrapedFreelancerEarningsData struct {
-	Average_recent_earnings          float64 `json:"average_recent_earnings"`
-	Combined_average_recent_earnings float64 `json:"combined_average_recent_earnings"`
-	Combined_recent_earnings         float64 `json:"combined_recent_earnings"`
-	Combined_total_earnings          float64 `json:"combined_total_earnings"`
-	Combined_total_revenue           float64 `json:"combined_total_revenue"`
-	Recent_earnings                  float64 `json:"recent_eaernings"`
-	Total_revenue                    float64 `json:"total_revenue"`
+type ScrapedUpworkFreelancerEarningsData struct {
+	Average_recent_earnings          float64 `json:"averageRecentEarnings"`
+	Combined_average_recent_earnings float64 `json:"combinedAverageRecentEarnings"`
+	Combined_recent_earnings         float64 `json:"combinedRecentEarnings"`
+	Combined_total_earnings          float64 `json:"combinedTotalEarnings"`
+	Combined_total_revenue           float64 `json:"combinedTotalRevenue"`
+	Recent_earnings                  float64 `json:"recentEarnings"`
+	Total_revenue                    float64 `json:"totalRevenue"`
 }
-type ScrapedAttachementData struct {
+type ScrapedUpworkAttachementData struct {
 	Name string `json:"name"`
 	Link string `json:"link"`
 }
 
-func (req *CreateFreelancersRequest) Validate() map[string]string {
+type ScrapedUpworkWorkHistoryData struct {
+	Title               string  `json:"title"`
+	Start_Date          string  `json:"start_date"`
+	End_Date            string  `json:"end_date"`
+	Description         string  `json:"description"`
+	Budget              float64 `json:"budget"`
+	Total_Earned        float64 `json:"total_earned"`
+	Client_Total_Spend  float64 `json:"client_total_spend"`
+	Client_Total_Hires  int     `json:"client_total_hires"`
+	Client_Active_Hires int     `json:"client_active_hires"`
+	Client_Feedback     string  `json:"client_feedback"`
+	Client_Rating       float64 `json:"client_rating"`
+	Client_Location     string  `json:"client_location"`
+}
+
+func (req *CreateUpworkFreelancerRequest) Validate() map[string]string {
 	errors := make(map[string]string)
 
 	if strings.TrimSpace(req.Name) == "" {

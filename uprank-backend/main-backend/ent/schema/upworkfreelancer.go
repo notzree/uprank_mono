@@ -7,18 +7,18 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
-// Freelancer represents a freelancers application to a job
-type Freelancer struct {
+// UpworkFreelancer represents a freelancers application to an Upwork job
+type UpworkFreelancer struct {
 	ent.Schema
 }
 
-func (Freelancer) Fields() []ent.Field {
+func (UpworkFreelancer) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.New()).Default(uuid.New).Unique(),
-		field.String("url").Unique(),
+		field.String("id").NotEmpty().
+			Unique().
+			Immutable(), //the freelancer url is the ID
 		field.String("name"),
 		field.String("title"),
 		field.String("description"),
@@ -62,11 +62,10 @@ func (Freelancer) Fields() []ent.Field {
 }
 
 // Edges of the Freelancer.
-func (Freelancer) Edges() []ent.Edge {
+func (UpworkFreelancer) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("job", Job.Type).
-			Ref("freelancers").
-			Unique().Required(),
+			Ref("freelancers"),
 		edge.To("attachments", AttachmentRef.Type),
 		edge.To("work_histories", WorkHistory.Type),
 	}

@@ -18,26 +18,16 @@ const (
 	FieldClientFeedback = "client_feedback"
 	// FieldOverallRating holds the string denoting the overall_rating field in the database.
 	FieldOverallRating = "overall_rating"
-	// FieldFixedChargeAmount holds the string denoting the fixed_charge_amount field in the database.
-	FieldFixedChargeAmount = "fixed_charge_amount"
-	// FieldFixedChargeCurrency holds the string denoting the fixed_charge_currency field in the database.
-	FieldFixedChargeCurrency = "fixed_charge_currency"
-	// FieldHourlyChargeAmount holds the string denoting the hourly_charge_amount field in the database.
-	FieldHourlyChargeAmount = "hourly_charge_amount"
-	// FieldHourlyChargeCurrency holds the string denoting the hourly_charge_currency field in the database.
-	FieldHourlyChargeCurrency = "hourly_charge_currency"
+	// FieldFreelancerEarnings holds the string denoting the freelancer_earnings field in the database.
+	FieldFreelancerEarnings = "freelancer_earnings"
 	// FieldStartDate holds the string denoting the start_date field in the database.
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
 	FieldEndDate = "end_date"
-	// FieldJobDescription holds the string denoting the job_description field in the database.
-	FieldJobDescription = "job_description"
-	// FieldTotalProposals holds the string denoting the total_proposals field in the database.
-	FieldTotalProposals = "total_proposals"
-	// FieldNumberOfInterviews holds the string denoting the number_of_interviews field in the database.
-	FieldNumberOfInterviews = "number_of_interviews"
-	// FieldSkills holds the string denoting the skills field in the database.
-	FieldSkills = "skills"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
+	// FieldBudget holds the string denoting the budget field in the database.
+	FieldBudget = "budget"
 	// FieldClientRating holds the string denoting the client_rating field in the database.
 	FieldClientRating = "client_rating"
 	// FieldClientReviewCount holds the string denoting the client_review_count field in the database.
@@ -50,6 +40,8 @@ const (
 	FieldClientTotalSpend = "client_total_spend"
 	// FieldClientTotalHires holds the string denoting the client_total_hires field in the database.
 	FieldClientTotalHires = "client_total_hires"
+	// FieldClientActiveHires holds the string denoting the client_active_hires field in the database.
+	FieldClientActiveHires = "client_active_hires"
 	// FieldClientTotalPaidHours holds the string denoting the client_total_paid_hours field in the database.
 	FieldClientTotalPaidHours = "client_total_paid_hours"
 	// FieldClientAverageHourlyRatePaid holds the string denoting the client_average_hourly_rate_paid field in the database.
@@ -58,17 +50,23 @@ const (
 	FieldClientCompanyCategory = "client_company_category"
 	// FieldClientCompanySize holds the string denoting the client_company_size field in the database.
 	FieldClientCompanySize = "client_company_size"
-	// EdgeUpworkFreelancerProposal holds the string denoting the upwork_freelancer_proposal edge name in mutations.
-	EdgeUpworkFreelancerProposal = "upwork_Freelancer_Proposal"
+	// FieldTotalProposals holds the string denoting the total_proposals field in the database.
+	FieldTotalProposals = "total_proposals"
+	// FieldNumberOfInterviews holds the string denoting the number_of_interviews field in the database.
+	FieldNumberOfInterviews = "number_of_interviews"
+	// FieldSkills holds the string denoting the skills field in the database.
+	FieldSkills = "skills"
+	// EdgeFreelancer holds the string denoting the freelancer edge name in mutations.
+	EdgeFreelancer = "freelancer"
 	// Table holds the table name of the workhistory in the database.
 	Table = "work_histories"
-	// UpworkFreelancerProposalTable is the table that holds the upwork_Freelancer_Proposal relation/edge.
-	UpworkFreelancerProposalTable = "work_histories"
-	// UpworkFreelancerProposalInverseTable is the table name for the Freelancer entity.
-	// It exists in this package in order to avoid circular dependency with the "freelancer" package.
-	UpworkFreelancerProposalInverseTable = "freelancers"
-	// UpworkFreelancerProposalColumn is the table column denoting the upwork_Freelancer_Proposal relation/edge.
-	UpworkFreelancerProposalColumn = "freelancer_work_histories"
+	// FreelancerTable is the table that holds the freelancer relation/edge.
+	FreelancerTable = "work_histories"
+	// FreelancerInverseTable is the table name for the UpworkFreelancer entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkfreelancer" package.
+	FreelancerInverseTable = "upwork_freelancers"
+	// FreelancerColumn is the table column denoting the freelancer relation/edge.
+	FreelancerColumn = "upwork_freelancer_work_histories"
 )
 
 // Columns holds all SQL columns for workhistory fields.
@@ -77,32 +75,31 @@ var Columns = []string{
 	FieldTitle,
 	FieldClientFeedback,
 	FieldOverallRating,
-	FieldFixedChargeAmount,
-	FieldFixedChargeCurrency,
-	FieldHourlyChargeAmount,
-	FieldHourlyChargeCurrency,
+	FieldFreelancerEarnings,
 	FieldStartDate,
 	FieldEndDate,
-	FieldJobDescription,
-	FieldTotalProposals,
-	FieldNumberOfInterviews,
-	FieldSkills,
+	FieldDescription,
+	FieldBudget,
 	FieldClientRating,
 	FieldClientReviewCount,
 	FieldClientCountry,
 	FieldClientTotalJobsPosted,
 	FieldClientTotalSpend,
 	FieldClientTotalHires,
+	FieldClientActiveHires,
 	FieldClientTotalPaidHours,
 	FieldClientAverageHourlyRatePaid,
 	FieldClientCompanyCategory,
 	FieldClientCompanySize,
+	FieldTotalProposals,
+	FieldNumberOfInterviews,
+	FieldSkills,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "work_histories"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"freelancer_work_histories",
+	"upwork_freelancer_work_histories",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -143,24 +140,9 @@ func ByOverallRating(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOverallRating, opts...).ToFunc()
 }
 
-// ByFixedChargeAmount orders the results by the fixed_charge_amount field.
-func ByFixedChargeAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixedChargeAmount, opts...).ToFunc()
-}
-
-// ByFixedChargeCurrency orders the results by the fixed_charge_currency field.
-func ByFixedChargeCurrency(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixedChargeCurrency, opts...).ToFunc()
-}
-
-// ByHourlyChargeAmount orders the results by the hourly_charge_amount field.
-func ByHourlyChargeAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHourlyChargeAmount, opts...).ToFunc()
-}
-
-// ByHourlyChargeCurrency orders the results by the hourly_charge_currency field.
-func ByHourlyChargeCurrency(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHourlyChargeCurrency, opts...).ToFunc()
+// ByFreelancerEarnings orders the results by the freelancer_earnings field.
+func ByFreelancerEarnings(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFreelancerEarnings, opts...).ToFunc()
 }
 
 // ByStartDate orders the results by the start_date field.
@@ -173,19 +155,14 @@ func ByEndDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndDate, opts...).ToFunc()
 }
 
-// ByJobDescription orders the results by the job_description field.
-func ByJobDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldJobDescription, opts...).ToFunc()
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByTotalProposals orders the results by the total_proposals field.
-func ByTotalProposals(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTotalProposals, opts...).ToFunc()
-}
-
-// ByNumberOfInterviews orders the results by the number_of_interviews field.
-func ByNumberOfInterviews(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNumberOfInterviews, opts...).ToFunc()
+// ByBudget orders the results by the budget field.
+func ByBudget(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBudget, opts...).ToFunc()
 }
 
 // ByClientRating orders the results by the client_rating field.
@@ -218,6 +195,11 @@ func ByClientTotalHires(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldClientTotalHires, opts...).ToFunc()
 }
 
+// ByClientActiveHires orders the results by the client_active_hires field.
+func ByClientActiveHires(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldClientActiveHires, opts...).ToFunc()
+}
+
 // ByClientTotalPaidHours orders the results by the client_total_paid_hours field.
 func ByClientTotalPaidHours(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldClientTotalPaidHours, opts...).ToFunc()
@@ -238,16 +220,26 @@ func ByClientCompanySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldClientCompanySize, opts...).ToFunc()
 }
 
-// ByUpworkFreelancerProposalField orders the results by upwork_Freelancer_Proposal field.
-func ByUpworkFreelancerProposalField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByTotalProposals orders the results by the total_proposals field.
+func ByTotalProposals(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotalProposals, opts...).ToFunc()
+}
+
+// ByNumberOfInterviews orders the results by the number_of_interviews field.
+func ByNumberOfInterviews(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNumberOfInterviews, opts...).ToFunc()
+}
+
+// ByFreelancerField orders the results by freelancer field.
+func ByFreelancerField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpworkFreelancerProposalStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newFreelancerStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newUpworkFreelancerProposalStep() *sqlgraph.Step {
+func newFreelancerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UpworkFreelancerProposalInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpworkFreelancerProposalTable, UpworkFreelancerProposalColumn),
+		sqlgraph.To(FreelancerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, FreelancerTable, FreelancerColumn),
 	)
 }

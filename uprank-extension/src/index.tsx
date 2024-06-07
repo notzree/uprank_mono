@@ -8,7 +8,7 @@ import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-f
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Job } from "~types/job"
-import type { CreateFreelancerProxyRequest, ScrapeFreelancerResponse } from "~types/freelancer"
+import type { CreateFreelancerProxyRequest, CreateFreelancerResponse, ScrapeFreelancerResponse } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
   style.textContent = cssText
@@ -46,7 +46,7 @@ export default function PopUpEntry() {
           const data = await response.json()
           console.log(data);
           setIsJobValid(true);
-          setJobFreelancerCount(data.edges);
+          setJobFreelancerCount(data.edges.freelancers.length);
         } else {
           setIsJobValid(false);
         }
@@ -123,17 +123,25 @@ export default function PopUpEntry() {
       )
     })
   }
+
   const handleAddFreelancers = async () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
         tabs[0].id,
         { action: scrape_freelancers_action, jobId: extractJobId(currentURL)},
         async function (scrape_response) {
-          if (!scrape_response.missingFields && scrape_response.freelancers.length > 0 && scrape_response.freelancers.length != jobFreelancerCount){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
-            const db_response: ScrapeFreelancerResponse  = await sendToBackground({
+          if (chrome.runtime.lastError) {
+            console.error("Runtime error:", chrome.runtime.lastError);
+            setMessage("Error communicating with content script.");
+            return;
+          }
+          console.log(scrape_response);
+          if ( scrape_response && !scrape_response.missing_fields && scrape_response.freelancers.length > 0){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
+            const db_response: CreateFreelancerResponse  = await sendToBackground({
               //@ts-ignore
               name: "create-freelancer-proxy",
               body: {
+                update: jobFreelancerCount > 0,
                 freelancers: scrape_response.freelancers,
                 authentication_token: await getToken(),
                 job_id: extractJobId(currentURL)
@@ -154,6 +162,7 @@ export default function PopUpEntry() {
       )
     })
   }
+  
   return (
     <div className="flex flex-col w-96 h-[300px] px-4 py-8 mb-10">
       <Header />

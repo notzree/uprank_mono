@@ -205,7 +205,7 @@ func HasFreelancer() predicate.AttachmentRef {
 }
 
 // HasFreelancerWith applies the HasEdge predicate on the "freelancer" edge with a given conditions (other predicates).
-func HasFreelancerWith(preds ...predicate.Freelancer) predicate.AttachmentRef {
+func HasFreelancerWith(preds ...predicate.UpworkFreelancer) predicate.AttachmentRef {
 	return predicate.AttachmentRef(func(s *sql.Selector) {
 		step := newFreelancerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

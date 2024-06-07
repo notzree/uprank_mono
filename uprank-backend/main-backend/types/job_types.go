@@ -39,3 +39,13 @@ func (req *CreateJobRequest) Validate() map[string]string {
 
 	return errors
 }
+
+type ScrapeFreelancerData struct {
+	Id  string `json:"id"`
+	Url string `json:"url"`
+}
+
+type QueueScrapeFreelancersReqest struct {
+	Job_id      string                 `json:"job_id"`
+	Freelancers []ScrapeFreelancerData `json:"freelancers"`
+}
