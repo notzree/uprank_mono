@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/cors"
 	_ "github.com/lib/pq"
 	"github.com/notzree/uprank-backend/main-backend/api"
+	"github.com/notzree/uprank-backend/main-backend/authenticator"
 	"github.com/notzree/uprank-backend/main-backend/ent"
 )
 
@@ -39,6 +40,8 @@ func main() {
 	}
 	sqs_client := sqs.NewFromConfig(sdkConfig)
 
+	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key)
+
 	//Create router
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -61,7 +64,7 @@ func main() {
 		w.Write([]byte("method is not valid"))
 	})
 
-	server := api.NewServer(server_port, router, client, clerk_secret_key, scraper_queue_url, sqs_client)
+	server := api.NewServer(server_port, router, client, scraper_queue_url, sqs_client, authenticator)
 	fmt.Println("Server listening on port:", server_port)
 	log.Fatal(server.Start())
 }

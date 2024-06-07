@@ -70,11 +70,6 @@ func OverallRating(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldOverallRating, v))
 }
 
-// IsHourly applies equality check predicate on the "is_hourly" field. It's identical to IsHourlyEQ.
-func IsHourly(v bool) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldIsHourly, v))
-}
-
 // FreelancerEarnings applies equality check predicate on the "freelancer_earnings" field. It's identical to FreelancerEarningsEQ.
 func FreelancerEarnings(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldFreelancerEarnings, v))
@@ -98,16 +93,6 @@ func Description(v string) predicate.WorkHistory {
 // Budget applies equality check predicate on the "budget" field. It's identical to BudgetEQ.
 func Budget(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldBudget, v))
-}
-
-// TotalProposals applies equality check predicate on the "total_proposals" field. It's identical to TotalProposalsEQ.
-func TotalProposals(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldTotalProposals, v))
-}
-
-// NumberOfInterviews applies equality check predicate on the "number_of_interviews" field. It's identical to NumberOfInterviewsEQ.
-func NumberOfInterviews(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldNumberOfInterviews, v))
 }
 
 // ClientRating applies equality check predicate on the "client_rating" field. It's identical to ClientRatingEQ.
@@ -140,6 +125,11 @@ func ClientTotalHires(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldClientTotalHires, v))
 }
 
+// ClientActiveHires applies equality check predicate on the "client_active_hires" field. It's identical to ClientActiveHiresEQ.
+func ClientActiveHires(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldClientActiveHires, v))
+}
+
 // ClientTotalPaidHours applies equality check predicate on the "client_total_paid_hours" field. It's identical to ClientTotalPaidHoursEQ.
 func ClientTotalPaidHours(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldClientTotalPaidHours, v))
@@ -158,6 +148,16 @@ func ClientCompanyCategory(v string) predicate.WorkHistory {
 // ClientCompanySize applies equality check predicate on the "client_company_size" field. It's identical to ClientCompanySizeEQ.
 func ClientCompanySize(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldClientCompanySize, v))
+}
+
+// TotalProposals applies equality check predicate on the "total_proposals" field. It's identical to TotalProposalsEQ.
+func TotalProposals(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldTotalProposals, v))
+}
+
+// NumberOfInterviews applies equality check predicate on the "number_of_interviews" field. It's identical to NumberOfInterviewsEQ.
+func NumberOfInterviews(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldNumberOfInterviews, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -280,6 +280,16 @@ func ClientFeedbackHasSuffix(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldHasSuffix(FieldClientFeedback, v))
 }
 
+// ClientFeedbackIsNil applies the IsNil predicate on the "client_feedback" field.
+func ClientFeedbackIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientFeedback))
+}
+
+// ClientFeedbackNotNil applies the NotNil predicate on the "client_feedback" field.
+func ClientFeedbackNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientFeedback))
+}
+
 // ClientFeedbackEqualFold applies the EqualFold predicate on the "client_feedback" field.
 func ClientFeedbackEqualFold(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEqualFold(FieldClientFeedback, v))
@@ -330,14 +340,14 @@ func OverallRatingLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldOverallRating, v))
 }
 
-// IsHourlyEQ applies the EQ predicate on the "is_hourly" field.
-func IsHourlyEQ(v bool) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldIsHourly, v))
+// OverallRatingIsNil applies the IsNil predicate on the "overall_rating" field.
+func OverallRatingIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldOverallRating))
 }
 
-// IsHourlyNEQ applies the NEQ predicate on the "is_hourly" field.
-func IsHourlyNEQ(v bool) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldIsHourly, v))
+// OverallRatingNotNil applies the NotNil predicate on the "overall_rating" field.
+func OverallRatingNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldOverallRating))
 }
 
 // FreelancerEarningsEQ applies the EQ predicate on the "freelancer_earnings" field.
@@ -380,6 +390,16 @@ func FreelancerEarningsLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldFreelancerEarnings, v))
 }
 
+// FreelancerEarningsIsNil applies the IsNil predicate on the "freelancer_earnings" field.
+func FreelancerEarningsIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldFreelancerEarnings))
+}
+
+// FreelancerEarningsNotNil applies the NotNil predicate on the "freelancer_earnings" field.
+func FreelancerEarningsNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldFreelancerEarnings))
+}
+
 // StartDateEQ applies the EQ predicate on the "start_date" field.
 func StartDateEQ(v time.Time) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldStartDate, v))
@@ -418,6 +438,16 @@ func StartDateLT(v time.Time) predicate.WorkHistory {
 // StartDateLTE applies the LTE predicate on the "start_date" field.
 func StartDateLTE(v time.Time) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldStartDate, v))
+}
+
+// StartDateIsNil applies the IsNil predicate on the "start_date" field.
+func StartDateIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldStartDate))
+}
+
+// StartDateNotNil applies the NotNil predicate on the "start_date" field.
+func StartDateNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldStartDate))
 }
 
 // EndDateEQ applies the EQ predicate on the "end_date" field.
@@ -525,6 +555,16 @@ func DescriptionHasSuffix(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldHasSuffix(FieldDescription, v))
 }
 
+// DescriptionIsNil applies the IsNil predicate on the "description" field.
+func DescriptionIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldDescription))
+}
+
+// DescriptionNotNil applies the NotNil predicate on the "description" field.
+func DescriptionNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldDescription))
+}
+
 // DescriptionEqualFold applies the EqualFold predicate on the "description" field.
 func DescriptionEqualFold(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEqualFold(FieldDescription, v))
@@ -575,84 +615,14 @@ func BudgetLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldBudget, v))
 }
 
-// TotalProposalsEQ applies the EQ predicate on the "total_proposals" field.
-func TotalProposalsEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldTotalProposals, v))
+// BudgetIsNil applies the IsNil predicate on the "budget" field.
+func BudgetIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldBudget))
 }
 
-// TotalProposalsNEQ applies the NEQ predicate on the "total_proposals" field.
-func TotalProposalsNEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldTotalProposals, v))
-}
-
-// TotalProposalsIn applies the In predicate on the "total_proposals" field.
-func TotalProposalsIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldTotalProposals, vs...))
-}
-
-// TotalProposalsNotIn applies the NotIn predicate on the "total_proposals" field.
-func TotalProposalsNotIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldTotalProposals, vs...))
-}
-
-// TotalProposalsGT applies the GT predicate on the "total_proposals" field.
-func TotalProposalsGT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldTotalProposals, v))
-}
-
-// TotalProposalsGTE applies the GTE predicate on the "total_proposals" field.
-func TotalProposalsGTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldTotalProposals, v))
-}
-
-// TotalProposalsLT applies the LT predicate on the "total_proposals" field.
-func TotalProposalsLT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldTotalProposals, v))
-}
-
-// TotalProposalsLTE applies the LTE predicate on the "total_proposals" field.
-func TotalProposalsLTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldTotalProposals, v))
-}
-
-// NumberOfInterviewsEQ applies the EQ predicate on the "number_of_interviews" field.
-func NumberOfInterviewsEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldEQ(FieldNumberOfInterviews, v))
-}
-
-// NumberOfInterviewsNEQ applies the NEQ predicate on the "number_of_interviews" field.
-func NumberOfInterviewsNEQ(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNEQ(FieldNumberOfInterviews, v))
-}
-
-// NumberOfInterviewsIn applies the In predicate on the "number_of_interviews" field.
-func NumberOfInterviewsIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldIn(FieldNumberOfInterviews, vs...))
-}
-
-// NumberOfInterviewsNotIn applies the NotIn predicate on the "number_of_interviews" field.
-func NumberOfInterviewsNotIn(vs ...int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldNotIn(FieldNumberOfInterviews, vs...))
-}
-
-// NumberOfInterviewsGT applies the GT predicate on the "number_of_interviews" field.
-func NumberOfInterviewsGT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGT(FieldNumberOfInterviews, v))
-}
-
-// NumberOfInterviewsGTE applies the GTE predicate on the "number_of_interviews" field.
-func NumberOfInterviewsGTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldGTE(FieldNumberOfInterviews, v))
-}
-
-// NumberOfInterviewsLT applies the LT predicate on the "number_of_interviews" field.
-func NumberOfInterviewsLT(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLT(FieldNumberOfInterviews, v))
-}
-
-// NumberOfInterviewsLTE applies the LTE predicate on the "number_of_interviews" field.
-func NumberOfInterviewsLTE(v int) predicate.WorkHistory {
-	return predicate.WorkHistory(sql.FieldLTE(FieldNumberOfInterviews, v))
+// BudgetNotNil applies the NotNil predicate on the "budget" field.
+func BudgetNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldBudget))
 }
 
 // ClientRatingEQ applies the EQ predicate on the "client_rating" field.
@@ -695,6 +665,16 @@ func ClientRatingLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldClientRating, v))
 }
 
+// ClientRatingIsNil applies the IsNil predicate on the "client_rating" field.
+func ClientRatingIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientRating))
+}
+
+// ClientRatingNotNil applies the NotNil predicate on the "client_rating" field.
+func ClientRatingNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientRating))
+}
+
 // ClientReviewCountEQ applies the EQ predicate on the "client_review_count" field.
 func ClientReviewCountEQ(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldClientReviewCount, v))
@@ -733,6 +713,16 @@ func ClientReviewCountLT(v int) predicate.WorkHistory {
 // ClientReviewCountLTE applies the LTE predicate on the "client_review_count" field.
 func ClientReviewCountLTE(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldClientReviewCount, v))
+}
+
+// ClientReviewCountIsNil applies the IsNil predicate on the "client_review_count" field.
+func ClientReviewCountIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientReviewCount))
+}
+
+// ClientReviewCountNotNil applies the NotNil predicate on the "client_review_count" field.
+func ClientReviewCountNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientReviewCount))
 }
 
 // ClientCountryEQ applies the EQ predicate on the "client_country" field.
@@ -790,6 +780,16 @@ func ClientCountryHasSuffix(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldHasSuffix(FieldClientCountry, v))
 }
 
+// ClientCountryIsNil applies the IsNil predicate on the "client_country" field.
+func ClientCountryIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientCountry))
+}
+
+// ClientCountryNotNil applies the NotNil predicate on the "client_country" field.
+func ClientCountryNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientCountry))
+}
+
 // ClientCountryEqualFold applies the EqualFold predicate on the "client_country" field.
 func ClientCountryEqualFold(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEqualFold(FieldClientCountry, v))
@@ -840,6 +840,16 @@ func ClientTotalJobsPostedLTE(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldClientTotalJobsPosted, v))
 }
 
+// ClientTotalJobsPostedIsNil applies the IsNil predicate on the "client_total_jobs_posted" field.
+func ClientTotalJobsPostedIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientTotalJobsPosted))
+}
+
+// ClientTotalJobsPostedNotNil applies the NotNil predicate on the "client_total_jobs_posted" field.
+func ClientTotalJobsPostedNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientTotalJobsPosted))
+}
+
 // ClientTotalSpendEQ applies the EQ predicate on the "client_total_spend" field.
 func ClientTotalSpendEQ(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldClientTotalSpend, v))
@@ -878,6 +888,16 @@ func ClientTotalSpendLT(v float64) predicate.WorkHistory {
 // ClientTotalSpendLTE applies the LTE predicate on the "client_total_spend" field.
 func ClientTotalSpendLTE(v float64) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldClientTotalSpend, v))
+}
+
+// ClientTotalSpendIsNil applies the IsNil predicate on the "client_total_spend" field.
+func ClientTotalSpendIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientTotalSpend))
+}
+
+// ClientTotalSpendNotNil applies the NotNil predicate on the "client_total_spend" field.
+func ClientTotalSpendNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientTotalSpend))
 }
 
 // ClientTotalHiresEQ applies the EQ predicate on the "client_total_hires" field.
@@ -928,6 +948,56 @@ func ClientTotalHiresIsNil() predicate.WorkHistory {
 // ClientTotalHiresNotNil applies the NotNil predicate on the "client_total_hires" field.
 func ClientTotalHiresNotNil() predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldNotNull(FieldClientTotalHires))
+}
+
+// ClientActiveHiresEQ applies the EQ predicate on the "client_active_hires" field.
+func ClientActiveHiresEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresNEQ applies the NEQ predicate on the "client_active_hires" field.
+func ClientActiveHiresNEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresIn applies the In predicate on the "client_active_hires" field.
+func ClientActiveHiresIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldClientActiveHires, vs...))
+}
+
+// ClientActiveHiresNotIn applies the NotIn predicate on the "client_active_hires" field.
+func ClientActiveHiresNotIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldClientActiveHires, vs...))
+}
+
+// ClientActiveHiresGT applies the GT predicate on the "client_active_hires" field.
+func ClientActiveHiresGT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresGTE applies the GTE predicate on the "client_active_hires" field.
+func ClientActiveHiresGTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresLT applies the LT predicate on the "client_active_hires" field.
+func ClientActiveHiresLT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresLTE applies the LTE predicate on the "client_active_hires" field.
+func ClientActiveHiresLTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldClientActiveHires, v))
+}
+
+// ClientActiveHiresIsNil applies the IsNil predicate on the "client_active_hires" field.
+func ClientActiveHiresIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldClientActiveHires))
+}
+
+// ClientActiveHiresNotNil applies the NotNil predicate on the "client_active_hires" field.
+func ClientActiveHiresNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldClientActiveHires))
 }
 
 // ClientTotalPaidHoursEQ applies the EQ predicate on the "client_total_paid_hours" field.
@@ -1180,21 +1250,131 @@ func ClientCompanySizeContainsFold(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldContainsFold(FieldClientCompanySize, v))
 }
 
-// HasUpworkFreelancerProposal applies the HasEdge predicate on the "upwork_Freelancer_Proposal" edge.
-func HasUpworkFreelancerProposal() predicate.WorkHistory {
+// TotalProposalsEQ applies the EQ predicate on the "total_proposals" field.
+func TotalProposalsEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldTotalProposals, v))
+}
+
+// TotalProposalsNEQ applies the NEQ predicate on the "total_proposals" field.
+func TotalProposalsNEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldTotalProposals, v))
+}
+
+// TotalProposalsIn applies the In predicate on the "total_proposals" field.
+func TotalProposalsIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldTotalProposals, vs...))
+}
+
+// TotalProposalsNotIn applies the NotIn predicate on the "total_proposals" field.
+func TotalProposalsNotIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldTotalProposals, vs...))
+}
+
+// TotalProposalsGT applies the GT predicate on the "total_proposals" field.
+func TotalProposalsGT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldTotalProposals, v))
+}
+
+// TotalProposalsGTE applies the GTE predicate on the "total_proposals" field.
+func TotalProposalsGTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldTotalProposals, v))
+}
+
+// TotalProposalsLT applies the LT predicate on the "total_proposals" field.
+func TotalProposalsLT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldTotalProposals, v))
+}
+
+// TotalProposalsLTE applies the LTE predicate on the "total_proposals" field.
+func TotalProposalsLTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldTotalProposals, v))
+}
+
+// TotalProposalsIsNil applies the IsNil predicate on the "total_proposals" field.
+func TotalProposalsIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldTotalProposals))
+}
+
+// TotalProposalsNotNil applies the NotNil predicate on the "total_proposals" field.
+func TotalProposalsNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldTotalProposals))
+}
+
+// NumberOfInterviewsEQ applies the EQ predicate on the "number_of_interviews" field.
+func NumberOfInterviewsEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsNEQ applies the NEQ predicate on the "number_of_interviews" field.
+func NumberOfInterviewsNEQ(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsIn applies the In predicate on the "number_of_interviews" field.
+func NumberOfInterviewsIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldNumberOfInterviews, vs...))
+}
+
+// NumberOfInterviewsNotIn applies the NotIn predicate on the "number_of_interviews" field.
+func NumberOfInterviewsNotIn(vs ...int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldNumberOfInterviews, vs...))
+}
+
+// NumberOfInterviewsGT applies the GT predicate on the "number_of_interviews" field.
+func NumberOfInterviewsGT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsGTE applies the GTE predicate on the "number_of_interviews" field.
+func NumberOfInterviewsGTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsLT applies the LT predicate on the "number_of_interviews" field.
+func NumberOfInterviewsLT(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsLTE applies the LTE predicate on the "number_of_interviews" field.
+func NumberOfInterviewsLTE(v int) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldNumberOfInterviews, v))
+}
+
+// NumberOfInterviewsIsNil applies the IsNil predicate on the "number_of_interviews" field.
+func NumberOfInterviewsIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldNumberOfInterviews))
+}
+
+// NumberOfInterviewsNotNil applies the NotNil predicate on the "number_of_interviews" field.
+func NumberOfInterviewsNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldNumberOfInterviews))
+}
+
+// SkillsIsNil applies the IsNil predicate on the "skills" field.
+func SkillsIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldSkills))
+}
+
+// SkillsNotNil applies the NotNil predicate on the "skills" field.
+func SkillsNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldSkills))
+}
+
+// HasFreelancer applies the HasEdge predicate on the "freelancer" edge.
+func HasFreelancer() predicate.WorkHistory {
 	return predicate.WorkHistory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpworkFreelancerProposalTable, UpworkFreelancerProposalColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, FreelancerTable, FreelancerColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUpworkFreelancerProposalWith applies the HasEdge predicate on the "upwork_Freelancer_Proposal" edge with a given conditions (other predicates).
-func HasUpworkFreelancerProposalWith(preds ...predicate.Freelancer) predicate.WorkHistory {
+// HasFreelancerWith applies the HasEdge predicate on the "freelancer" edge with a given conditions (other predicates).
+func HasFreelancerWith(preds ...predicate.UpworkFreelancer) predicate.WorkHistory {
 	return predicate.WorkHistory(func(s *sql.Selector) {
-		step := newUpworkFreelancerProposalStep()
+		step := newFreelancerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

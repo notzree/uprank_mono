@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
@@ -13,8 +12,10 @@ import (
 )
 
 func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
-	claims, _ := clerk.SessionClaimsFromContext(r.Context())
-	user_id := claims.Subject
+	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	if user_id_err != nil {
+		return user_id_err
+	}
 	var req types.CreateJobRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -45,8 +46,10 @@ func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) GetJobByID(w http.ResponseWriter, r *http.Request) error {
-	claims, _ := clerk.SessionClaimsFromContext(r.Context())
-	user_id := claims.Subject
+	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	if user_id_err != nil {
+		return user_id_err
+	}
 	job_id := chi.URLParam(r, "job_id")
 	job, err := s.ent.Job.Query().
 		Where(

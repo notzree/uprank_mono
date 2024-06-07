@@ -10,20 +10,20 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
 // WorkHistoryQuery is the builder for querying WorkHistory entities.
 type WorkHistoryQuery struct {
 	config
-	ctx                          *QueryContext
-	order                        []workhistory.OrderOption
-	inters                       []Interceptor
-	predicates                   []predicate.WorkHistory
-	withUpworkFreelancerProposal *FreelancerQuery
-	withFKs                      bool
+	ctx            *QueryContext
+	order          []workhistory.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.WorkHistory
+	withFreelancer *UpworkFreelancerQuery
+	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,9 +60,9 @@ func (whq *WorkHistoryQuery) Order(o ...workhistory.OrderOption) *WorkHistoryQue
 	return whq
 }
 
-// QueryUpworkFreelancerProposal chains the current query on the "upwork_Freelancer_Proposal" edge.
-func (whq *WorkHistoryQuery) QueryUpworkFreelancerProposal() *FreelancerQuery {
-	query := (&FreelancerClient{config: whq.config}).Query()
+// QueryFreelancer chains the current query on the "freelancer" edge.
+func (whq *WorkHistoryQuery) QueryFreelancer() *UpworkFreelancerQuery {
+	query := (&UpworkFreelancerClient{config: whq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := whq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,8 +73,8 @@ func (whq *WorkHistoryQuery) QueryUpworkFreelancerProposal() *FreelancerQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(workhistory.Table, workhistory.FieldID, selector),
-			sqlgraph.To(freelancer.Table, freelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, workhistory.UpworkFreelancerProposalTable, workhistory.UpworkFreelancerProposalColumn),
+			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, workhistory.FreelancerTable, workhistory.FreelancerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(whq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,26 +269,26 @@ func (whq *WorkHistoryQuery) Clone() *WorkHistoryQuery {
 		return nil
 	}
 	return &WorkHistoryQuery{
-		config:                       whq.config,
-		ctx:                          whq.ctx.Clone(),
-		order:                        append([]workhistory.OrderOption{}, whq.order...),
-		inters:                       append([]Interceptor{}, whq.inters...),
-		predicates:                   append([]predicate.WorkHistory{}, whq.predicates...),
-		withUpworkFreelancerProposal: whq.withUpworkFreelancerProposal.Clone(),
+		config:         whq.config,
+		ctx:            whq.ctx.Clone(),
+		order:          append([]workhistory.OrderOption{}, whq.order...),
+		inters:         append([]Interceptor{}, whq.inters...),
+		predicates:     append([]predicate.WorkHistory{}, whq.predicates...),
+		withFreelancer: whq.withFreelancer.Clone(),
 		// clone intermediate query.
 		sql:  whq.sql.Clone(),
 		path: whq.path,
 	}
 }
 
-// WithUpworkFreelancerProposal tells the query-builder to eager-load the nodes that are connected to
-// the "upwork_Freelancer_Proposal" edge. The optional arguments are used to configure the query builder of the edge.
-func (whq *WorkHistoryQuery) WithUpworkFreelancerProposal(opts ...func(*FreelancerQuery)) *WorkHistoryQuery {
-	query := (&FreelancerClient{config: whq.config}).Query()
+// WithFreelancer tells the query-builder to eager-load the nodes that are connected to
+// the "freelancer" edge. The optional arguments are used to configure the query builder of the edge.
+func (whq *WorkHistoryQuery) WithFreelancer(opts ...func(*UpworkFreelancerQuery)) *WorkHistoryQuery {
+	query := (&UpworkFreelancerClient{config: whq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	whq.withUpworkFreelancerProposal = query
+	whq.withFreelancer = query
 	return whq
 }
 
@@ -372,10 +372,10 @@ func (whq *WorkHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		withFKs     = whq.withFKs
 		_spec       = whq.querySpec()
 		loadedTypes = [1]bool{
-			whq.withUpworkFreelancerProposal != nil,
+			whq.withFreelancer != nil,
 		}
 	)
-	if whq.withUpworkFreelancerProposal != nil {
+	if whq.withFreelancer != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -399,23 +399,23 @@ func (whq *WorkHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := whq.withUpworkFreelancerProposal; query != nil {
-		if err := whq.loadUpworkFreelancerProposal(ctx, query, nodes, nil,
-			func(n *WorkHistory, e *Freelancer) { n.Edges.UpworkFreelancerProposal = e }); err != nil {
+	if query := whq.withFreelancer; query != nil {
+		if err := whq.loadFreelancer(ctx, query, nodes, nil,
+			func(n *WorkHistory, e *UpworkFreelancer) { n.Edges.Freelancer = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (whq *WorkHistoryQuery) loadUpworkFreelancerProposal(ctx context.Context, query *FreelancerQuery, nodes []*WorkHistory, init func(*WorkHistory), assign func(*WorkHistory, *Freelancer)) error {
+func (whq *WorkHistoryQuery) loadFreelancer(ctx context.Context, query *UpworkFreelancerQuery, nodes []*WorkHistory, init func(*WorkHistory), assign func(*WorkHistory, *UpworkFreelancer)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*WorkHistory)
 	for i := range nodes {
-		if nodes[i].freelancer_work_histories == nil {
+		if nodes[i].upwork_freelancer_work_histories == nil {
 			continue
 		}
-		fk := *nodes[i].freelancer_work_histories
+		fk := *nodes[i].upwork_freelancer_work_histories
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -424,7 +424,7 @@ func (whq *WorkHistoryQuery) loadUpworkFreelancerProposal(ctx context.Context, q
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(freelancer.IDIn(ids...))
+	query.Where(upworkfreelancer.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -432,7 +432,7 @@ func (whq *WorkHistoryQuery) loadUpworkFreelancerProposal(ctx context.Context, q
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "freelancer_work_histories" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "upwork_freelancer_work_histories" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

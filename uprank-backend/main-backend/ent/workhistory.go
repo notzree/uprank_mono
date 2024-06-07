@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
@@ -25,8 +25,6 @@ type WorkHistory struct {
 	ClientFeedback string `json:"client_feedback,omitempty"`
 	// OverallRating holds the value of the "overall_rating" field.
 	OverallRating float64 `json:"overall_rating,omitempty"`
-	// IsHourly holds the value of the "is_hourly" field.
-	IsHourly bool `json:"is_hourly,omitempty"`
 	// FreelancerEarnings holds the value of the "freelancer_earnings" field.
 	FreelancerEarnings float64 `json:"freelancer_earnings,omitempty"`
 	// StartDate holds the value of the "start_date" field.
@@ -37,12 +35,6 @@ type WorkHistory struct {
 	Description string `json:"description,omitempty"`
 	// Budget holds the value of the "budget" field.
 	Budget float64 `json:"budget,omitempty"`
-	// TotalProposals holds the value of the "total_proposals" field.
-	TotalProposals int `json:"total_proposals,omitempty"`
-	// NumberOfInterviews holds the value of the "number_of_interviews" field.
-	NumberOfInterviews int `json:"number_of_interviews,omitempty"`
-	// Skills holds the value of the "skills" field.
-	Skills []string `json:"skills,omitempty"`
 	// ClientRating holds the value of the "client_rating" field.
 	ClientRating float64 `json:"client_rating,omitempty"`
 	// ClientReviewCount holds the value of the "client_review_count" field.
@@ -55,6 +47,8 @@ type WorkHistory struct {
 	ClientTotalSpend float64 `json:"client_total_spend,omitempty"`
 	// ClientTotalHires holds the value of the "client_total_hires" field.
 	ClientTotalHires int `json:"client_total_hires,omitempty"`
+	// ClientActiveHires holds the value of the "client_active_hires" field.
+	ClientActiveHires int `json:"client_active_hires,omitempty"`
 	// ClientTotalPaidHours holds the value of the "client_total_paid_hours" field.
 	ClientTotalPaidHours int `json:"client_total_paid_hours,omitempty"`
 	// ClientAverageHourlyRatePaid holds the value of the "client_average_hourly_rate_paid" field.
@@ -63,31 +57,37 @@ type WorkHistory struct {
 	ClientCompanyCategory string `json:"client_company_category,omitempty"`
 	// ClientCompanySize holds the value of the "client_company_size" field.
 	ClientCompanySize string `json:"client_company_size,omitempty"`
+	// TotalProposals holds the value of the "total_proposals" field.
+	TotalProposals int `json:"total_proposals,omitempty"`
+	// NumberOfInterviews holds the value of the "number_of_interviews" field.
+	NumberOfInterviews int `json:"number_of_interviews,omitempty"`
+	// Skills holds the value of the "skills" field.
+	Skills []string `json:"skills,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkHistoryQuery when eager-loading is set.
-	Edges                     WorkHistoryEdges `json:"edges"`
-	freelancer_work_histories *string
-	selectValues              sql.SelectValues
+	Edges                            WorkHistoryEdges `json:"edges"`
+	upwork_freelancer_work_histories *string
+	selectValues                     sql.SelectValues
 }
 
 // WorkHistoryEdges holds the relations/edges for other nodes in the graph.
 type WorkHistoryEdges struct {
-	// UpworkFreelancerProposal holds the value of the upwork_Freelancer_Proposal edge.
-	UpworkFreelancerProposal *Freelancer `json:"upwork_Freelancer_Proposal,omitempty"`
+	// Freelancer holds the value of the freelancer edge.
+	Freelancer *UpworkFreelancer `json:"freelancer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// UpworkFreelancerProposalOrErr returns the UpworkFreelancerProposal value or an error if the edge
+// FreelancerOrErr returns the Freelancer value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e WorkHistoryEdges) UpworkFreelancerProposalOrErr() (*Freelancer, error) {
-	if e.UpworkFreelancerProposal != nil {
-		return e.UpworkFreelancerProposal, nil
+func (e WorkHistoryEdges) FreelancerOrErr() (*UpworkFreelancer, error) {
+	if e.Freelancer != nil {
+		return e.Freelancer, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: freelancer.Label}
+		return nil, &NotFoundError{label: upworkfreelancer.Label}
 	}
-	return nil, &NotLoadedError{edge: "upwork_Freelancer_Proposal"}
+	return nil, &NotLoadedError{edge: "freelancer"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,17 +97,15 @@ func (*WorkHistory) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case workhistory.FieldSkills:
 			values[i] = new([]byte)
-		case workhistory.FieldIsHourly:
-			values[i] = new(sql.NullBool)
 		case workhistory.FieldOverallRating, workhistory.FieldFreelancerEarnings, workhistory.FieldBudget, workhistory.FieldClientRating, workhistory.FieldClientTotalSpend, workhistory.FieldClientAverageHourlyRatePaid:
 			values[i] = new(sql.NullFloat64)
-		case workhistory.FieldID, workhistory.FieldTotalProposals, workhistory.FieldNumberOfInterviews, workhistory.FieldClientReviewCount, workhistory.FieldClientTotalJobsPosted, workhistory.FieldClientTotalHires, workhistory.FieldClientTotalPaidHours:
+		case workhistory.FieldID, workhistory.FieldClientReviewCount, workhistory.FieldClientTotalJobsPosted, workhistory.FieldClientTotalHires, workhistory.FieldClientActiveHires, workhistory.FieldClientTotalPaidHours, workhistory.FieldTotalProposals, workhistory.FieldNumberOfInterviews:
 			values[i] = new(sql.NullInt64)
 		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
 			values[i] = new(sql.NullString)
 		case workhistory.FieldStartDate, workhistory.FieldEndDate:
 			values[i] = new(sql.NullTime)
-		case workhistory.ForeignKeys[0]: // freelancer_work_histories
+		case workhistory.ForeignKeys[0]: // upwork_freelancer_work_histories
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -148,12 +146,6 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wh.OverallRating = value.Float64
 			}
-		case workhistory.FieldIsHourly:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_hourly", values[i])
-			} else if value.Valid {
-				wh.IsHourly = value.Bool
-			}
 		case workhistory.FieldFreelancerEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field freelancer_earnings", values[i])
@@ -183,26 +175,6 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field budget", values[i])
 			} else if value.Valid {
 				wh.Budget = value.Float64
-			}
-		case workhistory.FieldTotalProposals:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field total_proposals", values[i])
-			} else if value.Valid {
-				wh.TotalProposals = int(value.Int64)
-			}
-		case workhistory.FieldNumberOfInterviews:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field number_of_interviews", values[i])
-			} else if value.Valid {
-				wh.NumberOfInterviews = int(value.Int64)
-			}
-		case workhistory.FieldSkills:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field skills", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &wh.Skills); err != nil {
-					return fmt.Errorf("unmarshal field skills: %w", err)
-				}
 			}
 		case workhistory.FieldClientRating:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -240,6 +212,12 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wh.ClientTotalHires = int(value.Int64)
 			}
+		case workhistory.FieldClientActiveHires:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field client_active_hires", values[i])
+			} else if value.Valid {
+				wh.ClientActiveHires = int(value.Int64)
+			}
 		case workhistory.FieldClientTotalPaidHours:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field client_total_paid_hours", values[i])
@@ -264,12 +242,32 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wh.ClientCompanySize = value.String
 			}
+		case workhistory.FieldTotalProposals:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field total_proposals", values[i])
+			} else if value.Valid {
+				wh.TotalProposals = int(value.Int64)
+			}
+		case workhistory.FieldNumberOfInterviews:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field number_of_interviews", values[i])
+			} else if value.Valid {
+				wh.NumberOfInterviews = int(value.Int64)
+			}
+		case workhistory.FieldSkills:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field skills", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &wh.Skills); err != nil {
+					return fmt.Errorf("unmarshal field skills: %w", err)
+				}
+			}
 		case workhistory.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field freelancer_work_histories", values[i])
+				return fmt.Errorf("unexpected type %T for field upwork_freelancer_work_histories", values[i])
 			} else if value.Valid {
-				wh.freelancer_work_histories = new(string)
-				*wh.freelancer_work_histories = value.String
+				wh.upwork_freelancer_work_histories = new(string)
+				*wh.upwork_freelancer_work_histories = value.String
 			}
 		default:
 			wh.selectValues.Set(columns[i], values[i])
@@ -284,9 +282,9 @@ func (wh *WorkHistory) Value(name string) (ent.Value, error) {
 	return wh.selectValues.Get(name)
 }
 
-// QueryUpworkFreelancerProposal queries the "upwork_Freelancer_Proposal" edge of the WorkHistory entity.
-func (wh *WorkHistory) QueryUpworkFreelancerProposal() *FreelancerQuery {
-	return NewWorkHistoryClient(wh.config).QueryUpworkFreelancerProposal(wh)
+// QueryFreelancer queries the "freelancer" edge of the WorkHistory entity.
+func (wh *WorkHistory) QueryFreelancer() *UpworkFreelancerQuery {
+	return NewWorkHistoryClient(wh.config).QueryFreelancer(wh)
 }
 
 // Update returns a builder for updating this WorkHistory.
@@ -321,9 +319,6 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString("overall_rating=")
 	builder.WriteString(fmt.Sprintf("%v", wh.OverallRating))
 	builder.WriteString(", ")
-	builder.WriteString("is_hourly=")
-	builder.WriteString(fmt.Sprintf("%v", wh.IsHourly))
-	builder.WriteString(", ")
 	builder.WriteString("freelancer_earnings=")
 	builder.WriteString(fmt.Sprintf("%v", wh.FreelancerEarnings))
 	builder.WriteString(", ")
@@ -338,15 +333,6 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("budget=")
 	builder.WriteString(fmt.Sprintf("%v", wh.Budget))
-	builder.WriteString(", ")
-	builder.WriteString("total_proposals=")
-	builder.WriteString(fmt.Sprintf("%v", wh.TotalProposals))
-	builder.WriteString(", ")
-	builder.WriteString("number_of_interviews=")
-	builder.WriteString(fmt.Sprintf("%v", wh.NumberOfInterviews))
-	builder.WriteString(", ")
-	builder.WriteString("skills=")
-	builder.WriteString(fmt.Sprintf("%v", wh.Skills))
 	builder.WriteString(", ")
 	builder.WriteString("client_rating=")
 	builder.WriteString(fmt.Sprintf("%v", wh.ClientRating))
@@ -366,6 +352,9 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString("client_total_hires=")
 	builder.WriteString(fmt.Sprintf("%v", wh.ClientTotalHires))
 	builder.WriteString(", ")
+	builder.WriteString("client_active_hires=")
+	builder.WriteString(fmt.Sprintf("%v", wh.ClientActiveHires))
+	builder.WriteString(", ")
 	builder.WriteString("client_total_paid_hours=")
 	builder.WriteString(fmt.Sprintf("%v", wh.ClientTotalPaidHours))
 	builder.WriteString(", ")
@@ -377,6 +366,15 @@ func (wh *WorkHistory) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("client_company_size=")
 	builder.WriteString(wh.ClientCompanySize)
+	builder.WriteString(", ")
+	builder.WriteString("total_proposals=")
+	builder.WriteString(fmt.Sprintf("%v", wh.TotalProposals))
+	builder.WriteString(", ")
+	builder.WriteString("number_of_interviews=")
+	builder.WriteString(fmt.Sprintf("%v", wh.NumberOfInterviews))
+	builder.WriteString(", ")
+	builder.WriteString("skills=")
+	builder.WriteString(fmt.Sprintf("%v", wh.Skills))
 	builder.WriteByte(')')
 	return builder.String()
 }

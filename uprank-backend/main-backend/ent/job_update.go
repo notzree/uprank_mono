@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -296,17 +296,17 @@ func (ju *JobUpdate) SetUser(u *User) *JobUpdate {
 	return ju.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
+// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
 func (ju *JobUpdate) AddFreelancerIDs(ids ...string) *JobUpdate {
 	ju.mutation.AddFreelancerIDs(ids...)
 	return ju
 }
 
-// AddFreelancers adds the "freelancers" edges to the Freelancer entity.
-func (ju *JobUpdate) AddFreelancers(f ...*Freelancer) *JobUpdate {
-	ids := make([]string, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
+func (ju *JobUpdate) AddFreelancers(u ...*UpworkFreelancer) *JobUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ju.AddFreelancerIDs(ids...)
 }
@@ -322,23 +322,23 @@ func (ju *JobUpdate) ClearUser() *JobUpdate {
 	return ju
 }
 
-// ClearFreelancers clears all "freelancers" edges to the Freelancer entity.
+// ClearFreelancers clears all "freelancers" edges to the UpworkFreelancer entity.
 func (ju *JobUpdate) ClearFreelancers() *JobUpdate {
 	ju.mutation.ClearFreelancers()
 	return ju
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to Freelancer entities by IDs.
+// RemoveFreelancerIDs removes the "freelancers" edge to UpworkFreelancer entities by IDs.
 func (ju *JobUpdate) RemoveFreelancerIDs(ids ...string) *JobUpdate {
 	ju.mutation.RemoveFreelancerIDs(ids...)
 	return ju
 }
 
-// RemoveFreelancers removes "freelancers" edges to Freelancer entities.
-func (ju *JobUpdate) RemoveFreelancers(f ...*Freelancer) *JobUpdate {
-	ids := make([]string, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveFreelancers removes "freelancers" edges to UpworkFreelancer entities.
+func (ju *JobUpdate) RemoveFreelancers(u ...*UpworkFreelancer) *JobUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ju.RemoveFreelancerIDs(ids...)
 }
@@ -516,26 +516,26 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ju.mutation.FreelancersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ju.mutation.RemovedFreelancersIDs(); len(nodes) > 0 && !ju.mutation.FreelancersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -545,13 +545,13 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := ju.mutation.FreelancersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -844,17 +844,17 @@ func (juo *JobUpdateOne) SetUser(u *User) *JobUpdateOne {
 	return juo.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
+// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
 func (juo *JobUpdateOne) AddFreelancerIDs(ids ...string) *JobUpdateOne {
 	juo.mutation.AddFreelancerIDs(ids...)
 	return juo
 }
 
-// AddFreelancers adds the "freelancers" edges to the Freelancer entity.
-func (juo *JobUpdateOne) AddFreelancers(f ...*Freelancer) *JobUpdateOne {
-	ids := make([]string, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
+func (juo *JobUpdateOne) AddFreelancers(u ...*UpworkFreelancer) *JobUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return juo.AddFreelancerIDs(ids...)
 }
@@ -870,23 +870,23 @@ func (juo *JobUpdateOne) ClearUser() *JobUpdateOne {
 	return juo
 }
 
-// ClearFreelancers clears all "freelancers" edges to the Freelancer entity.
+// ClearFreelancers clears all "freelancers" edges to the UpworkFreelancer entity.
 func (juo *JobUpdateOne) ClearFreelancers() *JobUpdateOne {
 	juo.mutation.ClearFreelancers()
 	return juo
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to Freelancer entities by IDs.
+// RemoveFreelancerIDs removes the "freelancers" edge to UpworkFreelancer entities by IDs.
 func (juo *JobUpdateOne) RemoveFreelancerIDs(ids ...string) *JobUpdateOne {
 	juo.mutation.RemoveFreelancerIDs(ids...)
 	return juo
 }
 
-// RemoveFreelancers removes "freelancers" edges to Freelancer entities.
-func (juo *JobUpdateOne) RemoveFreelancers(f ...*Freelancer) *JobUpdateOne {
-	ids := make([]string, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveFreelancers removes "freelancers" edges to UpworkFreelancer entities.
+func (juo *JobUpdateOne) RemoveFreelancers(u ...*UpworkFreelancer) *JobUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return juo.RemoveFreelancerIDs(ids...)
 }
@@ -1094,26 +1094,26 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	}
 	if juo.mutation.FreelancersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := juo.mutation.RemovedFreelancersIDs(); len(nodes) > 0 && !juo.mutation.FreelancersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1123,13 +1123,13 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	}
 	if nodes := juo.mutation.FreelancersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

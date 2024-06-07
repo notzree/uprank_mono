@@ -14,10 +14,10 @@ type Tx struct {
 	config
 	// AttachmentRef is the client for interacting with the AttachmentRef builders.
 	AttachmentRef *AttachmentRefClient
-	// Freelancer is the client for interacting with the Freelancer builders.
-	Freelancer *FreelancerClient
 	// Job is the client for interacting with the Job builders.
 	Job *JobClient
+	// UpworkFreelancer is the client for interacting with the UpworkFreelancer builders.
+	UpworkFreelancer *UpworkFreelancerClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// WorkHistory is the client for interacting with the WorkHistory builders.
@@ -154,8 +154,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AttachmentRef = NewAttachmentRefClient(tx.config)
-	tx.Freelancer = NewFreelancerClient(tx.config)
 	tx.Job = NewJobClient(tx.config)
+	tx.UpworkFreelancer = NewUpworkFreelancerClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.WorkHistory = NewWorkHistoryClient(tx.config)
 }

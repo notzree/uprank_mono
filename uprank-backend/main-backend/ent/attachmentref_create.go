@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
 // AttachmentRefCreate is the builder for creating a AttachmentRef entity.
@@ -34,15 +34,15 @@ func (arc *AttachmentRefCreate) SetLink(s string) *AttachmentRefCreate {
 	return arc
 }
 
-// SetFreelancerID sets the "freelancer" edge to the Freelancer entity by ID.
+// SetFreelancerID sets the "freelancer" edge to the UpworkFreelancer entity by ID.
 func (arc *AttachmentRefCreate) SetFreelancerID(id string) *AttachmentRefCreate {
 	arc.mutation.SetFreelancerID(id)
 	return arc
 }
 
-// SetFreelancer sets the "freelancer" edge to the Freelancer entity.
-func (arc *AttachmentRefCreate) SetFreelancer(f *Freelancer) *AttachmentRefCreate {
-	return arc.SetFreelancerID(f.ID)
+// SetFreelancer sets the "freelancer" edge to the UpworkFreelancer entity.
+func (arc *AttachmentRefCreate) SetFreelancer(u *UpworkFreelancer) *AttachmentRefCreate {
+	return arc.SetFreelancerID(u.ID)
 }
 
 // Mutation returns the AttachmentRefMutation object of the builder.
@@ -131,13 +131,13 @@ func (arc *AttachmentRefCreate) createSpec() (*AttachmentRef, *sqlgraph.CreateSp
 			Columns: []string{attachmentref.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.freelancer_attachments = &nodes[0]
+		_node.upwork_freelancer_attachments = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

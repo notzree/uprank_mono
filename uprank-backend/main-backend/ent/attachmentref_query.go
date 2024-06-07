@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
 // AttachmentRefQuery is the builder for querying AttachmentRef entities.
@@ -22,7 +22,7 @@ type AttachmentRefQuery struct {
 	order          []attachmentref.OrderOption
 	inters         []Interceptor
 	predicates     []predicate.AttachmentRef
-	withFreelancer *FreelancerQuery
+	withFreelancer *UpworkFreelancerQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (arq *AttachmentRefQuery) Order(o ...attachmentref.OrderOption) *Attachment
 }
 
 // QueryFreelancer chains the current query on the "freelancer" edge.
-func (arq *AttachmentRefQuery) QueryFreelancer() *FreelancerQuery {
-	query := (&FreelancerClient{config: arq.config}).Query()
+func (arq *AttachmentRefQuery) QueryFreelancer() *UpworkFreelancerQuery {
+	query := (&UpworkFreelancerClient{config: arq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := arq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (arq *AttachmentRefQuery) QueryFreelancer() *FreelancerQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(attachmentref.Table, attachmentref.FieldID, selector),
-			sqlgraph.To(freelancer.Table, freelancer.FieldID),
+			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, attachmentref.FreelancerTable, attachmentref.FreelancerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(arq.driver.Dialect(), step)
@@ -283,8 +283,8 @@ func (arq *AttachmentRefQuery) Clone() *AttachmentRefQuery {
 
 // WithFreelancer tells the query-builder to eager-load the nodes that are connected to
 // the "freelancer" edge. The optional arguments are used to configure the query builder of the edge.
-func (arq *AttachmentRefQuery) WithFreelancer(opts ...func(*FreelancerQuery)) *AttachmentRefQuery {
-	query := (&FreelancerClient{config: arq.config}).Query()
+func (arq *AttachmentRefQuery) WithFreelancer(opts ...func(*UpworkFreelancerQuery)) *AttachmentRefQuery {
+	query := (&UpworkFreelancerClient{config: arq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -401,21 +401,21 @@ func (arq *AttachmentRefQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	}
 	if query := arq.withFreelancer; query != nil {
 		if err := arq.loadFreelancer(ctx, query, nodes, nil,
-			func(n *AttachmentRef, e *Freelancer) { n.Edges.Freelancer = e }); err != nil {
+			func(n *AttachmentRef, e *UpworkFreelancer) { n.Edges.Freelancer = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (arq *AttachmentRefQuery) loadFreelancer(ctx context.Context, query *FreelancerQuery, nodes []*AttachmentRef, init func(*AttachmentRef), assign func(*AttachmentRef, *Freelancer)) error {
+func (arq *AttachmentRefQuery) loadFreelancer(ctx context.Context, query *UpworkFreelancerQuery, nodes []*AttachmentRef, init func(*AttachmentRef), assign func(*AttachmentRef, *UpworkFreelancer)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*AttachmentRef)
 	for i := range nodes {
-		if nodes[i].freelancer_attachments == nil {
+		if nodes[i].upwork_freelancer_attachments == nil {
 			continue
 		}
-		fk := *nodes[i].freelancer_attachments
+		fk := *nodes[i].upwork_freelancer_attachments
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -424,7 +424,7 @@ func (arq *AttachmentRefQuery) loadFreelancer(ctx context.Context, query *Freela
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(freelancer.IDIn(ids...))
+	query.Where(upworkfreelancer.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -432,7 +432,7 @@ func (arq *AttachmentRefQuery) loadFreelancer(ctx context.Context, query *Freela
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "freelancer_attachments" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "upwork_freelancer_attachments" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

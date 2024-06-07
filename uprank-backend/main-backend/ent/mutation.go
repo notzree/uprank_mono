@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -28,11 +28,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAttachmentRef = "AttachmentRef"
-	TypeFreelancer    = "Freelancer"
-	TypeJob           = "Job"
-	TypeUser          = "User"
-	TypeWorkHistory   = "WorkHistory"
+	TypeAttachmentRef    = "AttachmentRef"
+	TypeJob              = "Job"
+	TypeUpworkFreelancer = "UpworkFreelancer"
+	TypeUser             = "User"
+	TypeWorkHistory      = "WorkHistory"
 )
 
 // AttachmentRefMutation represents an operation that mutates the AttachmentRef nodes in the graph.
@@ -221,17 +221,17 @@ func (m *AttachmentRefMutation) ResetLink() {
 	m.link = nil
 }
 
-// SetFreelancerID sets the "freelancer" edge to the Freelancer entity by id.
+// SetFreelancerID sets the "freelancer" edge to the UpworkFreelancer entity by id.
 func (m *AttachmentRefMutation) SetFreelancerID(id string) {
 	m.freelancer = &id
 }
 
-// ClearFreelancer clears the "freelancer" edge to the Freelancer entity.
+// ClearFreelancer clears the "freelancer" edge to the UpworkFreelancer entity.
 func (m *AttachmentRefMutation) ClearFreelancer() {
 	m.clearedfreelancer = true
 }
 
-// FreelancerCleared reports if the "freelancer" edge to the Freelancer entity was cleared.
+// FreelancerCleared reports if the "freelancer" edge to the UpworkFreelancer entity was cleared.
 func (m *AttachmentRefMutation) FreelancerCleared() bool {
 	return m.clearedfreelancer
 }
@@ -480,3271 +480,6 @@ func (m *AttachmentRefMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown AttachmentRef edge %s", name)
-}
-
-// FreelancerMutation represents an operation that mutates the Freelancer nodes in the graph.
-type FreelancerMutation struct {
-	config
-	op                                  Op
-	typ                                 string
-	id                                  *string
-	name                                *string
-	title                               *string
-	description                         *string
-	city                                *string
-	country                             *string
-	timezone                            *string
-	cv                                  *string
-	ai_reccomended                      *bool
-	fixed_charge_amount                 *float64
-	addfixed_charge_amount              *float64
-	fixed_charge_currency               *string
-	hourly_charge_amount                *float64
-	addhourly_charge_amount             *float64
-	hourly_charge_currency              *string
-	invited                             *bool
-	photo_url                           *string
-	recent_hours                        *float64
-	addrecent_hours                     *float64
-	total_hours                         *float64
-	addtotal_hours                      *float64
-	total_portfolio_items               *int
-	addtotal_portfolio_items            *int
-	total_portfolio_v2_items            *int
-	addtotal_portfolio_v2_items         *int
-	upwork_total_feedback               *float64
-	addupwork_total_feedback            *float64
-	upwork_recent_feedback              *float64
-	addupwork_recent_feedback           *float64
-	upwork_top_rated_status             *bool
-	upwork_top_rated_plus_status        *bool
-	upwork_sponsored                    *bool
-	upwork_job_success_score            *float64
-	addupwork_job_success_score         *float64
-	upwork_reccomended                  *bool
-	skills                              *[]string
-	appendskills                        []string
-	average_recent_earnings             *float64
-	addaverage_recent_earnings          *float64
-	combined_average_recent_earnings    *float64
-	addcombined_average_recent_earnings *float64
-	combined_recent_earnings            *float64
-	addcombined_recent_earnings         *float64
-	combined_total_earnings             *float64
-	addcombined_total_earnings          *float64
-	combined_total_revenue              *float64
-	addcombined_total_revenue           *float64
-	recent_earnings                     *float64
-	addrecent_earnings                  *float64
-	total_revenue                       *float64
-	addtotal_revenue                    *float64
-	uprank_score                        *int
-	adduprank_score                     *int
-	uprank_updated_at                   *time.Time
-	uprank_reccomended                  *bool
-	uprank_reccomended_reasons          *string
-	uprank_not_enough_data              *bool
-	clearedFields                       map[string]struct{}
-	job                                 *string
-	clearedjob                          bool
-	attachments                         map[int]struct{}
-	removedattachments                  map[int]struct{}
-	clearedattachments                  bool
-	work_histories                      map[int]struct{}
-	removedwork_histories               map[int]struct{}
-	clearedwork_histories               bool
-	done                                bool
-	oldValue                            func(context.Context) (*Freelancer, error)
-	predicates                          []predicate.Freelancer
-}
-
-var _ ent.Mutation = (*FreelancerMutation)(nil)
-
-// freelancerOption allows management of the mutation configuration using functional options.
-type freelancerOption func(*FreelancerMutation)
-
-// newFreelancerMutation creates new mutation for the Freelancer entity.
-func newFreelancerMutation(c config, op Op, opts ...freelancerOption) *FreelancerMutation {
-	m := &FreelancerMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeFreelancer,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withFreelancerID sets the ID field of the mutation.
-func withFreelancerID(id string) freelancerOption {
-	return func(m *FreelancerMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Freelancer
-		)
-		m.oldValue = func(ctx context.Context) (*Freelancer, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Freelancer.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withFreelancer sets the old Freelancer of the mutation.
-func withFreelancer(node *Freelancer) freelancerOption {
-	return func(m *FreelancerMutation) {
-		m.oldValue = func(context.Context) (*Freelancer, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m FreelancerMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m FreelancerMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Freelancer entities.
-func (m *FreelancerMutation) SetID(id string) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *FreelancerMutation) ID() (id string, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *FreelancerMutation) IDs(ctx context.Context) ([]string, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []string{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Freelancer.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetName sets the "name" field.
-func (m *FreelancerMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *FreelancerMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *FreelancerMutation) ResetName() {
-	m.name = nil
-}
-
-// SetTitle sets the "title" field.
-func (m *FreelancerMutation) SetTitle(s string) {
-	m.title = &s
-}
-
-// Title returns the value of the "title" field in the mutation.
-func (m *FreelancerMutation) Title() (r string, exists bool) {
-	v := m.title
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTitle returns the old "title" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTitle(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
-	}
-	return oldValue.Title, nil
-}
-
-// ResetTitle resets all changes to the "title" field.
-func (m *FreelancerMutation) ResetTitle() {
-	m.title = nil
-}
-
-// SetDescription sets the "description" field.
-func (m *FreelancerMutation) SetDescription(s string) {
-	m.description = &s
-}
-
-// Description returns the value of the "description" field in the mutation.
-func (m *FreelancerMutation) Description() (r string, exists bool) {
-	v := m.description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDescription returns the old "description" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldDescription(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
-	}
-	return oldValue.Description, nil
-}
-
-// ResetDescription resets all changes to the "description" field.
-func (m *FreelancerMutation) ResetDescription() {
-	m.description = nil
-}
-
-// SetCity sets the "city" field.
-func (m *FreelancerMutation) SetCity(s string) {
-	m.city = &s
-}
-
-// City returns the value of the "city" field in the mutation.
-func (m *FreelancerMutation) City() (r string, exists bool) {
-	v := m.city
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCity returns the old "city" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCity(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCity is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCity requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCity: %w", err)
-	}
-	return oldValue.City, nil
-}
-
-// ResetCity resets all changes to the "city" field.
-func (m *FreelancerMutation) ResetCity() {
-	m.city = nil
-}
-
-// SetCountry sets the "country" field.
-func (m *FreelancerMutation) SetCountry(s string) {
-	m.country = &s
-}
-
-// Country returns the value of the "country" field in the mutation.
-func (m *FreelancerMutation) Country() (r string, exists bool) {
-	v := m.country
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCountry returns the old "country" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCountry(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCountry is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCountry requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCountry: %w", err)
-	}
-	return oldValue.Country, nil
-}
-
-// ResetCountry resets all changes to the "country" field.
-func (m *FreelancerMutation) ResetCountry() {
-	m.country = nil
-}
-
-// SetTimezone sets the "timezone" field.
-func (m *FreelancerMutation) SetTimezone(s string) {
-	m.timezone = &s
-}
-
-// Timezone returns the value of the "timezone" field in the mutation.
-func (m *FreelancerMutation) Timezone() (r string, exists bool) {
-	v := m.timezone
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTimezone returns the old "timezone" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTimezone(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTimezone is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTimezone requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTimezone: %w", err)
-	}
-	return oldValue.Timezone, nil
-}
-
-// ResetTimezone resets all changes to the "timezone" field.
-func (m *FreelancerMutation) ResetTimezone() {
-	m.timezone = nil
-}
-
-// SetCv sets the "cv" field.
-func (m *FreelancerMutation) SetCv(s string) {
-	m.cv = &s
-}
-
-// Cv returns the value of the "cv" field in the mutation.
-func (m *FreelancerMutation) Cv() (r string, exists bool) {
-	v := m.cv
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCv returns the old "cv" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCv(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCv is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCv requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCv: %w", err)
-	}
-	return oldValue.Cv, nil
-}
-
-// ResetCv resets all changes to the "cv" field.
-func (m *FreelancerMutation) ResetCv() {
-	m.cv = nil
-}
-
-// SetAiReccomended sets the "ai_reccomended" field.
-func (m *FreelancerMutation) SetAiReccomended(b bool) {
-	m.ai_reccomended = &b
-}
-
-// AiReccomended returns the value of the "ai_reccomended" field in the mutation.
-func (m *FreelancerMutation) AiReccomended() (r bool, exists bool) {
-	v := m.ai_reccomended
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAiReccomended returns the old "ai_reccomended" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldAiReccomended(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAiReccomended is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAiReccomended requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAiReccomended: %w", err)
-	}
-	return oldValue.AiReccomended, nil
-}
-
-// ResetAiReccomended resets all changes to the "ai_reccomended" field.
-func (m *FreelancerMutation) ResetAiReccomended() {
-	m.ai_reccomended = nil
-}
-
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (m *FreelancerMutation) SetFixedChargeAmount(f float64) {
-	m.fixed_charge_amount = &f
-	m.addfixed_charge_amount = nil
-}
-
-// FixedChargeAmount returns the value of the "fixed_charge_amount" field in the mutation.
-func (m *FreelancerMutation) FixedChargeAmount() (r float64, exists bool) {
-	v := m.fixed_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFixedChargeAmount returns the old "fixed_charge_amount" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldFixedChargeAmount(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixedChargeAmount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixedChargeAmount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixedChargeAmount: %w", err)
-	}
-	return oldValue.FixedChargeAmount, nil
-}
-
-// AddFixedChargeAmount adds f to the "fixed_charge_amount" field.
-func (m *FreelancerMutation) AddFixedChargeAmount(f float64) {
-	if m.addfixed_charge_amount != nil {
-		*m.addfixed_charge_amount += f
-	} else {
-		m.addfixed_charge_amount = &f
-	}
-}
-
-// AddedFixedChargeAmount returns the value that was added to the "fixed_charge_amount" field in this mutation.
-func (m *FreelancerMutation) AddedFixedChargeAmount() (r float64, exists bool) {
-	v := m.addfixed_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (m *FreelancerMutation) ClearFixedChargeAmount() {
-	m.fixed_charge_amount = nil
-	m.addfixed_charge_amount = nil
-	m.clearedFields[freelancer.FieldFixedChargeAmount] = struct{}{}
-}
-
-// FixedChargeAmountCleared returns if the "fixed_charge_amount" field was cleared in this mutation.
-func (m *FreelancerMutation) FixedChargeAmountCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldFixedChargeAmount]
-	return ok
-}
-
-// ResetFixedChargeAmount resets all changes to the "fixed_charge_amount" field.
-func (m *FreelancerMutation) ResetFixedChargeAmount() {
-	m.fixed_charge_amount = nil
-	m.addfixed_charge_amount = nil
-	delete(m.clearedFields, freelancer.FieldFixedChargeAmount)
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (m *FreelancerMutation) SetFixedChargeCurrency(s string) {
-	m.fixed_charge_currency = &s
-}
-
-// FixedChargeCurrency returns the value of the "fixed_charge_currency" field in the mutation.
-func (m *FreelancerMutation) FixedChargeCurrency() (r string, exists bool) {
-	v := m.fixed_charge_currency
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFixedChargeCurrency returns the old "fixed_charge_currency" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldFixedChargeCurrency(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixedChargeCurrency is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixedChargeCurrency requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixedChargeCurrency: %w", err)
-	}
-	return oldValue.FixedChargeCurrency, nil
-}
-
-// ResetFixedChargeCurrency resets all changes to the "fixed_charge_currency" field.
-func (m *FreelancerMutation) ResetFixedChargeCurrency() {
-	m.fixed_charge_currency = nil
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (m *FreelancerMutation) SetHourlyChargeAmount(f float64) {
-	m.hourly_charge_amount = &f
-	m.addhourly_charge_amount = nil
-}
-
-// HourlyChargeAmount returns the value of the "hourly_charge_amount" field in the mutation.
-func (m *FreelancerMutation) HourlyChargeAmount() (r float64, exists bool) {
-	v := m.hourly_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourlyChargeAmount returns the old "hourly_charge_amount" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldHourlyChargeAmount(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourlyChargeAmount is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourlyChargeAmount requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourlyChargeAmount: %w", err)
-	}
-	return oldValue.HourlyChargeAmount, nil
-}
-
-// AddHourlyChargeAmount adds f to the "hourly_charge_amount" field.
-func (m *FreelancerMutation) AddHourlyChargeAmount(f float64) {
-	if m.addhourly_charge_amount != nil {
-		*m.addhourly_charge_amount += f
-	} else {
-		m.addhourly_charge_amount = &f
-	}
-}
-
-// AddedHourlyChargeAmount returns the value that was added to the "hourly_charge_amount" field in this mutation.
-func (m *FreelancerMutation) AddedHourlyChargeAmount() (r float64, exists bool) {
-	v := m.addhourly_charge_amount
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (m *FreelancerMutation) ClearHourlyChargeAmount() {
-	m.hourly_charge_amount = nil
-	m.addhourly_charge_amount = nil
-	m.clearedFields[freelancer.FieldHourlyChargeAmount] = struct{}{}
-}
-
-// HourlyChargeAmountCleared returns if the "hourly_charge_amount" field was cleared in this mutation.
-func (m *FreelancerMutation) HourlyChargeAmountCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldHourlyChargeAmount]
-	return ok
-}
-
-// ResetHourlyChargeAmount resets all changes to the "hourly_charge_amount" field.
-func (m *FreelancerMutation) ResetHourlyChargeAmount() {
-	m.hourly_charge_amount = nil
-	m.addhourly_charge_amount = nil
-	delete(m.clearedFields, freelancer.FieldHourlyChargeAmount)
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (m *FreelancerMutation) SetHourlyChargeCurrency(s string) {
-	m.hourly_charge_currency = &s
-}
-
-// HourlyChargeCurrency returns the value of the "hourly_charge_currency" field in the mutation.
-func (m *FreelancerMutation) HourlyChargeCurrency() (r string, exists bool) {
-	v := m.hourly_charge_currency
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourlyChargeCurrency returns the old "hourly_charge_currency" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldHourlyChargeCurrency(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourlyChargeCurrency is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourlyChargeCurrency requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourlyChargeCurrency: %w", err)
-	}
-	return oldValue.HourlyChargeCurrency, nil
-}
-
-// ResetHourlyChargeCurrency resets all changes to the "hourly_charge_currency" field.
-func (m *FreelancerMutation) ResetHourlyChargeCurrency() {
-	m.hourly_charge_currency = nil
-}
-
-// SetInvited sets the "invited" field.
-func (m *FreelancerMutation) SetInvited(b bool) {
-	m.invited = &b
-}
-
-// Invited returns the value of the "invited" field in the mutation.
-func (m *FreelancerMutation) Invited() (r bool, exists bool) {
-	v := m.invited
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldInvited returns the old "invited" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldInvited(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldInvited is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldInvited requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldInvited: %w", err)
-	}
-	return oldValue.Invited, nil
-}
-
-// ResetInvited resets all changes to the "invited" field.
-func (m *FreelancerMutation) ResetInvited() {
-	m.invited = nil
-}
-
-// SetPhotoURL sets the "photo_url" field.
-func (m *FreelancerMutation) SetPhotoURL(s string) {
-	m.photo_url = &s
-}
-
-// PhotoURL returns the value of the "photo_url" field in the mutation.
-func (m *FreelancerMutation) PhotoURL() (r string, exists bool) {
-	v := m.photo_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPhotoURL returns the old "photo_url" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldPhotoURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPhotoURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPhotoURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPhotoURL: %w", err)
-	}
-	return oldValue.PhotoURL, nil
-}
-
-// ResetPhotoURL resets all changes to the "photo_url" field.
-func (m *FreelancerMutation) ResetPhotoURL() {
-	m.photo_url = nil
-}
-
-// SetRecentHours sets the "recent_hours" field.
-func (m *FreelancerMutation) SetRecentHours(f float64) {
-	m.recent_hours = &f
-	m.addrecent_hours = nil
-}
-
-// RecentHours returns the value of the "recent_hours" field in the mutation.
-func (m *FreelancerMutation) RecentHours() (r float64, exists bool) {
-	v := m.recent_hours
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRecentHours returns the old "recent_hours" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldRecentHours(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRecentHours is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRecentHours requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRecentHours: %w", err)
-	}
-	return oldValue.RecentHours, nil
-}
-
-// AddRecentHours adds f to the "recent_hours" field.
-func (m *FreelancerMutation) AddRecentHours(f float64) {
-	if m.addrecent_hours != nil {
-		*m.addrecent_hours += f
-	} else {
-		m.addrecent_hours = &f
-	}
-}
-
-// AddedRecentHours returns the value that was added to the "recent_hours" field in this mutation.
-func (m *FreelancerMutation) AddedRecentHours() (r float64, exists bool) {
-	v := m.addrecent_hours
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetRecentHours resets all changes to the "recent_hours" field.
-func (m *FreelancerMutation) ResetRecentHours() {
-	m.recent_hours = nil
-	m.addrecent_hours = nil
-}
-
-// SetTotalHours sets the "total_hours" field.
-func (m *FreelancerMutation) SetTotalHours(f float64) {
-	m.total_hours = &f
-	m.addtotal_hours = nil
-}
-
-// TotalHours returns the value of the "total_hours" field in the mutation.
-func (m *FreelancerMutation) TotalHours() (r float64, exists bool) {
-	v := m.total_hours
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTotalHours returns the old "total_hours" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTotalHours(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalHours is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalHours requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalHours: %w", err)
-	}
-	return oldValue.TotalHours, nil
-}
-
-// AddTotalHours adds f to the "total_hours" field.
-func (m *FreelancerMutation) AddTotalHours(f float64) {
-	if m.addtotal_hours != nil {
-		*m.addtotal_hours += f
-	} else {
-		m.addtotal_hours = &f
-	}
-}
-
-// AddedTotalHours returns the value that was added to the "total_hours" field in this mutation.
-func (m *FreelancerMutation) AddedTotalHours() (r float64, exists bool) {
-	v := m.addtotal_hours
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalHours resets all changes to the "total_hours" field.
-func (m *FreelancerMutation) ResetTotalHours() {
-	m.total_hours = nil
-	m.addtotal_hours = nil
-}
-
-// SetTotalPortfolioItems sets the "total_portfolio_items" field.
-func (m *FreelancerMutation) SetTotalPortfolioItems(i int) {
-	m.total_portfolio_items = &i
-	m.addtotal_portfolio_items = nil
-}
-
-// TotalPortfolioItems returns the value of the "total_portfolio_items" field in the mutation.
-func (m *FreelancerMutation) TotalPortfolioItems() (r int, exists bool) {
-	v := m.total_portfolio_items
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTotalPortfolioItems returns the old "total_portfolio_items" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTotalPortfolioItems(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalPortfolioItems is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalPortfolioItems requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalPortfolioItems: %w", err)
-	}
-	return oldValue.TotalPortfolioItems, nil
-}
-
-// AddTotalPortfolioItems adds i to the "total_portfolio_items" field.
-func (m *FreelancerMutation) AddTotalPortfolioItems(i int) {
-	if m.addtotal_portfolio_items != nil {
-		*m.addtotal_portfolio_items += i
-	} else {
-		m.addtotal_portfolio_items = &i
-	}
-}
-
-// AddedTotalPortfolioItems returns the value that was added to the "total_portfolio_items" field in this mutation.
-func (m *FreelancerMutation) AddedTotalPortfolioItems() (r int, exists bool) {
-	v := m.addtotal_portfolio_items
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalPortfolioItems resets all changes to the "total_portfolio_items" field.
-func (m *FreelancerMutation) ResetTotalPortfolioItems() {
-	m.total_portfolio_items = nil
-	m.addtotal_portfolio_items = nil
-}
-
-// SetTotalPortfolioV2Items sets the "total_portfolio_v2_items" field.
-func (m *FreelancerMutation) SetTotalPortfolioV2Items(i int) {
-	m.total_portfolio_v2_items = &i
-	m.addtotal_portfolio_v2_items = nil
-}
-
-// TotalPortfolioV2Items returns the value of the "total_portfolio_v2_items" field in the mutation.
-func (m *FreelancerMutation) TotalPortfolioV2Items() (r int, exists bool) {
-	v := m.total_portfolio_v2_items
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTotalPortfolioV2Items returns the old "total_portfolio_v2_items" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTotalPortfolioV2Items(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalPortfolioV2Items is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalPortfolioV2Items requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalPortfolioV2Items: %w", err)
-	}
-	return oldValue.TotalPortfolioV2Items, nil
-}
-
-// AddTotalPortfolioV2Items adds i to the "total_portfolio_v2_items" field.
-func (m *FreelancerMutation) AddTotalPortfolioV2Items(i int) {
-	if m.addtotal_portfolio_v2_items != nil {
-		*m.addtotal_portfolio_v2_items += i
-	} else {
-		m.addtotal_portfolio_v2_items = &i
-	}
-}
-
-// AddedTotalPortfolioV2Items returns the value that was added to the "total_portfolio_v2_items" field in this mutation.
-func (m *FreelancerMutation) AddedTotalPortfolioV2Items() (r int, exists bool) {
-	v := m.addtotal_portfolio_v2_items
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalPortfolioV2Items resets all changes to the "total_portfolio_v2_items" field.
-func (m *FreelancerMutation) ResetTotalPortfolioV2Items() {
-	m.total_portfolio_v2_items = nil
-	m.addtotal_portfolio_v2_items = nil
-}
-
-// SetUpworkTotalFeedback sets the "upwork_total_feedback" field.
-func (m *FreelancerMutation) SetUpworkTotalFeedback(f float64) {
-	m.upwork_total_feedback = &f
-	m.addupwork_total_feedback = nil
-}
-
-// UpworkTotalFeedback returns the value of the "upwork_total_feedback" field in the mutation.
-func (m *FreelancerMutation) UpworkTotalFeedback() (r float64, exists bool) {
-	v := m.upwork_total_feedback
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkTotalFeedback returns the old "upwork_total_feedback" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkTotalFeedback(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkTotalFeedback is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkTotalFeedback requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkTotalFeedback: %w", err)
-	}
-	return oldValue.UpworkTotalFeedback, nil
-}
-
-// AddUpworkTotalFeedback adds f to the "upwork_total_feedback" field.
-func (m *FreelancerMutation) AddUpworkTotalFeedback(f float64) {
-	if m.addupwork_total_feedback != nil {
-		*m.addupwork_total_feedback += f
-	} else {
-		m.addupwork_total_feedback = &f
-	}
-}
-
-// AddedUpworkTotalFeedback returns the value that was added to the "upwork_total_feedback" field in this mutation.
-func (m *FreelancerMutation) AddedUpworkTotalFeedback() (r float64, exists bool) {
-	v := m.addupwork_total_feedback
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUpworkTotalFeedback resets all changes to the "upwork_total_feedback" field.
-func (m *FreelancerMutation) ResetUpworkTotalFeedback() {
-	m.upwork_total_feedback = nil
-	m.addupwork_total_feedback = nil
-}
-
-// SetUpworkRecentFeedback sets the "upwork_recent_feedback" field.
-func (m *FreelancerMutation) SetUpworkRecentFeedback(f float64) {
-	m.upwork_recent_feedback = &f
-	m.addupwork_recent_feedback = nil
-}
-
-// UpworkRecentFeedback returns the value of the "upwork_recent_feedback" field in the mutation.
-func (m *FreelancerMutation) UpworkRecentFeedback() (r float64, exists bool) {
-	v := m.upwork_recent_feedback
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkRecentFeedback returns the old "upwork_recent_feedback" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkRecentFeedback(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkRecentFeedback is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkRecentFeedback requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkRecentFeedback: %w", err)
-	}
-	return oldValue.UpworkRecentFeedback, nil
-}
-
-// AddUpworkRecentFeedback adds f to the "upwork_recent_feedback" field.
-func (m *FreelancerMutation) AddUpworkRecentFeedback(f float64) {
-	if m.addupwork_recent_feedback != nil {
-		*m.addupwork_recent_feedback += f
-	} else {
-		m.addupwork_recent_feedback = &f
-	}
-}
-
-// AddedUpworkRecentFeedback returns the value that was added to the "upwork_recent_feedback" field in this mutation.
-func (m *FreelancerMutation) AddedUpworkRecentFeedback() (r float64, exists bool) {
-	v := m.addupwork_recent_feedback
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUpworkRecentFeedback resets all changes to the "upwork_recent_feedback" field.
-func (m *FreelancerMutation) ResetUpworkRecentFeedback() {
-	m.upwork_recent_feedback = nil
-	m.addupwork_recent_feedback = nil
-}
-
-// SetUpworkTopRatedStatus sets the "upwork_top_rated_status" field.
-func (m *FreelancerMutation) SetUpworkTopRatedStatus(b bool) {
-	m.upwork_top_rated_status = &b
-}
-
-// UpworkTopRatedStatus returns the value of the "upwork_top_rated_status" field in the mutation.
-func (m *FreelancerMutation) UpworkTopRatedStatus() (r bool, exists bool) {
-	v := m.upwork_top_rated_status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkTopRatedStatus returns the old "upwork_top_rated_status" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkTopRatedStatus(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkTopRatedStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkTopRatedStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkTopRatedStatus: %w", err)
-	}
-	return oldValue.UpworkTopRatedStatus, nil
-}
-
-// ResetUpworkTopRatedStatus resets all changes to the "upwork_top_rated_status" field.
-func (m *FreelancerMutation) ResetUpworkTopRatedStatus() {
-	m.upwork_top_rated_status = nil
-}
-
-// SetUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field.
-func (m *FreelancerMutation) SetUpworkTopRatedPlusStatus(b bool) {
-	m.upwork_top_rated_plus_status = &b
-}
-
-// UpworkTopRatedPlusStatus returns the value of the "upwork_top_rated_plus_status" field in the mutation.
-func (m *FreelancerMutation) UpworkTopRatedPlusStatus() (r bool, exists bool) {
-	v := m.upwork_top_rated_plus_status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkTopRatedPlusStatus returns the old "upwork_top_rated_plus_status" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkTopRatedPlusStatus(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkTopRatedPlusStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkTopRatedPlusStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkTopRatedPlusStatus: %w", err)
-	}
-	return oldValue.UpworkTopRatedPlusStatus, nil
-}
-
-// ResetUpworkTopRatedPlusStatus resets all changes to the "upwork_top_rated_plus_status" field.
-func (m *FreelancerMutation) ResetUpworkTopRatedPlusStatus() {
-	m.upwork_top_rated_plus_status = nil
-}
-
-// SetUpworkSponsored sets the "upwork_sponsored" field.
-func (m *FreelancerMutation) SetUpworkSponsored(b bool) {
-	m.upwork_sponsored = &b
-}
-
-// UpworkSponsored returns the value of the "upwork_sponsored" field in the mutation.
-func (m *FreelancerMutation) UpworkSponsored() (r bool, exists bool) {
-	v := m.upwork_sponsored
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkSponsored returns the old "upwork_sponsored" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkSponsored(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkSponsored is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkSponsored requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkSponsored: %w", err)
-	}
-	return oldValue.UpworkSponsored, nil
-}
-
-// ResetUpworkSponsored resets all changes to the "upwork_sponsored" field.
-func (m *FreelancerMutation) ResetUpworkSponsored() {
-	m.upwork_sponsored = nil
-}
-
-// SetUpworkJobSuccessScore sets the "upwork_job_success_score" field.
-func (m *FreelancerMutation) SetUpworkJobSuccessScore(f float64) {
-	m.upwork_job_success_score = &f
-	m.addupwork_job_success_score = nil
-}
-
-// UpworkJobSuccessScore returns the value of the "upwork_job_success_score" field in the mutation.
-func (m *FreelancerMutation) UpworkJobSuccessScore() (r float64, exists bool) {
-	v := m.upwork_job_success_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkJobSuccessScore returns the old "upwork_job_success_score" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkJobSuccessScore(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkJobSuccessScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkJobSuccessScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkJobSuccessScore: %w", err)
-	}
-	return oldValue.UpworkJobSuccessScore, nil
-}
-
-// AddUpworkJobSuccessScore adds f to the "upwork_job_success_score" field.
-func (m *FreelancerMutation) AddUpworkJobSuccessScore(f float64) {
-	if m.addupwork_job_success_score != nil {
-		*m.addupwork_job_success_score += f
-	} else {
-		m.addupwork_job_success_score = &f
-	}
-}
-
-// AddedUpworkJobSuccessScore returns the value that was added to the "upwork_job_success_score" field in this mutation.
-func (m *FreelancerMutation) AddedUpworkJobSuccessScore() (r float64, exists bool) {
-	v := m.addupwork_job_success_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUpworkJobSuccessScore resets all changes to the "upwork_job_success_score" field.
-func (m *FreelancerMutation) ResetUpworkJobSuccessScore() {
-	m.upwork_job_success_score = nil
-	m.addupwork_job_success_score = nil
-}
-
-// SetUpworkReccomended sets the "upwork_reccomended" field.
-func (m *FreelancerMutation) SetUpworkReccomended(b bool) {
-	m.upwork_reccomended = &b
-}
-
-// UpworkReccomended returns the value of the "upwork_reccomended" field in the mutation.
-func (m *FreelancerMutation) UpworkReccomended() (r bool, exists bool) {
-	v := m.upwork_reccomended
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpworkReccomended returns the old "upwork_reccomended" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUpworkReccomended(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpworkReccomended is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpworkReccomended requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpworkReccomended: %w", err)
-	}
-	return oldValue.UpworkReccomended, nil
-}
-
-// ResetUpworkReccomended resets all changes to the "upwork_reccomended" field.
-func (m *FreelancerMutation) ResetUpworkReccomended() {
-	m.upwork_reccomended = nil
-}
-
-// SetSkills sets the "skills" field.
-func (m *FreelancerMutation) SetSkills(s []string) {
-	m.skills = &s
-	m.appendskills = nil
-}
-
-// Skills returns the value of the "skills" field in the mutation.
-func (m *FreelancerMutation) Skills() (r []string, exists bool) {
-	v := m.skills
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSkills returns the old "skills" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldSkills(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSkills requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
-	}
-	return oldValue.Skills, nil
-}
-
-// AppendSkills adds s to the "skills" field.
-func (m *FreelancerMutation) AppendSkills(s []string) {
-	m.appendskills = append(m.appendskills, s...)
-}
-
-// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
-func (m *FreelancerMutation) AppendedSkills() ([]string, bool) {
-	if len(m.appendskills) == 0 {
-		return nil, false
-	}
-	return m.appendskills, true
-}
-
-// ResetSkills resets all changes to the "skills" field.
-func (m *FreelancerMutation) ResetSkills() {
-	m.skills = nil
-	m.appendskills = nil
-}
-
-// SetAverageRecentEarnings sets the "average_recent_earnings" field.
-func (m *FreelancerMutation) SetAverageRecentEarnings(f float64) {
-	m.average_recent_earnings = &f
-	m.addaverage_recent_earnings = nil
-}
-
-// AverageRecentEarnings returns the value of the "average_recent_earnings" field in the mutation.
-func (m *FreelancerMutation) AverageRecentEarnings() (r float64, exists bool) {
-	v := m.average_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAverageRecentEarnings returns the old "average_recent_earnings" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldAverageRecentEarnings(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAverageRecentEarnings is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAverageRecentEarnings requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAverageRecentEarnings: %w", err)
-	}
-	return oldValue.AverageRecentEarnings, nil
-}
-
-// AddAverageRecentEarnings adds f to the "average_recent_earnings" field.
-func (m *FreelancerMutation) AddAverageRecentEarnings(f float64) {
-	if m.addaverage_recent_earnings != nil {
-		*m.addaverage_recent_earnings += f
-	} else {
-		m.addaverage_recent_earnings = &f
-	}
-}
-
-// AddedAverageRecentEarnings returns the value that was added to the "average_recent_earnings" field in this mutation.
-func (m *FreelancerMutation) AddedAverageRecentEarnings() (r float64, exists bool) {
-	v := m.addaverage_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetAverageRecentEarnings resets all changes to the "average_recent_earnings" field.
-func (m *FreelancerMutation) ResetAverageRecentEarnings() {
-	m.average_recent_earnings = nil
-	m.addaverage_recent_earnings = nil
-}
-
-// SetCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field.
-func (m *FreelancerMutation) SetCombinedAverageRecentEarnings(f float64) {
-	m.combined_average_recent_earnings = &f
-	m.addcombined_average_recent_earnings = nil
-}
-
-// CombinedAverageRecentEarnings returns the value of the "combined_average_recent_earnings" field in the mutation.
-func (m *FreelancerMutation) CombinedAverageRecentEarnings() (r float64, exists bool) {
-	v := m.combined_average_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCombinedAverageRecentEarnings returns the old "combined_average_recent_earnings" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCombinedAverageRecentEarnings(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCombinedAverageRecentEarnings is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCombinedAverageRecentEarnings requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCombinedAverageRecentEarnings: %w", err)
-	}
-	return oldValue.CombinedAverageRecentEarnings, nil
-}
-
-// AddCombinedAverageRecentEarnings adds f to the "combined_average_recent_earnings" field.
-func (m *FreelancerMutation) AddCombinedAverageRecentEarnings(f float64) {
-	if m.addcombined_average_recent_earnings != nil {
-		*m.addcombined_average_recent_earnings += f
-	} else {
-		m.addcombined_average_recent_earnings = &f
-	}
-}
-
-// AddedCombinedAverageRecentEarnings returns the value that was added to the "combined_average_recent_earnings" field in this mutation.
-func (m *FreelancerMutation) AddedCombinedAverageRecentEarnings() (r float64, exists bool) {
-	v := m.addcombined_average_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCombinedAverageRecentEarnings resets all changes to the "combined_average_recent_earnings" field.
-func (m *FreelancerMutation) ResetCombinedAverageRecentEarnings() {
-	m.combined_average_recent_earnings = nil
-	m.addcombined_average_recent_earnings = nil
-}
-
-// SetCombinedRecentEarnings sets the "combined_recent_earnings" field.
-func (m *FreelancerMutation) SetCombinedRecentEarnings(f float64) {
-	m.combined_recent_earnings = &f
-	m.addcombined_recent_earnings = nil
-}
-
-// CombinedRecentEarnings returns the value of the "combined_recent_earnings" field in the mutation.
-func (m *FreelancerMutation) CombinedRecentEarnings() (r float64, exists bool) {
-	v := m.combined_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCombinedRecentEarnings returns the old "combined_recent_earnings" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCombinedRecentEarnings(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCombinedRecentEarnings is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCombinedRecentEarnings requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCombinedRecentEarnings: %w", err)
-	}
-	return oldValue.CombinedRecentEarnings, nil
-}
-
-// AddCombinedRecentEarnings adds f to the "combined_recent_earnings" field.
-func (m *FreelancerMutation) AddCombinedRecentEarnings(f float64) {
-	if m.addcombined_recent_earnings != nil {
-		*m.addcombined_recent_earnings += f
-	} else {
-		m.addcombined_recent_earnings = &f
-	}
-}
-
-// AddedCombinedRecentEarnings returns the value that was added to the "combined_recent_earnings" field in this mutation.
-func (m *FreelancerMutation) AddedCombinedRecentEarnings() (r float64, exists bool) {
-	v := m.addcombined_recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCombinedRecentEarnings resets all changes to the "combined_recent_earnings" field.
-func (m *FreelancerMutation) ResetCombinedRecentEarnings() {
-	m.combined_recent_earnings = nil
-	m.addcombined_recent_earnings = nil
-}
-
-// SetCombinedTotalEarnings sets the "combined_total_earnings" field.
-func (m *FreelancerMutation) SetCombinedTotalEarnings(f float64) {
-	m.combined_total_earnings = &f
-	m.addcombined_total_earnings = nil
-}
-
-// CombinedTotalEarnings returns the value of the "combined_total_earnings" field in the mutation.
-func (m *FreelancerMutation) CombinedTotalEarnings() (r float64, exists bool) {
-	v := m.combined_total_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCombinedTotalEarnings returns the old "combined_total_earnings" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCombinedTotalEarnings(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCombinedTotalEarnings is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCombinedTotalEarnings requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCombinedTotalEarnings: %w", err)
-	}
-	return oldValue.CombinedTotalEarnings, nil
-}
-
-// AddCombinedTotalEarnings adds f to the "combined_total_earnings" field.
-func (m *FreelancerMutation) AddCombinedTotalEarnings(f float64) {
-	if m.addcombined_total_earnings != nil {
-		*m.addcombined_total_earnings += f
-	} else {
-		m.addcombined_total_earnings = &f
-	}
-}
-
-// AddedCombinedTotalEarnings returns the value that was added to the "combined_total_earnings" field in this mutation.
-func (m *FreelancerMutation) AddedCombinedTotalEarnings() (r float64, exists bool) {
-	v := m.addcombined_total_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCombinedTotalEarnings resets all changes to the "combined_total_earnings" field.
-func (m *FreelancerMutation) ResetCombinedTotalEarnings() {
-	m.combined_total_earnings = nil
-	m.addcombined_total_earnings = nil
-}
-
-// SetCombinedTotalRevenue sets the "combined_total_revenue" field.
-func (m *FreelancerMutation) SetCombinedTotalRevenue(f float64) {
-	m.combined_total_revenue = &f
-	m.addcombined_total_revenue = nil
-}
-
-// CombinedTotalRevenue returns the value of the "combined_total_revenue" field in the mutation.
-func (m *FreelancerMutation) CombinedTotalRevenue() (r float64, exists bool) {
-	v := m.combined_total_revenue
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCombinedTotalRevenue returns the old "combined_total_revenue" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldCombinedTotalRevenue(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCombinedTotalRevenue is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCombinedTotalRevenue requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCombinedTotalRevenue: %w", err)
-	}
-	return oldValue.CombinedTotalRevenue, nil
-}
-
-// AddCombinedTotalRevenue adds f to the "combined_total_revenue" field.
-func (m *FreelancerMutation) AddCombinedTotalRevenue(f float64) {
-	if m.addcombined_total_revenue != nil {
-		*m.addcombined_total_revenue += f
-	} else {
-		m.addcombined_total_revenue = &f
-	}
-}
-
-// AddedCombinedTotalRevenue returns the value that was added to the "combined_total_revenue" field in this mutation.
-func (m *FreelancerMutation) AddedCombinedTotalRevenue() (r float64, exists bool) {
-	v := m.addcombined_total_revenue
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCombinedTotalRevenue resets all changes to the "combined_total_revenue" field.
-func (m *FreelancerMutation) ResetCombinedTotalRevenue() {
-	m.combined_total_revenue = nil
-	m.addcombined_total_revenue = nil
-}
-
-// SetRecentEarnings sets the "recent_earnings" field.
-func (m *FreelancerMutation) SetRecentEarnings(f float64) {
-	m.recent_earnings = &f
-	m.addrecent_earnings = nil
-}
-
-// RecentEarnings returns the value of the "recent_earnings" field in the mutation.
-func (m *FreelancerMutation) RecentEarnings() (r float64, exists bool) {
-	v := m.recent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRecentEarnings returns the old "recent_earnings" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldRecentEarnings(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRecentEarnings is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRecentEarnings requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRecentEarnings: %w", err)
-	}
-	return oldValue.RecentEarnings, nil
-}
-
-// AddRecentEarnings adds f to the "recent_earnings" field.
-func (m *FreelancerMutation) AddRecentEarnings(f float64) {
-	if m.addrecent_earnings != nil {
-		*m.addrecent_earnings += f
-	} else {
-		m.addrecent_earnings = &f
-	}
-}
-
-// AddedRecentEarnings returns the value that was added to the "recent_earnings" field in this mutation.
-func (m *FreelancerMutation) AddedRecentEarnings() (r float64, exists bool) {
-	v := m.addrecent_earnings
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetRecentEarnings resets all changes to the "recent_earnings" field.
-func (m *FreelancerMutation) ResetRecentEarnings() {
-	m.recent_earnings = nil
-	m.addrecent_earnings = nil
-}
-
-// SetTotalRevenue sets the "total_revenue" field.
-func (m *FreelancerMutation) SetTotalRevenue(f float64) {
-	m.total_revenue = &f
-	m.addtotal_revenue = nil
-}
-
-// TotalRevenue returns the value of the "total_revenue" field in the mutation.
-func (m *FreelancerMutation) TotalRevenue() (r float64, exists bool) {
-	v := m.total_revenue
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTotalRevenue returns the old "total_revenue" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldTotalRevenue(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalRevenue is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalRevenue requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalRevenue: %w", err)
-	}
-	return oldValue.TotalRevenue, nil
-}
-
-// AddTotalRevenue adds f to the "total_revenue" field.
-func (m *FreelancerMutation) AddTotalRevenue(f float64) {
-	if m.addtotal_revenue != nil {
-		*m.addtotal_revenue += f
-	} else {
-		m.addtotal_revenue = &f
-	}
-}
-
-// AddedTotalRevenue returns the value that was added to the "total_revenue" field in this mutation.
-func (m *FreelancerMutation) AddedTotalRevenue() (r float64, exists bool) {
-	v := m.addtotal_revenue
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalRevenue resets all changes to the "total_revenue" field.
-func (m *FreelancerMutation) ResetTotalRevenue() {
-	m.total_revenue = nil
-	m.addtotal_revenue = nil
-}
-
-// SetUprankScore sets the "uprank_score" field.
-func (m *FreelancerMutation) SetUprankScore(i int) {
-	m.uprank_score = &i
-	m.adduprank_score = nil
-}
-
-// UprankScore returns the value of the "uprank_score" field in the mutation.
-func (m *FreelancerMutation) UprankScore() (r int, exists bool) {
-	v := m.uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankScore returns the old "uprank_score" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUprankScore(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankScore: %w", err)
-	}
-	return oldValue.UprankScore, nil
-}
-
-// AddUprankScore adds i to the "uprank_score" field.
-func (m *FreelancerMutation) AddUprankScore(i int) {
-	if m.adduprank_score != nil {
-		*m.adduprank_score += i
-	} else {
-		m.adduprank_score = &i
-	}
-}
-
-// AddedUprankScore returns the value that was added to the "uprank_score" field in this mutation.
-func (m *FreelancerMutation) AddedUprankScore() (r int, exists bool) {
-	v := m.adduprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearUprankScore clears the value of the "uprank_score" field.
-func (m *FreelancerMutation) ClearUprankScore() {
-	m.uprank_score = nil
-	m.adduprank_score = nil
-	m.clearedFields[freelancer.FieldUprankScore] = struct{}{}
-}
-
-// UprankScoreCleared returns if the "uprank_score" field was cleared in this mutation.
-func (m *FreelancerMutation) UprankScoreCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldUprankScore]
-	return ok
-}
-
-// ResetUprankScore resets all changes to the "uprank_score" field.
-func (m *FreelancerMutation) ResetUprankScore() {
-	m.uprank_score = nil
-	m.adduprank_score = nil
-	delete(m.clearedFields, freelancer.FieldUprankScore)
-}
-
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (m *FreelancerMutation) SetUprankUpdatedAt(t time.Time) {
-	m.uprank_updated_at = &t
-}
-
-// UprankUpdatedAt returns the value of the "uprank_updated_at" field in the mutation.
-func (m *FreelancerMutation) UprankUpdatedAt() (r time.Time, exists bool) {
-	v := m.uprank_updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankUpdatedAt returns the old "uprank_updated_at" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUprankUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankUpdatedAt: %w", err)
-	}
-	return oldValue.UprankUpdatedAt, nil
-}
-
-// ResetUprankUpdatedAt resets all changes to the "uprank_updated_at" field.
-func (m *FreelancerMutation) ResetUprankUpdatedAt() {
-	m.uprank_updated_at = nil
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (m *FreelancerMutation) SetUprankReccomended(b bool) {
-	m.uprank_reccomended = &b
-}
-
-// UprankReccomended returns the value of the "uprank_reccomended" field in the mutation.
-func (m *FreelancerMutation) UprankReccomended() (r bool, exists bool) {
-	v := m.uprank_reccomended
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankReccomended returns the old "uprank_reccomended" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUprankReccomended(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankReccomended is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankReccomended requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankReccomended: %w", err)
-	}
-	return oldValue.UprankReccomended, nil
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (m *FreelancerMutation) ClearUprankReccomended() {
-	m.uprank_reccomended = nil
-	m.clearedFields[freelancer.FieldUprankReccomended] = struct{}{}
-}
-
-// UprankReccomendedCleared returns if the "uprank_reccomended" field was cleared in this mutation.
-func (m *FreelancerMutation) UprankReccomendedCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldUprankReccomended]
-	return ok
-}
-
-// ResetUprankReccomended resets all changes to the "uprank_reccomended" field.
-func (m *FreelancerMutation) ResetUprankReccomended() {
-	m.uprank_reccomended = nil
-	delete(m.clearedFields, freelancer.FieldUprankReccomended)
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (m *FreelancerMutation) SetUprankReccomendedReasons(s string) {
-	m.uprank_reccomended_reasons = &s
-}
-
-// UprankReccomendedReasons returns the value of the "uprank_reccomended_reasons" field in the mutation.
-func (m *FreelancerMutation) UprankReccomendedReasons() (r string, exists bool) {
-	v := m.uprank_reccomended_reasons
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankReccomendedReasons returns the old "uprank_reccomended_reasons" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUprankReccomendedReasons(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankReccomendedReasons is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankReccomendedReasons requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankReccomendedReasons: %w", err)
-	}
-	return oldValue.UprankReccomendedReasons, nil
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (m *FreelancerMutation) ClearUprankReccomendedReasons() {
-	m.uprank_reccomended_reasons = nil
-	m.clearedFields[freelancer.FieldUprankReccomendedReasons] = struct{}{}
-}
-
-// UprankReccomendedReasonsCleared returns if the "uprank_reccomended_reasons" field was cleared in this mutation.
-func (m *FreelancerMutation) UprankReccomendedReasonsCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldUprankReccomendedReasons]
-	return ok
-}
-
-// ResetUprankReccomendedReasons resets all changes to the "uprank_reccomended_reasons" field.
-func (m *FreelancerMutation) ResetUprankReccomendedReasons() {
-	m.uprank_reccomended_reasons = nil
-	delete(m.clearedFields, freelancer.FieldUprankReccomendedReasons)
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (m *FreelancerMutation) SetUprankNotEnoughData(b bool) {
-	m.uprank_not_enough_data = &b
-}
-
-// UprankNotEnoughData returns the value of the "uprank_not_enough_data" field in the mutation.
-func (m *FreelancerMutation) UprankNotEnoughData() (r bool, exists bool) {
-	v := m.uprank_not_enough_data
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankNotEnoughData returns the old "uprank_not_enough_data" field's value of the Freelancer entity.
-// If the Freelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FreelancerMutation) OldUprankNotEnoughData(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankNotEnoughData is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankNotEnoughData requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankNotEnoughData: %w", err)
-	}
-	return oldValue.UprankNotEnoughData, nil
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (m *FreelancerMutation) ClearUprankNotEnoughData() {
-	m.uprank_not_enough_data = nil
-	m.clearedFields[freelancer.FieldUprankNotEnoughData] = struct{}{}
-}
-
-// UprankNotEnoughDataCleared returns if the "uprank_not_enough_data" field was cleared in this mutation.
-func (m *FreelancerMutation) UprankNotEnoughDataCleared() bool {
-	_, ok := m.clearedFields[freelancer.FieldUprankNotEnoughData]
-	return ok
-}
-
-// ResetUprankNotEnoughData resets all changes to the "uprank_not_enough_data" field.
-func (m *FreelancerMutation) ResetUprankNotEnoughData() {
-	m.uprank_not_enough_data = nil
-	delete(m.clearedFields, freelancer.FieldUprankNotEnoughData)
-}
-
-// SetJobID sets the "job" edge to the Job entity by id.
-func (m *FreelancerMutation) SetJobID(id string) {
-	m.job = &id
-}
-
-// ClearJob clears the "job" edge to the Job entity.
-func (m *FreelancerMutation) ClearJob() {
-	m.clearedjob = true
-}
-
-// JobCleared reports if the "job" edge to the Job entity was cleared.
-func (m *FreelancerMutation) JobCleared() bool {
-	return m.clearedjob
-}
-
-// JobID returns the "job" edge ID in the mutation.
-func (m *FreelancerMutation) JobID() (id string, exists bool) {
-	if m.job != nil {
-		return *m.job, true
-	}
-	return
-}
-
-// JobIDs returns the "job" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// JobID instead. It exists only for internal usage by the builders.
-func (m *FreelancerMutation) JobIDs() (ids []string) {
-	if id := m.job; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetJob resets all changes to the "job" edge.
-func (m *FreelancerMutation) ResetJob() {
-	m.job = nil
-	m.clearedjob = false
-}
-
-// AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by ids.
-func (m *FreelancerMutation) AddAttachmentIDs(ids ...int) {
-	if m.attachments == nil {
-		m.attachments = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.attachments[ids[i]] = struct{}{}
-	}
-}
-
-// ClearAttachments clears the "attachments" edge to the AttachmentRef entity.
-func (m *FreelancerMutation) ClearAttachments() {
-	m.clearedattachments = true
-}
-
-// AttachmentsCleared reports if the "attachments" edge to the AttachmentRef entity was cleared.
-func (m *FreelancerMutation) AttachmentsCleared() bool {
-	return m.clearedattachments
-}
-
-// RemoveAttachmentIDs removes the "attachments" edge to the AttachmentRef entity by IDs.
-func (m *FreelancerMutation) RemoveAttachmentIDs(ids ...int) {
-	if m.removedattachments == nil {
-		m.removedattachments = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.attachments, ids[i])
-		m.removedattachments[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedAttachments returns the removed IDs of the "attachments" edge to the AttachmentRef entity.
-func (m *FreelancerMutation) RemovedAttachmentsIDs() (ids []int) {
-	for id := range m.removedattachments {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// AttachmentsIDs returns the "attachments" edge IDs in the mutation.
-func (m *FreelancerMutation) AttachmentsIDs() (ids []int) {
-	for id := range m.attachments {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetAttachments resets all changes to the "attachments" edge.
-func (m *FreelancerMutation) ResetAttachments() {
-	m.attachments = nil
-	m.clearedattachments = false
-	m.removedattachments = nil
-}
-
-// AddWorkHistoryIDs adds the "work_histories" edge to the WorkHistory entity by ids.
-func (m *FreelancerMutation) AddWorkHistoryIDs(ids ...int) {
-	if m.work_histories == nil {
-		m.work_histories = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.work_histories[ids[i]] = struct{}{}
-	}
-}
-
-// ClearWorkHistories clears the "work_histories" edge to the WorkHistory entity.
-func (m *FreelancerMutation) ClearWorkHistories() {
-	m.clearedwork_histories = true
-}
-
-// WorkHistoriesCleared reports if the "work_histories" edge to the WorkHistory entity was cleared.
-func (m *FreelancerMutation) WorkHistoriesCleared() bool {
-	return m.clearedwork_histories
-}
-
-// RemoveWorkHistoryIDs removes the "work_histories" edge to the WorkHistory entity by IDs.
-func (m *FreelancerMutation) RemoveWorkHistoryIDs(ids ...int) {
-	if m.removedwork_histories == nil {
-		m.removedwork_histories = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.work_histories, ids[i])
-		m.removedwork_histories[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedWorkHistories returns the removed IDs of the "work_histories" edge to the WorkHistory entity.
-func (m *FreelancerMutation) RemovedWorkHistoriesIDs() (ids []int) {
-	for id := range m.removedwork_histories {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// WorkHistoriesIDs returns the "work_histories" edge IDs in the mutation.
-func (m *FreelancerMutation) WorkHistoriesIDs() (ids []int) {
-	for id := range m.work_histories {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetWorkHistories resets all changes to the "work_histories" edge.
-func (m *FreelancerMutation) ResetWorkHistories() {
-	m.work_histories = nil
-	m.clearedwork_histories = false
-	m.removedwork_histories = nil
-}
-
-// Where appends a list predicates to the FreelancerMutation builder.
-func (m *FreelancerMutation) Where(ps ...predicate.Freelancer) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the FreelancerMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *FreelancerMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Freelancer, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *FreelancerMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *FreelancerMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Freelancer).
-func (m *FreelancerMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *FreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 38)
-	if m.name != nil {
-		fields = append(fields, freelancer.FieldName)
-	}
-	if m.title != nil {
-		fields = append(fields, freelancer.FieldTitle)
-	}
-	if m.description != nil {
-		fields = append(fields, freelancer.FieldDescription)
-	}
-	if m.city != nil {
-		fields = append(fields, freelancer.FieldCity)
-	}
-	if m.country != nil {
-		fields = append(fields, freelancer.FieldCountry)
-	}
-	if m.timezone != nil {
-		fields = append(fields, freelancer.FieldTimezone)
-	}
-	if m.cv != nil {
-		fields = append(fields, freelancer.FieldCv)
-	}
-	if m.ai_reccomended != nil {
-		fields = append(fields, freelancer.FieldAiReccomended)
-	}
-	if m.fixed_charge_amount != nil {
-		fields = append(fields, freelancer.FieldFixedChargeAmount)
-	}
-	if m.fixed_charge_currency != nil {
-		fields = append(fields, freelancer.FieldFixedChargeCurrency)
-	}
-	if m.hourly_charge_amount != nil {
-		fields = append(fields, freelancer.FieldHourlyChargeAmount)
-	}
-	if m.hourly_charge_currency != nil {
-		fields = append(fields, freelancer.FieldHourlyChargeCurrency)
-	}
-	if m.invited != nil {
-		fields = append(fields, freelancer.FieldInvited)
-	}
-	if m.photo_url != nil {
-		fields = append(fields, freelancer.FieldPhotoURL)
-	}
-	if m.recent_hours != nil {
-		fields = append(fields, freelancer.FieldRecentHours)
-	}
-	if m.total_hours != nil {
-		fields = append(fields, freelancer.FieldTotalHours)
-	}
-	if m.total_portfolio_items != nil {
-		fields = append(fields, freelancer.FieldTotalPortfolioItems)
-	}
-	if m.total_portfolio_v2_items != nil {
-		fields = append(fields, freelancer.FieldTotalPortfolioV2Items)
-	}
-	if m.upwork_total_feedback != nil {
-		fields = append(fields, freelancer.FieldUpworkTotalFeedback)
-	}
-	if m.upwork_recent_feedback != nil {
-		fields = append(fields, freelancer.FieldUpworkRecentFeedback)
-	}
-	if m.upwork_top_rated_status != nil {
-		fields = append(fields, freelancer.FieldUpworkTopRatedStatus)
-	}
-	if m.upwork_top_rated_plus_status != nil {
-		fields = append(fields, freelancer.FieldUpworkTopRatedPlusStatus)
-	}
-	if m.upwork_sponsored != nil {
-		fields = append(fields, freelancer.FieldUpworkSponsored)
-	}
-	if m.upwork_job_success_score != nil {
-		fields = append(fields, freelancer.FieldUpworkJobSuccessScore)
-	}
-	if m.upwork_reccomended != nil {
-		fields = append(fields, freelancer.FieldUpworkReccomended)
-	}
-	if m.skills != nil {
-		fields = append(fields, freelancer.FieldSkills)
-	}
-	if m.average_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldAverageRecentEarnings)
-	}
-	if m.combined_average_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedAverageRecentEarnings)
-	}
-	if m.combined_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedRecentEarnings)
-	}
-	if m.combined_total_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedTotalEarnings)
-	}
-	if m.combined_total_revenue != nil {
-		fields = append(fields, freelancer.FieldCombinedTotalRevenue)
-	}
-	if m.recent_earnings != nil {
-		fields = append(fields, freelancer.FieldRecentEarnings)
-	}
-	if m.total_revenue != nil {
-		fields = append(fields, freelancer.FieldTotalRevenue)
-	}
-	if m.uprank_score != nil {
-		fields = append(fields, freelancer.FieldUprankScore)
-	}
-	if m.uprank_updated_at != nil {
-		fields = append(fields, freelancer.FieldUprankUpdatedAt)
-	}
-	if m.uprank_reccomended != nil {
-		fields = append(fields, freelancer.FieldUprankReccomended)
-	}
-	if m.uprank_reccomended_reasons != nil {
-		fields = append(fields, freelancer.FieldUprankReccomendedReasons)
-	}
-	if m.uprank_not_enough_data != nil {
-		fields = append(fields, freelancer.FieldUprankNotEnoughData)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *FreelancerMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case freelancer.FieldName:
-		return m.Name()
-	case freelancer.FieldTitle:
-		return m.Title()
-	case freelancer.FieldDescription:
-		return m.Description()
-	case freelancer.FieldCity:
-		return m.City()
-	case freelancer.FieldCountry:
-		return m.Country()
-	case freelancer.FieldTimezone:
-		return m.Timezone()
-	case freelancer.FieldCv:
-		return m.Cv()
-	case freelancer.FieldAiReccomended:
-		return m.AiReccomended()
-	case freelancer.FieldFixedChargeAmount:
-		return m.FixedChargeAmount()
-	case freelancer.FieldFixedChargeCurrency:
-		return m.FixedChargeCurrency()
-	case freelancer.FieldHourlyChargeAmount:
-		return m.HourlyChargeAmount()
-	case freelancer.FieldHourlyChargeCurrency:
-		return m.HourlyChargeCurrency()
-	case freelancer.FieldInvited:
-		return m.Invited()
-	case freelancer.FieldPhotoURL:
-		return m.PhotoURL()
-	case freelancer.FieldRecentHours:
-		return m.RecentHours()
-	case freelancer.FieldTotalHours:
-		return m.TotalHours()
-	case freelancer.FieldTotalPortfolioItems:
-		return m.TotalPortfolioItems()
-	case freelancer.FieldTotalPortfolioV2Items:
-		return m.TotalPortfolioV2Items()
-	case freelancer.FieldUpworkTotalFeedback:
-		return m.UpworkTotalFeedback()
-	case freelancer.FieldUpworkRecentFeedback:
-		return m.UpworkRecentFeedback()
-	case freelancer.FieldUpworkTopRatedStatus:
-		return m.UpworkTopRatedStatus()
-	case freelancer.FieldUpworkTopRatedPlusStatus:
-		return m.UpworkTopRatedPlusStatus()
-	case freelancer.FieldUpworkSponsored:
-		return m.UpworkSponsored()
-	case freelancer.FieldUpworkJobSuccessScore:
-		return m.UpworkJobSuccessScore()
-	case freelancer.FieldUpworkReccomended:
-		return m.UpworkReccomended()
-	case freelancer.FieldSkills:
-		return m.Skills()
-	case freelancer.FieldAverageRecentEarnings:
-		return m.AverageRecentEarnings()
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		return m.CombinedAverageRecentEarnings()
-	case freelancer.FieldCombinedRecentEarnings:
-		return m.CombinedRecentEarnings()
-	case freelancer.FieldCombinedTotalEarnings:
-		return m.CombinedTotalEarnings()
-	case freelancer.FieldCombinedTotalRevenue:
-		return m.CombinedTotalRevenue()
-	case freelancer.FieldRecentEarnings:
-		return m.RecentEarnings()
-	case freelancer.FieldTotalRevenue:
-		return m.TotalRevenue()
-	case freelancer.FieldUprankScore:
-		return m.UprankScore()
-	case freelancer.FieldUprankUpdatedAt:
-		return m.UprankUpdatedAt()
-	case freelancer.FieldUprankReccomended:
-		return m.UprankReccomended()
-	case freelancer.FieldUprankReccomendedReasons:
-		return m.UprankReccomendedReasons()
-	case freelancer.FieldUprankNotEnoughData:
-		return m.UprankNotEnoughData()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *FreelancerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case freelancer.FieldName:
-		return m.OldName(ctx)
-	case freelancer.FieldTitle:
-		return m.OldTitle(ctx)
-	case freelancer.FieldDescription:
-		return m.OldDescription(ctx)
-	case freelancer.FieldCity:
-		return m.OldCity(ctx)
-	case freelancer.FieldCountry:
-		return m.OldCountry(ctx)
-	case freelancer.FieldTimezone:
-		return m.OldTimezone(ctx)
-	case freelancer.FieldCv:
-		return m.OldCv(ctx)
-	case freelancer.FieldAiReccomended:
-		return m.OldAiReccomended(ctx)
-	case freelancer.FieldFixedChargeAmount:
-		return m.OldFixedChargeAmount(ctx)
-	case freelancer.FieldFixedChargeCurrency:
-		return m.OldFixedChargeCurrency(ctx)
-	case freelancer.FieldHourlyChargeAmount:
-		return m.OldHourlyChargeAmount(ctx)
-	case freelancer.FieldHourlyChargeCurrency:
-		return m.OldHourlyChargeCurrency(ctx)
-	case freelancer.FieldInvited:
-		return m.OldInvited(ctx)
-	case freelancer.FieldPhotoURL:
-		return m.OldPhotoURL(ctx)
-	case freelancer.FieldRecentHours:
-		return m.OldRecentHours(ctx)
-	case freelancer.FieldTotalHours:
-		return m.OldTotalHours(ctx)
-	case freelancer.FieldTotalPortfolioItems:
-		return m.OldTotalPortfolioItems(ctx)
-	case freelancer.FieldTotalPortfolioV2Items:
-		return m.OldTotalPortfolioV2Items(ctx)
-	case freelancer.FieldUpworkTotalFeedback:
-		return m.OldUpworkTotalFeedback(ctx)
-	case freelancer.FieldUpworkRecentFeedback:
-		return m.OldUpworkRecentFeedback(ctx)
-	case freelancer.FieldUpworkTopRatedStatus:
-		return m.OldUpworkTopRatedStatus(ctx)
-	case freelancer.FieldUpworkTopRatedPlusStatus:
-		return m.OldUpworkTopRatedPlusStatus(ctx)
-	case freelancer.FieldUpworkSponsored:
-		return m.OldUpworkSponsored(ctx)
-	case freelancer.FieldUpworkJobSuccessScore:
-		return m.OldUpworkJobSuccessScore(ctx)
-	case freelancer.FieldUpworkReccomended:
-		return m.OldUpworkReccomended(ctx)
-	case freelancer.FieldSkills:
-		return m.OldSkills(ctx)
-	case freelancer.FieldAverageRecentEarnings:
-		return m.OldAverageRecentEarnings(ctx)
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		return m.OldCombinedAverageRecentEarnings(ctx)
-	case freelancer.FieldCombinedRecentEarnings:
-		return m.OldCombinedRecentEarnings(ctx)
-	case freelancer.FieldCombinedTotalEarnings:
-		return m.OldCombinedTotalEarnings(ctx)
-	case freelancer.FieldCombinedTotalRevenue:
-		return m.OldCombinedTotalRevenue(ctx)
-	case freelancer.FieldRecentEarnings:
-		return m.OldRecentEarnings(ctx)
-	case freelancer.FieldTotalRevenue:
-		return m.OldTotalRevenue(ctx)
-	case freelancer.FieldUprankScore:
-		return m.OldUprankScore(ctx)
-	case freelancer.FieldUprankUpdatedAt:
-		return m.OldUprankUpdatedAt(ctx)
-	case freelancer.FieldUprankReccomended:
-		return m.OldUprankReccomended(ctx)
-	case freelancer.FieldUprankReccomendedReasons:
-		return m.OldUprankReccomendedReasons(ctx)
-	case freelancer.FieldUprankNotEnoughData:
-		return m.OldUprankNotEnoughData(ctx)
-	}
-	return nil, fmt.Errorf("unknown Freelancer field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *FreelancerMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case freelancer.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
-	case freelancer.FieldTitle:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTitle(v)
-		return nil
-	case freelancer.FieldDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDescription(v)
-		return nil
-	case freelancer.FieldCity:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCity(v)
-		return nil
-	case freelancer.FieldCountry:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCountry(v)
-		return nil
-	case freelancer.FieldTimezone:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTimezone(v)
-		return nil
-	case freelancer.FieldCv:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCv(v)
-		return nil
-	case freelancer.FieldAiReccomended:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAiReccomended(v)
-		return nil
-	case freelancer.FieldFixedChargeAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFixedChargeAmount(v)
-		return nil
-	case freelancer.FieldFixedChargeCurrency:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFixedChargeCurrency(v)
-		return nil
-	case freelancer.FieldHourlyChargeAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourlyChargeAmount(v)
-		return nil
-	case freelancer.FieldHourlyChargeCurrency:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourlyChargeCurrency(v)
-		return nil
-	case freelancer.FieldInvited:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetInvited(v)
-		return nil
-	case freelancer.FieldPhotoURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPhotoURL(v)
-		return nil
-	case freelancer.FieldRecentHours:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRecentHours(v)
-		return nil
-	case freelancer.FieldTotalHours:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTotalHours(v)
-		return nil
-	case freelancer.FieldTotalPortfolioItems:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTotalPortfolioItems(v)
-		return nil
-	case freelancer.FieldTotalPortfolioV2Items:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTotalPortfolioV2Items(v)
-		return nil
-	case freelancer.FieldUpworkTotalFeedback:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkTotalFeedback(v)
-		return nil
-	case freelancer.FieldUpworkRecentFeedback:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkRecentFeedback(v)
-		return nil
-	case freelancer.FieldUpworkTopRatedStatus:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkTopRatedStatus(v)
-		return nil
-	case freelancer.FieldUpworkTopRatedPlusStatus:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkTopRatedPlusStatus(v)
-		return nil
-	case freelancer.FieldUpworkSponsored:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkSponsored(v)
-		return nil
-	case freelancer.FieldUpworkJobSuccessScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkJobSuccessScore(v)
-		return nil
-	case freelancer.FieldUpworkReccomended:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpworkReccomended(v)
-		return nil
-	case freelancer.FieldSkills:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSkills(v)
-		return nil
-	case freelancer.FieldAverageRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAverageRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCombinedAverageRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCombinedRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedTotalEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCombinedTotalEarnings(v)
-		return nil
-	case freelancer.FieldCombinedTotalRevenue:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCombinedTotalRevenue(v)
-		return nil
-	case freelancer.FieldRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRecentEarnings(v)
-		return nil
-	case freelancer.FieldTotalRevenue:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTotalRevenue(v)
-		return nil
-	case freelancer.FieldUprankScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankScore(v)
-		return nil
-	case freelancer.FieldUprankUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankUpdatedAt(v)
-		return nil
-	case freelancer.FieldUprankReccomended:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankReccomended(v)
-		return nil
-	case freelancer.FieldUprankReccomendedReasons:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankReccomendedReasons(v)
-		return nil
-	case freelancer.FieldUprankNotEnoughData:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankNotEnoughData(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *FreelancerMutation) AddedFields() []string {
-	var fields []string
-	if m.addfixed_charge_amount != nil {
-		fields = append(fields, freelancer.FieldFixedChargeAmount)
-	}
-	if m.addhourly_charge_amount != nil {
-		fields = append(fields, freelancer.FieldHourlyChargeAmount)
-	}
-	if m.addrecent_hours != nil {
-		fields = append(fields, freelancer.FieldRecentHours)
-	}
-	if m.addtotal_hours != nil {
-		fields = append(fields, freelancer.FieldTotalHours)
-	}
-	if m.addtotal_portfolio_items != nil {
-		fields = append(fields, freelancer.FieldTotalPortfolioItems)
-	}
-	if m.addtotal_portfolio_v2_items != nil {
-		fields = append(fields, freelancer.FieldTotalPortfolioV2Items)
-	}
-	if m.addupwork_total_feedback != nil {
-		fields = append(fields, freelancer.FieldUpworkTotalFeedback)
-	}
-	if m.addupwork_recent_feedback != nil {
-		fields = append(fields, freelancer.FieldUpworkRecentFeedback)
-	}
-	if m.addupwork_job_success_score != nil {
-		fields = append(fields, freelancer.FieldUpworkJobSuccessScore)
-	}
-	if m.addaverage_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldAverageRecentEarnings)
-	}
-	if m.addcombined_average_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedAverageRecentEarnings)
-	}
-	if m.addcombined_recent_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedRecentEarnings)
-	}
-	if m.addcombined_total_earnings != nil {
-		fields = append(fields, freelancer.FieldCombinedTotalEarnings)
-	}
-	if m.addcombined_total_revenue != nil {
-		fields = append(fields, freelancer.FieldCombinedTotalRevenue)
-	}
-	if m.addrecent_earnings != nil {
-		fields = append(fields, freelancer.FieldRecentEarnings)
-	}
-	if m.addtotal_revenue != nil {
-		fields = append(fields, freelancer.FieldTotalRevenue)
-	}
-	if m.adduprank_score != nil {
-		fields = append(fields, freelancer.FieldUprankScore)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *FreelancerMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case freelancer.FieldFixedChargeAmount:
-		return m.AddedFixedChargeAmount()
-	case freelancer.FieldHourlyChargeAmount:
-		return m.AddedHourlyChargeAmount()
-	case freelancer.FieldRecentHours:
-		return m.AddedRecentHours()
-	case freelancer.FieldTotalHours:
-		return m.AddedTotalHours()
-	case freelancer.FieldTotalPortfolioItems:
-		return m.AddedTotalPortfolioItems()
-	case freelancer.FieldTotalPortfolioV2Items:
-		return m.AddedTotalPortfolioV2Items()
-	case freelancer.FieldUpworkTotalFeedback:
-		return m.AddedUpworkTotalFeedback()
-	case freelancer.FieldUpworkRecentFeedback:
-		return m.AddedUpworkRecentFeedback()
-	case freelancer.FieldUpworkJobSuccessScore:
-		return m.AddedUpworkJobSuccessScore()
-	case freelancer.FieldAverageRecentEarnings:
-		return m.AddedAverageRecentEarnings()
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		return m.AddedCombinedAverageRecentEarnings()
-	case freelancer.FieldCombinedRecentEarnings:
-		return m.AddedCombinedRecentEarnings()
-	case freelancer.FieldCombinedTotalEarnings:
-		return m.AddedCombinedTotalEarnings()
-	case freelancer.FieldCombinedTotalRevenue:
-		return m.AddedCombinedTotalRevenue()
-	case freelancer.FieldRecentEarnings:
-		return m.AddedRecentEarnings()
-	case freelancer.FieldTotalRevenue:
-		return m.AddedTotalRevenue()
-	case freelancer.FieldUprankScore:
-		return m.AddedUprankScore()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *FreelancerMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case freelancer.FieldFixedChargeAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddFixedChargeAmount(v)
-		return nil
-	case freelancer.FieldHourlyChargeAmount:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddHourlyChargeAmount(v)
-		return nil
-	case freelancer.FieldRecentHours:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddRecentHours(v)
-		return nil
-	case freelancer.FieldTotalHours:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTotalHours(v)
-		return nil
-	case freelancer.FieldTotalPortfolioItems:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTotalPortfolioItems(v)
-		return nil
-	case freelancer.FieldTotalPortfolioV2Items:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTotalPortfolioV2Items(v)
-		return nil
-	case freelancer.FieldUpworkTotalFeedback:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpworkTotalFeedback(v)
-		return nil
-	case freelancer.FieldUpworkRecentFeedback:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpworkRecentFeedback(v)
-		return nil
-	case freelancer.FieldUpworkJobSuccessScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpworkJobSuccessScore(v)
-		return nil
-	case freelancer.FieldAverageRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddAverageRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCombinedAverageRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCombinedRecentEarnings(v)
-		return nil
-	case freelancer.FieldCombinedTotalEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCombinedTotalEarnings(v)
-		return nil
-	case freelancer.FieldCombinedTotalRevenue:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCombinedTotalRevenue(v)
-		return nil
-	case freelancer.FieldRecentEarnings:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddRecentEarnings(v)
-		return nil
-	case freelancer.FieldTotalRevenue:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTotalRevenue(v)
-		return nil
-	case freelancer.FieldUprankScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUprankScore(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *FreelancerMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(freelancer.FieldFixedChargeAmount) {
-		fields = append(fields, freelancer.FieldFixedChargeAmount)
-	}
-	if m.FieldCleared(freelancer.FieldHourlyChargeAmount) {
-		fields = append(fields, freelancer.FieldHourlyChargeAmount)
-	}
-	if m.FieldCleared(freelancer.FieldUprankScore) {
-		fields = append(fields, freelancer.FieldUprankScore)
-	}
-	if m.FieldCleared(freelancer.FieldUprankReccomended) {
-		fields = append(fields, freelancer.FieldUprankReccomended)
-	}
-	if m.FieldCleared(freelancer.FieldUprankReccomendedReasons) {
-		fields = append(fields, freelancer.FieldUprankReccomendedReasons)
-	}
-	if m.FieldCleared(freelancer.FieldUprankNotEnoughData) {
-		fields = append(fields, freelancer.FieldUprankNotEnoughData)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *FreelancerMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *FreelancerMutation) ClearField(name string) error {
-	switch name {
-	case freelancer.FieldFixedChargeAmount:
-		m.ClearFixedChargeAmount()
-		return nil
-	case freelancer.FieldHourlyChargeAmount:
-		m.ClearHourlyChargeAmount()
-		return nil
-	case freelancer.FieldUprankScore:
-		m.ClearUprankScore()
-		return nil
-	case freelancer.FieldUprankReccomended:
-		m.ClearUprankReccomended()
-		return nil
-	case freelancer.FieldUprankReccomendedReasons:
-		m.ClearUprankReccomendedReasons()
-		return nil
-	case freelancer.FieldUprankNotEnoughData:
-		m.ClearUprankNotEnoughData()
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *FreelancerMutation) ResetField(name string) error {
-	switch name {
-	case freelancer.FieldName:
-		m.ResetName()
-		return nil
-	case freelancer.FieldTitle:
-		m.ResetTitle()
-		return nil
-	case freelancer.FieldDescription:
-		m.ResetDescription()
-		return nil
-	case freelancer.FieldCity:
-		m.ResetCity()
-		return nil
-	case freelancer.FieldCountry:
-		m.ResetCountry()
-		return nil
-	case freelancer.FieldTimezone:
-		m.ResetTimezone()
-		return nil
-	case freelancer.FieldCv:
-		m.ResetCv()
-		return nil
-	case freelancer.FieldAiReccomended:
-		m.ResetAiReccomended()
-		return nil
-	case freelancer.FieldFixedChargeAmount:
-		m.ResetFixedChargeAmount()
-		return nil
-	case freelancer.FieldFixedChargeCurrency:
-		m.ResetFixedChargeCurrency()
-		return nil
-	case freelancer.FieldHourlyChargeAmount:
-		m.ResetHourlyChargeAmount()
-		return nil
-	case freelancer.FieldHourlyChargeCurrency:
-		m.ResetHourlyChargeCurrency()
-		return nil
-	case freelancer.FieldInvited:
-		m.ResetInvited()
-		return nil
-	case freelancer.FieldPhotoURL:
-		m.ResetPhotoURL()
-		return nil
-	case freelancer.FieldRecentHours:
-		m.ResetRecentHours()
-		return nil
-	case freelancer.FieldTotalHours:
-		m.ResetTotalHours()
-		return nil
-	case freelancer.FieldTotalPortfolioItems:
-		m.ResetTotalPortfolioItems()
-		return nil
-	case freelancer.FieldTotalPortfolioV2Items:
-		m.ResetTotalPortfolioV2Items()
-		return nil
-	case freelancer.FieldUpworkTotalFeedback:
-		m.ResetUpworkTotalFeedback()
-		return nil
-	case freelancer.FieldUpworkRecentFeedback:
-		m.ResetUpworkRecentFeedback()
-		return nil
-	case freelancer.FieldUpworkTopRatedStatus:
-		m.ResetUpworkTopRatedStatus()
-		return nil
-	case freelancer.FieldUpworkTopRatedPlusStatus:
-		m.ResetUpworkTopRatedPlusStatus()
-		return nil
-	case freelancer.FieldUpworkSponsored:
-		m.ResetUpworkSponsored()
-		return nil
-	case freelancer.FieldUpworkJobSuccessScore:
-		m.ResetUpworkJobSuccessScore()
-		return nil
-	case freelancer.FieldUpworkReccomended:
-		m.ResetUpworkReccomended()
-		return nil
-	case freelancer.FieldSkills:
-		m.ResetSkills()
-		return nil
-	case freelancer.FieldAverageRecentEarnings:
-		m.ResetAverageRecentEarnings()
-		return nil
-	case freelancer.FieldCombinedAverageRecentEarnings:
-		m.ResetCombinedAverageRecentEarnings()
-		return nil
-	case freelancer.FieldCombinedRecentEarnings:
-		m.ResetCombinedRecentEarnings()
-		return nil
-	case freelancer.FieldCombinedTotalEarnings:
-		m.ResetCombinedTotalEarnings()
-		return nil
-	case freelancer.FieldCombinedTotalRevenue:
-		m.ResetCombinedTotalRevenue()
-		return nil
-	case freelancer.FieldRecentEarnings:
-		m.ResetRecentEarnings()
-		return nil
-	case freelancer.FieldTotalRevenue:
-		m.ResetTotalRevenue()
-		return nil
-	case freelancer.FieldUprankScore:
-		m.ResetUprankScore()
-		return nil
-	case freelancer.FieldUprankUpdatedAt:
-		m.ResetUprankUpdatedAt()
-		return nil
-	case freelancer.FieldUprankReccomended:
-		m.ResetUprankReccomended()
-		return nil
-	case freelancer.FieldUprankReccomendedReasons:
-		m.ResetUprankReccomendedReasons()
-		return nil
-	case freelancer.FieldUprankNotEnoughData:
-		m.ResetUprankNotEnoughData()
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *FreelancerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.job != nil {
-		edges = append(edges, freelancer.EdgeJob)
-	}
-	if m.attachments != nil {
-		edges = append(edges, freelancer.EdgeAttachments)
-	}
-	if m.work_histories != nil {
-		edges = append(edges, freelancer.EdgeWorkHistories)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *FreelancerMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case freelancer.EdgeJob:
-		if id := m.job; id != nil {
-			return []ent.Value{*id}
-		}
-	case freelancer.EdgeAttachments:
-		ids := make([]ent.Value, 0, len(m.attachments))
-		for id := range m.attachments {
-			ids = append(ids, id)
-		}
-		return ids
-	case freelancer.EdgeWorkHistories:
-		ids := make([]ent.Value, 0, len(m.work_histories))
-		for id := range m.work_histories {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *FreelancerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.removedattachments != nil {
-		edges = append(edges, freelancer.EdgeAttachments)
-	}
-	if m.removedwork_histories != nil {
-		edges = append(edges, freelancer.EdgeWorkHistories)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *FreelancerMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case freelancer.EdgeAttachments:
-		ids := make([]ent.Value, 0, len(m.removedattachments))
-		for id := range m.removedattachments {
-			ids = append(ids, id)
-		}
-		return ids
-	case freelancer.EdgeWorkHistories:
-		ids := make([]ent.Value, 0, len(m.removedwork_histories))
-		for id := range m.removedwork_histories {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *FreelancerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.clearedjob {
-		edges = append(edges, freelancer.EdgeJob)
-	}
-	if m.clearedattachments {
-		edges = append(edges, freelancer.EdgeAttachments)
-	}
-	if m.clearedwork_histories {
-		edges = append(edges, freelancer.EdgeWorkHistories)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *FreelancerMutation) EdgeCleared(name string) bool {
-	switch name {
-	case freelancer.EdgeJob:
-		return m.clearedjob
-	case freelancer.EdgeAttachments:
-		return m.clearedattachments
-	case freelancer.EdgeWorkHistories:
-		return m.clearedwork_histories
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *FreelancerMutation) ClearEdge(name string) error {
-	switch name {
-	case freelancer.EdgeJob:
-		m.ClearJob()
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *FreelancerMutation) ResetEdge(name string) error {
-	switch name {
-	case freelancer.EdgeJob:
-		m.ResetJob()
-		return nil
-	case freelancer.EdgeAttachments:
-		m.ResetAttachments()
-		return nil
-	case freelancer.EdgeWorkHistories:
-		m.ResetWorkHistories()
-		return nil
-	}
-	return fmt.Errorf("unknown Freelancer edge %s", name)
 }
 
 // JobMutation represents an operation that mutates the Job nodes in the graph.
@@ -4614,7 +1349,7 @@ func (m *JobMutation) ResetUser() {
 	m.cleareduser = false
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by ids.
+// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by ids.
 func (m *JobMutation) AddFreelancerIDs(ids ...string) {
 	if m.freelancers == nil {
 		m.freelancers = make(map[string]struct{})
@@ -4624,17 +1359,17 @@ func (m *JobMutation) AddFreelancerIDs(ids ...string) {
 	}
 }
 
-// ClearFreelancers clears the "freelancers" edge to the Freelancer entity.
+// ClearFreelancers clears the "freelancers" edge to the UpworkFreelancer entity.
 func (m *JobMutation) ClearFreelancers() {
 	m.clearedfreelancers = true
 }
 
-// FreelancersCleared reports if the "freelancers" edge to the Freelancer entity was cleared.
+// FreelancersCleared reports if the "freelancers" edge to the UpworkFreelancer entity was cleared.
 func (m *JobMutation) FreelancersCleared() bool {
 	return m.clearedfreelancers
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to the Freelancer entity by IDs.
+// RemoveFreelancerIDs removes the "freelancers" edge to the UpworkFreelancer entity by IDs.
 func (m *JobMutation) RemoveFreelancerIDs(ids ...string) {
 	if m.removedfreelancers == nil {
 		m.removedfreelancers = make(map[string]struct{})
@@ -4645,7 +1380,7 @@ func (m *JobMutation) RemoveFreelancerIDs(ids ...string) {
 	}
 }
 
-// RemovedFreelancers returns the removed IDs of the "freelancers" edge to the Freelancer entity.
+// RemovedFreelancers returns the removed IDs of the "freelancers" edge to the UpworkFreelancer entity.
 func (m *JobMutation) RemovedFreelancersIDs() (ids []string) {
 	for id := range m.removedfreelancers {
 		ids = append(ids, id)
@@ -5205,6 +1940,3295 @@ func (m *JobMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Job edge %s", name)
+}
+
+// UpworkFreelancerMutation represents an operation that mutates the UpworkFreelancer nodes in the graph.
+type UpworkFreelancerMutation struct {
+	config
+	op                                  Op
+	typ                                 string
+	id                                  *string
+	name                                *string
+	title                               *string
+	description                         *string
+	city                                *string
+	country                             *string
+	timezone                            *string
+	cv                                  *string
+	ai_reccomended                      *bool
+	fixed_charge_amount                 *float64
+	addfixed_charge_amount              *float64
+	fixed_charge_currency               *string
+	hourly_charge_amount                *float64
+	addhourly_charge_amount             *float64
+	hourly_charge_currency              *string
+	invited                             *bool
+	photo_url                           *string
+	recent_hours                        *float64
+	addrecent_hours                     *float64
+	total_hours                         *float64
+	addtotal_hours                      *float64
+	total_portfolio_items               *int
+	addtotal_portfolio_items            *int
+	total_portfolio_v2_items            *int
+	addtotal_portfolio_v2_items         *int
+	upwork_total_feedback               *float64
+	addupwork_total_feedback            *float64
+	upwork_recent_feedback              *float64
+	addupwork_recent_feedback           *float64
+	upwork_top_rated_status             *bool
+	upwork_top_rated_plus_status        *bool
+	upwork_sponsored                    *bool
+	upwork_job_success_score            *float64
+	addupwork_job_success_score         *float64
+	upwork_reccomended                  *bool
+	skills                              *[]string
+	appendskills                        []string
+	average_recent_earnings             *float64
+	addaverage_recent_earnings          *float64
+	combined_average_recent_earnings    *float64
+	addcombined_average_recent_earnings *float64
+	combined_recent_earnings            *float64
+	addcombined_recent_earnings         *float64
+	combined_total_earnings             *float64
+	addcombined_total_earnings          *float64
+	combined_total_revenue              *float64
+	addcombined_total_revenue           *float64
+	recent_earnings                     *float64
+	addrecent_earnings                  *float64
+	total_revenue                       *float64
+	addtotal_revenue                    *float64
+	uprank_score                        *int
+	adduprank_score                     *int
+	uprank_updated_at                   *time.Time
+	uprank_reccomended                  *bool
+	uprank_reccomended_reasons          *string
+	uprank_not_enough_data              *bool
+	clearedFields                       map[string]struct{}
+	job                                 map[string]struct{}
+	removedjob                          map[string]struct{}
+	clearedjob                          bool
+	attachments                         map[int]struct{}
+	removedattachments                  map[int]struct{}
+	clearedattachments                  bool
+	work_histories                      map[int]struct{}
+	removedwork_histories               map[int]struct{}
+	clearedwork_histories               bool
+	done                                bool
+	oldValue                            func(context.Context) (*UpworkFreelancer, error)
+	predicates                          []predicate.UpworkFreelancer
+}
+
+var _ ent.Mutation = (*UpworkFreelancerMutation)(nil)
+
+// upworkfreelancerOption allows management of the mutation configuration using functional options.
+type upworkfreelancerOption func(*UpworkFreelancerMutation)
+
+// newUpworkFreelancerMutation creates new mutation for the UpworkFreelancer entity.
+func newUpworkFreelancerMutation(c config, op Op, opts ...upworkfreelancerOption) *UpworkFreelancerMutation {
+	m := &UpworkFreelancerMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUpworkFreelancer,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUpworkFreelancerID sets the ID field of the mutation.
+func withUpworkFreelancerID(id string) upworkfreelancerOption {
+	return func(m *UpworkFreelancerMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UpworkFreelancer
+		)
+		m.oldValue = func(ctx context.Context) (*UpworkFreelancer, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UpworkFreelancer.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUpworkFreelancer sets the old UpworkFreelancer of the mutation.
+func withUpworkFreelancer(node *UpworkFreelancer) upworkfreelancerOption {
+	return func(m *UpworkFreelancerMutation) {
+		m.oldValue = func(context.Context) (*UpworkFreelancer, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UpworkFreelancerMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UpworkFreelancerMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of UpworkFreelancer entities.
+func (m *UpworkFreelancerMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *UpworkFreelancerMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *UpworkFreelancerMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().UpworkFreelancer.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *UpworkFreelancerMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *UpworkFreelancerMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *UpworkFreelancerMutation) ResetName() {
+	m.name = nil
+}
+
+// SetTitle sets the "title" field.
+func (m *UpworkFreelancerMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *UpworkFreelancerMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *UpworkFreelancerMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *UpworkFreelancerMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *UpworkFreelancerMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *UpworkFreelancerMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetCity sets the "city" field.
+func (m *UpworkFreelancerMutation) SetCity(s string) {
+	m.city = &s
+}
+
+// City returns the value of the "city" field in the mutation.
+func (m *UpworkFreelancerMutation) City() (r string, exists bool) {
+	v := m.city
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCity returns the old "city" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCity(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCity: %w", err)
+	}
+	return oldValue.City, nil
+}
+
+// ResetCity resets all changes to the "city" field.
+func (m *UpworkFreelancerMutation) ResetCity() {
+	m.city = nil
+}
+
+// SetCountry sets the "country" field.
+func (m *UpworkFreelancerMutation) SetCountry(s string) {
+	m.country = &s
+}
+
+// Country returns the value of the "country" field in the mutation.
+func (m *UpworkFreelancerMutation) Country() (r string, exists bool) {
+	v := m.country
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCountry returns the old "country" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCountry(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCountry is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCountry requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCountry: %w", err)
+	}
+	return oldValue.Country, nil
+}
+
+// ResetCountry resets all changes to the "country" field.
+func (m *UpworkFreelancerMutation) ResetCountry() {
+	m.country = nil
+}
+
+// SetTimezone sets the "timezone" field.
+func (m *UpworkFreelancerMutation) SetTimezone(s string) {
+	m.timezone = &s
+}
+
+// Timezone returns the value of the "timezone" field in the mutation.
+func (m *UpworkFreelancerMutation) Timezone() (r string, exists bool) {
+	v := m.timezone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimezone returns the old "timezone" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTimezone(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimezone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimezone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimezone: %w", err)
+	}
+	return oldValue.Timezone, nil
+}
+
+// ResetTimezone resets all changes to the "timezone" field.
+func (m *UpworkFreelancerMutation) ResetTimezone() {
+	m.timezone = nil
+}
+
+// SetCv sets the "cv" field.
+func (m *UpworkFreelancerMutation) SetCv(s string) {
+	m.cv = &s
+}
+
+// Cv returns the value of the "cv" field in the mutation.
+func (m *UpworkFreelancerMutation) Cv() (r string, exists bool) {
+	v := m.cv
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCv returns the old "cv" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCv(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCv is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCv requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCv: %w", err)
+	}
+	return oldValue.Cv, nil
+}
+
+// ResetCv resets all changes to the "cv" field.
+func (m *UpworkFreelancerMutation) ResetCv() {
+	m.cv = nil
+}
+
+// SetAiReccomended sets the "ai_reccomended" field.
+func (m *UpworkFreelancerMutation) SetAiReccomended(b bool) {
+	m.ai_reccomended = &b
+}
+
+// AiReccomended returns the value of the "ai_reccomended" field in the mutation.
+func (m *UpworkFreelancerMutation) AiReccomended() (r bool, exists bool) {
+	v := m.ai_reccomended
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAiReccomended returns the old "ai_reccomended" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldAiReccomended(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAiReccomended is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAiReccomended requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAiReccomended: %w", err)
+	}
+	return oldValue.AiReccomended, nil
+}
+
+// ResetAiReccomended resets all changes to the "ai_reccomended" field.
+func (m *UpworkFreelancerMutation) ResetAiReccomended() {
+	m.ai_reccomended = nil
+}
+
+// SetFixedChargeAmount sets the "fixed_charge_amount" field.
+func (m *UpworkFreelancerMutation) SetFixedChargeAmount(f float64) {
+	m.fixed_charge_amount = &f
+	m.addfixed_charge_amount = nil
+}
+
+// FixedChargeAmount returns the value of the "fixed_charge_amount" field in the mutation.
+func (m *UpworkFreelancerMutation) FixedChargeAmount() (r float64, exists bool) {
+	v := m.fixed_charge_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFixedChargeAmount returns the old "fixed_charge_amount" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldFixedChargeAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFixedChargeAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFixedChargeAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFixedChargeAmount: %w", err)
+	}
+	return oldValue.FixedChargeAmount, nil
+}
+
+// AddFixedChargeAmount adds f to the "fixed_charge_amount" field.
+func (m *UpworkFreelancerMutation) AddFixedChargeAmount(f float64) {
+	if m.addfixed_charge_amount != nil {
+		*m.addfixed_charge_amount += f
+	} else {
+		m.addfixed_charge_amount = &f
+	}
+}
+
+// AddedFixedChargeAmount returns the value that was added to the "fixed_charge_amount" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedFixedChargeAmount() (r float64, exists bool) {
+	v := m.addfixed_charge_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
+func (m *UpworkFreelancerMutation) ClearFixedChargeAmount() {
+	m.fixed_charge_amount = nil
+	m.addfixed_charge_amount = nil
+	m.clearedFields[upworkfreelancer.FieldFixedChargeAmount] = struct{}{}
+}
+
+// FixedChargeAmountCleared returns if the "fixed_charge_amount" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) FixedChargeAmountCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldFixedChargeAmount]
+	return ok
+}
+
+// ResetFixedChargeAmount resets all changes to the "fixed_charge_amount" field.
+func (m *UpworkFreelancerMutation) ResetFixedChargeAmount() {
+	m.fixed_charge_amount = nil
+	m.addfixed_charge_amount = nil
+	delete(m.clearedFields, upworkfreelancer.FieldFixedChargeAmount)
+}
+
+// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
+func (m *UpworkFreelancerMutation) SetFixedChargeCurrency(s string) {
+	m.fixed_charge_currency = &s
+}
+
+// FixedChargeCurrency returns the value of the "fixed_charge_currency" field in the mutation.
+func (m *UpworkFreelancerMutation) FixedChargeCurrency() (r string, exists bool) {
+	v := m.fixed_charge_currency
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFixedChargeCurrency returns the old "fixed_charge_currency" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldFixedChargeCurrency(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFixedChargeCurrency is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFixedChargeCurrency requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFixedChargeCurrency: %w", err)
+	}
+	return oldValue.FixedChargeCurrency, nil
+}
+
+// ResetFixedChargeCurrency resets all changes to the "fixed_charge_currency" field.
+func (m *UpworkFreelancerMutation) ResetFixedChargeCurrency() {
+	m.fixed_charge_currency = nil
+}
+
+// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
+func (m *UpworkFreelancerMutation) SetHourlyChargeAmount(f float64) {
+	m.hourly_charge_amount = &f
+	m.addhourly_charge_amount = nil
+}
+
+// HourlyChargeAmount returns the value of the "hourly_charge_amount" field in the mutation.
+func (m *UpworkFreelancerMutation) HourlyChargeAmount() (r float64, exists bool) {
+	v := m.hourly_charge_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHourlyChargeAmount returns the old "hourly_charge_amount" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldHourlyChargeAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHourlyChargeAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHourlyChargeAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHourlyChargeAmount: %w", err)
+	}
+	return oldValue.HourlyChargeAmount, nil
+}
+
+// AddHourlyChargeAmount adds f to the "hourly_charge_amount" field.
+func (m *UpworkFreelancerMutation) AddHourlyChargeAmount(f float64) {
+	if m.addhourly_charge_amount != nil {
+		*m.addhourly_charge_amount += f
+	} else {
+		m.addhourly_charge_amount = &f
+	}
+}
+
+// AddedHourlyChargeAmount returns the value that was added to the "hourly_charge_amount" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedHourlyChargeAmount() (r float64, exists bool) {
+	v := m.addhourly_charge_amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
+func (m *UpworkFreelancerMutation) ClearHourlyChargeAmount() {
+	m.hourly_charge_amount = nil
+	m.addhourly_charge_amount = nil
+	m.clearedFields[upworkfreelancer.FieldHourlyChargeAmount] = struct{}{}
+}
+
+// HourlyChargeAmountCleared returns if the "hourly_charge_amount" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) HourlyChargeAmountCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldHourlyChargeAmount]
+	return ok
+}
+
+// ResetHourlyChargeAmount resets all changes to the "hourly_charge_amount" field.
+func (m *UpworkFreelancerMutation) ResetHourlyChargeAmount() {
+	m.hourly_charge_amount = nil
+	m.addhourly_charge_amount = nil
+	delete(m.clearedFields, upworkfreelancer.FieldHourlyChargeAmount)
+}
+
+// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
+func (m *UpworkFreelancerMutation) SetHourlyChargeCurrency(s string) {
+	m.hourly_charge_currency = &s
+}
+
+// HourlyChargeCurrency returns the value of the "hourly_charge_currency" field in the mutation.
+func (m *UpworkFreelancerMutation) HourlyChargeCurrency() (r string, exists bool) {
+	v := m.hourly_charge_currency
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHourlyChargeCurrency returns the old "hourly_charge_currency" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldHourlyChargeCurrency(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHourlyChargeCurrency is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHourlyChargeCurrency requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHourlyChargeCurrency: %w", err)
+	}
+	return oldValue.HourlyChargeCurrency, nil
+}
+
+// ResetHourlyChargeCurrency resets all changes to the "hourly_charge_currency" field.
+func (m *UpworkFreelancerMutation) ResetHourlyChargeCurrency() {
+	m.hourly_charge_currency = nil
+}
+
+// SetInvited sets the "invited" field.
+func (m *UpworkFreelancerMutation) SetInvited(b bool) {
+	m.invited = &b
+}
+
+// Invited returns the value of the "invited" field in the mutation.
+func (m *UpworkFreelancerMutation) Invited() (r bool, exists bool) {
+	v := m.invited
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvited returns the old "invited" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldInvited(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvited is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvited requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvited: %w", err)
+	}
+	return oldValue.Invited, nil
+}
+
+// ResetInvited resets all changes to the "invited" field.
+func (m *UpworkFreelancerMutation) ResetInvited() {
+	m.invited = nil
+}
+
+// SetPhotoURL sets the "photo_url" field.
+func (m *UpworkFreelancerMutation) SetPhotoURL(s string) {
+	m.photo_url = &s
+}
+
+// PhotoURL returns the value of the "photo_url" field in the mutation.
+func (m *UpworkFreelancerMutation) PhotoURL() (r string, exists bool) {
+	v := m.photo_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhotoURL returns the old "photo_url" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldPhotoURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhotoURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhotoURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhotoURL: %w", err)
+	}
+	return oldValue.PhotoURL, nil
+}
+
+// ResetPhotoURL resets all changes to the "photo_url" field.
+func (m *UpworkFreelancerMutation) ResetPhotoURL() {
+	m.photo_url = nil
+}
+
+// SetRecentHours sets the "recent_hours" field.
+func (m *UpworkFreelancerMutation) SetRecentHours(f float64) {
+	m.recent_hours = &f
+	m.addrecent_hours = nil
+}
+
+// RecentHours returns the value of the "recent_hours" field in the mutation.
+func (m *UpworkFreelancerMutation) RecentHours() (r float64, exists bool) {
+	v := m.recent_hours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecentHours returns the old "recent_hours" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldRecentHours(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecentHours is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecentHours requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecentHours: %w", err)
+	}
+	return oldValue.RecentHours, nil
+}
+
+// AddRecentHours adds f to the "recent_hours" field.
+func (m *UpworkFreelancerMutation) AddRecentHours(f float64) {
+	if m.addrecent_hours != nil {
+		*m.addrecent_hours += f
+	} else {
+		m.addrecent_hours = &f
+	}
+}
+
+// AddedRecentHours returns the value that was added to the "recent_hours" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedRecentHours() (r float64, exists bool) {
+	v := m.addrecent_hours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRecentHours resets all changes to the "recent_hours" field.
+func (m *UpworkFreelancerMutation) ResetRecentHours() {
+	m.recent_hours = nil
+	m.addrecent_hours = nil
+}
+
+// SetTotalHours sets the "total_hours" field.
+func (m *UpworkFreelancerMutation) SetTotalHours(f float64) {
+	m.total_hours = &f
+	m.addtotal_hours = nil
+}
+
+// TotalHours returns the value of the "total_hours" field in the mutation.
+func (m *UpworkFreelancerMutation) TotalHours() (r float64, exists bool) {
+	v := m.total_hours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalHours returns the old "total_hours" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTotalHours(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalHours is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalHours requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalHours: %w", err)
+	}
+	return oldValue.TotalHours, nil
+}
+
+// AddTotalHours adds f to the "total_hours" field.
+func (m *UpworkFreelancerMutation) AddTotalHours(f float64) {
+	if m.addtotal_hours != nil {
+		*m.addtotal_hours += f
+	} else {
+		m.addtotal_hours = &f
+	}
+}
+
+// AddedTotalHours returns the value that was added to the "total_hours" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedTotalHours() (r float64, exists bool) {
+	v := m.addtotal_hours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalHours resets all changes to the "total_hours" field.
+func (m *UpworkFreelancerMutation) ResetTotalHours() {
+	m.total_hours = nil
+	m.addtotal_hours = nil
+}
+
+// SetTotalPortfolioItems sets the "total_portfolio_items" field.
+func (m *UpworkFreelancerMutation) SetTotalPortfolioItems(i int) {
+	m.total_portfolio_items = &i
+	m.addtotal_portfolio_items = nil
+}
+
+// TotalPortfolioItems returns the value of the "total_portfolio_items" field in the mutation.
+func (m *UpworkFreelancerMutation) TotalPortfolioItems() (r int, exists bool) {
+	v := m.total_portfolio_items
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalPortfolioItems returns the old "total_portfolio_items" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTotalPortfolioItems(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalPortfolioItems is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalPortfolioItems requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalPortfolioItems: %w", err)
+	}
+	return oldValue.TotalPortfolioItems, nil
+}
+
+// AddTotalPortfolioItems adds i to the "total_portfolio_items" field.
+func (m *UpworkFreelancerMutation) AddTotalPortfolioItems(i int) {
+	if m.addtotal_portfolio_items != nil {
+		*m.addtotal_portfolio_items += i
+	} else {
+		m.addtotal_portfolio_items = &i
+	}
+}
+
+// AddedTotalPortfolioItems returns the value that was added to the "total_portfolio_items" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedTotalPortfolioItems() (r int, exists bool) {
+	v := m.addtotal_portfolio_items
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalPortfolioItems resets all changes to the "total_portfolio_items" field.
+func (m *UpworkFreelancerMutation) ResetTotalPortfolioItems() {
+	m.total_portfolio_items = nil
+	m.addtotal_portfolio_items = nil
+}
+
+// SetTotalPortfolioV2Items sets the "total_portfolio_v2_items" field.
+func (m *UpworkFreelancerMutation) SetTotalPortfolioV2Items(i int) {
+	m.total_portfolio_v2_items = &i
+	m.addtotal_portfolio_v2_items = nil
+}
+
+// TotalPortfolioV2Items returns the value of the "total_portfolio_v2_items" field in the mutation.
+func (m *UpworkFreelancerMutation) TotalPortfolioV2Items() (r int, exists bool) {
+	v := m.total_portfolio_v2_items
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalPortfolioV2Items returns the old "total_portfolio_v2_items" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTotalPortfolioV2Items(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalPortfolioV2Items is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalPortfolioV2Items requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalPortfolioV2Items: %w", err)
+	}
+	return oldValue.TotalPortfolioV2Items, nil
+}
+
+// AddTotalPortfolioV2Items adds i to the "total_portfolio_v2_items" field.
+func (m *UpworkFreelancerMutation) AddTotalPortfolioV2Items(i int) {
+	if m.addtotal_portfolio_v2_items != nil {
+		*m.addtotal_portfolio_v2_items += i
+	} else {
+		m.addtotal_portfolio_v2_items = &i
+	}
+}
+
+// AddedTotalPortfolioV2Items returns the value that was added to the "total_portfolio_v2_items" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedTotalPortfolioV2Items() (r int, exists bool) {
+	v := m.addtotal_portfolio_v2_items
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalPortfolioV2Items resets all changes to the "total_portfolio_v2_items" field.
+func (m *UpworkFreelancerMutation) ResetTotalPortfolioV2Items() {
+	m.total_portfolio_v2_items = nil
+	m.addtotal_portfolio_v2_items = nil
+}
+
+// SetUpworkTotalFeedback sets the "upwork_total_feedback" field.
+func (m *UpworkFreelancerMutation) SetUpworkTotalFeedback(f float64) {
+	m.upwork_total_feedback = &f
+	m.addupwork_total_feedback = nil
+}
+
+// UpworkTotalFeedback returns the value of the "upwork_total_feedback" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkTotalFeedback() (r float64, exists bool) {
+	v := m.upwork_total_feedback
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkTotalFeedback returns the old "upwork_total_feedback" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkTotalFeedback(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkTotalFeedback is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkTotalFeedback requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkTotalFeedback: %w", err)
+	}
+	return oldValue.UpworkTotalFeedback, nil
+}
+
+// AddUpworkTotalFeedback adds f to the "upwork_total_feedback" field.
+func (m *UpworkFreelancerMutation) AddUpworkTotalFeedback(f float64) {
+	if m.addupwork_total_feedback != nil {
+		*m.addupwork_total_feedback += f
+	} else {
+		m.addupwork_total_feedback = &f
+	}
+}
+
+// AddedUpworkTotalFeedback returns the value that was added to the "upwork_total_feedback" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedUpworkTotalFeedback() (r float64, exists bool) {
+	v := m.addupwork_total_feedback
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpworkTotalFeedback resets all changes to the "upwork_total_feedback" field.
+func (m *UpworkFreelancerMutation) ResetUpworkTotalFeedback() {
+	m.upwork_total_feedback = nil
+	m.addupwork_total_feedback = nil
+}
+
+// SetUpworkRecentFeedback sets the "upwork_recent_feedback" field.
+func (m *UpworkFreelancerMutation) SetUpworkRecentFeedback(f float64) {
+	m.upwork_recent_feedback = &f
+	m.addupwork_recent_feedback = nil
+}
+
+// UpworkRecentFeedback returns the value of the "upwork_recent_feedback" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkRecentFeedback() (r float64, exists bool) {
+	v := m.upwork_recent_feedback
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkRecentFeedback returns the old "upwork_recent_feedback" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkRecentFeedback(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkRecentFeedback is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkRecentFeedback requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkRecentFeedback: %w", err)
+	}
+	return oldValue.UpworkRecentFeedback, nil
+}
+
+// AddUpworkRecentFeedback adds f to the "upwork_recent_feedback" field.
+func (m *UpworkFreelancerMutation) AddUpworkRecentFeedback(f float64) {
+	if m.addupwork_recent_feedback != nil {
+		*m.addupwork_recent_feedback += f
+	} else {
+		m.addupwork_recent_feedback = &f
+	}
+}
+
+// AddedUpworkRecentFeedback returns the value that was added to the "upwork_recent_feedback" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedUpworkRecentFeedback() (r float64, exists bool) {
+	v := m.addupwork_recent_feedback
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpworkRecentFeedback resets all changes to the "upwork_recent_feedback" field.
+func (m *UpworkFreelancerMutation) ResetUpworkRecentFeedback() {
+	m.upwork_recent_feedback = nil
+	m.addupwork_recent_feedback = nil
+}
+
+// SetUpworkTopRatedStatus sets the "upwork_top_rated_status" field.
+func (m *UpworkFreelancerMutation) SetUpworkTopRatedStatus(b bool) {
+	m.upwork_top_rated_status = &b
+}
+
+// UpworkTopRatedStatus returns the value of the "upwork_top_rated_status" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkTopRatedStatus() (r bool, exists bool) {
+	v := m.upwork_top_rated_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkTopRatedStatus returns the old "upwork_top_rated_status" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkTopRatedStatus(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkTopRatedStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkTopRatedStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkTopRatedStatus: %w", err)
+	}
+	return oldValue.UpworkTopRatedStatus, nil
+}
+
+// ResetUpworkTopRatedStatus resets all changes to the "upwork_top_rated_status" field.
+func (m *UpworkFreelancerMutation) ResetUpworkTopRatedStatus() {
+	m.upwork_top_rated_status = nil
+}
+
+// SetUpworkTopRatedPlusStatus sets the "upwork_top_rated_plus_status" field.
+func (m *UpworkFreelancerMutation) SetUpworkTopRatedPlusStatus(b bool) {
+	m.upwork_top_rated_plus_status = &b
+}
+
+// UpworkTopRatedPlusStatus returns the value of the "upwork_top_rated_plus_status" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkTopRatedPlusStatus() (r bool, exists bool) {
+	v := m.upwork_top_rated_plus_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkTopRatedPlusStatus returns the old "upwork_top_rated_plus_status" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkTopRatedPlusStatus(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkTopRatedPlusStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkTopRatedPlusStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkTopRatedPlusStatus: %w", err)
+	}
+	return oldValue.UpworkTopRatedPlusStatus, nil
+}
+
+// ResetUpworkTopRatedPlusStatus resets all changes to the "upwork_top_rated_plus_status" field.
+func (m *UpworkFreelancerMutation) ResetUpworkTopRatedPlusStatus() {
+	m.upwork_top_rated_plus_status = nil
+}
+
+// SetUpworkSponsored sets the "upwork_sponsored" field.
+func (m *UpworkFreelancerMutation) SetUpworkSponsored(b bool) {
+	m.upwork_sponsored = &b
+}
+
+// UpworkSponsored returns the value of the "upwork_sponsored" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkSponsored() (r bool, exists bool) {
+	v := m.upwork_sponsored
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkSponsored returns the old "upwork_sponsored" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkSponsored(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkSponsored is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkSponsored requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkSponsored: %w", err)
+	}
+	return oldValue.UpworkSponsored, nil
+}
+
+// ResetUpworkSponsored resets all changes to the "upwork_sponsored" field.
+func (m *UpworkFreelancerMutation) ResetUpworkSponsored() {
+	m.upwork_sponsored = nil
+}
+
+// SetUpworkJobSuccessScore sets the "upwork_job_success_score" field.
+func (m *UpworkFreelancerMutation) SetUpworkJobSuccessScore(f float64) {
+	m.upwork_job_success_score = &f
+	m.addupwork_job_success_score = nil
+}
+
+// UpworkJobSuccessScore returns the value of the "upwork_job_success_score" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkJobSuccessScore() (r float64, exists bool) {
+	v := m.upwork_job_success_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkJobSuccessScore returns the old "upwork_job_success_score" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkJobSuccessScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkJobSuccessScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkJobSuccessScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkJobSuccessScore: %w", err)
+	}
+	return oldValue.UpworkJobSuccessScore, nil
+}
+
+// AddUpworkJobSuccessScore adds f to the "upwork_job_success_score" field.
+func (m *UpworkFreelancerMutation) AddUpworkJobSuccessScore(f float64) {
+	if m.addupwork_job_success_score != nil {
+		*m.addupwork_job_success_score += f
+	} else {
+		m.addupwork_job_success_score = &f
+	}
+}
+
+// AddedUpworkJobSuccessScore returns the value that was added to the "upwork_job_success_score" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedUpworkJobSuccessScore() (r float64, exists bool) {
+	v := m.addupwork_job_success_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpworkJobSuccessScore resets all changes to the "upwork_job_success_score" field.
+func (m *UpworkFreelancerMutation) ResetUpworkJobSuccessScore() {
+	m.upwork_job_success_score = nil
+	m.addupwork_job_success_score = nil
+}
+
+// SetUpworkReccomended sets the "upwork_reccomended" field.
+func (m *UpworkFreelancerMutation) SetUpworkReccomended(b bool) {
+	m.upwork_reccomended = &b
+}
+
+// UpworkReccomended returns the value of the "upwork_reccomended" field in the mutation.
+func (m *UpworkFreelancerMutation) UpworkReccomended() (r bool, exists bool) {
+	v := m.upwork_reccomended
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpworkReccomended returns the old "upwork_reccomended" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpworkReccomended(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpworkReccomended is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpworkReccomended requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpworkReccomended: %w", err)
+	}
+	return oldValue.UpworkReccomended, nil
+}
+
+// ResetUpworkReccomended resets all changes to the "upwork_reccomended" field.
+func (m *UpworkFreelancerMutation) ResetUpworkReccomended() {
+	m.upwork_reccomended = nil
+}
+
+// SetSkills sets the "skills" field.
+func (m *UpworkFreelancerMutation) SetSkills(s []string) {
+	m.skills = &s
+	m.appendskills = nil
+}
+
+// Skills returns the value of the "skills" field in the mutation.
+func (m *UpworkFreelancerMutation) Skills() (r []string, exists bool) {
+	v := m.skills
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSkills returns the old "skills" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldSkills(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSkills requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
+	}
+	return oldValue.Skills, nil
+}
+
+// AppendSkills adds s to the "skills" field.
+func (m *UpworkFreelancerMutation) AppendSkills(s []string) {
+	m.appendskills = append(m.appendskills, s...)
+}
+
+// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
+func (m *UpworkFreelancerMutation) AppendedSkills() ([]string, bool) {
+	if len(m.appendskills) == 0 {
+		return nil, false
+	}
+	return m.appendskills, true
+}
+
+// ResetSkills resets all changes to the "skills" field.
+func (m *UpworkFreelancerMutation) ResetSkills() {
+	m.skills = nil
+	m.appendskills = nil
+}
+
+// SetAverageRecentEarnings sets the "average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) SetAverageRecentEarnings(f float64) {
+	m.average_recent_earnings = &f
+	m.addaverage_recent_earnings = nil
+}
+
+// AverageRecentEarnings returns the value of the "average_recent_earnings" field in the mutation.
+func (m *UpworkFreelancerMutation) AverageRecentEarnings() (r float64, exists bool) {
+	v := m.average_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAverageRecentEarnings returns the old "average_recent_earnings" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldAverageRecentEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAverageRecentEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAverageRecentEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAverageRecentEarnings: %w", err)
+	}
+	return oldValue.AverageRecentEarnings, nil
+}
+
+// AddAverageRecentEarnings adds f to the "average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) AddAverageRecentEarnings(f float64) {
+	if m.addaverage_recent_earnings != nil {
+		*m.addaverage_recent_earnings += f
+	} else {
+		m.addaverage_recent_earnings = &f
+	}
+}
+
+// AddedAverageRecentEarnings returns the value that was added to the "average_recent_earnings" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedAverageRecentEarnings() (r float64, exists bool) {
+	v := m.addaverage_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAverageRecentEarnings resets all changes to the "average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) ResetAverageRecentEarnings() {
+	m.average_recent_earnings = nil
+	m.addaverage_recent_earnings = nil
+}
+
+// SetCombinedAverageRecentEarnings sets the "combined_average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) SetCombinedAverageRecentEarnings(f float64) {
+	m.combined_average_recent_earnings = &f
+	m.addcombined_average_recent_earnings = nil
+}
+
+// CombinedAverageRecentEarnings returns the value of the "combined_average_recent_earnings" field in the mutation.
+func (m *UpworkFreelancerMutation) CombinedAverageRecentEarnings() (r float64, exists bool) {
+	v := m.combined_average_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCombinedAverageRecentEarnings returns the old "combined_average_recent_earnings" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCombinedAverageRecentEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCombinedAverageRecentEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCombinedAverageRecentEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCombinedAverageRecentEarnings: %w", err)
+	}
+	return oldValue.CombinedAverageRecentEarnings, nil
+}
+
+// AddCombinedAverageRecentEarnings adds f to the "combined_average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) AddCombinedAverageRecentEarnings(f float64) {
+	if m.addcombined_average_recent_earnings != nil {
+		*m.addcombined_average_recent_earnings += f
+	} else {
+		m.addcombined_average_recent_earnings = &f
+	}
+}
+
+// AddedCombinedAverageRecentEarnings returns the value that was added to the "combined_average_recent_earnings" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedCombinedAverageRecentEarnings() (r float64, exists bool) {
+	v := m.addcombined_average_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCombinedAverageRecentEarnings resets all changes to the "combined_average_recent_earnings" field.
+func (m *UpworkFreelancerMutation) ResetCombinedAverageRecentEarnings() {
+	m.combined_average_recent_earnings = nil
+	m.addcombined_average_recent_earnings = nil
+}
+
+// SetCombinedRecentEarnings sets the "combined_recent_earnings" field.
+func (m *UpworkFreelancerMutation) SetCombinedRecentEarnings(f float64) {
+	m.combined_recent_earnings = &f
+	m.addcombined_recent_earnings = nil
+}
+
+// CombinedRecentEarnings returns the value of the "combined_recent_earnings" field in the mutation.
+func (m *UpworkFreelancerMutation) CombinedRecentEarnings() (r float64, exists bool) {
+	v := m.combined_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCombinedRecentEarnings returns the old "combined_recent_earnings" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCombinedRecentEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCombinedRecentEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCombinedRecentEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCombinedRecentEarnings: %w", err)
+	}
+	return oldValue.CombinedRecentEarnings, nil
+}
+
+// AddCombinedRecentEarnings adds f to the "combined_recent_earnings" field.
+func (m *UpworkFreelancerMutation) AddCombinedRecentEarnings(f float64) {
+	if m.addcombined_recent_earnings != nil {
+		*m.addcombined_recent_earnings += f
+	} else {
+		m.addcombined_recent_earnings = &f
+	}
+}
+
+// AddedCombinedRecentEarnings returns the value that was added to the "combined_recent_earnings" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedCombinedRecentEarnings() (r float64, exists bool) {
+	v := m.addcombined_recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCombinedRecentEarnings resets all changes to the "combined_recent_earnings" field.
+func (m *UpworkFreelancerMutation) ResetCombinedRecentEarnings() {
+	m.combined_recent_earnings = nil
+	m.addcombined_recent_earnings = nil
+}
+
+// SetCombinedTotalEarnings sets the "combined_total_earnings" field.
+func (m *UpworkFreelancerMutation) SetCombinedTotalEarnings(f float64) {
+	m.combined_total_earnings = &f
+	m.addcombined_total_earnings = nil
+}
+
+// CombinedTotalEarnings returns the value of the "combined_total_earnings" field in the mutation.
+func (m *UpworkFreelancerMutation) CombinedTotalEarnings() (r float64, exists bool) {
+	v := m.combined_total_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCombinedTotalEarnings returns the old "combined_total_earnings" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCombinedTotalEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCombinedTotalEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCombinedTotalEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCombinedTotalEarnings: %w", err)
+	}
+	return oldValue.CombinedTotalEarnings, nil
+}
+
+// AddCombinedTotalEarnings adds f to the "combined_total_earnings" field.
+func (m *UpworkFreelancerMutation) AddCombinedTotalEarnings(f float64) {
+	if m.addcombined_total_earnings != nil {
+		*m.addcombined_total_earnings += f
+	} else {
+		m.addcombined_total_earnings = &f
+	}
+}
+
+// AddedCombinedTotalEarnings returns the value that was added to the "combined_total_earnings" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedCombinedTotalEarnings() (r float64, exists bool) {
+	v := m.addcombined_total_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCombinedTotalEarnings resets all changes to the "combined_total_earnings" field.
+func (m *UpworkFreelancerMutation) ResetCombinedTotalEarnings() {
+	m.combined_total_earnings = nil
+	m.addcombined_total_earnings = nil
+}
+
+// SetCombinedTotalRevenue sets the "combined_total_revenue" field.
+func (m *UpworkFreelancerMutation) SetCombinedTotalRevenue(f float64) {
+	m.combined_total_revenue = &f
+	m.addcombined_total_revenue = nil
+}
+
+// CombinedTotalRevenue returns the value of the "combined_total_revenue" field in the mutation.
+func (m *UpworkFreelancerMutation) CombinedTotalRevenue() (r float64, exists bool) {
+	v := m.combined_total_revenue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCombinedTotalRevenue returns the old "combined_total_revenue" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCombinedTotalRevenue(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCombinedTotalRevenue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCombinedTotalRevenue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCombinedTotalRevenue: %w", err)
+	}
+	return oldValue.CombinedTotalRevenue, nil
+}
+
+// AddCombinedTotalRevenue adds f to the "combined_total_revenue" field.
+func (m *UpworkFreelancerMutation) AddCombinedTotalRevenue(f float64) {
+	if m.addcombined_total_revenue != nil {
+		*m.addcombined_total_revenue += f
+	} else {
+		m.addcombined_total_revenue = &f
+	}
+}
+
+// AddedCombinedTotalRevenue returns the value that was added to the "combined_total_revenue" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedCombinedTotalRevenue() (r float64, exists bool) {
+	v := m.addcombined_total_revenue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCombinedTotalRevenue resets all changes to the "combined_total_revenue" field.
+func (m *UpworkFreelancerMutation) ResetCombinedTotalRevenue() {
+	m.combined_total_revenue = nil
+	m.addcombined_total_revenue = nil
+}
+
+// SetRecentEarnings sets the "recent_earnings" field.
+func (m *UpworkFreelancerMutation) SetRecentEarnings(f float64) {
+	m.recent_earnings = &f
+	m.addrecent_earnings = nil
+}
+
+// RecentEarnings returns the value of the "recent_earnings" field in the mutation.
+func (m *UpworkFreelancerMutation) RecentEarnings() (r float64, exists bool) {
+	v := m.recent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecentEarnings returns the old "recent_earnings" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldRecentEarnings(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecentEarnings is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecentEarnings requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecentEarnings: %w", err)
+	}
+	return oldValue.RecentEarnings, nil
+}
+
+// AddRecentEarnings adds f to the "recent_earnings" field.
+func (m *UpworkFreelancerMutation) AddRecentEarnings(f float64) {
+	if m.addrecent_earnings != nil {
+		*m.addrecent_earnings += f
+	} else {
+		m.addrecent_earnings = &f
+	}
+}
+
+// AddedRecentEarnings returns the value that was added to the "recent_earnings" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedRecentEarnings() (r float64, exists bool) {
+	v := m.addrecent_earnings
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRecentEarnings resets all changes to the "recent_earnings" field.
+func (m *UpworkFreelancerMutation) ResetRecentEarnings() {
+	m.recent_earnings = nil
+	m.addrecent_earnings = nil
+}
+
+// SetTotalRevenue sets the "total_revenue" field.
+func (m *UpworkFreelancerMutation) SetTotalRevenue(f float64) {
+	m.total_revenue = &f
+	m.addtotal_revenue = nil
+}
+
+// TotalRevenue returns the value of the "total_revenue" field in the mutation.
+func (m *UpworkFreelancerMutation) TotalRevenue() (r float64, exists bool) {
+	v := m.total_revenue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalRevenue returns the old "total_revenue" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldTotalRevenue(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalRevenue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalRevenue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalRevenue: %w", err)
+	}
+	return oldValue.TotalRevenue, nil
+}
+
+// AddTotalRevenue adds f to the "total_revenue" field.
+func (m *UpworkFreelancerMutation) AddTotalRevenue(f float64) {
+	if m.addtotal_revenue != nil {
+		*m.addtotal_revenue += f
+	} else {
+		m.addtotal_revenue = &f
+	}
+}
+
+// AddedTotalRevenue returns the value that was added to the "total_revenue" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedTotalRevenue() (r float64, exists bool) {
+	v := m.addtotal_revenue
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalRevenue resets all changes to the "total_revenue" field.
+func (m *UpworkFreelancerMutation) ResetTotalRevenue() {
+	m.total_revenue = nil
+	m.addtotal_revenue = nil
+}
+
+// SetUprankScore sets the "uprank_score" field.
+func (m *UpworkFreelancerMutation) SetUprankScore(i int) {
+	m.uprank_score = &i
+	m.adduprank_score = nil
+}
+
+// UprankScore returns the value of the "uprank_score" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankScore() (r int, exists bool) {
+	v := m.uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankScore returns the old "uprank_score" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUprankScore(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankScore: %w", err)
+	}
+	return oldValue.UprankScore, nil
+}
+
+// AddUprankScore adds i to the "uprank_score" field.
+func (m *UpworkFreelancerMutation) AddUprankScore(i int) {
+	if m.adduprank_score != nil {
+		*m.adduprank_score += i
+	} else {
+		m.adduprank_score = &i
+	}
+}
+
+// AddedUprankScore returns the value that was added to the "uprank_score" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedUprankScore() (r int, exists bool) {
+	v := m.adduprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUprankScore clears the value of the "uprank_score" field.
+func (m *UpworkFreelancerMutation) ClearUprankScore() {
+	m.uprank_score = nil
+	m.adduprank_score = nil
+	m.clearedFields[upworkfreelancer.FieldUprankScore] = struct{}{}
+}
+
+// UprankScoreCleared returns if the "uprank_score" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankScoreCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankScore]
+	return ok
+}
+
+// ResetUprankScore resets all changes to the "uprank_score" field.
+func (m *UpworkFreelancerMutation) ResetUprankScore() {
+	m.uprank_score = nil
+	m.adduprank_score = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankScore)
+}
+
+// SetUprankUpdatedAt sets the "uprank_updated_at" field.
+func (m *UpworkFreelancerMutation) SetUprankUpdatedAt(t time.Time) {
+	m.uprank_updated_at = &t
+}
+
+// UprankUpdatedAt returns the value of the "uprank_updated_at" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankUpdatedAt() (r time.Time, exists bool) {
+	v := m.uprank_updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankUpdatedAt returns the old "uprank_updated_at" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUprankUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankUpdatedAt: %w", err)
+	}
+	return oldValue.UprankUpdatedAt, nil
+}
+
+// ResetUprankUpdatedAt resets all changes to the "uprank_updated_at" field.
+func (m *UpworkFreelancerMutation) ResetUprankUpdatedAt() {
+	m.uprank_updated_at = nil
+}
+
+// SetUprankReccomended sets the "uprank_reccomended" field.
+func (m *UpworkFreelancerMutation) SetUprankReccomended(b bool) {
+	m.uprank_reccomended = &b
+}
+
+// UprankReccomended returns the value of the "uprank_reccomended" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankReccomended() (r bool, exists bool) {
+	v := m.uprank_reccomended
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankReccomended returns the old "uprank_reccomended" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUprankReccomended(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankReccomended is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankReccomended requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankReccomended: %w", err)
+	}
+	return oldValue.UprankReccomended, nil
+}
+
+// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
+func (m *UpworkFreelancerMutation) ClearUprankReccomended() {
+	m.uprank_reccomended = nil
+	m.clearedFields[upworkfreelancer.FieldUprankReccomended] = struct{}{}
+}
+
+// UprankReccomendedCleared returns if the "uprank_reccomended" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankReccomendedCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankReccomended]
+	return ok
+}
+
+// ResetUprankReccomended resets all changes to the "uprank_reccomended" field.
+func (m *UpworkFreelancerMutation) ResetUprankReccomended() {
+	m.uprank_reccomended = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankReccomended)
+}
+
+// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
+func (m *UpworkFreelancerMutation) SetUprankReccomendedReasons(s string) {
+	m.uprank_reccomended_reasons = &s
+}
+
+// UprankReccomendedReasons returns the value of the "uprank_reccomended_reasons" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankReccomendedReasons() (r string, exists bool) {
+	v := m.uprank_reccomended_reasons
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankReccomendedReasons returns the old "uprank_reccomended_reasons" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUprankReccomendedReasons(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankReccomendedReasons is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankReccomendedReasons requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankReccomendedReasons: %w", err)
+	}
+	return oldValue.UprankReccomendedReasons, nil
+}
+
+// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
+func (m *UpworkFreelancerMutation) ClearUprankReccomendedReasons() {
+	m.uprank_reccomended_reasons = nil
+	m.clearedFields[upworkfreelancer.FieldUprankReccomendedReasons] = struct{}{}
+}
+
+// UprankReccomendedReasonsCleared returns if the "uprank_reccomended_reasons" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankReccomendedReasonsCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankReccomendedReasons]
+	return ok
+}
+
+// ResetUprankReccomendedReasons resets all changes to the "uprank_reccomended_reasons" field.
+func (m *UpworkFreelancerMutation) ResetUprankReccomendedReasons() {
+	m.uprank_reccomended_reasons = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankReccomendedReasons)
+}
+
+// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
+func (m *UpworkFreelancerMutation) SetUprankNotEnoughData(b bool) {
+	m.uprank_not_enough_data = &b
+}
+
+// UprankNotEnoughData returns the value of the "uprank_not_enough_data" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankNotEnoughData() (r bool, exists bool) {
+	v := m.uprank_not_enough_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankNotEnoughData returns the old "uprank_not_enough_data" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUprankNotEnoughData(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankNotEnoughData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankNotEnoughData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankNotEnoughData: %w", err)
+	}
+	return oldValue.UprankNotEnoughData, nil
+}
+
+// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
+func (m *UpworkFreelancerMutation) ClearUprankNotEnoughData() {
+	m.uprank_not_enough_data = nil
+	m.clearedFields[upworkfreelancer.FieldUprankNotEnoughData] = struct{}{}
+}
+
+// UprankNotEnoughDataCleared returns if the "uprank_not_enough_data" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankNotEnoughDataCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankNotEnoughData]
+	return ok
+}
+
+// ResetUprankNotEnoughData resets all changes to the "uprank_not_enough_data" field.
+func (m *UpworkFreelancerMutation) ResetUprankNotEnoughData() {
+	m.uprank_not_enough_data = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankNotEnoughData)
+}
+
+// AddJobIDs adds the "job" edge to the Job entity by ids.
+func (m *UpworkFreelancerMutation) AddJobIDs(ids ...string) {
+	if m.job == nil {
+		m.job = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.job[ids[i]] = struct{}{}
+	}
+}
+
+// ClearJob clears the "job" edge to the Job entity.
+func (m *UpworkFreelancerMutation) ClearJob() {
+	m.clearedjob = true
+}
+
+// JobCleared reports if the "job" edge to the Job entity was cleared.
+func (m *UpworkFreelancerMutation) JobCleared() bool {
+	return m.clearedjob
+}
+
+// RemoveJobIDs removes the "job" edge to the Job entity by IDs.
+func (m *UpworkFreelancerMutation) RemoveJobIDs(ids ...string) {
+	if m.removedjob == nil {
+		m.removedjob = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.job, ids[i])
+		m.removedjob[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedJob returns the removed IDs of the "job" edge to the Job entity.
+func (m *UpworkFreelancerMutation) RemovedJobIDs() (ids []string) {
+	for id := range m.removedjob {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// JobIDs returns the "job" edge IDs in the mutation.
+func (m *UpworkFreelancerMutation) JobIDs() (ids []string) {
+	for id := range m.job {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetJob resets all changes to the "job" edge.
+func (m *UpworkFreelancerMutation) ResetJob() {
+	m.job = nil
+	m.clearedjob = false
+	m.removedjob = nil
+}
+
+// AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by ids.
+func (m *UpworkFreelancerMutation) AddAttachmentIDs(ids ...int) {
+	if m.attachments == nil {
+		m.attachments = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.attachments[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAttachments clears the "attachments" edge to the AttachmentRef entity.
+func (m *UpworkFreelancerMutation) ClearAttachments() {
+	m.clearedattachments = true
+}
+
+// AttachmentsCleared reports if the "attachments" edge to the AttachmentRef entity was cleared.
+func (m *UpworkFreelancerMutation) AttachmentsCleared() bool {
+	return m.clearedattachments
+}
+
+// RemoveAttachmentIDs removes the "attachments" edge to the AttachmentRef entity by IDs.
+func (m *UpworkFreelancerMutation) RemoveAttachmentIDs(ids ...int) {
+	if m.removedattachments == nil {
+		m.removedattachments = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.attachments, ids[i])
+		m.removedattachments[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAttachments returns the removed IDs of the "attachments" edge to the AttachmentRef entity.
+func (m *UpworkFreelancerMutation) RemovedAttachmentsIDs() (ids []int) {
+	for id := range m.removedattachments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AttachmentsIDs returns the "attachments" edge IDs in the mutation.
+func (m *UpworkFreelancerMutation) AttachmentsIDs() (ids []int) {
+	for id := range m.attachments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAttachments resets all changes to the "attachments" edge.
+func (m *UpworkFreelancerMutation) ResetAttachments() {
+	m.attachments = nil
+	m.clearedattachments = false
+	m.removedattachments = nil
+}
+
+// AddWorkHistoryIDs adds the "work_histories" edge to the WorkHistory entity by ids.
+func (m *UpworkFreelancerMutation) AddWorkHistoryIDs(ids ...int) {
+	if m.work_histories == nil {
+		m.work_histories = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.work_histories[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWorkHistories clears the "work_histories" edge to the WorkHistory entity.
+func (m *UpworkFreelancerMutation) ClearWorkHistories() {
+	m.clearedwork_histories = true
+}
+
+// WorkHistoriesCleared reports if the "work_histories" edge to the WorkHistory entity was cleared.
+func (m *UpworkFreelancerMutation) WorkHistoriesCleared() bool {
+	return m.clearedwork_histories
+}
+
+// RemoveWorkHistoryIDs removes the "work_histories" edge to the WorkHistory entity by IDs.
+func (m *UpworkFreelancerMutation) RemoveWorkHistoryIDs(ids ...int) {
+	if m.removedwork_histories == nil {
+		m.removedwork_histories = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.work_histories, ids[i])
+		m.removedwork_histories[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWorkHistories returns the removed IDs of the "work_histories" edge to the WorkHistory entity.
+func (m *UpworkFreelancerMutation) RemovedWorkHistoriesIDs() (ids []int) {
+	for id := range m.removedwork_histories {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WorkHistoriesIDs returns the "work_histories" edge IDs in the mutation.
+func (m *UpworkFreelancerMutation) WorkHistoriesIDs() (ids []int) {
+	for id := range m.work_histories {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWorkHistories resets all changes to the "work_histories" edge.
+func (m *UpworkFreelancerMutation) ResetWorkHistories() {
+	m.work_histories = nil
+	m.clearedwork_histories = false
+	m.removedwork_histories = nil
+}
+
+// Where appends a list predicates to the UpworkFreelancerMutation builder.
+func (m *UpworkFreelancerMutation) Where(ps ...predicate.UpworkFreelancer) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the UpworkFreelancerMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *UpworkFreelancerMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.UpworkFreelancer, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *UpworkFreelancerMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *UpworkFreelancerMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (UpworkFreelancer).
+func (m *UpworkFreelancerMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UpworkFreelancerMutation) Fields() []string {
+	fields := make([]string, 0, 38)
+	if m.name != nil {
+		fields = append(fields, upworkfreelancer.FieldName)
+	}
+	if m.title != nil {
+		fields = append(fields, upworkfreelancer.FieldTitle)
+	}
+	if m.description != nil {
+		fields = append(fields, upworkfreelancer.FieldDescription)
+	}
+	if m.city != nil {
+		fields = append(fields, upworkfreelancer.FieldCity)
+	}
+	if m.country != nil {
+		fields = append(fields, upworkfreelancer.FieldCountry)
+	}
+	if m.timezone != nil {
+		fields = append(fields, upworkfreelancer.FieldTimezone)
+	}
+	if m.cv != nil {
+		fields = append(fields, upworkfreelancer.FieldCv)
+	}
+	if m.ai_reccomended != nil {
+		fields = append(fields, upworkfreelancer.FieldAiReccomended)
+	}
+	if m.fixed_charge_amount != nil {
+		fields = append(fields, upworkfreelancer.FieldFixedChargeAmount)
+	}
+	if m.fixed_charge_currency != nil {
+		fields = append(fields, upworkfreelancer.FieldFixedChargeCurrency)
+	}
+	if m.hourly_charge_amount != nil {
+		fields = append(fields, upworkfreelancer.FieldHourlyChargeAmount)
+	}
+	if m.hourly_charge_currency != nil {
+		fields = append(fields, upworkfreelancer.FieldHourlyChargeCurrency)
+	}
+	if m.invited != nil {
+		fields = append(fields, upworkfreelancer.FieldInvited)
+	}
+	if m.photo_url != nil {
+		fields = append(fields, upworkfreelancer.FieldPhotoURL)
+	}
+	if m.recent_hours != nil {
+		fields = append(fields, upworkfreelancer.FieldRecentHours)
+	}
+	if m.total_hours != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalHours)
+	}
+	if m.total_portfolio_items != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalPortfolioItems)
+	}
+	if m.total_portfolio_v2_items != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalPortfolioV2Items)
+	}
+	if m.upwork_total_feedback != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkTotalFeedback)
+	}
+	if m.upwork_recent_feedback != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkRecentFeedback)
+	}
+	if m.upwork_top_rated_status != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkTopRatedStatus)
+	}
+	if m.upwork_top_rated_plus_status != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkTopRatedPlusStatus)
+	}
+	if m.upwork_sponsored != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkSponsored)
+	}
+	if m.upwork_job_success_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkJobSuccessScore)
+	}
+	if m.upwork_reccomended != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkReccomended)
+	}
+	if m.skills != nil {
+		fields = append(fields, upworkfreelancer.FieldSkills)
+	}
+	if m.average_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldAverageRecentEarnings)
+	}
+	if m.combined_average_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedAverageRecentEarnings)
+	}
+	if m.combined_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedRecentEarnings)
+	}
+	if m.combined_total_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedTotalEarnings)
+	}
+	if m.combined_total_revenue != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedTotalRevenue)
+	}
+	if m.recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldRecentEarnings)
+	}
+	if m.total_revenue != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
+	}
+	if m.uprank_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankScore)
+	}
+	if m.uprank_updated_at != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankUpdatedAt)
+	}
+	if m.uprank_reccomended != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
+	}
+	if m.uprank_reccomended_reasons != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankReccomendedReasons)
+	}
+	if m.uprank_not_enough_data != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankNotEnoughData)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case upworkfreelancer.FieldName:
+		return m.Name()
+	case upworkfreelancer.FieldTitle:
+		return m.Title()
+	case upworkfreelancer.FieldDescription:
+		return m.Description()
+	case upworkfreelancer.FieldCity:
+		return m.City()
+	case upworkfreelancer.FieldCountry:
+		return m.Country()
+	case upworkfreelancer.FieldTimezone:
+		return m.Timezone()
+	case upworkfreelancer.FieldCv:
+		return m.Cv()
+	case upworkfreelancer.FieldAiReccomended:
+		return m.AiReccomended()
+	case upworkfreelancer.FieldFixedChargeAmount:
+		return m.FixedChargeAmount()
+	case upworkfreelancer.FieldFixedChargeCurrency:
+		return m.FixedChargeCurrency()
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		return m.HourlyChargeAmount()
+	case upworkfreelancer.FieldHourlyChargeCurrency:
+		return m.HourlyChargeCurrency()
+	case upworkfreelancer.FieldInvited:
+		return m.Invited()
+	case upworkfreelancer.FieldPhotoURL:
+		return m.PhotoURL()
+	case upworkfreelancer.FieldRecentHours:
+		return m.RecentHours()
+	case upworkfreelancer.FieldTotalHours:
+		return m.TotalHours()
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		return m.TotalPortfolioItems()
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		return m.TotalPortfolioV2Items()
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		return m.UpworkTotalFeedback()
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		return m.UpworkRecentFeedback()
+	case upworkfreelancer.FieldUpworkTopRatedStatus:
+		return m.UpworkTopRatedStatus()
+	case upworkfreelancer.FieldUpworkTopRatedPlusStatus:
+		return m.UpworkTopRatedPlusStatus()
+	case upworkfreelancer.FieldUpworkSponsored:
+		return m.UpworkSponsored()
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		return m.UpworkJobSuccessScore()
+	case upworkfreelancer.FieldUpworkReccomended:
+		return m.UpworkReccomended()
+	case upworkfreelancer.FieldSkills:
+		return m.Skills()
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		return m.AverageRecentEarnings()
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		return m.CombinedAverageRecentEarnings()
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		return m.CombinedRecentEarnings()
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		return m.CombinedTotalEarnings()
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		return m.CombinedTotalRevenue()
+	case upworkfreelancer.FieldRecentEarnings:
+		return m.RecentEarnings()
+	case upworkfreelancer.FieldTotalRevenue:
+		return m.TotalRevenue()
+	case upworkfreelancer.FieldUprankScore:
+		return m.UprankScore()
+	case upworkfreelancer.FieldUprankUpdatedAt:
+		return m.UprankUpdatedAt()
+	case upworkfreelancer.FieldUprankReccomended:
+		return m.UprankReccomended()
+	case upworkfreelancer.FieldUprankReccomendedReasons:
+		return m.UprankReccomendedReasons()
+	case upworkfreelancer.FieldUprankNotEnoughData:
+		return m.UprankNotEnoughData()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case upworkfreelancer.FieldName:
+		return m.OldName(ctx)
+	case upworkfreelancer.FieldTitle:
+		return m.OldTitle(ctx)
+	case upworkfreelancer.FieldDescription:
+		return m.OldDescription(ctx)
+	case upworkfreelancer.FieldCity:
+		return m.OldCity(ctx)
+	case upworkfreelancer.FieldCountry:
+		return m.OldCountry(ctx)
+	case upworkfreelancer.FieldTimezone:
+		return m.OldTimezone(ctx)
+	case upworkfreelancer.FieldCv:
+		return m.OldCv(ctx)
+	case upworkfreelancer.FieldAiReccomended:
+		return m.OldAiReccomended(ctx)
+	case upworkfreelancer.FieldFixedChargeAmount:
+		return m.OldFixedChargeAmount(ctx)
+	case upworkfreelancer.FieldFixedChargeCurrency:
+		return m.OldFixedChargeCurrency(ctx)
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		return m.OldHourlyChargeAmount(ctx)
+	case upworkfreelancer.FieldHourlyChargeCurrency:
+		return m.OldHourlyChargeCurrency(ctx)
+	case upworkfreelancer.FieldInvited:
+		return m.OldInvited(ctx)
+	case upworkfreelancer.FieldPhotoURL:
+		return m.OldPhotoURL(ctx)
+	case upworkfreelancer.FieldRecentHours:
+		return m.OldRecentHours(ctx)
+	case upworkfreelancer.FieldTotalHours:
+		return m.OldTotalHours(ctx)
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		return m.OldTotalPortfolioItems(ctx)
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		return m.OldTotalPortfolioV2Items(ctx)
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		return m.OldUpworkTotalFeedback(ctx)
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		return m.OldUpworkRecentFeedback(ctx)
+	case upworkfreelancer.FieldUpworkTopRatedStatus:
+		return m.OldUpworkTopRatedStatus(ctx)
+	case upworkfreelancer.FieldUpworkTopRatedPlusStatus:
+		return m.OldUpworkTopRatedPlusStatus(ctx)
+	case upworkfreelancer.FieldUpworkSponsored:
+		return m.OldUpworkSponsored(ctx)
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		return m.OldUpworkJobSuccessScore(ctx)
+	case upworkfreelancer.FieldUpworkReccomended:
+		return m.OldUpworkReccomended(ctx)
+	case upworkfreelancer.FieldSkills:
+		return m.OldSkills(ctx)
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		return m.OldAverageRecentEarnings(ctx)
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		return m.OldCombinedAverageRecentEarnings(ctx)
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		return m.OldCombinedRecentEarnings(ctx)
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		return m.OldCombinedTotalEarnings(ctx)
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		return m.OldCombinedTotalRevenue(ctx)
+	case upworkfreelancer.FieldRecentEarnings:
+		return m.OldRecentEarnings(ctx)
+	case upworkfreelancer.FieldTotalRevenue:
+		return m.OldTotalRevenue(ctx)
+	case upworkfreelancer.FieldUprankScore:
+		return m.OldUprankScore(ctx)
+	case upworkfreelancer.FieldUprankUpdatedAt:
+		return m.OldUprankUpdatedAt(ctx)
+	case upworkfreelancer.FieldUprankReccomended:
+		return m.OldUprankReccomended(ctx)
+	case upworkfreelancer.FieldUprankReccomendedReasons:
+		return m.OldUprankReccomendedReasons(ctx)
+	case upworkfreelancer.FieldUprankNotEnoughData:
+		return m.OldUprankNotEnoughData(ctx)
+	}
+	return nil, fmt.Errorf("unknown UpworkFreelancer field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case upworkfreelancer.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case upworkfreelancer.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case upworkfreelancer.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case upworkfreelancer.FieldCity:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCity(v)
+		return nil
+	case upworkfreelancer.FieldCountry:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCountry(v)
+		return nil
+	case upworkfreelancer.FieldTimezone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimezone(v)
+		return nil
+	case upworkfreelancer.FieldCv:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCv(v)
+		return nil
+	case upworkfreelancer.FieldAiReccomended:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAiReccomended(v)
+		return nil
+	case upworkfreelancer.FieldFixedChargeAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFixedChargeAmount(v)
+		return nil
+	case upworkfreelancer.FieldFixedChargeCurrency:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFixedChargeCurrency(v)
+		return nil
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHourlyChargeAmount(v)
+		return nil
+	case upworkfreelancer.FieldHourlyChargeCurrency:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHourlyChargeCurrency(v)
+		return nil
+	case upworkfreelancer.FieldInvited:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvited(v)
+		return nil
+	case upworkfreelancer.FieldPhotoURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhotoURL(v)
+		return nil
+	case upworkfreelancer.FieldRecentHours:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecentHours(v)
+		return nil
+	case upworkfreelancer.FieldTotalHours:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalHours(v)
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalPortfolioItems(v)
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalPortfolioV2Items(v)
+		return nil
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkTotalFeedback(v)
+		return nil
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkRecentFeedback(v)
+		return nil
+	case upworkfreelancer.FieldUpworkTopRatedStatus:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkTopRatedStatus(v)
+		return nil
+	case upworkfreelancer.FieldUpworkTopRatedPlusStatus:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkTopRatedPlusStatus(v)
+		return nil
+	case upworkfreelancer.FieldUpworkSponsored:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkSponsored(v)
+		return nil
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkJobSuccessScore(v)
+		return nil
+	case upworkfreelancer.FieldUpworkReccomended:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpworkReccomended(v)
+		return nil
+	case upworkfreelancer.FieldSkills:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSkills(v)
+		return nil
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAverageRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCombinedAverageRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCombinedRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCombinedTotalEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCombinedTotalRevenue(v)
+		return nil
+	case upworkfreelancer.FieldRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldTotalRevenue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalRevenue(v)
+		return nil
+	case upworkfreelancer.FieldUprankScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankScore(v)
+		return nil
+	case upworkfreelancer.FieldUprankUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankUpdatedAt(v)
+		return nil
+	case upworkfreelancer.FieldUprankReccomended:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankReccomended(v)
+		return nil
+	case upworkfreelancer.FieldUprankReccomendedReasons:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankReccomendedReasons(v)
+		return nil
+	case upworkfreelancer.FieldUprankNotEnoughData:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankNotEnoughData(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkFreelancer field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UpworkFreelancerMutation) AddedFields() []string {
+	var fields []string
+	if m.addfixed_charge_amount != nil {
+		fields = append(fields, upworkfreelancer.FieldFixedChargeAmount)
+	}
+	if m.addhourly_charge_amount != nil {
+		fields = append(fields, upworkfreelancer.FieldHourlyChargeAmount)
+	}
+	if m.addrecent_hours != nil {
+		fields = append(fields, upworkfreelancer.FieldRecentHours)
+	}
+	if m.addtotal_hours != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalHours)
+	}
+	if m.addtotal_portfolio_items != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalPortfolioItems)
+	}
+	if m.addtotal_portfolio_v2_items != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalPortfolioV2Items)
+	}
+	if m.addupwork_total_feedback != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkTotalFeedback)
+	}
+	if m.addupwork_recent_feedback != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkRecentFeedback)
+	}
+	if m.addupwork_job_success_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUpworkJobSuccessScore)
+	}
+	if m.addaverage_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldAverageRecentEarnings)
+	}
+	if m.addcombined_average_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedAverageRecentEarnings)
+	}
+	if m.addcombined_recent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedRecentEarnings)
+	}
+	if m.addcombined_total_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedTotalEarnings)
+	}
+	if m.addcombined_total_revenue != nil {
+		fields = append(fields, upworkfreelancer.FieldCombinedTotalRevenue)
+	}
+	if m.addrecent_earnings != nil {
+		fields = append(fields, upworkfreelancer.FieldRecentEarnings)
+	}
+	if m.addtotal_revenue != nil {
+		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
+	}
+	if m.adduprank_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UpworkFreelancerMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case upworkfreelancer.FieldFixedChargeAmount:
+		return m.AddedFixedChargeAmount()
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		return m.AddedHourlyChargeAmount()
+	case upworkfreelancer.FieldRecentHours:
+		return m.AddedRecentHours()
+	case upworkfreelancer.FieldTotalHours:
+		return m.AddedTotalHours()
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		return m.AddedTotalPortfolioItems()
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		return m.AddedTotalPortfolioV2Items()
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		return m.AddedUpworkTotalFeedback()
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		return m.AddedUpworkRecentFeedback()
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		return m.AddedUpworkJobSuccessScore()
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		return m.AddedAverageRecentEarnings()
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		return m.AddedCombinedAverageRecentEarnings()
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		return m.AddedCombinedRecentEarnings()
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		return m.AddedCombinedTotalEarnings()
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		return m.AddedCombinedTotalRevenue()
+	case upworkfreelancer.FieldRecentEarnings:
+		return m.AddedRecentEarnings()
+	case upworkfreelancer.FieldTotalRevenue:
+		return m.AddedTotalRevenue()
+	case upworkfreelancer.FieldUprankScore:
+		return m.AddedUprankScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UpworkFreelancerMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case upworkfreelancer.FieldFixedChargeAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFixedChargeAmount(v)
+		return nil
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddHourlyChargeAmount(v)
+		return nil
+	case upworkfreelancer.FieldRecentHours:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRecentHours(v)
+		return nil
+	case upworkfreelancer.FieldTotalHours:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalHours(v)
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalPortfolioItems(v)
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalPortfolioV2Items(v)
+		return nil
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpworkTotalFeedback(v)
+		return nil
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpworkRecentFeedback(v)
+		return nil
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpworkJobSuccessScore(v)
+		return nil
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAverageRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCombinedAverageRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCombinedRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCombinedTotalEarnings(v)
+		return nil
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCombinedTotalRevenue(v)
+		return nil
+	case upworkfreelancer.FieldRecentEarnings:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRecentEarnings(v)
+		return nil
+	case upworkfreelancer.FieldTotalRevenue:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalRevenue(v)
+		return nil
+	case upworkfreelancer.FieldUprankScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUprankScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkFreelancer numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UpworkFreelancerMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(upworkfreelancer.FieldFixedChargeAmount) {
+		fields = append(fields, upworkfreelancer.FieldFixedChargeAmount)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldHourlyChargeAmount) {
+		fields = append(fields, upworkfreelancer.FieldHourlyChargeAmount)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankScore) {
+		fields = append(fields, upworkfreelancer.FieldUprankScore)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankReccomended) {
+		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankReccomendedReasons) {
+		fields = append(fields, upworkfreelancer.FieldUprankReccomendedReasons)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankNotEnoughData) {
+		fields = append(fields, upworkfreelancer.FieldUprankNotEnoughData)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UpworkFreelancerMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UpworkFreelancerMutation) ClearField(name string) error {
+	switch name {
+	case upworkfreelancer.FieldFixedChargeAmount:
+		m.ClearFixedChargeAmount()
+		return nil
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		m.ClearHourlyChargeAmount()
+		return nil
+	case upworkfreelancer.FieldUprankScore:
+		m.ClearUprankScore()
+		return nil
+	case upworkfreelancer.FieldUprankReccomended:
+		m.ClearUprankReccomended()
+		return nil
+	case upworkfreelancer.FieldUprankReccomendedReasons:
+		m.ClearUprankReccomendedReasons()
+		return nil
+	case upworkfreelancer.FieldUprankNotEnoughData:
+		m.ClearUprankNotEnoughData()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkFreelancer nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UpworkFreelancerMutation) ResetField(name string) error {
+	switch name {
+	case upworkfreelancer.FieldName:
+		m.ResetName()
+		return nil
+	case upworkfreelancer.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case upworkfreelancer.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case upworkfreelancer.FieldCity:
+		m.ResetCity()
+		return nil
+	case upworkfreelancer.FieldCountry:
+		m.ResetCountry()
+		return nil
+	case upworkfreelancer.FieldTimezone:
+		m.ResetTimezone()
+		return nil
+	case upworkfreelancer.FieldCv:
+		m.ResetCv()
+		return nil
+	case upworkfreelancer.FieldAiReccomended:
+		m.ResetAiReccomended()
+		return nil
+	case upworkfreelancer.FieldFixedChargeAmount:
+		m.ResetFixedChargeAmount()
+		return nil
+	case upworkfreelancer.FieldFixedChargeCurrency:
+		m.ResetFixedChargeCurrency()
+		return nil
+	case upworkfreelancer.FieldHourlyChargeAmount:
+		m.ResetHourlyChargeAmount()
+		return nil
+	case upworkfreelancer.FieldHourlyChargeCurrency:
+		m.ResetHourlyChargeCurrency()
+		return nil
+	case upworkfreelancer.FieldInvited:
+		m.ResetInvited()
+		return nil
+	case upworkfreelancer.FieldPhotoURL:
+		m.ResetPhotoURL()
+		return nil
+	case upworkfreelancer.FieldRecentHours:
+		m.ResetRecentHours()
+		return nil
+	case upworkfreelancer.FieldTotalHours:
+		m.ResetTotalHours()
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioItems:
+		m.ResetTotalPortfolioItems()
+		return nil
+	case upworkfreelancer.FieldTotalPortfolioV2Items:
+		m.ResetTotalPortfolioV2Items()
+		return nil
+	case upworkfreelancer.FieldUpworkTotalFeedback:
+		m.ResetUpworkTotalFeedback()
+		return nil
+	case upworkfreelancer.FieldUpworkRecentFeedback:
+		m.ResetUpworkRecentFeedback()
+		return nil
+	case upworkfreelancer.FieldUpworkTopRatedStatus:
+		m.ResetUpworkTopRatedStatus()
+		return nil
+	case upworkfreelancer.FieldUpworkTopRatedPlusStatus:
+		m.ResetUpworkTopRatedPlusStatus()
+		return nil
+	case upworkfreelancer.FieldUpworkSponsored:
+		m.ResetUpworkSponsored()
+		return nil
+	case upworkfreelancer.FieldUpworkJobSuccessScore:
+		m.ResetUpworkJobSuccessScore()
+		return nil
+	case upworkfreelancer.FieldUpworkReccomended:
+		m.ResetUpworkReccomended()
+		return nil
+	case upworkfreelancer.FieldSkills:
+		m.ResetSkills()
+		return nil
+	case upworkfreelancer.FieldAverageRecentEarnings:
+		m.ResetAverageRecentEarnings()
+		return nil
+	case upworkfreelancer.FieldCombinedAverageRecentEarnings:
+		m.ResetCombinedAverageRecentEarnings()
+		return nil
+	case upworkfreelancer.FieldCombinedRecentEarnings:
+		m.ResetCombinedRecentEarnings()
+		return nil
+	case upworkfreelancer.FieldCombinedTotalEarnings:
+		m.ResetCombinedTotalEarnings()
+		return nil
+	case upworkfreelancer.FieldCombinedTotalRevenue:
+		m.ResetCombinedTotalRevenue()
+		return nil
+	case upworkfreelancer.FieldRecentEarnings:
+		m.ResetRecentEarnings()
+		return nil
+	case upworkfreelancer.FieldTotalRevenue:
+		m.ResetTotalRevenue()
+		return nil
+	case upworkfreelancer.FieldUprankScore:
+		m.ResetUprankScore()
+		return nil
+	case upworkfreelancer.FieldUprankUpdatedAt:
+		m.ResetUprankUpdatedAt()
+		return nil
+	case upworkfreelancer.FieldUprankReccomended:
+		m.ResetUprankReccomended()
+		return nil
+	case upworkfreelancer.FieldUprankReccomendedReasons:
+		m.ResetUprankReccomendedReasons()
+		return nil
+	case upworkfreelancer.FieldUprankNotEnoughData:
+		m.ResetUprankNotEnoughData()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkFreelancer field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UpworkFreelancerMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.job != nil {
+		edges = append(edges, upworkfreelancer.EdgeJob)
+	}
+	if m.attachments != nil {
+		edges = append(edges, upworkfreelancer.EdgeAttachments)
+	}
+	if m.work_histories != nil {
+		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UpworkFreelancerMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case upworkfreelancer.EdgeJob:
+		ids := make([]ent.Value, 0, len(m.job))
+		for id := range m.job {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkfreelancer.EdgeAttachments:
+		ids := make([]ent.Value, 0, len(m.attachments))
+		for id := range m.attachments {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkfreelancer.EdgeWorkHistories:
+		ids := make([]ent.Value, 0, len(m.work_histories))
+		for id := range m.work_histories {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UpworkFreelancerMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedjob != nil {
+		edges = append(edges, upworkfreelancer.EdgeJob)
+	}
+	if m.removedattachments != nil {
+		edges = append(edges, upworkfreelancer.EdgeAttachments)
+	}
+	if m.removedwork_histories != nil {
+		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UpworkFreelancerMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case upworkfreelancer.EdgeJob:
+		ids := make([]ent.Value, 0, len(m.removedjob))
+		for id := range m.removedjob {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkfreelancer.EdgeAttachments:
+		ids := make([]ent.Value, 0, len(m.removedattachments))
+		for id := range m.removedattachments {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkfreelancer.EdgeWorkHistories:
+		ids := make([]ent.Value, 0, len(m.removedwork_histories))
+		for id := range m.removedwork_histories {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UpworkFreelancerMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedjob {
+		edges = append(edges, upworkfreelancer.EdgeJob)
+	}
+	if m.clearedattachments {
+		edges = append(edges, upworkfreelancer.EdgeAttachments)
+	}
+	if m.clearedwork_histories {
+		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UpworkFreelancerMutation) EdgeCleared(name string) bool {
+	switch name {
+	case upworkfreelancer.EdgeJob:
+		return m.clearedjob
+	case upworkfreelancer.EdgeAttachments:
+		return m.clearedattachments
+	case upworkfreelancer.EdgeWorkHistories:
+		return m.clearedwork_histories
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UpworkFreelancerMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown UpworkFreelancer unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UpworkFreelancerMutation) ResetEdge(name string) error {
+	switch name {
+	case upworkfreelancer.EdgeJob:
+		m.ResetJob()
+		return nil
+	case upworkfreelancer.EdgeAttachments:
+		m.ResetAttachments()
+		return nil
+	case upworkfreelancer.EdgeWorkHistories:
+		m.ResetWorkHistories()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkFreelancer edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.
@@ -5912,7 +5936,6 @@ type WorkHistoryMutation struct {
 	client_feedback                    *string
 	overall_rating                     *float64
 	addoverall_rating                  *float64
-	is_hourly                          *bool
 	freelancer_earnings                *float64
 	addfreelancer_earnings             *float64
 	start_date                         *time.Time
@@ -5920,12 +5943,6 @@ type WorkHistoryMutation struct {
 	description                        *string
 	budget                             *float64
 	addbudget                          *float64
-	total_proposals                    *int
-	addtotal_proposals                 *int
-	number_of_interviews               *int
-	addnumber_of_interviews            *int
-	skills                             *[]string
-	appendskills                       []string
 	client_rating                      *float64
 	addclient_rating                   *float64
 	client_review_count                *int
@@ -5937,15 +5954,23 @@ type WorkHistoryMutation struct {
 	addclient_total_spend              *float64
 	client_total_hires                 *int
 	addclient_total_hires              *int
+	client_active_hires                *int
+	addclient_active_hires             *int
 	client_total_paid_hours            *int
 	addclient_total_paid_hours         *int
 	client_average_hourly_rate_paid    *float64
 	addclient_average_hourly_rate_paid *float64
 	client_company_category            *string
 	client_company_size                *string
+	total_proposals                    *int
+	addtotal_proposals                 *int
+	number_of_interviews               *int
+	addnumber_of_interviews            *int
+	skills                             *[]string
+	appendskills                       []string
 	clearedFields                      map[string]struct{}
-	upwork_Freelancer_Proposal         *string
-	clearedupwork_Freelancer_Proposal  bool
+	freelancer                         *string
+	clearedfreelancer                  bool
 	done                               bool
 	oldValue                           func(context.Context) (*WorkHistory, error)
 	predicates                         []predicate.WorkHistory
@@ -6116,9 +6141,22 @@ func (m *WorkHistoryMutation) OldClientFeedback(ctx context.Context) (v string, 
 	return oldValue.ClientFeedback, nil
 }
 
+// ClearClientFeedback clears the value of the "client_feedback" field.
+func (m *WorkHistoryMutation) ClearClientFeedback() {
+	m.client_feedback = nil
+	m.clearedFields[workhistory.FieldClientFeedback] = struct{}{}
+}
+
+// ClientFeedbackCleared returns if the "client_feedback" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientFeedbackCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientFeedback]
+	return ok
+}
+
 // ResetClientFeedback resets all changes to the "client_feedback" field.
 func (m *WorkHistoryMutation) ResetClientFeedback() {
 	m.client_feedback = nil
+	delete(m.clearedFields, workhistory.FieldClientFeedback)
 }
 
 // SetOverallRating sets the "overall_rating" field.
@@ -6171,46 +6209,24 @@ func (m *WorkHistoryMutation) AddedOverallRating() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearOverallRating clears the value of the "overall_rating" field.
+func (m *WorkHistoryMutation) ClearOverallRating() {
+	m.overall_rating = nil
+	m.addoverall_rating = nil
+	m.clearedFields[workhistory.FieldOverallRating] = struct{}{}
+}
+
+// OverallRatingCleared returns if the "overall_rating" field was cleared in this mutation.
+func (m *WorkHistoryMutation) OverallRatingCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldOverallRating]
+	return ok
+}
+
 // ResetOverallRating resets all changes to the "overall_rating" field.
 func (m *WorkHistoryMutation) ResetOverallRating() {
 	m.overall_rating = nil
 	m.addoverall_rating = nil
-}
-
-// SetIsHourly sets the "is_hourly" field.
-func (m *WorkHistoryMutation) SetIsHourly(b bool) {
-	m.is_hourly = &b
-}
-
-// IsHourly returns the value of the "is_hourly" field in the mutation.
-func (m *WorkHistoryMutation) IsHourly() (r bool, exists bool) {
-	v := m.is_hourly
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsHourly returns the old "is_hourly" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldIsHourly(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsHourly is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsHourly requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsHourly: %w", err)
-	}
-	return oldValue.IsHourly, nil
-}
-
-// ResetIsHourly resets all changes to the "is_hourly" field.
-func (m *WorkHistoryMutation) ResetIsHourly() {
-	m.is_hourly = nil
+	delete(m.clearedFields, workhistory.FieldOverallRating)
 }
 
 // SetFreelancerEarnings sets the "freelancer_earnings" field.
@@ -6263,10 +6279,24 @@ func (m *WorkHistoryMutation) AddedFreelancerEarnings() (r float64, exists bool)
 	return *v, true
 }
 
+// ClearFreelancerEarnings clears the value of the "freelancer_earnings" field.
+func (m *WorkHistoryMutation) ClearFreelancerEarnings() {
+	m.freelancer_earnings = nil
+	m.addfreelancer_earnings = nil
+	m.clearedFields[workhistory.FieldFreelancerEarnings] = struct{}{}
+}
+
+// FreelancerEarningsCleared returns if the "freelancer_earnings" field was cleared in this mutation.
+func (m *WorkHistoryMutation) FreelancerEarningsCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldFreelancerEarnings]
+	return ok
+}
+
 // ResetFreelancerEarnings resets all changes to the "freelancer_earnings" field.
 func (m *WorkHistoryMutation) ResetFreelancerEarnings() {
 	m.freelancer_earnings = nil
 	m.addfreelancer_earnings = nil
+	delete(m.clearedFields, workhistory.FieldFreelancerEarnings)
 }
 
 // SetStartDate sets the "start_date" field.
@@ -6300,9 +6330,22 @@ func (m *WorkHistoryMutation) OldStartDate(ctx context.Context) (v time.Time, er
 	return oldValue.StartDate, nil
 }
 
+// ClearStartDate clears the value of the "start_date" field.
+func (m *WorkHistoryMutation) ClearStartDate() {
+	m.start_date = nil
+	m.clearedFields[workhistory.FieldStartDate] = struct{}{}
+}
+
+// StartDateCleared returns if the "start_date" field was cleared in this mutation.
+func (m *WorkHistoryMutation) StartDateCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldStartDate]
+	return ok
+}
+
 // ResetStartDate resets all changes to the "start_date" field.
 func (m *WorkHistoryMutation) ResetStartDate() {
 	m.start_date = nil
+	delete(m.clearedFields, workhistory.FieldStartDate)
 }
 
 // SetEndDate sets the "end_date" field.
@@ -6385,9 +6428,22 @@ func (m *WorkHistoryMutation) OldDescription(ctx context.Context) (v string, err
 	return oldValue.Description, nil
 }
 
+// ClearDescription clears the value of the "description" field.
+func (m *WorkHistoryMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[workhistory.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *WorkHistoryMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldDescription]
+	return ok
+}
+
 // ResetDescription resets all changes to the "description" field.
 func (m *WorkHistoryMutation) ResetDescription() {
 	m.description = nil
+	delete(m.clearedFields, workhistory.FieldDescription)
 }
 
 // SetBudget sets the "budget" field.
@@ -6440,173 +6496,24 @@ func (m *WorkHistoryMutation) AddedBudget() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearBudget clears the value of the "budget" field.
+func (m *WorkHistoryMutation) ClearBudget() {
+	m.budget = nil
+	m.addbudget = nil
+	m.clearedFields[workhistory.FieldBudget] = struct{}{}
+}
+
+// BudgetCleared returns if the "budget" field was cleared in this mutation.
+func (m *WorkHistoryMutation) BudgetCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldBudget]
+	return ok
+}
+
 // ResetBudget resets all changes to the "budget" field.
 func (m *WorkHistoryMutation) ResetBudget() {
 	m.budget = nil
 	m.addbudget = nil
-}
-
-// SetTotalProposals sets the "total_proposals" field.
-func (m *WorkHistoryMutation) SetTotalProposals(i int) {
-	m.total_proposals = &i
-	m.addtotal_proposals = nil
-}
-
-// TotalProposals returns the value of the "total_proposals" field in the mutation.
-func (m *WorkHistoryMutation) TotalProposals() (r int, exists bool) {
-	v := m.total_proposals
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTotalProposals returns the old "total_proposals" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldTotalProposals(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalProposals is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalProposals requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalProposals: %w", err)
-	}
-	return oldValue.TotalProposals, nil
-}
-
-// AddTotalProposals adds i to the "total_proposals" field.
-func (m *WorkHistoryMutation) AddTotalProposals(i int) {
-	if m.addtotal_proposals != nil {
-		*m.addtotal_proposals += i
-	} else {
-		m.addtotal_proposals = &i
-	}
-}
-
-// AddedTotalProposals returns the value that was added to the "total_proposals" field in this mutation.
-func (m *WorkHistoryMutation) AddedTotalProposals() (r int, exists bool) {
-	v := m.addtotal_proposals
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalProposals resets all changes to the "total_proposals" field.
-func (m *WorkHistoryMutation) ResetTotalProposals() {
-	m.total_proposals = nil
-	m.addtotal_proposals = nil
-}
-
-// SetNumberOfInterviews sets the "number_of_interviews" field.
-func (m *WorkHistoryMutation) SetNumberOfInterviews(i int) {
-	m.number_of_interviews = &i
-	m.addnumber_of_interviews = nil
-}
-
-// NumberOfInterviews returns the value of the "number_of_interviews" field in the mutation.
-func (m *WorkHistoryMutation) NumberOfInterviews() (r int, exists bool) {
-	v := m.number_of_interviews
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNumberOfInterviews returns the old "number_of_interviews" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldNumberOfInterviews(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNumberOfInterviews is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNumberOfInterviews requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNumberOfInterviews: %w", err)
-	}
-	return oldValue.NumberOfInterviews, nil
-}
-
-// AddNumberOfInterviews adds i to the "number_of_interviews" field.
-func (m *WorkHistoryMutation) AddNumberOfInterviews(i int) {
-	if m.addnumber_of_interviews != nil {
-		*m.addnumber_of_interviews += i
-	} else {
-		m.addnumber_of_interviews = &i
-	}
-}
-
-// AddedNumberOfInterviews returns the value that was added to the "number_of_interviews" field in this mutation.
-func (m *WorkHistoryMutation) AddedNumberOfInterviews() (r int, exists bool) {
-	v := m.addnumber_of_interviews
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetNumberOfInterviews resets all changes to the "number_of_interviews" field.
-func (m *WorkHistoryMutation) ResetNumberOfInterviews() {
-	m.number_of_interviews = nil
-	m.addnumber_of_interviews = nil
-}
-
-// SetSkills sets the "skills" field.
-func (m *WorkHistoryMutation) SetSkills(s []string) {
-	m.skills = &s
-	m.appendskills = nil
-}
-
-// Skills returns the value of the "skills" field in the mutation.
-func (m *WorkHistoryMutation) Skills() (r []string, exists bool) {
-	v := m.skills
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSkills returns the old "skills" field's value of the WorkHistory entity.
-// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WorkHistoryMutation) OldSkills(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSkills requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
-	}
-	return oldValue.Skills, nil
-}
-
-// AppendSkills adds s to the "skills" field.
-func (m *WorkHistoryMutation) AppendSkills(s []string) {
-	m.appendskills = append(m.appendskills, s...)
-}
-
-// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
-func (m *WorkHistoryMutation) AppendedSkills() ([]string, bool) {
-	if len(m.appendskills) == 0 {
-		return nil, false
-	}
-	return m.appendskills, true
-}
-
-// ResetSkills resets all changes to the "skills" field.
-func (m *WorkHistoryMutation) ResetSkills() {
-	m.skills = nil
-	m.appendskills = nil
+	delete(m.clearedFields, workhistory.FieldBudget)
 }
 
 // SetClientRating sets the "client_rating" field.
@@ -6659,10 +6566,24 @@ func (m *WorkHistoryMutation) AddedClientRating() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearClientRating clears the value of the "client_rating" field.
+func (m *WorkHistoryMutation) ClearClientRating() {
+	m.client_rating = nil
+	m.addclient_rating = nil
+	m.clearedFields[workhistory.FieldClientRating] = struct{}{}
+}
+
+// ClientRatingCleared returns if the "client_rating" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientRatingCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientRating]
+	return ok
+}
+
 // ResetClientRating resets all changes to the "client_rating" field.
 func (m *WorkHistoryMutation) ResetClientRating() {
 	m.client_rating = nil
 	m.addclient_rating = nil
+	delete(m.clearedFields, workhistory.FieldClientRating)
 }
 
 // SetClientReviewCount sets the "client_review_count" field.
@@ -6715,10 +6636,24 @@ func (m *WorkHistoryMutation) AddedClientReviewCount() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearClientReviewCount clears the value of the "client_review_count" field.
+func (m *WorkHistoryMutation) ClearClientReviewCount() {
+	m.client_review_count = nil
+	m.addclient_review_count = nil
+	m.clearedFields[workhistory.FieldClientReviewCount] = struct{}{}
+}
+
+// ClientReviewCountCleared returns if the "client_review_count" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientReviewCountCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientReviewCount]
+	return ok
+}
+
 // ResetClientReviewCount resets all changes to the "client_review_count" field.
 func (m *WorkHistoryMutation) ResetClientReviewCount() {
 	m.client_review_count = nil
 	m.addclient_review_count = nil
+	delete(m.clearedFields, workhistory.FieldClientReviewCount)
 }
 
 // SetClientCountry sets the "client_country" field.
@@ -6752,9 +6687,22 @@ func (m *WorkHistoryMutation) OldClientCountry(ctx context.Context) (v string, e
 	return oldValue.ClientCountry, nil
 }
 
+// ClearClientCountry clears the value of the "client_country" field.
+func (m *WorkHistoryMutation) ClearClientCountry() {
+	m.client_country = nil
+	m.clearedFields[workhistory.FieldClientCountry] = struct{}{}
+}
+
+// ClientCountryCleared returns if the "client_country" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientCountryCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientCountry]
+	return ok
+}
+
 // ResetClientCountry resets all changes to the "client_country" field.
 func (m *WorkHistoryMutation) ResetClientCountry() {
 	m.client_country = nil
+	delete(m.clearedFields, workhistory.FieldClientCountry)
 }
 
 // SetClientTotalJobsPosted sets the "client_total_jobs_posted" field.
@@ -6807,10 +6755,24 @@ func (m *WorkHistoryMutation) AddedClientTotalJobsPosted() (r int, exists bool) 
 	return *v, true
 }
 
+// ClearClientTotalJobsPosted clears the value of the "client_total_jobs_posted" field.
+func (m *WorkHistoryMutation) ClearClientTotalJobsPosted() {
+	m.client_total_jobs_posted = nil
+	m.addclient_total_jobs_posted = nil
+	m.clearedFields[workhistory.FieldClientTotalJobsPosted] = struct{}{}
+}
+
+// ClientTotalJobsPostedCleared returns if the "client_total_jobs_posted" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientTotalJobsPostedCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientTotalJobsPosted]
+	return ok
+}
+
 // ResetClientTotalJobsPosted resets all changes to the "client_total_jobs_posted" field.
 func (m *WorkHistoryMutation) ResetClientTotalJobsPosted() {
 	m.client_total_jobs_posted = nil
 	m.addclient_total_jobs_posted = nil
+	delete(m.clearedFields, workhistory.FieldClientTotalJobsPosted)
 }
 
 // SetClientTotalSpend sets the "client_total_spend" field.
@@ -6863,10 +6825,24 @@ func (m *WorkHistoryMutation) AddedClientTotalSpend() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearClientTotalSpend clears the value of the "client_total_spend" field.
+func (m *WorkHistoryMutation) ClearClientTotalSpend() {
+	m.client_total_spend = nil
+	m.addclient_total_spend = nil
+	m.clearedFields[workhistory.FieldClientTotalSpend] = struct{}{}
+}
+
+// ClientTotalSpendCleared returns if the "client_total_spend" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientTotalSpendCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientTotalSpend]
+	return ok
+}
+
 // ResetClientTotalSpend resets all changes to the "client_total_spend" field.
 func (m *WorkHistoryMutation) ResetClientTotalSpend() {
 	m.client_total_spend = nil
 	m.addclient_total_spend = nil
+	delete(m.clearedFields, workhistory.FieldClientTotalSpend)
 }
 
 // SetClientTotalHires sets the "client_total_hires" field.
@@ -6937,6 +6913,76 @@ func (m *WorkHistoryMutation) ResetClientTotalHires() {
 	m.client_total_hires = nil
 	m.addclient_total_hires = nil
 	delete(m.clearedFields, workhistory.FieldClientTotalHires)
+}
+
+// SetClientActiveHires sets the "client_active_hires" field.
+func (m *WorkHistoryMutation) SetClientActiveHires(i int) {
+	m.client_active_hires = &i
+	m.addclient_active_hires = nil
+}
+
+// ClientActiveHires returns the value of the "client_active_hires" field in the mutation.
+func (m *WorkHistoryMutation) ClientActiveHires() (r int, exists bool) {
+	v := m.client_active_hires
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClientActiveHires returns the old "client_active_hires" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldClientActiveHires(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClientActiveHires is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClientActiveHires requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClientActiveHires: %w", err)
+	}
+	return oldValue.ClientActiveHires, nil
+}
+
+// AddClientActiveHires adds i to the "client_active_hires" field.
+func (m *WorkHistoryMutation) AddClientActiveHires(i int) {
+	if m.addclient_active_hires != nil {
+		*m.addclient_active_hires += i
+	} else {
+		m.addclient_active_hires = &i
+	}
+}
+
+// AddedClientActiveHires returns the value that was added to the "client_active_hires" field in this mutation.
+func (m *WorkHistoryMutation) AddedClientActiveHires() (r int, exists bool) {
+	v := m.addclient_active_hires
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearClientActiveHires clears the value of the "client_active_hires" field.
+func (m *WorkHistoryMutation) ClearClientActiveHires() {
+	m.client_active_hires = nil
+	m.addclient_active_hires = nil
+	m.clearedFields[workhistory.FieldClientActiveHires] = struct{}{}
+}
+
+// ClientActiveHiresCleared returns if the "client_active_hires" field was cleared in this mutation.
+func (m *WorkHistoryMutation) ClientActiveHiresCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldClientActiveHires]
+	return ok
+}
+
+// ResetClientActiveHires resets all changes to the "client_active_hires" field.
+func (m *WorkHistoryMutation) ResetClientActiveHires() {
+	m.client_active_hires = nil
+	m.addclient_active_hires = nil
+	delete(m.clearedFields, workhistory.FieldClientActiveHires)
 }
 
 // SetClientTotalPaidHours sets the "client_total_paid_hours" field.
@@ -7177,43 +7223,248 @@ func (m *WorkHistoryMutation) ResetClientCompanySize() {
 	delete(m.clearedFields, workhistory.FieldClientCompanySize)
 }
 
-// SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by id.
-func (m *WorkHistoryMutation) SetUpworkFreelancerProposalID(id string) {
-	m.upwork_Freelancer_Proposal = &id
+// SetTotalProposals sets the "total_proposals" field.
+func (m *WorkHistoryMutation) SetTotalProposals(i int) {
+	m.total_proposals = &i
+	m.addtotal_proposals = nil
 }
 
-// ClearUpworkFreelancerProposal clears the "upwork_Freelancer_Proposal" edge to the Freelancer entity.
-func (m *WorkHistoryMutation) ClearUpworkFreelancerProposal() {
-	m.clearedupwork_Freelancer_Proposal = true
+// TotalProposals returns the value of the "total_proposals" field in the mutation.
+func (m *WorkHistoryMutation) TotalProposals() (r int, exists bool) {
+	v := m.total_proposals
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// UpworkFreelancerProposalCleared reports if the "upwork_Freelancer_Proposal" edge to the Freelancer entity was cleared.
-func (m *WorkHistoryMutation) UpworkFreelancerProposalCleared() bool {
-	return m.clearedupwork_Freelancer_Proposal
+// OldTotalProposals returns the old "total_proposals" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldTotalProposals(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalProposals is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalProposals requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalProposals: %w", err)
+	}
+	return oldValue.TotalProposals, nil
 }
 
-// UpworkFreelancerProposalID returns the "upwork_Freelancer_Proposal" edge ID in the mutation.
-func (m *WorkHistoryMutation) UpworkFreelancerProposalID() (id string, exists bool) {
-	if m.upwork_Freelancer_Proposal != nil {
-		return *m.upwork_Freelancer_Proposal, true
+// AddTotalProposals adds i to the "total_proposals" field.
+func (m *WorkHistoryMutation) AddTotalProposals(i int) {
+	if m.addtotal_proposals != nil {
+		*m.addtotal_proposals += i
+	} else {
+		m.addtotal_proposals = &i
+	}
+}
+
+// AddedTotalProposals returns the value that was added to the "total_proposals" field in this mutation.
+func (m *WorkHistoryMutation) AddedTotalProposals() (r int, exists bool) {
+	v := m.addtotal_proposals
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTotalProposals clears the value of the "total_proposals" field.
+func (m *WorkHistoryMutation) ClearTotalProposals() {
+	m.total_proposals = nil
+	m.addtotal_proposals = nil
+	m.clearedFields[workhistory.FieldTotalProposals] = struct{}{}
+}
+
+// TotalProposalsCleared returns if the "total_proposals" field was cleared in this mutation.
+func (m *WorkHistoryMutation) TotalProposalsCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldTotalProposals]
+	return ok
+}
+
+// ResetTotalProposals resets all changes to the "total_proposals" field.
+func (m *WorkHistoryMutation) ResetTotalProposals() {
+	m.total_proposals = nil
+	m.addtotal_proposals = nil
+	delete(m.clearedFields, workhistory.FieldTotalProposals)
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (m *WorkHistoryMutation) SetNumberOfInterviews(i int) {
+	m.number_of_interviews = &i
+	m.addnumber_of_interviews = nil
+}
+
+// NumberOfInterviews returns the value of the "number_of_interviews" field in the mutation.
+func (m *WorkHistoryMutation) NumberOfInterviews() (r int, exists bool) {
+	v := m.number_of_interviews
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNumberOfInterviews returns the old "number_of_interviews" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldNumberOfInterviews(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNumberOfInterviews is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNumberOfInterviews requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNumberOfInterviews: %w", err)
+	}
+	return oldValue.NumberOfInterviews, nil
+}
+
+// AddNumberOfInterviews adds i to the "number_of_interviews" field.
+func (m *WorkHistoryMutation) AddNumberOfInterviews(i int) {
+	if m.addnumber_of_interviews != nil {
+		*m.addnumber_of_interviews += i
+	} else {
+		m.addnumber_of_interviews = &i
+	}
+}
+
+// AddedNumberOfInterviews returns the value that was added to the "number_of_interviews" field in this mutation.
+func (m *WorkHistoryMutation) AddedNumberOfInterviews() (r int, exists bool) {
+	v := m.addnumber_of_interviews
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearNumberOfInterviews clears the value of the "number_of_interviews" field.
+func (m *WorkHistoryMutation) ClearNumberOfInterviews() {
+	m.number_of_interviews = nil
+	m.addnumber_of_interviews = nil
+	m.clearedFields[workhistory.FieldNumberOfInterviews] = struct{}{}
+}
+
+// NumberOfInterviewsCleared returns if the "number_of_interviews" field was cleared in this mutation.
+func (m *WorkHistoryMutation) NumberOfInterviewsCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldNumberOfInterviews]
+	return ok
+}
+
+// ResetNumberOfInterviews resets all changes to the "number_of_interviews" field.
+func (m *WorkHistoryMutation) ResetNumberOfInterviews() {
+	m.number_of_interviews = nil
+	m.addnumber_of_interviews = nil
+	delete(m.clearedFields, workhistory.FieldNumberOfInterviews)
+}
+
+// SetSkills sets the "skills" field.
+func (m *WorkHistoryMutation) SetSkills(s []string) {
+	m.skills = &s
+	m.appendskills = nil
+}
+
+// Skills returns the value of the "skills" field in the mutation.
+func (m *WorkHistoryMutation) Skills() (r []string, exists bool) {
+	v := m.skills
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSkills returns the old "skills" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldSkills(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSkills requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
+	}
+	return oldValue.Skills, nil
+}
+
+// AppendSkills adds s to the "skills" field.
+func (m *WorkHistoryMutation) AppendSkills(s []string) {
+	m.appendskills = append(m.appendskills, s...)
+}
+
+// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
+func (m *WorkHistoryMutation) AppendedSkills() ([]string, bool) {
+	if len(m.appendskills) == 0 {
+		return nil, false
+	}
+	return m.appendskills, true
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (m *WorkHistoryMutation) ClearSkills() {
+	m.skills = nil
+	m.appendskills = nil
+	m.clearedFields[workhistory.FieldSkills] = struct{}{}
+}
+
+// SkillsCleared returns if the "skills" field was cleared in this mutation.
+func (m *WorkHistoryMutation) SkillsCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldSkills]
+	return ok
+}
+
+// ResetSkills resets all changes to the "skills" field.
+func (m *WorkHistoryMutation) ResetSkills() {
+	m.skills = nil
+	m.appendskills = nil
+	delete(m.clearedFields, workhistory.FieldSkills)
+}
+
+// SetFreelancerID sets the "freelancer" edge to the UpworkFreelancer entity by id.
+func (m *WorkHistoryMutation) SetFreelancerID(id string) {
+	m.freelancer = &id
+}
+
+// ClearFreelancer clears the "freelancer" edge to the UpworkFreelancer entity.
+func (m *WorkHistoryMutation) ClearFreelancer() {
+	m.clearedfreelancer = true
+}
+
+// FreelancerCleared reports if the "freelancer" edge to the UpworkFreelancer entity was cleared.
+func (m *WorkHistoryMutation) FreelancerCleared() bool {
+	return m.clearedfreelancer
+}
+
+// FreelancerID returns the "freelancer" edge ID in the mutation.
+func (m *WorkHistoryMutation) FreelancerID() (id string, exists bool) {
+	if m.freelancer != nil {
+		return *m.freelancer, true
 	}
 	return
 }
 
-// UpworkFreelancerProposalIDs returns the "upwork_Freelancer_Proposal" edge IDs in the mutation.
+// FreelancerIDs returns the "freelancer" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpworkFreelancerProposalID instead. It exists only for internal usage by the builders.
-func (m *WorkHistoryMutation) UpworkFreelancerProposalIDs() (ids []string) {
-	if id := m.upwork_Freelancer_Proposal; id != nil {
+// FreelancerID instead. It exists only for internal usage by the builders.
+func (m *WorkHistoryMutation) FreelancerIDs() (ids []string) {
+	if id := m.freelancer; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpworkFreelancerProposal resets all changes to the "upwork_Freelancer_Proposal" edge.
-func (m *WorkHistoryMutation) ResetUpworkFreelancerProposal() {
-	m.upwork_Freelancer_Proposal = nil
-	m.clearedupwork_Freelancer_Proposal = false
+// ResetFreelancer resets all changes to the "freelancer" edge.
+func (m *WorkHistoryMutation) ResetFreelancer() {
+	m.freelancer = nil
+	m.clearedfreelancer = false
 }
 
 // Where appends a list predicates to the WorkHistoryMutation builder.
@@ -7260,9 +7511,6 @@ func (m *WorkHistoryMutation) Fields() []string {
 	if m.overall_rating != nil {
 		fields = append(fields, workhistory.FieldOverallRating)
 	}
-	if m.is_hourly != nil {
-		fields = append(fields, workhistory.FieldIsHourly)
-	}
 	if m.freelancer_earnings != nil {
 		fields = append(fields, workhistory.FieldFreelancerEarnings)
 	}
@@ -7277,15 +7525,6 @@ func (m *WorkHistoryMutation) Fields() []string {
 	}
 	if m.budget != nil {
 		fields = append(fields, workhistory.FieldBudget)
-	}
-	if m.total_proposals != nil {
-		fields = append(fields, workhistory.FieldTotalProposals)
-	}
-	if m.number_of_interviews != nil {
-		fields = append(fields, workhistory.FieldNumberOfInterviews)
-	}
-	if m.skills != nil {
-		fields = append(fields, workhistory.FieldSkills)
 	}
 	if m.client_rating != nil {
 		fields = append(fields, workhistory.FieldClientRating)
@@ -7305,6 +7544,9 @@ func (m *WorkHistoryMutation) Fields() []string {
 	if m.client_total_hires != nil {
 		fields = append(fields, workhistory.FieldClientTotalHires)
 	}
+	if m.client_active_hires != nil {
+		fields = append(fields, workhistory.FieldClientActiveHires)
+	}
 	if m.client_total_paid_hours != nil {
 		fields = append(fields, workhistory.FieldClientTotalPaidHours)
 	}
@@ -7316,6 +7558,15 @@ func (m *WorkHistoryMutation) Fields() []string {
 	}
 	if m.client_company_size != nil {
 		fields = append(fields, workhistory.FieldClientCompanySize)
+	}
+	if m.total_proposals != nil {
+		fields = append(fields, workhistory.FieldTotalProposals)
+	}
+	if m.number_of_interviews != nil {
+		fields = append(fields, workhistory.FieldNumberOfInterviews)
+	}
+	if m.skills != nil {
+		fields = append(fields, workhistory.FieldSkills)
 	}
 	return fields
 }
@@ -7331,8 +7582,6 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.ClientFeedback()
 	case workhistory.FieldOverallRating:
 		return m.OverallRating()
-	case workhistory.FieldIsHourly:
-		return m.IsHourly()
 	case workhistory.FieldFreelancerEarnings:
 		return m.FreelancerEarnings()
 	case workhistory.FieldStartDate:
@@ -7343,12 +7592,6 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case workhistory.FieldBudget:
 		return m.Budget()
-	case workhistory.FieldTotalProposals:
-		return m.TotalProposals()
-	case workhistory.FieldNumberOfInterviews:
-		return m.NumberOfInterviews()
-	case workhistory.FieldSkills:
-		return m.Skills()
 	case workhistory.FieldClientRating:
 		return m.ClientRating()
 	case workhistory.FieldClientReviewCount:
@@ -7361,6 +7604,8 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.ClientTotalSpend()
 	case workhistory.FieldClientTotalHires:
 		return m.ClientTotalHires()
+	case workhistory.FieldClientActiveHires:
+		return m.ClientActiveHires()
 	case workhistory.FieldClientTotalPaidHours:
 		return m.ClientTotalPaidHours()
 	case workhistory.FieldClientAverageHourlyRatePaid:
@@ -7369,6 +7614,12 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.ClientCompanyCategory()
 	case workhistory.FieldClientCompanySize:
 		return m.ClientCompanySize()
+	case workhistory.FieldTotalProposals:
+		return m.TotalProposals()
+	case workhistory.FieldNumberOfInterviews:
+		return m.NumberOfInterviews()
+	case workhistory.FieldSkills:
+		return m.Skills()
 	}
 	return nil, false
 }
@@ -7384,8 +7635,6 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldClientFeedback(ctx)
 	case workhistory.FieldOverallRating:
 		return m.OldOverallRating(ctx)
-	case workhistory.FieldIsHourly:
-		return m.OldIsHourly(ctx)
 	case workhistory.FieldFreelancerEarnings:
 		return m.OldFreelancerEarnings(ctx)
 	case workhistory.FieldStartDate:
@@ -7396,12 +7645,6 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldDescription(ctx)
 	case workhistory.FieldBudget:
 		return m.OldBudget(ctx)
-	case workhistory.FieldTotalProposals:
-		return m.OldTotalProposals(ctx)
-	case workhistory.FieldNumberOfInterviews:
-		return m.OldNumberOfInterviews(ctx)
-	case workhistory.FieldSkills:
-		return m.OldSkills(ctx)
 	case workhistory.FieldClientRating:
 		return m.OldClientRating(ctx)
 	case workhistory.FieldClientReviewCount:
@@ -7414,6 +7657,8 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldClientTotalSpend(ctx)
 	case workhistory.FieldClientTotalHires:
 		return m.OldClientTotalHires(ctx)
+	case workhistory.FieldClientActiveHires:
+		return m.OldClientActiveHires(ctx)
 	case workhistory.FieldClientTotalPaidHours:
 		return m.OldClientTotalPaidHours(ctx)
 	case workhistory.FieldClientAverageHourlyRatePaid:
@@ -7422,6 +7667,12 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldClientCompanyCategory(ctx)
 	case workhistory.FieldClientCompanySize:
 		return m.OldClientCompanySize(ctx)
+	case workhistory.FieldTotalProposals:
+		return m.OldTotalProposals(ctx)
+	case workhistory.FieldNumberOfInterviews:
+		return m.OldNumberOfInterviews(ctx)
+	case workhistory.FieldSkills:
+		return m.OldSkills(ctx)
 	}
 	return nil, fmt.Errorf("unknown WorkHistory field %s", name)
 }
@@ -7451,13 +7702,6 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOverallRating(v)
-		return nil
-	case workhistory.FieldIsHourly:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsHourly(v)
 		return nil
 	case workhistory.FieldFreelancerEarnings:
 		v, ok := value.(float64)
@@ -7493,27 +7737,6 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBudget(v)
-		return nil
-	case workhistory.FieldTotalProposals:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTotalProposals(v)
-		return nil
-	case workhistory.FieldNumberOfInterviews:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNumberOfInterviews(v)
-		return nil
-	case workhistory.FieldSkills:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSkills(v)
 		return nil
 	case workhistory.FieldClientRating:
 		v, ok := value.(float64)
@@ -7557,6 +7780,13 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetClientTotalHires(v)
 		return nil
+	case workhistory.FieldClientActiveHires:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClientActiveHires(v)
+		return nil
 	case workhistory.FieldClientTotalPaidHours:
 		v, ok := value.(int)
 		if !ok {
@@ -7585,6 +7815,27 @@ func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetClientCompanySize(v)
 		return nil
+	case workhistory.FieldTotalProposals:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalProposals(v)
+		return nil
+	case workhistory.FieldNumberOfInterviews:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNumberOfInterviews(v)
+		return nil
+	case workhistory.FieldSkills:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSkills(v)
+		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory field %s", name)
 }
@@ -7602,12 +7853,6 @@ func (m *WorkHistoryMutation) AddedFields() []string {
 	if m.addbudget != nil {
 		fields = append(fields, workhistory.FieldBudget)
 	}
-	if m.addtotal_proposals != nil {
-		fields = append(fields, workhistory.FieldTotalProposals)
-	}
-	if m.addnumber_of_interviews != nil {
-		fields = append(fields, workhistory.FieldNumberOfInterviews)
-	}
 	if m.addclient_rating != nil {
 		fields = append(fields, workhistory.FieldClientRating)
 	}
@@ -7623,11 +7868,20 @@ func (m *WorkHistoryMutation) AddedFields() []string {
 	if m.addclient_total_hires != nil {
 		fields = append(fields, workhistory.FieldClientTotalHires)
 	}
+	if m.addclient_active_hires != nil {
+		fields = append(fields, workhistory.FieldClientActiveHires)
+	}
 	if m.addclient_total_paid_hours != nil {
 		fields = append(fields, workhistory.FieldClientTotalPaidHours)
 	}
 	if m.addclient_average_hourly_rate_paid != nil {
 		fields = append(fields, workhistory.FieldClientAverageHourlyRatePaid)
+	}
+	if m.addtotal_proposals != nil {
+		fields = append(fields, workhistory.FieldTotalProposals)
+	}
+	if m.addnumber_of_interviews != nil {
+		fields = append(fields, workhistory.FieldNumberOfInterviews)
 	}
 	return fields
 }
@@ -7643,10 +7897,6 @@ func (m *WorkHistoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedFreelancerEarnings()
 	case workhistory.FieldBudget:
 		return m.AddedBudget()
-	case workhistory.FieldTotalProposals:
-		return m.AddedTotalProposals()
-	case workhistory.FieldNumberOfInterviews:
-		return m.AddedNumberOfInterviews()
 	case workhistory.FieldClientRating:
 		return m.AddedClientRating()
 	case workhistory.FieldClientReviewCount:
@@ -7657,10 +7907,16 @@ func (m *WorkHistoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedClientTotalSpend()
 	case workhistory.FieldClientTotalHires:
 		return m.AddedClientTotalHires()
+	case workhistory.FieldClientActiveHires:
+		return m.AddedClientActiveHires()
 	case workhistory.FieldClientTotalPaidHours:
 		return m.AddedClientTotalPaidHours()
 	case workhistory.FieldClientAverageHourlyRatePaid:
 		return m.AddedClientAverageHourlyRatePaid()
+	case workhistory.FieldTotalProposals:
+		return m.AddedTotalProposals()
+	case workhistory.FieldNumberOfInterviews:
+		return m.AddedNumberOfInterviews()
 	}
 	return nil, false
 }
@@ -7690,20 +7946,6 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddBudget(v)
-		return nil
-	case workhistory.FieldTotalProposals:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTotalProposals(v)
-		return nil
-	case workhistory.FieldNumberOfInterviews:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddNumberOfInterviews(v)
 		return nil
 	case workhistory.FieldClientRating:
 		v, ok := value.(float64)
@@ -7740,6 +7982,13 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddClientTotalHires(v)
 		return nil
+	case workhistory.FieldClientActiveHires:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddClientActiveHires(v)
+		return nil
 	case workhistory.FieldClientTotalPaidHours:
 		v, ok := value.(int)
 		if !ok {
@@ -7754,6 +8003,20 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddClientAverageHourlyRatePaid(v)
 		return nil
+	case workhistory.FieldTotalProposals:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalProposals(v)
+		return nil
+	case workhistory.FieldNumberOfInterviews:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNumberOfInterviews(v)
+		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory numeric field %s", name)
 }
@@ -7762,11 +8025,47 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *WorkHistoryMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(workhistory.FieldClientFeedback) {
+		fields = append(fields, workhistory.FieldClientFeedback)
+	}
+	if m.FieldCleared(workhistory.FieldOverallRating) {
+		fields = append(fields, workhistory.FieldOverallRating)
+	}
+	if m.FieldCleared(workhistory.FieldFreelancerEarnings) {
+		fields = append(fields, workhistory.FieldFreelancerEarnings)
+	}
+	if m.FieldCleared(workhistory.FieldStartDate) {
+		fields = append(fields, workhistory.FieldStartDate)
+	}
 	if m.FieldCleared(workhistory.FieldEndDate) {
 		fields = append(fields, workhistory.FieldEndDate)
 	}
+	if m.FieldCleared(workhistory.FieldDescription) {
+		fields = append(fields, workhistory.FieldDescription)
+	}
+	if m.FieldCleared(workhistory.FieldBudget) {
+		fields = append(fields, workhistory.FieldBudget)
+	}
+	if m.FieldCleared(workhistory.FieldClientRating) {
+		fields = append(fields, workhistory.FieldClientRating)
+	}
+	if m.FieldCleared(workhistory.FieldClientReviewCount) {
+		fields = append(fields, workhistory.FieldClientReviewCount)
+	}
+	if m.FieldCleared(workhistory.FieldClientCountry) {
+		fields = append(fields, workhistory.FieldClientCountry)
+	}
+	if m.FieldCleared(workhistory.FieldClientTotalJobsPosted) {
+		fields = append(fields, workhistory.FieldClientTotalJobsPosted)
+	}
+	if m.FieldCleared(workhistory.FieldClientTotalSpend) {
+		fields = append(fields, workhistory.FieldClientTotalSpend)
+	}
 	if m.FieldCleared(workhistory.FieldClientTotalHires) {
 		fields = append(fields, workhistory.FieldClientTotalHires)
+	}
+	if m.FieldCleared(workhistory.FieldClientActiveHires) {
+		fields = append(fields, workhistory.FieldClientActiveHires)
 	}
 	if m.FieldCleared(workhistory.FieldClientTotalPaidHours) {
 		fields = append(fields, workhistory.FieldClientTotalPaidHours)
@@ -7779,6 +8078,15 @@ func (m *WorkHistoryMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(workhistory.FieldClientCompanySize) {
 		fields = append(fields, workhistory.FieldClientCompanySize)
+	}
+	if m.FieldCleared(workhistory.FieldTotalProposals) {
+		fields = append(fields, workhistory.FieldTotalProposals)
+	}
+	if m.FieldCleared(workhistory.FieldNumberOfInterviews) {
+		fields = append(fields, workhistory.FieldNumberOfInterviews)
+	}
+	if m.FieldCleared(workhistory.FieldSkills) {
+		fields = append(fields, workhistory.FieldSkills)
 	}
 	return fields
 }
@@ -7794,11 +8102,47 @@ func (m *WorkHistoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *WorkHistoryMutation) ClearField(name string) error {
 	switch name {
+	case workhistory.FieldClientFeedback:
+		m.ClearClientFeedback()
+		return nil
+	case workhistory.FieldOverallRating:
+		m.ClearOverallRating()
+		return nil
+	case workhistory.FieldFreelancerEarnings:
+		m.ClearFreelancerEarnings()
+		return nil
+	case workhistory.FieldStartDate:
+		m.ClearStartDate()
+		return nil
 	case workhistory.FieldEndDate:
 		m.ClearEndDate()
 		return nil
+	case workhistory.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case workhistory.FieldBudget:
+		m.ClearBudget()
+		return nil
+	case workhistory.FieldClientRating:
+		m.ClearClientRating()
+		return nil
+	case workhistory.FieldClientReviewCount:
+		m.ClearClientReviewCount()
+		return nil
+	case workhistory.FieldClientCountry:
+		m.ClearClientCountry()
+		return nil
+	case workhistory.FieldClientTotalJobsPosted:
+		m.ClearClientTotalJobsPosted()
+		return nil
+	case workhistory.FieldClientTotalSpend:
+		m.ClearClientTotalSpend()
+		return nil
 	case workhistory.FieldClientTotalHires:
 		m.ClearClientTotalHires()
+		return nil
+	case workhistory.FieldClientActiveHires:
+		m.ClearClientActiveHires()
 		return nil
 	case workhistory.FieldClientTotalPaidHours:
 		m.ClearClientTotalPaidHours()
@@ -7811,6 +8155,15 @@ func (m *WorkHistoryMutation) ClearField(name string) error {
 		return nil
 	case workhistory.FieldClientCompanySize:
 		m.ClearClientCompanySize()
+		return nil
+	case workhistory.FieldTotalProposals:
+		m.ClearTotalProposals()
+		return nil
+	case workhistory.FieldNumberOfInterviews:
+		m.ClearNumberOfInterviews()
+		return nil
+	case workhistory.FieldSkills:
+		m.ClearSkills()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory nullable field %s", name)
@@ -7829,9 +8182,6 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 	case workhistory.FieldOverallRating:
 		m.ResetOverallRating()
 		return nil
-	case workhistory.FieldIsHourly:
-		m.ResetIsHourly()
-		return nil
 	case workhistory.FieldFreelancerEarnings:
 		m.ResetFreelancerEarnings()
 		return nil
@@ -7846,15 +8196,6 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 		return nil
 	case workhistory.FieldBudget:
 		m.ResetBudget()
-		return nil
-	case workhistory.FieldTotalProposals:
-		m.ResetTotalProposals()
-		return nil
-	case workhistory.FieldNumberOfInterviews:
-		m.ResetNumberOfInterviews()
-		return nil
-	case workhistory.FieldSkills:
-		m.ResetSkills()
 		return nil
 	case workhistory.FieldClientRating:
 		m.ResetClientRating()
@@ -7874,6 +8215,9 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 	case workhistory.FieldClientTotalHires:
 		m.ResetClientTotalHires()
 		return nil
+	case workhistory.FieldClientActiveHires:
+		m.ResetClientActiveHires()
+		return nil
 	case workhistory.FieldClientTotalPaidHours:
 		m.ResetClientTotalPaidHours()
 		return nil
@@ -7886,6 +8230,15 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 	case workhistory.FieldClientCompanySize:
 		m.ResetClientCompanySize()
 		return nil
+	case workhistory.FieldTotalProposals:
+		m.ResetTotalProposals()
+		return nil
+	case workhistory.FieldNumberOfInterviews:
+		m.ResetNumberOfInterviews()
+		return nil
+	case workhistory.FieldSkills:
+		m.ResetSkills()
+		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory field %s", name)
 }
@@ -7893,8 +8246,8 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkHistoryMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.upwork_Freelancer_Proposal != nil {
-		edges = append(edges, workhistory.EdgeUpworkFreelancerProposal)
+	if m.freelancer != nil {
+		edges = append(edges, workhistory.EdgeFreelancer)
 	}
 	return edges
 }
@@ -7903,8 +8256,8 @@ func (m *WorkHistoryMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *WorkHistoryMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case workhistory.EdgeUpworkFreelancerProposal:
-		if id := m.upwork_Freelancer_Proposal; id != nil {
+	case workhistory.EdgeFreelancer:
+		if id := m.freelancer; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -7926,8 +8279,8 @@ func (m *WorkHistoryMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkHistoryMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedupwork_Freelancer_Proposal {
-		edges = append(edges, workhistory.EdgeUpworkFreelancerProposal)
+	if m.clearedfreelancer {
+		edges = append(edges, workhistory.EdgeFreelancer)
 	}
 	return edges
 }
@@ -7936,8 +8289,8 @@ func (m *WorkHistoryMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *WorkHistoryMutation) EdgeCleared(name string) bool {
 	switch name {
-	case workhistory.EdgeUpworkFreelancerProposal:
-		return m.clearedupwork_Freelancer_Proposal
+	case workhistory.EdgeFreelancer:
+		return m.clearedfreelancer
 	}
 	return false
 }
@@ -7946,8 +8299,8 @@ func (m *WorkHistoryMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *WorkHistoryMutation) ClearEdge(name string) error {
 	switch name {
-	case workhistory.EdgeUpworkFreelancerProposal:
-		m.ClearUpworkFreelancerProposal()
+	case workhistory.EdgeFreelancer:
+		m.ClearFreelancer()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory unique edge %s", name)
@@ -7957,8 +8310,8 @@ func (m *WorkHistoryMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *WorkHistoryMutation) ResetEdge(name string) error {
 	switch name {
-	case workhistory.EdgeUpworkFreelancerProposal:
-		m.ResetUpworkFreelancerProposal()
+	case workhistory.EdgeFreelancer:
+		m.ResetFreelancer()
 		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory edge %s", name)
