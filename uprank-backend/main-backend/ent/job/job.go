@@ -53,13 +53,11 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_jobs"
-	// FreelancersTable is the table that holds the freelancers relation/edge.
-	FreelancersTable = "freelancers"
-	// FreelancersInverseTable is the table name for the Freelancer entity.
-	// It exists in this package in order to avoid circular dependency with the "freelancer" package.
-	FreelancersInverseTable = "freelancers"
-	// FreelancersColumn is the table column denoting the freelancers relation/edge.
-	FreelancersColumn = "job_freelancers"
+	// FreelancersTable is the table that holds the freelancers relation/edge. The primary key declared below.
+	FreelancersTable = "job_freelancers"
+	// FreelancersInverseTable is the table name for the UpworkFreelancer entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkfreelancer" package.
+	FreelancersInverseTable = "upwork_freelancers"
 )
 
 // Columns holds all SQL columns for job fields.
@@ -85,6 +83,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"user_jobs",
 }
+
+var (
+	// FreelancersPrimaryKey and FreelancersColumn2 are the table columns denoting the
+	// primary key for the freelancers relation (M2M).
+	FreelancersPrimaryKey = []string{"job_id", "upwork_freelancer_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -206,6 +210,6 @@ func newFreelancersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FreelancersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, FreelancersTable, FreelancersColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, FreelancersTable, FreelancersPrimaryKey...),
 	)
 }

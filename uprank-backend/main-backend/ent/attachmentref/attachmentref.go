@@ -22,11 +22,11 @@ const (
 	Table = "attachment_refs"
 	// FreelancerTable is the table that holds the freelancer relation/edge.
 	FreelancerTable = "attachment_refs"
-	// FreelancerInverseTable is the table name for the Freelancer entity.
-	// It exists in this package in order to avoid circular dependency with the "freelancer" package.
-	FreelancerInverseTable = "freelancers"
+	// FreelancerInverseTable is the table name for the UpworkFreelancer entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkfreelancer" package.
+	FreelancerInverseTable = "upwork_freelancers"
 	// FreelancerColumn is the table column denoting the freelancer relation/edge.
-	FreelancerColumn = "freelancer_attachments"
+	FreelancerColumn = "upwork_freelancer_attachments"
 )
 
 // Columns holds all SQL columns for attachmentref fields.
@@ -39,7 +39,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "attachment_refs"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"freelancer_attachments",
+	"upwork_freelancer_attachments",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -12,9 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
@@ -59,6 +58,12 @@ func (whu *WorkHistoryUpdate) SetNillableClientFeedback(s *string) *WorkHistoryU
 	return whu
 }
 
+// ClearClientFeedback clears the value of the "client_feedback" field.
+func (whu *WorkHistoryUpdate) ClearClientFeedback() *WorkHistoryUpdate {
+	whu.mutation.ClearClientFeedback()
+	return whu
+}
+
 // SetOverallRating sets the "overall_rating" field.
 func (whu *WorkHistoryUpdate) SetOverallRating(f float64) *WorkHistoryUpdate {
 	whu.mutation.ResetOverallRating()
@@ -80,97 +85,36 @@ func (whu *WorkHistoryUpdate) AddOverallRating(f float64) *WorkHistoryUpdate {
 	return whu
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) SetFixedChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetFixedChargeAmount()
-	whu.mutation.SetFixedChargeAmount(i)
+// ClearOverallRating clears the value of the "overall_rating" field.
+func (whu *WorkHistoryUpdate) ClearOverallRating() *WorkHistoryUpdate {
+	whu.mutation.ClearOverallRating()
 	return whu
 }
 
-// SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableFixedChargeAmount(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetFixedChargeAmount(*i)
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (whu *WorkHistoryUpdate) SetFreelancerEarnings(f float64) *WorkHistoryUpdate {
+	whu.mutation.ResetFreelancerEarnings()
+	whu.mutation.SetFreelancerEarnings(f)
+	return whu
+}
+
+// SetNillableFreelancerEarnings sets the "freelancer_earnings" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableFreelancerEarnings(f *float64) *WorkHistoryUpdate {
+	if f != nil {
+		whu.SetFreelancerEarnings(*f)
 	}
 	return whu
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) AddFixedChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.AddFixedChargeAmount(i)
+// AddFreelancerEarnings adds f to the "freelancer_earnings" field.
+func (whu *WorkHistoryUpdate) AddFreelancerEarnings(f float64) *WorkHistoryUpdate {
+	whu.mutation.AddFreelancerEarnings(f)
 	return whu
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (whu *WorkHistoryUpdate) ClearFixedChargeAmount() *WorkHistoryUpdate {
-	whu.mutation.ClearFixedChargeAmount()
-	return whu
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (whu *WorkHistoryUpdate) SetFixedChargeCurrency(s string) *WorkHistoryUpdate {
-	whu.mutation.SetFixedChargeCurrency(s)
-	return whu
-}
-
-// SetNillableFixedChargeCurrency sets the "fixed_charge_currency" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableFixedChargeCurrency(s *string) *WorkHistoryUpdate {
-	if s != nil {
-		whu.SetFixedChargeCurrency(*s)
-	}
-	return whu
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (whu *WorkHistoryUpdate) ClearFixedChargeCurrency() *WorkHistoryUpdate {
-	whu.mutation.ClearFixedChargeCurrency()
-	return whu
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) SetHourlyChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetHourlyChargeAmount()
-	whu.mutation.SetHourlyChargeAmount(i)
-	return whu
-}
-
-// SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableHourlyChargeAmount(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetHourlyChargeAmount(*i)
-	}
-	return whu
-}
-
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) AddHourlyChargeAmount(i int) *WorkHistoryUpdate {
-	whu.mutation.AddHourlyChargeAmount(i)
-	return whu
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (whu *WorkHistoryUpdate) ClearHourlyChargeAmount() *WorkHistoryUpdate {
-	whu.mutation.ClearHourlyChargeAmount()
-	return whu
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (whu *WorkHistoryUpdate) SetHourlyChargeCurrency(s string) *WorkHistoryUpdate {
-	whu.mutation.SetHourlyChargeCurrency(s)
-	return whu
-}
-
-// SetNillableHourlyChargeCurrency sets the "hourly_charge_currency" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableHourlyChargeCurrency(s *string) *WorkHistoryUpdate {
-	if s != nil {
-		whu.SetHourlyChargeCurrency(*s)
-	}
-	return whu
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (whu *WorkHistoryUpdate) ClearHourlyChargeCurrency() *WorkHistoryUpdate {
-	whu.mutation.ClearHourlyChargeCurrency()
+// ClearFreelancerEarnings clears the value of the "freelancer_earnings" field.
+func (whu *WorkHistoryUpdate) ClearFreelancerEarnings() *WorkHistoryUpdate {
+	whu.mutation.ClearFreelancerEarnings()
 	return whu
 }
 
@@ -185,6 +129,12 @@ func (whu *WorkHistoryUpdate) SetNillableStartDate(t *time.Time) *WorkHistoryUpd
 	if t != nil {
 		whu.SetStartDate(*t)
 	}
+	return whu
+}
+
+// ClearStartDate clears the value of the "start_date" field.
+func (whu *WorkHistoryUpdate) ClearStartDate() *WorkHistoryUpdate {
+	whu.mutation.ClearStartDate()
 	return whu
 }
 
@@ -208,71 +158,50 @@ func (whu *WorkHistoryUpdate) ClearEndDate() *WorkHistoryUpdate {
 	return whu
 }
 
-// SetJobDescription sets the "job_description" field.
-func (whu *WorkHistoryUpdate) SetJobDescription(s string) *WorkHistoryUpdate {
-	whu.mutation.SetJobDescription(s)
+// SetDescription sets the "description" field.
+func (whu *WorkHistoryUpdate) SetDescription(s string) *WorkHistoryUpdate {
+	whu.mutation.SetDescription(s)
 	return whu
 }
 
-// SetNillableJobDescription sets the "job_description" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableJobDescription(s *string) *WorkHistoryUpdate {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableDescription(s *string) *WorkHistoryUpdate {
 	if s != nil {
-		whu.SetJobDescription(*s)
+		whu.SetDescription(*s)
 	}
 	return whu
 }
 
-// SetTotalProposals sets the "total_proposals" field.
-func (whu *WorkHistoryUpdate) SetTotalProposals(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetTotalProposals()
-	whu.mutation.SetTotalProposals(i)
+// ClearDescription clears the value of the "description" field.
+func (whu *WorkHistoryUpdate) ClearDescription() *WorkHistoryUpdate {
+	whu.mutation.ClearDescription()
 	return whu
 }
 
-// SetNillableTotalProposals sets the "total_proposals" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableTotalProposals(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetTotalProposals(*i)
+// SetBudget sets the "budget" field.
+func (whu *WorkHistoryUpdate) SetBudget(f float64) *WorkHistoryUpdate {
+	whu.mutation.ResetBudget()
+	whu.mutation.SetBudget(f)
+	return whu
+}
+
+// SetNillableBudget sets the "budget" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableBudget(f *float64) *WorkHistoryUpdate {
+	if f != nil {
+		whu.SetBudget(*f)
 	}
 	return whu
 }
 
-// AddTotalProposals adds i to the "total_proposals" field.
-func (whu *WorkHistoryUpdate) AddTotalProposals(i int) *WorkHistoryUpdate {
-	whu.mutation.AddTotalProposals(i)
+// AddBudget adds f to the "budget" field.
+func (whu *WorkHistoryUpdate) AddBudget(f float64) *WorkHistoryUpdate {
+	whu.mutation.AddBudget(f)
 	return whu
 }
 
-// SetNumberOfInterviews sets the "number_of_interviews" field.
-func (whu *WorkHistoryUpdate) SetNumberOfInterviews(i int) *WorkHistoryUpdate {
-	whu.mutation.ResetNumberOfInterviews()
-	whu.mutation.SetNumberOfInterviews(i)
-	return whu
-}
-
-// SetNillableNumberOfInterviews sets the "number_of_interviews" field if the given value is not nil.
-func (whu *WorkHistoryUpdate) SetNillableNumberOfInterviews(i *int) *WorkHistoryUpdate {
-	if i != nil {
-		whu.SetNumberOfInterviews(*i)
-	}
-	return whu
-}
-
-// AddNumberOfInterviews adds i to the "number_of_interviews" field.
-func (whu *WorkHistoryUpdate) AddNumberOfInterviews(i int) *WorkHistoryUpdate {
-	whu.mutation.AddNumberOfInterviews(i)
-	return whu
-}
-
-// SetSkills sets the "skills" field.
-func (whu *WorkHistoryUpdate) SetSkills(s []string) *WorkHistoryUpdate {
-	whu.mutation.SetSkills(s)
-	return whu
-}
-
-// AppendSkills appends s to the "skills" field.
-func (whu *WorkHistoryUpdate) AppendSkills(s []string) *WorkHistoryUpdate {
-	whu.mutation.AppendSkills(s)
+// ClearBudget clears the value of the "budget" field.
+func (whu *WorkHistoryUpdate) ClearBudget() *WorkHistoryUpdate {
+	whu.mutation.ClearBudget()
 	return whu
 }
 
@@ -297,6 +226,12 @@ func (whu *WorkHistoryUpdate) AddClientRating(f float64) *WorkHistoryUpdate {
 	return whu
 }
 
+// ClearClientRating clears the value of the "client_rating" field.
+func (whu *WorkHistoryUpdate) ClearClientRating() *WorkHistoryUpdate {
+	whu.mutation.ClearClientRating()
+	return whu
+}
+
 // SetClientReviewCount sets the "client_review_count" field.
 func (whu *WorkHistoryUpdate) SetClientReviewCount(i int) *WorkHistoryUpdate {
 	whu.mutation.ResetClientReviewCount()
@@ -318,6 +253,12 @@ func (whu *WorkHistoryUpdate) AddClientReviewCount(i int) *WorkHistoryUpdate {
 	return whu
 }
 
+// ClearClientReviewCount clears the value of the "client_review_count" field.
+func (whu *WorkHistoryUpdate) ClearClientReviewCount() *WorkHistoryUpdate {
+	whu.mutation.ClearClientReviewCount()
+	return whu
+}
+
 // SetClientCountry sets the "client_country" field.
 func (whu *WorkHistoryUpdate) SetClientCountry(s string) *WorkHistoryUpdate {
 	whu.mutation.SetClientCountry(s)
@@ -329,6 +270,12 @@ func (whu *WorkHistoryUpdate) SetNillableClientCountry(s *string) *WorkHistoryUp
 	if s != nil {
 		whu.SetClientCountry(*s)
 	}
+	return whu
+}
+
+// ClearClientCountry clears the value of the "client_country" field.
+func (whu *WorkHistoryUpdate) ClearClientCountry() *WorkHistoryUpdate {
+	whu.mutation.ClearClientCountry()
 	return whu
 }
 
@@ -353,6 +300,12 @@ func (whu *WorkHistoryUpdate) AddClientTotalJobsPosted(i int) *WorkHistoryUpdate
 	return whu
 }
 
+// ClearClientTotalJobsPosted clears the value of the "client_total_jobs_posted" field.
+func (whu *WorkHistoryUpdate) ClearClientTotalJobsPosted() *WorkHistoryUpdate {
+	whu.mutation.ClearClientTotalJobsPosted()
+	return whu
+}
+
 // SetClientTotalSpend sets the "client_total_spend" field.
 func (whu *WorkHistoryUpdate) SetClientTotalSpend(f float64) *WorkHistoryUpdate {
 	whu.mutation.ResetClientTotalSpend()
@@ -371,6 +324,12 @@ func (whu *WorkHistoryUpdate) SetNillableClientTotalSpend(f *float64) *WorkHisto
 // AddClientTotalSpend adds f to the "client_total_spend" field.
 func (whu *WorkHistoryUpdate) AddClientTotalSpend(f float64) *WorkHistoryUpdate {
 	whu.mutation.AddClientTotalSpend(f)
+	return whu
+}
+
+// ClearClientTotalSpend clears the value of the "client_total_spend" field.
+func (whu *WorkHistoryUpdate) ClearClientTotalSpend() *WorkHistoryUpdate {
+	whu.mutation.ClearClientTotalSpend()
 	return whu
 }
 
@@ -398,6 +357,33 @@ func (whu *WorkHistoryUpdate) AddClientTotalHires(i int) *WorkHistoryUpdate {
 // ClearClientTotalHires clears the value of the "client_total_hires" field.
 func (whu *WorkHistoryUpdate) ClearClientTotalHires() *WorkHistoryUpdate {
 	whu.mutation.ClearClientTotalHires()
+	return whu
+}
+
+// SetClientActiveHires sets the "client_active_hires" field.
+func (whu *WorkHistoryUpdate) SetClientActiveHires(i int) *WorkHistoryUpdate {
+	whu.mutation.ResetClientActiveHires()
+	whu.mutation.SetClientActiveHires(i)
+	return whu
+}
+
+// SetNillableClientActiveHires sets the "client_active_hires" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableClientActiveHires(i *int) *WorkHistoryUpdate {
+	if i != nil {
+		whu.SetClientActiveHires(*i)
+	}
+	return whu
+}
+
+// AddClientActiveHires adds i to the "client_active_hires" field.
+func (whu *WorkHistoryUpdate) AddClientActiveHires(i int) *WorkHistoryUpdate {
+	whu.mutation.AddClientActiveHires(i)
+	return whu
+}
+
+// ClearClientActiveHires clears the value of the "client_active_hires" field.
+func (whu *WorkHistoryUpdate) ClearClientActiveHires() *WorkHistoryUpdate {
+	whu.mutation.ClearClientActiveHires()
 	return whu
 }
 
@@ -495,15 +481,87 @@ func (whu *WorkHistoryUpdate) ClearClientCompanySize() *WorkHistoryUpdate {
 	return whu
 }
 
-// SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by ID.
-func (whu *WorkHistoryUpdate) SetUpworkFreelancerProposalID(id uuid.UUID) *WorkHistoryUpdate {
-	whu.mutation.SetUpworkFreelancerProposalID(id)
+// SetTotalProposals sets the "total_proposals" field.
+func (whu *WorkHistoryUpdate) SetTotalProposals(i int) *WorkHistoryUpdate {
+	whu.mutation.ResetTotalProposals()
+	whu.mutation.SetTotalProposals(i)
 	return whu
 }
 
-// SetUpworkFreelancerProposal sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity.
-func (whu *WorkHistoryUpdate) SetUpworkFreelancerProposal(f *Freelancer) *WorkHistoryUpdate {
-	return whu.SetUpworkFreelancerProposalID(f.ID)
+// SetNillableTotalProposals sets the "total_proposals" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableTotalProposals(i *int) *WorkHistoryUpdate {
+	if i != nil {
+		whu.SetTotalProposals(*i)
+	}
+	return whu
+}
+
+// AddTotalProposals adds i to the "total_proposals" field.
+func (whu *WorkHistoryUpdate) AddTotalProposals(i int) *WorkHistoryUpdate {
+	whu.mutation.AddTotalProposals(i)
+	return whu
+}
+
+// ClearTotalProposals clears the value of the "total_proposals" field.
+func (whu *WorkHistoryUpdate) ClearTotalProposals() *WorkHistoryUpdate {
+	whu.mutation.ClearTotalProposals()
+	return whu
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (whu *WorkHistoryUpdate) SetNumberOfInterviews(i int) *WorkHistoryUpdate {
+	whu.mutation.ResetNumberOfInterviews()
+	whu.mutation.SetNumberOfInterviews(i)
+	return whu
+}
+
+// SetNillableNumberOfInterviews sets the "number_of_interviews" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableNumberOfInterviews(i *int) *WorkHistoryUpdate {
+	if i != nil {
+		whu.SetNumberOfInterviews(*i)
+	}
+	return whu
+}
+
+// AddNumberOfInterviews adds i to the "number_of_interviews" field.
+func (whu *WorkHistoryUpdate) AddNumberOfInterviews(i int) *WorkHistoryUpdate {
+	whu.mutation.AddNumberOfInterviews(i)
+	return whu
+}
+
+// ClearNumberOfInterviews clears the value of the "number_of_interviews" field.
+func (whu *WorkHistoryUpdate) ClearNumberOfInterviews() *WorkHistoryUpdate {
+	whu.mutation.ClearNumberOfInterviews()
+	return whu
+}
+
+// SetSkills sets the "skills" field.
+func (whu *WorkHistoryUpdate) SetSkills(s []string) *WorkHistoryUpdate {
+	whu.mutation.SetSkills(s)
+	return whu
+}
+
+// AppendSkills appends s to the "skills" field.
+func (whu *WorkHistoryUpdate) AppendSkills(s []string) *WorkHistoryUpdate {
+	whu.mutation.AppendSkills(s)
+	return whu
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (whu *WorkHistoryUpdate) ClearSkills() *WorkHistoryUpdate {
+	whu.mutation.ClearSkills()
+	return whu
+}
+
+// SetFreelancerID sets the "freelancer" edge to the UpworkFreelancer entity by ID.
+func (whu *WorkHistoryUpdate) SetFreelancerID(id string) *WorkHistoryUpdate {
+	whu.mutation.SetFreelancerID(id)
+	return whu
+}
+
+// SetFreelancer sets the "freelancer" edge to the UpworkFreelancer entity.
+func (whu *WorkHistoryUpdate) SetFreelancer(u *UpworkFreelancer) *WorkHistoryUpdate {
+	return whu.SetFreelancerID(u.ID)
 }
 
 // Mutation returns the WorkHistoryMutation object of the builder.
@@ -511,9 +569,9 @@ func (whu *WorkHistoryUpdate) Mutation() *WorkHistoryMutation {
 	return whu.mutation
 }
 
-// ClearUpworkFreelancerProposal clears the "upwork_Freelancer_Proposal" edge to the Freelancer entity.
-func (whu *WorkHistoryUpdate) ClearUpworkFreelancerProposal() *WorkHistoryUpdate {
-	whu.mutation.ClearUpworkFreelancerProposal()
+// ClearFreelancer clears the "freelancer" edge to the UpworkFreelancer entity.
+func (whu *WorkHistoryUpdate) ClearFreelancer() *WorkHistoryUpdate {
+	whu.mutation.ClearFreelancer()
 	return whu
 }
 
@@ -546,8 +604,8 @@ func (whu *WorkHistoryUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (whu *WorkHistoryUpdate) check() error {
-	if _, ok := whu.mutation.UpworkFreelancerProposalID(); whu.mutation.UpworkFreelancerProposalCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "WorkHistory.upwork_Freelancer_Proposal"`)
+	if _, ok := whu.mutation.FreelancerID(); whu.mutation.FreelancerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WorkHistory.freelancer"`)
 	}
 	return nil
 }
@@ -570,44 +628,32 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := whu.mutation.ClientFeedback(); ok {
 		_spec.SetField(workhistory.FieldClientFeedback, field.TypeString, value)
 	}
+	if whu.mutation.ClientFeedbackCleared() {
+		_spec.ClearField(workhistory.FieldClientFeedback, field.TypeString)
+	}
 	if value, ok := whu.mutation.OverallRating(); ok {
 		_spec.SetField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
 	if value, ok := whu.mutation.AddedOverallRating(); ok {
 		_spec.AddField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
-	if value, ok := whu.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if whu.mutation.OverallRatingCleared() {
+		_spec.ClearField(workhistory.FieldOverallRating, field.TypeFloat64)
 	}
-	if value, ok := whu.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whu.mutation.FreelancerEarnings(); ok {
+		_spec.SetField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if whu.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeAmount, field.TypeInt)
+	if value, ok := whu.mutation.AddedFreelancerEarnings(); ok {
+		_spec.AddField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if value, ok := whu.mutation.FixedChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeCurrency, field.TypeString, value)
-	}
-	if whu.mutation.FixedChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeCurrency, field.TypeString)
-	}
-	if value, ok := whu.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if value, ok := whu.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if whu.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeAmount, field.TypeInt)
-	}
-	if value, ok := whu.mutation.HourlyChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeCurrency, field.TypeString, value)
-	}
-	if whu.mutation.HourlyChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeCurrency, field.TypeString)
+	if whu.mutation.FreelancerEarningsCleared() {
+		_spec.ClearField(workhistory.FieldFreelancerEarnings, field.TypeFloat64)
 	}
 	if value, ok := whu.mutation.StartDate(); ok {
 		_spec.SetField(workhistory.FieldStartDate, field.TypeTime, value)
+	}
+	if whu.mutation.StartDateCleared() {
+		_spec.ClearField(workhistory.FieldStartDate, field.TypeTime)
 	}
 	if value, ok := whu.mutation.EndDate(); ok {
 		_spec.SetField(workhistory.FieldEndDate, field.TypeTime, value)
@@ -615,28 +661,20 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if whu.mutation.EndDateCleared() {
 		_spec.ClearField(workhistory.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := whu.mutation.JobDescription(); ok {
-		_spec.SetField(workhistory.FieldJobDescription, field.TypeString, value)
+	if value, ok := whu.mutation.Description(); ok {
+		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := whu.mutation.TotalProposals(); ok {
-		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	if whu.mutation.DescriptionCleared() {
+		_spec.ClearField(workhistory.FieldDescription, field.TypeString)
 	}
-	if value, ok := whu.mutation.AddedTotalProposals(); ok {
-		_spec.AddField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	if value, ok := whu.mutation.Budget(); ok {
+		_spec.SetField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
-	if value, ok := whu.mutation.NumberOfInterviews(); ok {
-		_spec.SetField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	if value, ok := whu.mutation.AddedBudget(); ok {
+		_spec.AddField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
-	if value, ok := whu.mutation.AddedNumberOfInterviews(); ok {
-		_spec.AddField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
-	}
-	if value, ok := whu.mutation.Skills(); ok {
-		_spec.SetField(workhistory.FieldSkills, field.TypeJSON, value)
-	}
-	if value, ok := whu.mutation.AppendedSkills(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, workhistory.FieldSkills, value)
-		})
+	if whu.mutation.BudgetCleared() {
+		_spec.ClearField(workhistory.FieldBudget, field.TypeFloat64)
 	}
 	if value, ok := whu.mutation.ClientRating(); ok {
 		_spec.SetField(workhistory.FieldClientRating, field.TypeFloat64, value)
@@ -644,14 +682,23 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := whu.mutation.AddedClientRating(); ok {
 		_spec.AddField(workhistory.FieldClientRating, field.TypeFloat64, value)
 	}
+	if whu.mutation.ClientRatingCleared() {
+		_spec.ClearField(workhistory.FieldClientRating, field.TypeFloat64)
+	}
 	if value, ok := whu.mutation.ClientReviewCount(); ok {
 		_spec.SetField(workhistory.FieldClientReviewCount, field.TypeInt, value)
 	}
 	if value, ok := whu.mutation.AddedClientReviewCount(); ok {
 		_spec.AddField(workhistory.FieldClientReviewCount, field.TypeInt, value)
 	}
+	if whu.mutation.ClientReviewCountCleared() {
+		_spec.ClearField(workhistory.FieldClientReviewCount, field.TypeInt)
+	}
 	if value, ok := whu.mutation.ClientCountry(); ok {
 		_spec.SetField(workhistory.FieldClientCountry, field.TypeString, value)
+	}
+	if whu.mutation.ClientCountryCleared() {
+		_spec.ClearField(workhistory.FieldClientCountry, field.TypeString)
 	}
 	if value, ok := whu.mutation.ClientTotalJobsPosted(); ok {
 		_spec.SetField(workhistory.FieldClientTotalJobsPosted, field.TypeInt, value)
@@ -659,11 +706,17 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := whu.mutation.AddedClientTotalJobsPosted(); ok {
 		_spec.AddField(workhistory.FieldClientTotalJobsPosted, field.TypeInt, value)
 	}
+	if whu.mutation.ClientTotalJobsPostedCleared() {
+		_spec.ClearField(workhistory.FieldClientTotalJobsPosted, field.TypeInt)
+	}
 	if value, ok := whu.mutation.ClientTotalSpend(); ok {
 		_spec.SetField(workhistory.FieldClientTotalSpend, field.TypeFloat64, value)
 	}
 	if value, ok := whu.mutation.AddedClientTotalSpend(); ok {
 		_spec.AddField(workhistory.FieldClientTotalSpend, field.TypeFloat64, value)
+	}
+	if whu.mutation.ClientTotalSpendCleared() {
+		_spec.ClearField(workhistory.FieldClientTotalSpend, field.TypeFloat64)
 	}
 	if value, ok := whu.mutation.ClientTotalHires(); ok {
 		_spec.SetField(workhistory.FieldClientTotalHires, field.TypeInt, value)
@@ -673,6 +726,15 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if whu.mutation.ClientTotalHiresCleared() {
 		_spec.ClearField(workhistory.FieldClientTotalHires, field.TypeInt)
+	}
+	if value, ok := whu.mutation.ClientActiveHires(); ok {
+		_spec.SetField(workhistory.FieldClientActiveHires, field.TypeInt, value)
+	}
+	if value, ok := whu.mutation.AddedClientActiveHires(); ok {
+		_spec.AddField(workhistory.FieldClientActiveHires, field.TypeInt, value)
+	}
+	if whu.mutation.ClientActiveHiresCleared() {
+		_spec.ClearField(workhistory.FieldClientActiveHires, field.TypeInt)
 	}
 	if value, ok := whu.mutation.ClientTotalPaidHours(); ok {
 		_spec.SetField(workhistory.FieldClientTotalPaidHours, field.TypeInt, value)
@@ -704,28 +766,57 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if whu.mutation.ClientCompanySizeCleared() {
 		_spec.ClearField(workhistory.FieldClientCompanySize, field.TypeString)
 	}
-	if whu.mutation.UpworkFreelancerProposalCleared() {
+	if value, ok := whu.mutation.TotalProposals(); ok {
+		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	}
+	if value, ok := whu.mutation.AddedTotalProposals(); ok {
+		_spec.AddField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	}
+	if whu.mutation.TotalProposalsCleared() {
+		_spec.ClearField(workhistory.FieldTotalProposals, field.TypeInt)
+	}
+	if value, ok := whu.mutation.NumberOfInterviews(); ok {
+		_spec.SetField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	}
+	if value, ok := whu.mutation.AddedNumberOfInterviews(); ok {
+		_spec.AddField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	}
+	if whu.mutation.NumberOfInterviewsCleared() {
+		_spec.ClearField(workhistory.FieldNumberOfInterviews, field.TypeInt)
+	}
+	if value, ok := whu.mutation.Skills(); ok {
+		_spec.SetField(workhistory.FieldSkills, field.TypeJSON, value)
+	}
+	if value, ok := whu.mutation.AppendedSkills(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, workhistory.FieldSkills, value)
+		})
+	}
+	if whu.mutation.SkillsCleared() {
+		_spec.ClearField(workhistory.FieldSkills, field.TypeJSON)
+	}
+	if whu.mutation.FreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   workhistory.UpworkFreelancerProposalTable,
-			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
+			Table:   workhistory.FreelancerTable,
+			Columns: []string{workhistory.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := whu.mutation.UpworkFreelancerProposalIDs(); len(nodes) > 0 {
+	if nodes := whu.mutation.FreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   workhistory.UpworkFreelancerProposalTable,
-			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
+			Table:   workhistory.FreelancerTable,
+			Columns: []string{workhistory.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -781,6 +872,12 @@ func (whuo *WorkHistoryUpdateOne) SetNillableClientFeedback(s *string) *WorkHist
 	return whuo
 }
 
+// ClearClientFeedback clears the value of the "client_feedback" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientFeedback() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientFeedback()
+	return whuo
+}
+
 // SetOverallRating sets the "overall_rating" field.
 func (whuo *WorkHistoryUpdateOne) SetOverallRating(f float64) *WorkHistoryUpdateOne {
 	whuo.mutation.ResetOverallRating()
@@ -802,97 +899,36 @@ func (whuo *WorkHistoryUpdateOne) AddOverallRating(f float64) *WorkHistoryUpdate
 	return whuo
 }
 
-// SetFixedChargeAmount sets the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) SetFixedChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetFixedChargeAmount()
-	whuo.mutation.SetFixedChargeAmount(i)
+// ClearOverallRating clears the value of the "overall_rating" field.
+func (whuo *WorkHistoryUpdateOne) ClearOverallRating() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearOverallRating()
 	return whuo
 }
 
-// SetNillableFixedChargeAmount sets the "fixed_charge_amount" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableFixedChargeAmount(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetFixedChargeAmount(*i)
+// SetFreelancerEarnings sets the "freelancer_earnings" field.
+func (whuo *WorkHistoryUpdateOne) SetFreelancerEarnings(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetFreelancerEarnings()
+	whuo.mutation.SetFreelancerEarnings(f)
+	return whuo
+}
+
+// SetNillableFreelancerEarnings sets the "freelancer_earnings" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableFreelancerEarnings(f *float64) *WorkHistoryUpdateOne {
+	if f != nil {
+		whuo.SetFreelancerEarnings(*f)
 	}
 	return whuo
 }
 
-// AddFixedChargeAmount adds i to the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) AddFixedChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddFixedChargeAmount(i)
+// AddFreelancerEarnings adds f to the "freelancer_earnings" field.
+func (whuo *WorkHistoryUpdateOne) AddFreelancerEarnings(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.AddFreelancerEarnings(f)
 	return whuo
 }
 
-// ClearFixedChargeAmount clears the value of the "fixed_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) ClearFixedChargeAmount() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearFixedChargeAmount()
-	return whuo
-}
-
-// SetFixedChargeCurrency sets the "fixed_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) SetFixedChargeCurrency(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetFixedChargeCurrency(s)
-	return whuo
-}
-
-// SetNillableFixedChargeCurrency sets the "fixed_charge_currency" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableFixedChargeCurrency(s *string) *WorkHistoryUpdateOne {
-	if s != nil {
-		whuo.SetFixedChargeCurrency(*s)
-	}
-	return whuo
-}
-
-// ClearFixedChargeCurrency clears the value of the "fixed_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) ClearFixedChargeCurrency() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearFixedChargeCurrency()
-	return whuo
-}
-
-// SetHourlyChargeAmount sets the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) SetHourlyChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetHourlyChargeAmount()
-	whuo.mutation.SetHourlyChargeAmount(i)
-	return whuo
-}
-
-// SetNillableHourlyChargeAmount sets the "hourly_charge_amount" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableHourlyChargeAmount(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetHourlyChargeAmount(*i)
-	}
-	return whuo
-}
-
-// AddHourlyChargeAmount adds i to the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) AddHourlyChargeAmount(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddHourlyChargeAmount(i)
-	return whuo
-}
-
-// ClearHourlyChargeAmount clears the value of the "hourly_charge_amount" field.
-func (whuo *WorkHistoryUpdateOne) ClearHourlyChargeAmount() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearHourlyChargeAmount()
-	return whuo
-}
-
-// SetHourlyChargeCurrency sets the "hourly_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) SetHourlyChargeCurrency(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetHourlyChargeCurrency(s)
-	return whuo
-}
-
-// SetNillableHourlyChargeCurrency sets the "hourly_charge_currency" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableHourlyChargeCurrency(s *string) *WorkHistoryUpdateOne {
-	if s != nil {
-		whuo.SetHourlyChargeCurrency(*s)
-	}
-	return whuo
-}
-
-// ClearHourlyChargeCurrency clears the value of the "hourly_charge_currency" field.
-func (whuo *WorkHistoryUpdateOne) ClearHourlyChargeCurrency() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearHourlyChargeCurrency()
+// ClearFreelancerEarnings clears the value of the "freelancer_earnings" field.
+func (whuo *WorkHistoryUpdateOne) ClearFreelancerEarnings() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearFreelancerEarnings()
 	return whuo
 }
 
@@ -907,6 +943,12 @@ func (whuo *WorkHistoryUpdateOne) SetNillableStartDate(t *time.Time) *WorkHistor
 	if t != nil {
 		whuo.SetStartDate(*t)
 	}
+	return whuo
+}
+
+// ClearStartDate clears the value of the "start_date" field.
+func (whuo *WorkHistoryUpdateOne) ClearStartDate() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearStartDate()
 	return whuo
 }
 
@@ -930,71 +972,50 @@ func (whuo *WorkHistoryUpdateOne) ClearEndDate() *WorkHistoryUpdateOne {
 	return whuo
 }
 
-// SetJobDescription sets the "job_description" field.
-func (whuo *WorkHistoryUpdateOne) SetJobDescription(s string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetJobDescription(s)
+// SetDescription sets the "description" field.
+func (whuo *WorkHistoryUpdateOne) SetDescription(s string) *WorkHistoryUpdateOne {
+	whuo.mutation.SetDescription(s)
 	return whuo
 }
 
-// SetNillableJobDescription sets the "job_description" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableJobDescription(s *string) *WorkHistoryUpdateOne {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableDescription(s *string) *WorkHistoryUpdateOne {
 	if s != nil {
-		whuo.SetJobDescription(*s)
+		whuo.SetDescription(*s)
 	}
 	return whuo
 }
 
-// SetTotalProposals sets the "total_proposals" field.
-func (whuo *WorkHistoryUpdateOne) SetTotalProposals(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetTotalProposals()
-	whuo.mutation.SetTotalProposals(i)
+// ClearDescription clears the value of the "description" field.
+func (whuo *WorkHistoryUpdateOne) ClearDescription() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearDescription()
 	return whuo
 }
 
-// SetNillableTotalProposals sets the "total_proposals" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableTotalProposals(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetTotalProposals(*i)
+// SetBudget sets the "budget" field.
+func (whuo *WorkHistoryUpdateOne) SetBudget(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetBudget()
+	whuo.mutation.SetBudget(f)
+	return whuo
+}
+
+// SetNillableBudget sets the "budget" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableBudget(f *float64) *WorkHistoryUpdateOne {
+	if f != nil {
+		whuo.SetBudget(*f)
 	}
 	return whuo
 }
 
-// AddTotalProposals adds i to the "total_proposals" field.
-func (whuo *WorkHistoryUpdateOne) AddTotalProposals(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddTotalProposals(i)
+// AddBudget adds f to the "budget" field.
+func (whuo *WorkHistoryUpdateOne) AddBudget(f float64) *WorkHistoryUpdateOne {
+	whuo.mutation.AddBudget(f)
 	return whuo
 }
 
-// SetNumberOfInterviews sets the "number_of_interviews" field.
-func (whuo *WorkHistoryUpdateOne) SetNumberOfInterviews(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.ResetNumberOfInterviews()
-	whuo.mutation.SetNumberOfInterviews(i)
-	return whuo
-}
-
-// SetNillableNumberOfInterviews sets the "number_of_interviews" field if the given value is not nil.
-func (whuo *WorkHistoryUpdateOne) SetNillableNumberOfInterviews(i *int) *WorkHistoryUpdateOne {
-	if i != nil {
-		whuo.SetNumberOfInterviews(*i)
-	}
-	return whuo
-}
-
-// AddNumberOfInterviews adds i to the "number_of_interviews" field.
-func (whuo *WorkHistoryUpdateOne) AddNumberOfInterviews(i int) *WorkHistoryUpdateOne {
-	whuo.mutation.AddNumberOfInterviews(i)
-	return whuo
-}
-
-// SetSkills sets the "skills" field.
-func (whuo *WorkHistoryUpdateOne) SetSkills(s []string) *WorkHistoryUpdateOne {
-	whuo.mutation.SetSkills(s)
-	return whuo
-}
-
-// AppendSkills appends s to the "skills" field.
-func (whuo *WorkHistoryUpdateOne) AppendSkills(s []string) *WorkHistoryUpdateOne {
-	whuo.mutation.AppendSkills(s)
+// ClearBudget clears the value of the "budget" field.
+func (whuo *WorkHistoryUpdateOne) ClearBudget() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearBudget()
 	return whuo
 }
 
@@ -1019,6 +1040,12 @@ func (whuo *WorkHistoryUpdateOne) AddClientRating(f float64) *WorkHistoryUpdateO
 	return whuo
 }
 
+// ClearClientRating clears the value of the "client_rating" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientRating() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientRating()
+	return whuo
+}
+
 // SetClientReviewCount sets the "client_review_count" field.
 func (whuo *WorkHistoryUpdateOne) SetClientReviewCount(i int) *WorkHistoryUpdateOne {
 	whuo.mutation.ResetClientReviewCount()
@@ -1040,6 +1067,12 @@ func (whuo *WorkHistoryUpdateOne) AddClientReviewCount(i int) *WorkHistoryUpdate
 	return whuo
 }
 
+// ClearClientReviewCount clears the value of the "client_review_count" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientReviewCount() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientReviewCount()
+	return whuo
+}
+
 // SetClientCountry sets the "client_country" field.
 func (whuo *WorkHistoryUpdateOne) SetClientCountry(s string) *WorkHistoryUpdateOne {
 	whuo.mutation.SetClientCountry(s)
@@ -1051,6 +1084,12 @@ func (whuo *WorkHistoryUpdateOne) SetNillableClientCountry(s *string) *WorkHisto
 	if s != nil {
 		whuo.SetClientCountry(*s)
 	}
+	return whuo
+}
+
+// ClearClientCountry clears the value of the "client_country" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientCountry() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientCountry()
 	return whuo
 }
 
@@ -1075,6 +1114,12 @@ func (whuo *WorkHistoryUpdateOne) AddClientTotalJobsPosted(i int) *WorkHistoryUp
 	return whuo
 }
 
+// ClearClientTotalJobsPosted clears the value of the "client_total_jobs_posted" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientTotalJobsPosted() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientTotalJobsPosted()
+	return whuo
+}
+
 // SetClientTotalSpend sets the "client_total_spend" field.
 func (whuo *WorkHistoryUpdateOne) SetClientTotalSpend(f float64) *WorkHistoryUpdateOne {
 	whuo.mutation.ResetClientTotalSpend()
@@ -1093,6 +1138,12 @@ func (whuo *WorkHistoryUpdateOne) SetNillableClientTotalSpend(f *float64) *WorkH
 // AddClientTotalSpend adds f to the "client_total_spend" field.
 func (whuo *WorkHistoryUpdateOne) AddClientTotalSpend(f float64) *WorkHistoryUpdateOne {
 	whuo.mutation.AddClientTotalSpend(f)
+	return whuo
+}
+
+// ClearClientTotalSpend clears the value of the "client_total_spend" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientTotalSpend() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientTotalSpend()
 	return whuo
 }
 
@@ -1120,6 +1171,33 @@ func (whuo *WorkHistoryUpdateOne) AddClientTotalHires(i int) *WorkHistoryUpdateO
 // ClearClientTotalHires clears the value of the "client_total_hires" field.
 func (whuo *WorkHistoryUpdateOne) ClearClientTotalHires() *WorkHistoryUpdateOne {
 	whuo.mutation.ClearClientTotalHires()
+	return whuo
+}
+
+// SetClientActiveHires sets the "client_active_hires" field.
+func (whuo *WorkHistoryUpdateOne) SetClientActiveHires(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetClientActiveHires()
+	whuo.mutation.SetClientActiveHires(i)
+	return whuo
+}
+
+// SetNillableClientActiveHires sets the "client_active_hires" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableClientActiveHires(i *int) *WorkHistoryUpdateOne {
+	if i != nil {
+		whuo.SetClientActiveHires(*i)
+	}
+	return whuo
+}
+
+// AddClientActiveHires adds i to the "client_active_hires" field.
+func (whuo *WorkHistoryUpdateOne) AddClientActiveHires(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.AddClientActiveHires(i)
+	return whuo
+}
+
+// ClearClientActiveHires clears the value of the "client_active_hires" field.
+func (whuo *WorkHistoryUpdateOne) ClearClientActiveHires() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearClientActiveHires()
 	return whuo
 }
 
@@ -1217,15 +1295,87 @@ func (whuo *WorkHistoryUpdateOne) ClearClientCompanySize() *WorkHistoryUpdateOne
 	return whuo
 }
 
-// SetUpworkFreelancerProposalID sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity by ID.
-func (whuo *WorkHistoryUpdateOne) SetUpworkFreelancerProposalID(id uuid.UUID) *WorkHistoryUpdateOne {
-	whuo.mutation.SetUpworkFreelancerProposalID(id)
+// SetTotalProposals sets the "total_proposals" field.
+func (whuo *WorkHistoryUpdateOne) SetTotalProposals(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetTotalProposals()
+	whuo.mutation.SetTotalProposals(i)
 	return whuo
 }
 
-// SetUpworkFreelancerProposal sets the "upwork_Freelancer_Proposal" edge to the Freelancer entity.
-func (whuo *WorkHistoryUpdateOne) SetUpworkFreelancerProposal(f *Freelancer) *WorkHistoryUpdateOne {
-	return whuo.SetUpworkFreelancerProposalID(f.ID)
+// SetNillableTotalProposals sets the "total_proposals" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableTotalProposals(i *int) *WorkHistoryUpdateOne {
+	if i != nil {
+		whuo.SetTotalProposals(*i)
+	}
+	return whuo
+}
+
+// AddTotalProposals adds i to the "total_proposals" field.
+func (whuo *WorkHistoryUpdateOne) AddTotalProposals(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.AddTotalProposals(i)
+	return whuo
+}
+
+// ClearTotalProposals clears the value of the "total_proposals" field.
+func (whuo *WorkHistoryUpdateOne) ClearTotalProposals() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearTotalProposals()
+	return whuo
+}
+
+// SetNumberOfInterviews sets the "number_of_interviews" field.
+func (whuo *WorkHistoryUpdateOne) SetNumberOfInterviews(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.ResetNumberOfInterviews()
+	whuo.mutation.SetNumberOfInterviews(i)
+	return whuo
+}
+
+// SetNillableNumberOfInterviews sets the "number_of_interviews" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableNumberOfInterviews(i *int) *WorkHistoryUpdateOne {
+	if i != nil {
+		whuo.SetNumberOfInterviews(*i)
+	}
+	return whuo
+}
+
+// AddNumberOfInterviews adds i to the "number_of_interviews" field.
+func (whuo *WorkHistoryUpdateOne) AddNumberOfInterviews(i int) *WorkHistoryUpdateOne {
+	whuo.mutation.AddNumberOfInterviews(i)
+	return whuo
+}
+
+// ClearNumberOfInterviews clears the value of the "number_of_interviews" field.
+func (whuo *WorkHistoryUpdateOne) ClearNumberOfInterviews() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearNumberOfInterviews()
+	return whuo
+}
+
+// SetSkills sets the "skills" field.
+func (whuo *WorkHistoryUpdateOne) SetSkills(s []string) *WorkHistoryUpdateOne {
+	whuo.mutation.SetSkills(s)
+	return whuo
+}
+
+// AppendSkills appends s to the "skills" field.
+func (whuo *WorkHistoryUpdateOne) AppendSkills(s []string) *WorkHistoryUpdateOne {
+	whuo.mutation.AppendSkills(s)
+	return whuo
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (whuo *WorkHistoryUpdateOne) ClearSkills() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearSkills()
+	return whuo
+}
+
+// SetFreelancerID sets the "freelancer" edge to the UpworkFreelancer entity by ID.
+func (whuo *WorkHistoryUpdateOne) SetFreelancerID(id string) *WorkHistoryUpdateOne {
+	whuo.mutation.SetFreelancerID(id)
+	return whuo
+}
+
+// SetFreelancer sets the "freelancer" edge to the UpworkFreelancer entity.
+func (whuo *WorkHistoryUpdateOne) SetFreelancer(u *UpworkFreelancer) *WorkHistoryUpdateOne {
+	return whuo.SetFreelancerID(u.ID)
 }
 
 // Mutation returns the WorkHistoryMutation object of the builder.
@@ -1233,9 +1383,9 @@ func (whuo *WorkHistoryUpdateOne) Mutation() *WorkHistoryMutation {
 	return whuo.mutation
 }
 
-// ClearUpworkFreelancerProposal clears the "upwork_Freelancer_Proposal" edge to the Freelancer entity.
-func (whuo *WorkHistoryUpdateOne) ClearUpworkFreelancerProposal() *WorkHistoryUpdateOne {
-	whuo.mutation.ClearUpworkFreelancerProposal()
+// ClearFreelancer clears the "freelancer" edge to the UpworkFreelancer entity.
+func (whuo *WorkHistoryUpdateOne) ClearFreelancer() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearFreelancer()
 	return whuo
 }
 
@@ -1281,8 +1431,8 @@ func (whuo *WorkHistoryUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (whuo *WorkHistoryUpdateOne) check() error {
-	if _, ok := whuo.mutation.UpworkFreelancerProposalID(); whuo.mutation.UpworkFreelancerProposalCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "WorkHistory.upwork_Freelancer_Proposal"`)
+	if _, ok := whuo.mutation.FreelancerID(); whuo.mutation.FreelancerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WorkHistory.freelancer"`)
 	}
 	return nil
 }
@@ -1322,44 +1472,32 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if value, ok := whuo.mutation.ClientFeedback(); ok {
 		_spec.SetField(workhistory.FieldClientFeedback, field.TypeString, value)
 	}
+	if whuo.mutation.ClientFeedbackCleared() {
+		_spec.ClearField(workhistory.FieldClientFeedback, field.TypeString)
+	}
 	if value, ok := whuo.mutation.OverallRating(); ok {
 		_spec.SetField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
 	if value, ok := whuo.mutation.AddedOverallRating(); ok {
 		_spec.AddField(workhistory.FieldOverallRating, field.TypeFloat64, value)
 	}
-	if value, ok := whuo.mutation.FixedChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if whuo.mutation.OverallRatingCleared() {
+		_spec.ClearField(workhistory.FieldOverallRating, field.TypeFloat64)
 	}
-	if value, ok := whuo.mutation.AddedFixedChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldFixedChargeAmount, field.TypeInt, value)
+	if value, ok := whuo.mutation.FreelancerEarnings(); ok {
+		_spec.SetField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if whuo.mutation.FixedChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeAmount, field.TypeInt)
+	if value, ok := whuo.mutation.AddedFreelancerEarnings(); ok {
+		_spec.AddField(workhistory.FieldFreelancerEarnings, field.TypeFloat64, value)
 	}
-	if value, ok := whuo.mutation.FixedChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldFixedChargeCurrency, field.TypeString, value)
-	}
-	if whuo.mutation.FixedChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldFixedChargeCurrency, field.TypeString)
-	}
-	if value, ok := whuo.mutation.HourlyChargeAmount(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if value, ok := whuo.mutation.AddedHourlyChargeAmount(); ok {
-		_spec.AddField(workhistory.FieldHourlyChargeAmount, field.TypeInt, value)
-	}
-	if whuo.mutation.HourlyChargeAmountCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeAmount, field.TypeInt)
-	}
-	if value, ok := whuo.mutation.HourlyChargeCurrency(); ok {
-		_spec.SetField(workhistory.FieldHourlyChargeCurrency, field.TypeString, value)
-	}
-	if whuo.mutation.HourlyChargeCurrencyCleared() {
-		_spec.ClearField(workhistory.FieldHourlyChargeCurrency, field.TypeString)
+	if whuo.mutation.FreelancerEarningsCleared() {
+		_spec.ClearField(workhistory.FieldFreelancerEarnings, field.TypeFloat64)
 	}
 	if value, ok := whuo.mutation.StartDate(); ok {
 		_spec.SetField(workhistory.FieldStartDate, field.TypeTime, value)
+	}
+	if whuo.mutation.StartDateCleared() {
+		_spec.ClearField(workhistory.FieldStartDate, field.TypeTime)
 	}
 	if value, ok := whuo.mutation.EndDate(); ok {
 		_spec.SetField(workhistory.FieldEndDate, field.TypeTime, value)
@@ -1367,28 +1505,20 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if whuo.mutation.EndDateCleared() {
 		_spec.ClearField(workhistory.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := whuo.mutation.JobDescription(); ok {
-		_spec.SetField(workhistory.FieldJobDescription, field.TypeString, value)
+	if value, ok := whuo.mutation.Description(); ok {
+		_spec.SetField(workhistory.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := whuo.mutation.TotalProposals(); ok {
-		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	if whuo.mutation.DescriptionCleared() {
+		_spec.ClearField(workhistory.FieldDescription, field.TypeString)
 	}
-	if value, ok := whuo.mutation.AddedTotalProposals(); ok {
-		_spec.AddField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	if value, ok := whuo.mutation.Budget(); ok {
+		_spec.SetField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
-	if value, ok := whuo.mutation.NumberOfInterviews(); ok {
-		_spec.SetField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	if value, ok := whuo.mutation.AddedBudget(); ok {
+		_spec.AddField(workhistory.FieldBudget, field.TypeFloat64, value)
 	}
-	if value, ok := whuo.mutation.AddedNumberOfInterviews(); ok {
-		_spec.AddField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
-	}
-	if value, ok := whuo.mutation.Skills(); ok {
-		_spec.SetField(workhistory.FieldSkills, field.TypeJSON, value)
-	}
-	if value, ok := whuo.mutation.AppendedSkills(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, workhistory.FieldSkills, value)
-		})
+	if whuo.mutation.BudgetCleared() {
+		_spec.ClearField(workhistory.FieldBudget, field.TypeFloat64)
 	}
 	if value, ok := whuo.mutation.ClientRating(); ok {
 		_spec.SetField(workhistory.FieldClientRating, field.TypeFloat64, value)
@@ -1396,14 +1526,23 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if value, ok := whuo.mutation.AddedClientRating(); ok {
 		_spec.AddField(workhistory.FieldClientRating, field.TypeFloat64, value)
 	}
+	if whuo.mutation.ClientRatingCleared() {
+		_spec.ClearField(workhistory.FieldClientRating, field.TypeFloat64)
+	}
 	if value, ok := whuo.mutation.ClientReviewCount(); ok {
 		_spec.SetField(workhistory.FieldClientReviewCount, field.TypeInt, value)
 	}
 	if value, ok := whuo.mutation.AddedClientReviewCount(); ok {
 		_spec.AddField(workhistory.FieldClientReviewCount, field.TypeInt, value)
 	}
+	if whuo.mutation.ClientReviewCountCleared() {
+		_spec.ClearField(workhistory.FieldClientReviewCount, field.TypeInt)
+	}
 	if value, ok := whuo.mutation.ClientCountry(); ok {
 		_spec.SetField(workhistory.FieldClientCountry, field.TypeString, value)
+	}
+	if whuo.mutation.ClientCountryCleared() {
+		_spec.ClearField(workhistory.FieldClientCountry, field.TypeString)
 	}
 	if value, ok := whuo.mutation.ClientTotalJobsPosted(); ok {
 		_spec.SetField(workhistory.FieldClientTotalJobsPosted, field.TypeInt, value)
@@ -1411,11 +1550,17 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if value, ok := whuo.mutation.AddedClientTotalJobsPosted(); ok {
 		_spec.AddField(workhistory.FieldClientTotalJobsPosted, field.TypeInt, value)
 	}
+	if whuo.mutation.ClientTotalJobsPostedCleared() {
+		_spec.ClearField(workhistory.FieldClientTotalJobsPosted, field.TypeInt)
+	}
 	if value, ok := whuo.mutation.ClientTotalSpend(); ok {
 		_spec.SetField(workhistory.FieldClientTotalSpend, field.TypeFloat64, value)
 	}
 	if value, ok := whuo.mutation.AddedClientTotalSpend(); ok {
 		_spec.AddField(workhistory.FieldClientTotalSpend, field.TypeFloat64, value)
+	}
+	if whuo.mutation.ClientTotalSpendCleared() {
+		_spec.ClearField(workhistory.FieldClientTotalSpend, field.TypeFloat64)
 	}
 	if value, ok := whuo.mutation.ClientTotalHires(); ok {
 		_spec.SetField(workhistory.FieldClientTotalHires, field.TypeInt, value)
@@ -1425,6 +1570,15 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	}
 	if whuo.mutation.ClientTotalHiresCleared() {
 		_spec.ClearField(workhistory.FieldClientTotalHires, field.TypeInt)
+	}
+	if value, ok := whuo.mutation.ClientActiveHires(); ok {
+		_spec.SetField(workhistory.FieldClientActiveHires, field.TypeInt, value)
+	}
+	if value, ok := whuo.mutation.AddedClientActiveHires(); ok {
+		_spec.AddField(workhistory.FieldClientActiveHires, field.TypeInt, value)
+	}
+	if whuo.mutation.ClientActiveHiresCleared() {
+		_spec.ClearField(workhistory.FieldClientActiveHires, field.TypeInt)
 	}
 	if value, ok := whuo.mutation.ClientTotalPaidHours(); ok {
 		_spec.SetField(workhistory.FieldClientTotalPaidHours, field.TypeInt, value)
@@ -1456,28 +1610,57 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 	if whuo.mutation.ClientCompanySizeCleared() {
 		_spec.ClearField(workhistory.FieldClientCompanySize, field.TypeString)
 	}
-	if whuo.mutation.UpworkFreelancerProposalCleared() {
+	if value, ok := whuo.mutation.TotalProposals(); ok {
+		_spec.SetField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	}
+	if value, ok := whuo.mutation.AddedTotalProposals(); ok {
+		_spec.AddField(workhistory.FieldTotalProposals, field.TypeInt, value)
+	}
+	if whuo.mutation.TotalProposalsCleared() {
+		_spec.ClearField(workhistory.FieldTotalProposals, field.TypeInt)
+	}
+	if value, ok := whuo.mutation.NumberOfInterviews(); ok {
+		_spec.SetField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	}
+	if value, ok := whuo.mutation.AddedNumberOfInterviews(); ok {
+		_spec.AddField(workhistory.FieldNumberOfInterviews, field.TypeInt, value)
+	}
+	if whuo.mutation.NumberOfInterviewsCleared() {
+		_spec.ClearField(workhistory.FieldNumberOfInterviews, field.TypeInt)
+	}
+	if value, ok := whuo.mutation.Skills(); ok {
+		_spec.SetField(workhistory.FieldSkills, field.TypeJSON, value)
+	}
+	if value, ok := whuo.mutation.AppendedSkills(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, workhistory.FieldSkills, value)
+		})
+	}
+	if whuo.mutation.SkillsCleared() {
+		_spec.ClearField(workhistory.FieldSkills, field.TypeJSON)
+	}
+	if whuo.mutation.FreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   workhistory.UpworkFreelancerProposalTable,
-			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
+			Table:   workhistory.FreelancerTable,
+			Columns: []string{workhistory.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := whuo.mutation.UpworkFreelancerProposalIDs(); len(nodes) > 0 {
+	if nodes := whuo.mutation.FreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   workhistory.UpworkFreelancerProposalTable,
-			Columns: []string{workhistory.UpworkFreelancerProposalColumn},
+			Table:   workhistory.FreelancerTable,
+			Columns: []string{workhistory.FreelancerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

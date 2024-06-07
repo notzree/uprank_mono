@@ -57,7 +57,7 @@ type JobEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Freelancers holds the value of the freelancers edge.
-	Freelancers []*Freelancer `json:"freelancers,omitempty"`
+	Freelancers []*UpworkFreelancer `json:"freelancers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -76,7 +76,7 @@ func (e JobEdges) UserOrErr() (*User, error) {
 
 // FreelancersOrErr returns the Freelancers value or an error if the edge
 // was not loaded in eager-loading.
-func (e JobEdges) FreelancersOrErr() ([]*Freelancer, error) {
+func (e JobEdges) FreelancersOrErr() ([]*UpworkFreelancer, error) {
 	if e.loadedTypes[1] {
 		return e.Freelancers, nil
 	}
@@ -229,7 +229,7 @@ func (j *Job) QueryUser() *UserQuery {
 }
 
 // QueryFreelancers queries the "freelancers" edge of the Job entity.
-func (j *Job) QueryFreelancers() *FreelancerQuery {
+func (j *Job) QueryFreelancers() *UpworkFreelancerQuery {
 	return NewJobClient(j.config).QueryFreelancers(j)
 }
 

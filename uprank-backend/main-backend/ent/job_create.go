@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -21,6 +22,7 @@ type JobCreate struct {
 	config
 	mutation *JobMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetTitle sets the "title" field.
@@ -174,17 +176,17 @@ func (jc *JobCreate) SetUser(u *User) *JobCreate {
 	return jc.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
-func (jc *JobCreate) AddFreelancerIDs(ids ...uuid.UUID) *JobCreate {
+// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
+func (jc *JobCreate) AddFreelancerIDs(ids ...string) *JobCreate {
 	jc.mutation.AddFreelancerIDs(ids...)
 	return jc
 }
 
-// AddFreelancers adds the "freelancers" edges to the Freelancer entity.
-func (jc *JobCreate) AddFreelancers(f ...*Freelancer) *JobCreate {
-	ids := make([]uuid.UUID, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
+func (jc *JobCreate) AddFreelancers(u ...*UpworkFreelancer) *JobCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return jc.AddFreelancerIDs(ids...)
 }
@@ -296,6 +298,7 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 		_node = &Job{config: jc.config}
 		_spec = sqlgraph.NewCreateSpec(job.Table, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = jc.conflict
 	if id, ok := jc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -371,13 +374,13 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	}
 	if nodes := jc.mutation.FreelancersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -388,11 +391,641 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Job.Create().
+//		SetTitle(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.JobUpsert) {
+//			SetTitle(v+v).
+//		}).
+//		Exec(ctx)
+func (jc *JobCreate) OnConflict(opts ...sql.ConflictOption) *JobUpsertOne {
+	jc.conflict = opts
+	return &JobUpsertOne{
+		create: jc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (jc *JobCreate) OnConflictColumns(columns ...string) *JobUpsertOne {
+	jc.conflict = append(jc.conflict, sql.ConflictColumns(columns...))
+	return &JobUpsertOne{
+		create: jc,
+	}
+}
+
+type (
+	// JobUpsertOne is the builder for "upsert"-ing
+	//  one Job node.
+	JobUpsertOne struct {
+		create *JobCreate
+	}
+
+	// JobUpsert is the "OnConflict" setter.
+	JobUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetTitle sets the "title" field.
+func (u *JobUpsert) SetTitle(v string) *JobUpsert {
+	u.Set(job.FieldTitle, v)
+	return u
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *JobUpsert) UpdateTitle() *JobUpsert {
+	u.SetExcluded(job.FieldTitle)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *JobUpsert) SetCreatedAt(v time.Time) *JobUpsert {
+	u.Set(job.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *JobUpsert) UpdateCreatedAt() *JobUpsert {
+	u.SetExcluded(job.FieldCreatedAt)
+	return u
+}
+
+// SetLocation sets the "location" field.
+func (u *JobUpsert) SetLocation(v string) *JobUpsert {
+	u.Set(job.FieldLocation, v)
+	return u
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *JobUpsert) UpdateLocation() *JobUpsert {
+	u.SetExcluded(job.FieldLocation)
+	return u
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *JobUpsert) ClearLocation() *JobUpsert {
+	u.SetNull(job.FieldLocation)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *JobUpsert) SetDescription(v string) *JobUpsert {
+	u.Set(job.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *JobUpsert) UpdateDescription() *JobUpsert {
+	u.SetExcluded(job.FieldDescription)
+	return u
+}
+
+// SetSkills sets the "skills" field.
+func (u *JobUpsert) SetSkills(v []string) *JobUpsert {
+	u.Set(job.FieldSkills, v)
+	return u
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *JobUpsert) UpdateSkills() *JobUpsert {
+	u.SetExcluded(job.FieldSkills)
+	return u
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (u *JobUpsert) ClearSkills() *JobUpsert {
+	u.SetNull(job.FieldSkills)
+	return u
+}
+
+// SetExperienceLevel sets the "experience_level" field.
+func (u *JobUpsert) SetExperienceLevel(v string) *JobUpsert {
+	u.Set(job.FieldExperienceLevel, v)
+	return u
+}
+
+// UpdateExperienceLevel sets the "experience_level" field to the value that was provided on create.
+func (u *JobUpsert) UpdateExperienceLevel() *JobUpsert {
+	u.SetExcluded(job.FieldExperienceLevel)
+	return u
+}
+
+// ClearExperienceLevel clears the value of the "experience_level" field.
+func (u *JobUpsert) ClearExperienceLevel() *JobUpsert {
+	u.SetNull(job.FieldExperienceLevel)
+	return u
+}
+
+// SetHourly sets the "hourly" field.
+func (u *JobUpsert) SetHourly(v bool) *JobUpsert {
+	u.Set(job.FieldHourly, v)
+	return u
+}
+
+// UpdateHourly sets the "hourly" field to the value that was provided on create.
+func (u *JobUpsert) UpdateHourly() *JobUpsert {
+	u.SetExcluded(job.FieldHourly)
+	return u
+}
+
+// SetFixed sets the "fixed" field.
+func (u *JobUpsert) SetFixed(v bool) *JobUpsert {
+	u.Set(job.FieldFixed, v)
+	return u
+}
+
+// UpdateFixed sets the "fixed" field to the value that was provided on create.
+func (u *JobUpsert) UpdateFixed() *JobUpsert {
+	u.SetExcluded(job.FieldFixed)
+	return u
+}
+
+// SetHourlyRate sets the "hourly_rate" field.
+func (u *JobUpsert) SetHourlyRate(v []float32) *JobUpsert {
+	u.Set(job.FieldHourlyRate, v)
+	return u
+}
+
+// UpdateHourlyRate sets the "hourly_rate" field to the value that was provided on create.
+func (u *JobUpsert) UpdateHourlyRate() *JobUpsert {
+	u.SetExcluded(job.FieldHourlyRate)
+	return u
+}
+
+// ClearHourlyRate clears the value of the "hourly_rate" field.
+func (u *JobUpsert) ClearHourlyRate() *JobUpsert {
+	u.SetNull(job.FieldHourlyRate)
+	return u
+}
+
+// SetFixedRate sets the "fixed_rate" field.
+func (u *JobUpsert) SetFixedRate(v float64) *JobUpsert {
+	u.Set(job.FieldFixedRate, v)
+	return u
+}
+
+// UpdateFixedRate sets the "fixed_rate" field to the value that was provided on create.
+func (u *JobUpsert) UpdateFixedRate() *JobUpsert {
+	u.SetExcluded(job.FieldFixedRate)
+	return u
+}
+
+// AddFixedRate adds v to the "fixed_rate" field.
+func (u *JobUpsert) AddFixedRate(v float64) *JobUpsert {
+	u.Add(job.FieldFixedRate, v)
+	return u
+}
+
+// ClearFixedRate clears the value of the "fixed_rate" field.
+func (u *JobUpsert) ClearFixedRate() *JobUpsert {
+	u.SetNull(job.FieldFixedRate)
+	return u
+}
+
+// SetAverageUprankScore sets the "average_uprank_score" field.
+func (u *JobUpsert) SetAverageUprankScore(v float64) *JobUpsert {
+	u.Set(job.FieldAverageUprankScore, v)
+	return u
+}
+
+// UpdateAverageUprankScore sets the "average_uprank_score" field to the value that was provided on create.
+func (u *JobUpsert) UpdateAverageUprankScore() *JobUpsert {
+	u.SetExcluded(job.FieldAverageUprankScore)
+	return u
+}
+
+// AddAverageUprankScore adds v to the "average_uprank_score" field.
+func (u *JobUpsert) AddAverageUprankScore(v float64) *JobUpsert {
+	u.Add(job.FieldAverageUprankScore, v)
+	return u
+}
+
+// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
+func (u *JobUpsert) ClearAverageUprankScore() *JobUpsert {
+	u.SetNull(job.FieldAverageUprankScore)
+	return u
+}
+
+// SetMaxUprankScore sets the "max_uprank_score" field.
+func (u *JobUpsert) SetMaxUprankScore(v float64) *JobUpsert {
+	u.Set(job.FieldMaxUprankScore, v)
+	return u
+}
+
+// UpdateMaxUprankScore sets the "max_uprank_score" field to the value that was provided on create.
+func (u *JobUpsert) UpdateMaxUprankScore() *JobUpsert {
+	u.SetExcluded(job.FieldMaxUprankScore)
+	return u
+}
+
+// AddMaxUprankScore adds v to the "max_uprank_score" field.
+func (u *JobUpsert) AddMaxUprankScore(v float64) *JobUpsert {
+	u.Add(job.FieldMaxUprankScore, v)
+	return u
+}
+
+// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
+func (u *JobUpsert) ClearMaxUprankScore() *JobUpsert {
+	u.SetNull(job.FieldMaxUprankScore)
+	return u
+}
+
+// SetMinUprankScore sets the "min_uprank_score" field.
+func (u *JobUpsert) SetMinUprankScore(v float64) *JobUpsert {
+	u.Set(job.FieldMinUprankScore, v)
+	return u
+}
+
+// UpdateMinUprankScore sets the "min_uprank_score" field to the value that was provided on create.
+func (u *JobUpsert) UpdateMinUprankScore() *JobUpsert {
+	u.SetExcluded(job.FieldMinUprankScore)
+	return u
+}
+
+// AddMinUprankScore adds v to the "min_uprank_score" field.
+func (u *JobUpsert) AddMinUprankScore(v float64) *JobUpsert {
+	u.Add(job.FieldMinUprankScore, v)
+	return u
+}
+
+// ClearMinUprankScore clears the value of the "min_uprank_score" field.
+func (u *JobUpsert) ClearMinUprankScore() *JobUpsert {
+	u.SetNull(job.FieldMinUprankScore)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(job.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *JobUpsertOne) UpdateNewValues() *JobUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(job.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *JobUpsertOne) Ignore() *JobUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *JobUpsertOne) DoNothing() *JobUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the JobCreate.OnConflict
+// documentation for more info.
+func (u *JobUpsertOne) Update(set func(*JobUpsert)) *JobUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&JobUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *JobUpsertOne) SetTitle(v string) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateTitle() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *JobUpsertOne) SetCreatedAt(v time.Time) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateCreatedAt() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *JobUpsertOne) SetLocation(v string) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateLocation() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *JobUpsertOne) ClearLocation() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearLocation()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *JobUpsertOne) SetDescription(v string) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateDescription() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *JobUpsertOne) SetSkills(v []string) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateSkills() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (u *JobUpsertOne) ClearSkills() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearSkills()
+	})
+}
+
+// SetExperienceLevel sets the "experience_level" field.
+func (u *JobUpsertOne) SetExperienceLevel(v string) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetExperienceLevel(v)
+	})
+}
+
+// UpdateExperienceLevel sets the "experience_level" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateExperienceLevel() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateExperienceLevel()
+	})
+}
+
+// ClearExperienceLevel clears the value of the "experience_level" field.
+func (u *JobUpsertOne) ClearExperienceLevel() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearExperienceLevel()
+	})
+}
+
+// SetHourly sets the "hourly" field.
+func (u *JobUpsertOne) SetHourly(v bool) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetHourly(v)
+	})
+}
+
+// UpdateHourly sets the "hourly" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateHourly() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateHourly()
+	})
+}
+
+// SetFixed sets the "fixed" field.
+func (u *JobUpsertOne) SetFixed(v bool) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetFixed(v)
+	})
+}
+
+// UpdateFixed sets the "fixed" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateFixed() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateFixed()
+	})
+}
+
+// SetHourlyRate sets the "hourly_rate" field.
+func (u *JobUpsertOne) SetHourlyRate(v []float32) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetHourlyRate(v)
+	})
+}
+
+// UpdateHourlyRate sets the "hourly_rate" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateHourlyRate() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateHourlyRate()
+	})
+}
+
+// ClearHourlyRate clears the value of the "hourly_rate" field.
+func (u *JobUpsertOne) ClearHourlyRate() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearHourlyRate()
+	})
+}
+
+// SetFixedRate sets the "fixed_rate" field.
+func (u *JobUpsertOne) SetFixedRate(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetFixedRate(v)
+	})
+}
+
+// AddFixedRate adds v to the "fixed_rate" field.
+func (u *JobUpsertOne) AddFixedRate(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.AddFixedRate(v)
+	})
+}
+
+// UpdateFixedRate sets the "fixed_rate" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateFixedRate() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateFixedRate()
+	})
+}
+
+// ClearFixedRate clears the value of the "fixed_rate" field.
+func (u *JobUpsertOne) ClearFixedRate() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearFixedRate()
+	})
+}
+
+// SetAverageUprankScore sets the "average_uprank_score" field.
+func (u *JobUpsertOne) SetAverageUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetAverageUprankScore(v)
+	})
+}
+
+// AddAverageUprankScore adds v to the "average_uprank_score" field.
+func (u *JobUpsertOne) AddAverageUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.AddAverageUprankScore(v)
+	})
+}
+
+// UpdateAverageUprankScore sets the "average_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateAverageUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateAverageUprankScore()
+	})
+}
+
+// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
+func (u *JobUpsertOne) ClearAverageUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearAverageUprankScore()
+	})
+}
+
+// SetMaxUprankScore sets the "max_uprank_score" field.
+func (u *JobUpsertOne) SetMaxUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetMaxUprankScore(v)
+	})
+}
+
+// AddMaxUprankScore adds v to the "max_uprank_score" field.
+func (u *JobUpsertOne) AddMaxUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.AddMaxUprankScore(v)
+	})
+}
+
+// UpdateMaxUprankScore sets the "max_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateMaxUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateMaxUprankScore()
+	})
+}
+
+// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
+func (u *JobUpsertOne) ClearMaxUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearMaxUprankScore()
+	})
+}
+
+// SetMinUprankScore sets the "min_uprank_score" field.
+func (u *JobUpsertOne) SetMinUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.SetMinUprankScore(v)
+	})
+}
+
+// AddMinUprankScore adds v to the "min_uprank_score" field.
+func (u *JobUpsertOne) AddMinUprankScore(v float64) *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.AddMinUprankScore(v)
+	})
+}
+
+// UpdateMinUprankScore sets the "min_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertOne) UpdateMinUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateMinUprankScore()
+	})
+}
+
+// ClearMinUprankScore clears the value of the "min_uprank_score" field.
+func (u *JobUpsertOne) ClearMinUprankScore() *JobUpsertOne {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearMinUprankScore()
+	})
+}
+
+// Exec executes the query.
+func (u *JobUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for JobCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *JobUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *JobUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: JobUpsertOne.ID is not supported by MySQL driver. Use JobUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *JobUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // JobCreateBulk is the builder for creating many Job entities in bulk.
 type JobCreateBulk struct {
 	config
 	err      error
 	builders []*JobCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Job entities in the database.
@@ -422,6 +1055,7 @@ func (jcb *JobCreateBulk) Save(ctx context.Context) ([]*Job, error) {
 					_, err = mutators[i+1].Mutate(root, jcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = jcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, jcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -468,6 +1102,386 @@ func (jcb *JobCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (jcb *JobCreateBulk) ExecX(ctx context.Context) {
 	if err := jcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Job.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.JobUpsert) {
+//			SetTitle(v+v).
+//		}).
+//		Exec(ctx)
+func (jcb *JobCreateBulk) OnConflict(opts ...sql.ConflictOption) *JobUpsertBulk {
+	jcb.conflict = opts
+	return &JobUpsertBulk{
+		create: jcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (jcb *JobCreateBulk) OnConflictColumns(columns ...string) *JobUpsertBulk {
+	jcb.conflict = append(jcb.conflict, sql.ConflictColumns(columns...))
+	return &JobUpsertBulk{
+		create: jcb,
+	}
+}
+
+// JobUpsertBulk is the builder for "upsert"-ing
+// a bulk of Job nodes.
+type JobUpsertBulk struct {
+	create *JobCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(job.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *JobUpsertBulk) UpdateNewValues() *JobUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(job.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Job.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *JobUpsertBulk) Ignore() *JobUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *JobUpsertBulk) DoNothing() *JobUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the JobCreateBulk.OnConflict
+// documentation for more info.
+func (u *JobUpsertBulk) Update(set func(*JobUpsert)) *JobUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&JobUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *JobUpsertBulk) SetTitle(v string) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateTitle() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *JobUpsertBulk) SetCreatedAt(v time.Time) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateCreatedAt() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *JobUpsertBulk) SetLocation(v string) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateLocation() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *JobUpsertBulk) ClearLocation() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearLocation()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *JobUpsertBulk) SetDescription(v string) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateDescription() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// SetSkills sets the "skills" field.
+func (u *JobUpsertBulk) SetSkills(v []string) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetSkills(v)
+	})
+}
+
+// UpdateSkills sets the "skills" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateSkills() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateSkills()
+	})
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (u *JobUpsertBulk) ClearSkills() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearSkills()
+	})
+}
+
+// SetExperienceLevel sets the "experience_level" field.
+func (u *JobUpsertBulk) SetExperienceLevel(v string) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetExperienceLevel(v)
+	})
+}
+
+// UpdateExperienceLevel sets the "experience_level" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateExperienceLevel() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateExperienceLevel()
+	})
+}
+
+// ClearExperienceLevel clears the value of the "experience_level" field.
+func (u *JobUpsertBulk) ClearExperienceLevel() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearExperienceLevel()
+	})
+}
+
+// SetHourly sets the "hourly" field.
+func (u *JobUpsertBulk) SetHourly(v bool) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetHourly(v)
+	})
+}
+
+// UpdateHourly sets the "hourly" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateHourly() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateHourly()
+	})
+}
+
+// SetFixed sets the "fixed" field.
+func (u *JobUpsertBulk) SetFixed(v bool) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetFixed(v)
+	})
+}
+
+// UpdateFixed sets the "fixed" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateFixed() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateFixed()
+	})
+}
+
+// SetHourlyRate sets the "hourly_rate" field.
+func (u *JobUpsertBulk) SetHourlyRate(v []float32) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetHourlyRate(v)
+	})
+}
+
+// UpdateHourlyRate sets the "hourly_rate" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateHourlyRate() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateHourlyRate()
+	})
+}
+
+// ClearHourlyRate clears the value of the "hourly_rate" field.
+func (u *JobUpsertBulk) ClearHourlyRate() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearHourlyRate()
+	})
+}
+
+// SetFixedRate sets the "fixed_rate" field.
+func (u *JobUpsertBulk) SetFixedRate(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetFixedRate(v)
+	})
+}
+
+// AddFixedRate adds v to the "fixed_rate" field.
+func (u *JobUpsertBulk) AddFixedRate(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.AddFixedRate(v)
+	})
+}
+
+// UpdateFixedRate sets the "fixed_rate" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateFixedRate() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateFixedRate()
+	})
+}
+
+// ClearFixedRate clears the value of the "fixed_rate" field.
+func (u *JobUpsertBulk) ClearFixedRate() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearFixedRate()
+	})
+}
+
+// SetAverageUprankScore sets the "average_uprank_score" field.
+func (u *JobUpsertBulk) SetAverageUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetAverageUprankScore(v)
+	})
+}
+
+// AddAverageUprankScore adds v to the "average_uprank_score" field.
+func (u *JobUpsertBulk) AddAverageUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.AddAverageUprankScore(v)
+	})
+}
+
+// UpdateAverageUprankScore sets the "average_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateAverageUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateAverageUprankScore()
+	})
+}
+
+// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
+func (u *JobUpsertBulk) ClearAverageUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearAverageUprankScore()
+	})
+}
+
+// SetMaxUprankScore sets the "max_uprank_score" field.
+func (u *JobUpsertBulk) SetMaxUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetMaxUprankScore(v)
+	})
+}
+
+// AddMaxUprankScore adds v to the "max_uprank_score" field.
+func (u *JobUpsertBulk) AddMaxUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.AddMaxUprankScore(v)
+	})
+}
+
+// UpdateMaxUprankScore sets the "max_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateMaxUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateMaxUprankScore()
+	})
+}
+
+// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
+func (u *JobUpsertBulk) ClearMaxUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearMaxUprankScore()
+	})
+}
+
+// SetMinUprankScore sets the "min_uprank_score" field.
+func (u *JobUpsertBulk) SetMinUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.SetMinUprankScore(v)
+	})
+}
+
+// AddMinUprankScore adds v to the "min_uprank_score" field.
+func (u *JobUpsertBulk) AddMinUprankScore(v float64) *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.AddMinUprankScore(v)
+	})
+}
+
+// UpdateMinUprankScore sets the "min_uprank_score" field to the value that was provided on create.
+func (u *JobUpsertBulk) UpdateMinUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.UpdateMinUprankScore()
+	})
+}
+
+// ClearMinUprankScore clears the value of the "min_uprank_score" field.
+func (u *JobUpsertBulk) ClearMinUprankScore() *JobUpsertBulk {
+	return u.Update(func(s *JobUpsert) {
+		s.ClearMinUprankScore()
+	})
+}
+
+// Exec executes the query.
+func (u *JobUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the JobCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for JobCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *JobUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

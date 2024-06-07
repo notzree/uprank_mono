@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -25,7 +25,7 @@ type JobQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Job
 	withUser        *UserQuery
-	withFreelancers *FreelancerQuery
+	withFreelancers *UpworkFreelancerQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -86,8 +86,8 @@ func (jq *JobQuery) QueryUser() *UserQuery {
 }
 
 // QueryFreelancers chains the current query on the "freelancers" edge.
-func (jq *JobQuery) QueryFreelancers() *FreelancerQuery {
-	query := (&FreelancerClient{config: jq.config}).Query()
+func (jq *JobQuery) QueryFreelancers() *UpworkFreelancerQuery {
+	query := (&UpworkFreelancerClient{config: jq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := jq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,8 +98,8 @@ func (jq *JobQuery) QueryFreelancers() *FreelancerQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(job.Table, job.FieldID, selector),
-			sqlgraph.To(freelancer.Table, freelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, job.FreelancersTable, job.FreelancersColumn),
+			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, job.FreelancersTable, job.FreelancersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(jq.driver.Dialect(), step)
 		return fromU, nil
@@ -320,8 +320,8 @@ func (jq *JobQuery) WithUser(opts ...func(*UserQuery)) *JobQuery {
 
 // WithFreelancers tells the query-builder to eager-load the nodes that are connected to
 // the "freelancers" edge. The optional arguments are used to configure the query builder of the edge.
-func (jq *JobQuery) WithFreelancers(opts ...func(*FreelancerQuery)) *JobQuery {
-	query := (&FreelancerClient{config: jq.config}).Query()
+func (jq *JobQuery) WithFreelancers(opts ...func(*UpworkFreelancerQuery)) *JobQuery {
+	query := (&UpworkFreelancerClient{config: jq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -445,8 +445,8 @@ func (jq *JobQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Job, err
 	}
 	if query := jq.withFreelancers; query != nil {
 		if err := jq.loadFreelancers(ctx, query, nodes,
-			func(n *Job) { n.Edges.Freelancers = []*Freelancer{} },
-			func(n *Job, e *Freelancer) { n.Edges.Freelancers = append(n.Edges.Freelancers, e) }); err != nil {
+			func(n *Job) { n.Edges.Freelancers = []*UpworkFreelancer{} },
+			func(n *Job, e *UpworkFreelancer) { n.Edges.Freelancers = append(n.Edges.Freelancers, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -485,34 +485,64 @@ func (jq *JobQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Job
 	}
 	return nil
 }
-func (jq *JobQuery) loadFreelancers(ctx context.Context, query *FreelancerQuery, nodes []*Job, init func(*Job), assign func(*Job, *Freelancer)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Job)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+func (jq *JobQuery) loadFreelancers(ctx context.Context, query *UpworkFreelancerQuery, nodes []*Job, init func(*Job), assign func(*Job, *UpworkFreelancer)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Job)
+	nids := make(map[string]map[*Job]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.Freelancer(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(job.FreelancersColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(job.FreelancersTable)
+		s.Join(joinT).On(s.C(upworkfreelancer.FieldID), joinT.C(job.FreelancersPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(job.FreelancersPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(job.FreelancersPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Job]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*UpworkFreelancer](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.job_freelancers
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "job_freelancers" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "job_freelancers" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "freelancers" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

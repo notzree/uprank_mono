@@ -9,11 +9,11 @@ import (
 // AttachmentRef is the predicate function for attachmentref builders.
 type AttachmentRef func(*sql.Selector)
 
-// Freelancer is the predicate function for freelancer builders.
-type Freelancer func(*sql.Selector)
-
 // Job is the predicate function for job builders.
 type Job func(*sql.Selector)
+
+// UpworkFreelancer is the predicate function for upworkfreelancer builders.
+type UpworkFreelancer func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

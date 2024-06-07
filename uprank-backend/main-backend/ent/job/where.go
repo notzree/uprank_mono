@@ -708,14 +708,14 @@ func HasFreelancers() predicate.Job {
 	return predicate.Job(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, FreelancersTable, FreelancersColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, FreelancersTable, FreelancersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasFreelancersWith applies the HasEdge predicate on the "freelancers" edge with a given conditions (other predicates).
-func HasFreelancersWith(preds ...predicate.Freelancer) predicate.Job {
+func HasFreelancersWith(preds ...predicate.UpworkFreelancer) predicate.Job {
 	return predicate.Job(func(s *sql.Selector) {
 		step := newFreelancersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

@@ -21,18 +21,6 @@ func (f AttachmentRefFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AttachmentRefMutation", m)
 }
 
-// The FreelancerFunc type is an adapter to allow the use of ordinary
-// function as Freelancer mutator.
-type FreelancerFunc func(context.Context, *ent.FreelancerMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f FreelancerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.FreelancerMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FreelancerMutation", m)
-}
-
 // The JobFunc type is an adapter to allow the use of ordinary
 // function as Job mutator.
 type JobFunc func(context.Context, *ent.JobMutation) (ent.Value, error)
@@ -43,6 +31,18 @@ func (f JobFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.JobMutation", m)
+}
+
+// The UpworkFreelancerFunc type is an adapter to allow the use of ordinary
+// function as UpworkFreelancer mutator.
+type UpworkFreelancerFunc func(context.Context, *ent.UpworkFreelancerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UpworkFreelancerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UpworkFreelancerMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UpworkFreelancerMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary
