@@ -9,12 +9,12 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Freelancer represents a freelancers application to a job
-type Freelancer struct {
+// UpworkFreelancer represents a freelancers application to an Upwork job
+type UpworkFreelancer struct {
 	ent.Schema
 }
 
-func (Freelancer) Fields() []ent.Field {
+func (UpworkFreelancer) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").NotEmpty().
 			Unique().
@@ -62,11 +62,10 @@ func (Freelancer) Fields() []ent.Field {
 }
 
 // Edges of the Freelancer.
-func (Freelancer) Edges() []ent.Edge {
+func (UpworkFreelancer) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("job", Job.Type).
-			Ref("freelancers").
-			Unique().Required(),
+			Ref("freelancers"),
 		edge.To("attachments", AttachmentRef.Type),
 		edge.To("work_histories", WorkHistory.Type),
 	}

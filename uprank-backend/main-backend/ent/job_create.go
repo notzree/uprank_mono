@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -176,17 +176,17 @@ func (jc *JobCreate) SetUser(u *User) *JobCreate {
 	return jc.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the Freelancer entity by IDs.
+// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
 func (jc *JobCreate) AddFreelancerIDs(ids ...string) *JobCreate {
 	jc.mutation.AddFreelancerIDs(ids...)
 	return jc
 }
 
-// AddFreelancers adds the "freelancers" edges to the Freelancer entity.
-func (jc *JobCreate) AddFreelancers(f ...*Freelancer) *JobCreate {
-	ids := make([]string, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
+func (jc *JobCreate) AddFreelancers(u ...*UpworkFreelancer) *JobCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return jc.AddFreelancerIDs(ids...)
 }
@@ -374,13 +374,13 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	}
 	if nodes := jc.mutation.FreelancersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   job.FreelancersTable,
-			Columns: []string{job.FreelancersColumn},
+			Columns: job.FreelancersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

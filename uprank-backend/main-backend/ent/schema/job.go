@@ -44,6 +44,6 @@ func (Job) Edges() []ent.Edge {
 		edge.From("user", User.Type).
 			Ref("jobs").
 			Unique().Required(),
-		edge.To("freelancers", Freelancer.Type),
+		edge.To("freelancers", UpworkFreelancer.Type),
 	}
 }

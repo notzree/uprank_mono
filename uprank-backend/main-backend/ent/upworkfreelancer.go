@@ -10,12 +10,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
-// Freelancer is the model entity for the Freelancer schema.
-type Freelancer struct {
+// UpworkFreelancer is the model entity for the UpworkFreelancer schema.
+type UpworkFreelancer struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
@@ -96,16 +95,15 @@ type Freelancer struct {
 	// UprankNotEnoughData holds the value of the "uprank_not_enough_data" field.
 	UprankNotEnoughData bool `json:"uprank_not_enough_data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the FreelancerQuery when eager-loading is set.
-	Edges           FreelancerEdges `json:"edges"`
-	job_freelancers *string
-	selectValues    sql.SelectValues
+	// The values are being populated by the UpworkFreelancerQuery when eager-loading is set.
+	Edges        UpworkFreelancerEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
-// FreelancerEdges holds the relations/edges for other nodes in the graph.
-type FreelancerEdges struct {
+// UpworkFreelancerEdges holds the relations/edges for other nodes in the graph.
+type UpworkFreelancerEdges struct {
 	// Job holds the value of the job edge.
-	Job *Job `json:"job,omitempty"`
+	Job []*Job `json:"job,omitempty"`
 	// Attachments holds the value of the attachments edge.
 	Attachments []*AttachmentRef `json:"attachments,omitempty"`
 	// WorkHistories holds the value of the work_histories edge.
@@ -116,19 +114,17 @@ type FreelancerEdges struct {
 }
 
 // JobOrErr returns the Job value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e FreelancerEdges) JobOrErr() (*Job, error) {
-	if e.Job != nil {
+// was not loaded in eager-loading.
+func (e UpworkFreelancerEdges) JobOrErr() ([]*Job, error) {
+	if e.loadedTypes[0] {
 		return e.Job, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: job.Label}
 	}
 	return nil, &NotLoadedError{edge: "job"}
 }
 
 // AttachmentsOrErr returns the Attachments value or an error if the edge
 // was not loaded in eager-loading.
-func (e FreelancerEdges) AttachmentsOrErr() ([]*AttachmentRef, error) {
+func (e UpworkFreelancerEdges) AttachmentsOrErr() ([]*AttachmentRef, error) {
 	if e.loadedTypes[1] {
 		return e.Attachments, nil
 	}
@@ -137,7 +133,7 @@ func (e FreelancerEdges) AttachmentsOrErr() ([]*AttachmentRef, error) {
 
 // WorkHistoriesOrErr returns the WorkHistories value or an error if the edge
 // was not loaded in eager-loading.
-func (e FreelancerEdges) WorkHistoriesOrErr() ([]*WorkHistory, error) {
+func (e UpworkFreelancerEdges) WorkHistoriesOrErr() ([]*WorkHistory, error) {
 	if e.loadedTypes[2] {
 		return e.WorkHistories, nil
 	}
@@ -145,24 +141,22 @@ func (e FreelancerEdges) WorkHistoriesOrErr() ([]*WorkHistory, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Freelancer) scanValues(columns []string) ([]any, error) {
+func (*UpworkFreelancer) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case freelancer.FieldSkills:
+		case upworkfreelancer.FieldSkills:
 			values[i] = new([]byte)
-		case freelancer.FieldAiReccomended, freelancer.FieldInvited, freelancer.FieldUpworkTopRatedStatus, freelancer.FieldUpworkTopRatedPlusStatus, freelancer.FieldUpworkSponsored, freelancer.FieldUpworkReccomended, freelancer.FieldUprankReccomended, freelancer.FieldUprankNotEnoughData:
+		case upworkfreelancer.FieldAiReccomended, upworkfreelancer.FieldInvited, upworkfreelancer.FieldUpworkTopRatedStatus, upworkfreelancer.FieldUpworkTopRatedPlusStatus, upworkfreelancer.FieldUpworkSponsored, upworkfreelancer.FieldUpworkReccomended, upworkfreelancer.FieldUprankReccomended, upworkfreelancer.FieldUprankNotEnoughData:
 			values[i] = new(sql.NullBool)
-		case freelancer.FieldFixedChargeAmount, freelancer.FieldHourlyChargeAmount, freelancer.FieldRecentHours, freelancer.FieldTotalHours, freelancer.FieldUpworkTotalFeedback, freelancer.FieldUpworkRecentFeedback, freelancer.FieldUpworkJobSuccessScore, freelancer.FieldAverageRecentEarnings, freelancer.FieldCombinedAverageRecentEarnings, freelancer.FieldCombinedRecentEarnings, freelancer.FieldCombinedTotalEarnings, freelancer.FieldCombinedTotalRevenue, freelancer.FieldRecentEarnings, freelancer.FieldTotalRevenue:
+		case upworkfreelancer.FieldFixedChargeAmount, upworkfreelancer.FieldHourlyChargeAmount, upworkfreelancer.FieldRecentHours, upworkfreelancer.FieldTotalHours, upworkfreelancer.FieldUpworkTotalFeedback, upworkfreelancer.FieldUpworkRecentFeedback, upworkfreelancer.FieldUpworkJobSuccessScore, upworkfreelancer.FieldAverageRecentEarnings, upworkfreelancer.FieldCombinedAverageRecentEarnings, upworkfreelancer.FieldCombinedRecentEarnings, upworkfreelancer.FieldCombinedTotalEarnings, upworkfreelancer.FieldCombinedTotalRevenue, upworkfreelancer.FieldRecentEarnings, upworkfreelancer.FieldTotalRevenue:
 			values[i] = new(sql.NullFloat64)
-		case freelancer.FieldTotalPortfolioItems, freelancer.FieldTotalPortfolioV2Items, freelancer.FieldUprankScore:
+		case upworkfreelancer.FieldTotalPortfolioItems, upworkfreelancer.FieldTotalPortfolioV2Items, upworkfreelancer.FieldUprankScore:
 			values[i] = new(sql.NullInt64)
-		case freelancer.FieldID, freelancer.FieldName, freelancer.FieldTitle, freelancer.FieldDescription, freelancer.FieldCity, freelancer.FieldCountry, freelancer.FieldTimezone, freelancer.FieldCv, freelancer.FieldFixedChargeCurrency, freelancer.FieldHourlyChargeCurrency, freelancer.FieldPhotoURL, freelancer.FieldUprankReccomendedReasons:
+		case upworkfreelancer.FieldID, upworkfreelancer.FieldName, upworkfreelancer.FieldTitle, upworkfreelancer.FieldDescription, upworkfreelancer.FieldCity, upworkfreelancer.FieldCountry, upworkfreelancer.FieldTimezone, upworkfreelancer.FieldCv, upworkfreelancer.FieldFixedChargeCurrency, upworkfreelancer.FieldHourlyChargeCurrency, upworkfreelancer.FieldPhotoURL, upworkfreelancer.FieldUprankReccomendedReasons:
 			values[i] = new(sql.NullString)
-		case freelancer.FieldUprankUpdatedAt:
+		case upworkfreelancer.FieldUprankUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case freelancer.ForeignKeys[0]: // job_freelancers
-			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -171,423 +165,416 @@ func (*Freelancer) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Freelancer fields.
-func (f *Freelancer) assignValues(columns []string, values []any) error {
+// to the UpworkFreelancer fields.
+func (uf *UpworkFreelancer) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case freelancer.FieldID:
+		case upworkfreelancer.FieldID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				f.ID = value.String
+				uf.ID = value.String
 			}
-		case freelancer.FieldName:
+		case upworkfreelancer.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				f.Name = value.String
+				uf.Name = value.String
 			}
-		case freelancer.FieldTitle:
+		case upworkfreelancer.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				f.Title = value.String
+				uf.Title = value.String
 			}
-		case freelancer.FieldDescription:
+		case upworkfreelancer.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				f.Description = value.String
+				uf.Description = value.String
 			}
-		case freelancer.FieldCity:
+		case upworkfreelancer.FieldCity:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field city", values[i])
 			} else if value.Valid {
-				f.City = value.String
+				uf.City = value.String
 			}
-		case freelancer.FieldCountry:
+		case upworkfreelancer.FieldCountry:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field country", values[i])
 			} else if value.Valid {
-				f.Country = value.String
+				uf.Country = value.String
 			}
-		case freelancer.FieldTimezone:
+		case upworkfreelancer.FieldTimezone:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field timezone", values[i])
 			} else if value.Valid {
-				f.Timezone = value.String
+				uf.Timezone = value.String
 			}
-		case freelancer.FieldCv:
+		case upworkfreelancer.FieldCv:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field cv", values[i])
 			} else if value.Valid {
-				f.Cv = value.String
+				uf.Cv = value.String
 			}
-		case freelancer.FieldAiReccomended:
+		case upworkfreelancer.FieldAiReccomended:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field ai_reccomended", values[i])
 			} else if value.Valid {
-				f.AiReccomended = value.Bool
+				uf.AiReccomended = value.Bool
 			}
-		case freelancer.FieldFixedChargeAmount:
+		case upworkfreelancer.FieldFixedChargeAmount:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field fixed_charge_amount", values[i])
 			} else if value.Valid {
-				f.FixedChargeAmount = value.Float64
+				uf.FixedChargeAmount = value.Float64
 			}
-		case freelancer.FieldFixedChargeCurrency:
+		case upworkfreelancer.FieldFixedChargeCurrency:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field fixed_charge_currency", values[i])
 			} else if value.Valid {
-				f.FixedChargeCurrency = value.String
+				uf.FixedChargeCurrency = value.String
 			}
-		case freelancer.FieldHourlyChargeAmount:
+		case upworkfreelancer.FieldHourlyChargeAmount:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field hourly_charge_amount", values[i])
 			} else if value.Valid {
-				f.HourlyChargeAmount = value.Float64
+				uf.HourlyChargeAmount = value.Float64
 			}
-		case freelancer.FieldHourlyChargeCurrency:
+		case upworkfreelancer.FieldHourlyChargeCurrency:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field hourly_charge_currency", values[i])
 			} else if value.Valid {
-				f.HourlyChargeCurrency = value.String
+				uf.HourlyChargeCurrency = value.String
 			}
-		case freelancer.FieldInvited:
+		case upworkfreelancer.FieldInvited:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field invited", values[i])
 			} else if value.Valid {
-				f.Invited = value.Bool
+				uf.Invited = value.Bool
 			}
-		case freelancer.FieldPhotoURL:
+		case upworkfreelancer.FieldPhotoURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field photo_url", values[i])
 			} else if value.Valid {
-				f.PhotoURL = value.String
+				uf.PhotoURL = value.String
 			}
-		case freelancer.FieldRecentHours:
+		case upworkfreelancer.FieldRecentHours:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field recent_hours", values[i])
 			} else if value.Valid {
-				f.RecentHours = value.Float64
+				uf.RecentHours = value.Float64
 			}
-		case freelancer.FieldTotalHours:
+		case upworkfreelancer.FieldTotalHours:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_hours", values[i])
 			} else if value.Valid {
-				f.TotalHours = value.Float64
+				uf.TotalHours = value.Float64
 			}
-		case freelancer.FieldTotalPortfolioItems:
+		case upworkfreelancer.FieldTotalPortfolioItems:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_portfolio_items", values[i])
 			} else if value.Valid {
-				f.TotalPortfolioItems = int(value.Int64)
+				uf.TotalPortfolioItems = int(value.Int64)
 			}
-		case freelancer.FieldTotalPortfolioV2Items:
+		case upworkfreelancer.FieldTotalPortfolioV2Items:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_portfolio_v2_items", values[i])
 			} else if value.Valid {
-				f.TotalPortfolioV2Items = int(value.Int64)
+				uf.TotalPortfolioV2Items = int(value.Int64)
 			}
-		case freelancer.FieldUpworkTotalFeedback:
+		case upworkfreelancer.FieldUpworkTotalFeedback:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_total_feedback", values[i])
 			} else if value.Valid {
-				f.UpworkTotalFeedback = value.Float64
+				uf.UpworkTotalFeedback = value.Float64
 			}
-		case freelancer.FieldUpworkRecentFeedback:
+		case upworkfreelancer.FieldUpworkRecentFeedback:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_recent_feedback", values[i])
 			} else if value.Valid {
-				f.UpworkRecentFeedback = value.Float64
+				uf.UpworkRecentFeedback = value.Float64
 			}
-		case freelancer.FieldUpworkTopRatedStatus:
+		case upworkfreelancer.FieldUpworkTopRatedStatus:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_top_rated_status", values[i])
 			} else if value.Valid {
-				f.UpworkTopRatedStatus = value.Bool
+				uf.UpworkTopRatedStatus = value.Bool
 			}
-		case freelancer.FieldUpworkTopRatedPlusStatus:
+		case upworkfreelancer.FieldUpworkTopRatedPlusStatus:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_top_rated_plus_status", values[i])
 			} else if value.Valid {
-				f.UpworkTopRatedPlusStatus = value.Bool
+				uf.UpworkTopRatedPlusStatus = value.Bool
 			}
-		case freelancer.FieldUpworkSponsored:
+		case upworkfreelancer.FieldUpworkSponsored:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_sponsored", values[i])
 			} else if value.Valid {
-				f.UpworkSponsored = value.Bool
+				uf.UpworkSponsored = value.Bool
 			}
-		case freelancer.FieldUpworkJobSuccessScore:
+		case upworkfreelancer.FieldUpworkJobSuccessScore:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_job_success_score", values[i])
 			} else if value.Valid {
-				f.UpworkJobSuccessScore = value.Float64
+				uf.UpworkJobSuccessScore = value.Float64
 			}
-		case freelancer.FieldUpworkReccomended:
+		case upworkfreelancer.FieldUpworkReccomended:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_reccomended", values[i])
 			} else if value.Valid {
-				f.UpworkReccomended = value.Bool
+				uf.UpworkReccomended = value.Bool
 			}
-		case freelancer.FieldSkills:
+		case upworkfreelancer.FieldSkills:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field skills", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &f.Skills); err != nil {
+				if err := json.Unmarshal(*value, &uf.Skills); err != nil {
 					return fmt.Errorf("unmarshal field skills: %w", err)
 				}
 			}
-		case freelancer.FieldAverageRecentEarnings:
+		case upworkfreelancer.FieldAverageRecentEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field average_recent_earnings", values[i])
 			} else if value.Valid {
-				f.AverageRecentEarnings = value.Float64
+				uf.AverageRecentEarnings = value.Float64
 			}
-		case freelancer.FieldCombinedAverageRecentEarnings:
+		case upworkfreelancer.FieldCombinedAverageRecentEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field combined_average_recent_earnings", values[i])
 			} else if value.Valid {
-				f.CombinedAverageRecentEarnings = value.Float64
+				uf.CombinedAverageRecentEarnings = value.Float64
 			}
-		case freelancer.FieldCombinedRecentEarnings:
+		case upworkfreelancer.FieldCombinedRecentEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field combined_recent_earnings", values[i])
 			} else if value.Valid {
-				f.CombinedRecentEarnings = value.Float64
+				uf.CombinedRecentEarnings = value.Float64
 			}
-		case freelancer.FieldCombinedTotalEarnings:
+		case upworkfreelancer.FieldCombinedTotalEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field combined_total_earnings", values[i])
 			} else if value.Valid {
-				f.CombinedTotalEarnings = value.Float64
+				uf.CombinedTotalEarnings = value.Float64
 			}
-		case freelancer.FieldCombinedTotalRevenue:
+		case upworkfreelancer.FieldCombinedTotalRevenue:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field combined_total_revenue", values[i])
 			} else if value.Valid {
-				f.CombinedTotalRevenue = value.Float64
+				uf.CombinedTotalRevenue = value.Float64
 			}
-		case freelancer.FieldRecentEarnings:
+		case upworkfreelancer.FieldRecentEarnings:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field recent_earnings", values[i])
 			} else if value.Valid {
-				f.RecentEarnings = value.Float64
+				uf.RecentEarnings = value.Float64
 			}
-		case freelancer.FieldTotalRevenue:
+		case upworkfreelancer.FieldTotalRevenue:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_revenue", values[i])
 			} else if value.Valid {
-				f.TotalRevenue = value.Float64
+				uf.TotalRevenue = value.Float64
 			}
-		case freelancer.FieldUprankScore:
+		case upworkfreelancer.FieldUprankScore:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field uprank_score", values[i])
 			} else if value.Valid {
-				f.UprankScore = int(value.Int64)
+				uf.UprankScore = int(value.Int64)
 			}
-		case freelancer.FieldUprankUpdatedAt:
+		case upworkfreelancer.FieldUprankUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field uprank_updated_at", values[i])
 			} else if value.Valid {
-				f.UprankUpdatedAt = value.Time
+				uf.UprankUpdatedAt = value.Time
 			}
-		case freelancer.FieldUprankReccomended:
+		case upworkfreelancer.FieldUprankReccomended:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field uprank_reccomended", values[i])
 			} else if value.Valid {
-				f.UprankReccomended = value.Bool
+				uf.UprankReccomended = value.Bool
 			}
-		case freelancer.FieldUprankReccomendedReasons:
+		case upworkfreelancer.FieldUprankReccomendedReasons:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field uprank_reccomended_reasons", values[i])
 			} else if value.Valid {
-				f.UprankReccomendedReasons = value.String
+				uf.UprankReccomendedReasons = value.String
 			}
-		case freelancer.FieldUprankNotEnoughData:
+		case upworkfreelancer.FieldUprankNotEnoughData:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field uprank_not_enough_data", values[i])
 			} else if value.Valid {
-				f.UprankNotEnoughData = value.Bool
-			}
-		case freelancer.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field job_freelancers", values[i])
-			} else if value.Valid {
-				f.job_freelancers = new(string)
-				*f.job_freelancers = value.String
+				uf.UprankNotEnoughData = value.Bool
 			}
 		default:
-			f.selectValues.Set(columns[i], values[i])
+			uf.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Freelancer.
+// Value returns the ent.Value that was dynamically selected and assigned to the UpworkFreelancer.
 // This includes values selected through modifiers, order, etc.
-func (f *Freelancer) Value(name string) (ent.Value, error) {
-	return f.selectValues.Get(name)
+func (uf *UpworkFreelancer) Value(name string) (ent.Value, error) {
+	return uf.selectValues.Get(name)
 }
 
-// QueryJob queries the "job" edge of the Freelancer entity.
-func (f *Freelancer) QueryJob() *JobQuery {
-	return NewFreelancerClient(f.config).QueryJob(f)
+// QueryJob queries the "job" edge of the UpworkFreelancer entity.
+func (uf *UpworkFreelancer) QueryJob() *JobQuery {
+	return NewUpworkFreelancerClient(uf.config).QueryJob(uf)
 }
 
-// QueryAttachments queries the "attachments" edge of the Freelancer entity.
-func (f *Freelancer) QueryAttachments() *AttachmentRefQuery {
-	return NewFreelancerClient(f.config).QueryAttachments(f)
+// QueryAttachments queries the "attachments" edge of the UpworkFreelancer entity.
+func (uf *UpworkFreelancer) QueryAttachments() *AttachmentRefQuery {
+	return NewUpworkFreelancerClient(uf.config).QueryAttachments(uf)
 }
 
-// QueryWorkHistories queries the "work_histories" edge of the Freelancer entity.
-func (f *Freelancer) QueryWorkHistories() *WorkHistoryQuery {
-	return NewFreelancerClient(f.config).QueryWorkHistories(f)
+// QueryWorkHistories queries the "work_histories" edge of the UpworkFreelancer entity.
+func (uf *UpworkFreelancer) QueryWorkHistories() *WorkHistoryQuery {
+	return NewUpworkFreelancerClient(uf.config).QueryWorkHistories(uf)
 }
 
-// Update returns a builder for updating this Freelancer.
-// Note that you need to call Freelancer.Unwrap() before calling this method if this Freelancer
+// Update returns a builder for updating this UpworkFreelancer.
+// Note that you need to call UpworkFreelancer.Unwrap() before calling this method if this UpworkFreelancer
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (f *Freelancer) Update() *FreelancerUpdateOne {
-	return NewFreelancerClient(f.config).UpdateOne(f)
+func (uf *UpworkFreelancer) Update() *UpworkFreelancerUpdateOne {
+	return NewUpworkFreelancerClient(uf.config).UpdateOne(uf)
 }
 
-// Unwrap unwraps the Freelancer entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the UpworkFreelancer entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (f *Freelancer) Unwrap() *Freelancer {
-	_tx, ok := f.config.driver.(*txDriver)
+func (uf *UpworkFreelancer) Unwrap() *UpworkFreelancer {
+	_tx, ok := uf.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Freelancer is not a transactional entity")
+		panic("ent: UpworkFreelancer is not a transactional entity")
 	}
-	f.config.driver = _tx.drv
-	return f
+	uf.config.driver = _tx.drv
+	return uf
 }
 
 // String implements the fmt.Stringer.
-func (f *Freelancer) String() string {
+func (uf *UpworkFreelancer) String() string {
 	var builder strings.Builder
-	builder.WriteString("Freelancer(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
+	builder.WriteString("UpworkFreelancer(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", uf.ID))
 	builder.WriteString("name=")
-	builder.WriteString(f.Name)
+	builder.WriteString(uf.Name)
 	builder.WriteString(", ")
 	builder.WriteString("title=")
-	builder.WriteString(f.Title)
+	builder.WriteString(uf.Title)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
-	builder.WriteString(f.Description)
+	builder.WriteString(uf.Description)
 	builder.WriteString(", ")
 	builder.WriteString("city=")
-	builder.WriteString(f.City)
+	builder.WriteString(uf.City)
 	builder.WriteString(", ")
 	builder.WriteString("country=")
-	builder.WriteString(f.Country)
+	builder.WriteString(uf.Country)
 	builder.WriteString(", ")
 	builder.WriteString("timezone=")
-	builder.WriteString(f.Timezone)
+	builder.WriteString(uf.Timezone)
 	builder.WriteString(", ")
 	builder.WriteString("cv=")
-	builder.WriteString(f.Cv)
+	builder.WriteString(uf.Cv)
 	builder.WriteString(", ")
 	builder.WriteString("ai_reccomended=")
-	builder.WriteString(fmt.Sprintf("%v", f.AiReccomended))
+	builder.WriteString(fmt.Sprintf("%v", uf.AiReccomended))
 	builder.WriteString(", ")
 	builder.WriteString("fixed_charge_amount=")
-	builder.WriteString(fmt.Sprintf("%v", f.FixedChargeAmount))
+	builder.WriteString(fmt.Sprintf("%v", uf.FixedChargeAmount))
 	builder.WriteString(", ")
 	builder.WriteString("fixed_charge_currency=")
-	builder.WriteString(f.FixedChargeCurrency)
+	builder.WriteString(uf.FixedChargeCurrency)
 	builder.WriteString(", ")
 	builder.WriteString("hourly_charge_amount=")
-	builder.WriteString(fmt.Sprintf("%v", f.HourlyChargeAmount))
+	builder.WriteString(fmt.Sprintf("%v", uf.HourlyChargeAmount))
 	builder.WriteString(", ")
 	builder.WriteString("hourly_charge_currency=")
-	builder.WriteString(f.HourlyChargeCurrency)
+	builder.WriteString(uf.HourlyChargeCurrency)
 	builder.WriteString(", ")
 	builder.WriteString("invited=")
-	builder.WriteString(fmt.Sprintf("%v", f.Invited))
+	builder.WriteString(fmt.Sprintf("%v", uf.Invited))
 	builder.WriteString(", ")
 	builder.WriteString("photo_url=")
-	builder.WriteString(f.PhotoURL)
+	builder.WriteString(uf.PhotoURL)
 	builder.WriteString(", ")
 	builder.WriteString("recent_hours=")
-	builder.WriteString(fmt.Sprintf("%v", f.RecentHours))
+	builder.WriteString(fmt.Sprintf("%v", uf.RecentHours))
 	builder.WriteString(", ")
 	builder.WriteString("total_hours=")
-	builder.WriteString(fmt.Sprintf("%v", f.TotalHours))
+	builder.WriteString(fmt.Sprintf("%v", uf.TotalHours))
 	builder.WriteString(", ")
 	builder.WriteString("total_portfolio_items=")
-	builder.WriteString(fmt.Sprintf("%v", f.TotalPortfolioItems))
+	builder.WriteString(fmt.Sprintf("%v", uf.TotalPortfolioItems))
 	builder.WriteString(", ")
 	builder.WriteString("total_portfolio_v2_items=")
-	builder.WriteString(fmt.Sprintf("%v", f.TotalPortfolioV2Items))
+	builder.WriteString(fmt.Sprintf("%v", uf.TotalPortfolioV2Items))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_total_feedback=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkTotalFeedback))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkTotalFeedback))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_recent_feedback=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkRecentFeedback))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkRecentFeedback))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_top_rated_status=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkTopRatedStatus))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkTopRatedStatus))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_top_rated_plus_status=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkTopRatedPlusStatus))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkTopRatedPlusStatus))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_sponsored=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkSponsored))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkSponsored))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_job_success_score=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkJobSuccessScore))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkJobSuccessScore))
 	builder.WriteString(", ")
 	builder.WriteString("upwork_reccomended=")
-	builder.WriteString(fmt.Sprintf("%v", f.UpworkReccomended))
+	builder.WriteString(fmt.Sprintf("%v", uf.UpworkReccomended))
 	builder.WriteString(", ")
 	builder.WriteString("skills=")
-	builder.WriteString(fmt.Sprintf("%v", f.Skills))
+	builder.WriteString(fmt.Sprintf("%v", uf.Skills))
 	builder.WriteString(", ")
 	builder.WriteString("average_recent_earnings=")
-	builder.WriteString(fmt.Sprintf("%v", f.AverageRecentEarnings))
+	builder.WriteString(fmt.Sprintf("%v", uf.AverageRecentEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("combined_average_recent_earnings=")
-	builder.WriteString(fmt.Sprintf("%v", f.CombinedAverageRecentEarnings))
+	builder.WriteString(fmt.Sprintf("%v", uf.CombinedAverageRecentEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("combined_recent_earnings=")
-	builder.WriteString(fmt.Sprintf("%v", f.CombinedRecentEarnings))
+	builder.WriteString(fmt.Sprintf("%v", uf.CombinedRecentEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("combined_total_earnings=")
-	builder.WriteString(fmt.Sprintf("%v", f.CombinedTotalEarnings))
+	builder.WriteString(fmt.Sprintf("%v", uf.CombinedTotalEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("combined_total_revenue=")
-	builder.WriteString(fmt.Sprintf("%v", f.CombinedTotalRevenue))
+	builder.WriteString(fmt.Sprintf("%v", uf.CombinedTotalRevenue))
 	builder.WriteString(", ")
 	builder.WriteString("recent_earnings=")
-	builder.WriteString(fmt.Sprintf("%v", f.RecentEarnings))
+	builder.WriteString(fmt.Sprintf("%v", uf.RecentEarnings))
 	builder.WriteString(", ")
 	builder.WriteString("total_revenue=")
-	builder.WriteString(fmt.Sprintf("%v", f.TotalRevenue))
+	builder.WriteString(fmt.Sprintf("%v", uf.TotalRevenue))
 	builder.WriteString(", ")
 	builder.WriteString("uprank_score=")
-	builder.WriteString(fmt.Sprintf("%v", f.UprankScore))
+	builder.WriteString(fmt.Sprintf("%v", uf.UprankScore))
 	builder.WriteString(", ")
 	builder.WriteString("uprank_updated_at=")
-	builder.WriteString(f.UprankUpdatedAt.Format(time.ANSIC))
+	builder.WriteString(uf.UprankUpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("uprank_reccomended=")
-	builder.WriteString(fmt.Sprintf("%v", f.UprankReccomended))
+	builder.WriteString(fmt.Sprintf("%v", uf.UprankReccomended))
 	builder.WriteString(", ")
 	builder.WriteString("uprank_reccomended_reasons=")
-	builder.WriteString(f.UprankReccomendedReasons)
+	builder.WriteString(uf.UprankReccomendedReasons)
 	builder.WriteString(", ")
 	builder.WriteString("uprank_not_enough_data=")
-	builder.WriteString(fmt.Sprintf("%v", f.UprankNotEnoughData))
+	builder.WriteString(fmt.Sprintf("%v", uf.UprankNotEnoughData))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// Freelancers is a parsable slice of Freelancer.
-type Freelancers []*Freelancer
+// UpworkFreelancers is a parsable slice of UpworkFreelancer.
+type UpworkFreelancers []*UpworkFreelancer

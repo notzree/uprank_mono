@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -77,11 +77,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			attachmentref.Table: attachmentref.ValidColumn,
-			freelancer.Table:    freelancer.ValidColumn,
-			job.Table:           job.ValidColumn,
-			user.Table:          user.ValidColumn,
-			workhistory.Table:   workhistory.ValidColumn,
+			attachmentref.Table:    attachmentref.ValidColumn,
+			job.Table:              job.ValidColumn,
+			upworkfreelancer.Table: upworkfreelancer.ValidColumn,
+			user.Table:             user.ValidColumn,
+			workhistory.Table:      workhistory.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

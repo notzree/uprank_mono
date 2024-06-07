@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
 // AttachmentRef is the model entity for the AttachmentRef schema.
@@ -23,15 +23,15 @@ type AttachmentRef struct {
 	Link string `json:"link,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AttachmentRefQuery when eager-loading is set.
-	Edges                  AttachmentRefEdges `json:"edges"`
-	freelancer_attachments *string
-	selectValues           sql.SelectValues
+	Edges                         AttachmentRefEdges `json:"edges"`
+	upwork_freelancer_attachments *string
+	selectValues                  sql.SelectValues
 }
 
 // AttachmentRefEdges holds the relations/edges for other nodes in the graph.
 type AttachmentRefEdges struct {
 	// Freelancer holds the value of the freelancer edge.
-	Freelancer *Freelancer `json:"freelancer,omitempty"`
+	Freelancer *UpworkFreelancer `json:"freelancer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -39,11 +39,11 @@ type AttachmentRefEdges struct {
 
 // FreelancerOrErr returns the Freelancer value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e AttachmentRefEdges) FreelancerOrErr() (*Freelancer, error) {
+func (e AttachmentRefEdges) FreelancerOrErr() (*UpworkFreelancer, error) {
 	if e.Freelancer != nil {
 		return e.Freelancer, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: freelancer.Label}
+		return nil, &NotFoundError{label: upworkfreelancer.Label}
 	}
 	return nil, &NotLoadedError{edge: "freelancer"}
 }
@@ -57,7 +57,7 @@ func (*AttachmentRef) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case attachmentref.FieldName, attachmentref.FieldLink:
 			values[i] = new(sql.NullString)
-		case attachmentref.ForeignKeys[0]: // freelancer_attachments
+		case attachmentref.ForeignKeys[0]: // upwork_freelancer_attachments
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -94,10 +94,10 @@ func (ar *AttachmentRef) assignValues(columns []string, values []any) error {
 			}
 		case attachmentref.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field freelancer_attachments", values[i])
+				return fmt.Errorf("unexpected type %T for field upwork_freelancer_attachments", values[i])
 			} else if value.Valid {
-				ar.freelancer_attachments = new(string)
-				*ar.freelancer_attachments = value.String
+				ar.upwork_freelancer_attachments = new(string)
+				*ar.upwork_freelancer_attachments = value.String
 			}
 		default:
 			ar.selectValues.Set(columns[i], values[i])
@@ -113,7 +113,7 @@ func (ar *AttachmentRef) Value(name string) (ent.Value, error) {
 }
 
 // QueryFreelancer queries the "freelancer" edge of the AttachmentRef entity.
-func (ar *AttachmentRef) QueryFreelancer() *FreelancerQuery {
+func (ar *AttachmentRef) QueryFreelancer() *UpworkFreelancerQuery {
 	return NewAttachmentRefClient(ar.config).QueryFreelancer(ar)
 }
 

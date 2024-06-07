@@ -22,7 +22,7 @@ func (AttachmentRef) Fields() []ent.Field {
 // Edges of the AttachmentRef.
 func (AttachmentRef) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("freelancer", Freelancer.Type).
+		edge.From("freelancer", UpworkFreelancer.Type).
 			Ref("attachments").
 			Unique().Required(),
 	}

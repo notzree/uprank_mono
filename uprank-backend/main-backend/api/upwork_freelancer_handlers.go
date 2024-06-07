@@ -6,22 +6,29 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/notzree/uprank-backend/main-backend/ent"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/types"
 )
 
 func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error {
-
-	claims, _ := clerk.SessionClaimsFromContext(r.Context())
-	user_id := claims.Subject
+	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	if user_id_err != nil {
+		return user_id_err
+	}
 	job_id := chi.URLParam(r, "job_id")
+	var req []types.CreateUpworkFreelancerRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		slog.Error("failed to decode request", "err", err)
+		return InvalidJSON()
+	}
+	defer r.Body.Close()
 
 	//check if job exists and belongs to user
 	_, getJobErr := s.ent.Job.Query().
@@ -34,21 +41,13 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 		return ResourceMisMatch()
 	}
 
-	var req []types.CreateFreelancersRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.Error("failed to decode request", "err", err)
-		return InvalidJSON()
-	}
-	defer r.Body.Close()
-
 	for _, freelancer := range req {
 		if errors := freelancer.Validate(); len(errors) > 0 {
 			return InvalidRequestData(errors)
 		}
 	}
 
-	freelancers, createFreelancerErr := s.ent.Freelancer.MapCreateBulk(req, func(c *ent.FreelancerCreate, i int) {
+	freelancers, createFreelancerErr := s.ent.UpworkFreelancer.MapCreateBulk(req, func(c *ent.UpworkFreelancerCreate, i int) {
 		freelancer := req[i]
 		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
@@ -87,15 +86,14 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 			SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue).
 			SetRecentEarnings(freelancer.Earnings_info.Recent_earnings).
 			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).
-			SetJobID(job_id)
+			AddJobIDs(job_id)
 	}).Save(r.Context())
 	if createFreelancerErr != nil {
 		return createFreelancerErr
 	}
 
-	//TODO: CREATE JOB HISTORIES
-	//need to fix type so the json parses correctly, then handle the creation of job histories
 	for _, freelancer := range req {
+
 		if len(freelancer.Attachements) == 0 {
 			continue
 		}
@@ -104,9 +102,33 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 				SetLink(freelancer.Attachements[j].Link).
 				SetFreelancerID(freelancer.Url)
 		}).Save(r.Context())
-
 		if createAttachementErr != nil {
 			return createAttachementErr
+		}
+
+		if len(freelancer.Work_history) == 0 {
+			continue
+		}
+		_, createWorkHistoryErr := s.ent.WorkHistory.MapCreateBulk(freelancer.Work_history, func(c *ent.WorkHistoryCreate, j int) {
+			work_history := freelancer.Work_history[j]
+			work_history_start_date, _ := time.Parse(time.RFC3339, work_history.Start_Date)
+			work_history_end_date, _ := time.Parse(time.RFC3339, work_history.End_Date)
+			c.SetTitle(work_history.Title).
+				SetStartDate(work_history_start_date).
+				SetEndDate(work_history_end_date).
+				SetDescription(work_history.Description).
+				SetClientFeedback(work_history.Client_Feedback).
+				SetOverallRating(work_history.Client_Rating).
+				SetClientTotalSpend(work_history.Client_Total_Spend).
+				SetClientTotalHires(work_history.Client_Total_Hires).
+				SetClientActiveHires(work_history.Client_Active_Hires).
+				SetBudget(work_history.Budget).
+				SetFreelancerEarnings(work_history.Total_Earned).
+				SetClientCountry(work_history.Client_Location).
+				SetFreelancerID(freelancer.Url)
+		}).Save(r.Context())
+		if createWorkHistoryErr != nil {
+			return createWorkHistoryErr
 		}
 
 	}
@@ -115,9 +137,24 @@ func (s *Server) CreateFreelancers(w http.ResponseWriter, r *http.Request) error
 }
 
 func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error {
-	claims, _ := clerk.SessionClaimsFromContext(r.Context())
-	user_id := claims.Subject
+	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	if user_id_err != nil {
+		return user_id_err
+	}
 	job_id := chi.URLParam(r, "job_id")
+
+	var (
+		req                   []types.CreateUpworkFreelancerRequest
+		freelancers_to_create []types.CreateUpworkFreelancerRequest
+		freelancers_to_update []types.CreateUpworkFreelancerRequest
+		freelancers_to_delete []string
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		slog.Error("failed to decode request", "err", err)
+		return InvalidJSON()
+	}
+	defer r.Body.Close()
 
 	//check if job exists and belongs to user
 	current_freelancers, getJobErr := s.ent.Job.Query().
@@ -129,30 +166,17 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 		return ResourceMisMatch()
 	}
 
-	var (
-		req                   []types.CreateFreelancersRequest
-		freelancers_to_create []types.CreateFreelancersRequest
-		freelancers_to_update []types.CreateFreelancersRequest
-		freelancers_to_delete []string
-	)
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.Error("failed to decode request", "err", err)
-		return InvalidJSON()
-	}
-	defer r.Body.Close()
-
 	for _, freelancer := range req {
 		if errors := freelancer.Validate(); len(errors) > 0 {
 			return InvalidRequestData(errors)
 		}
 	}
 
-	incoming_freelancer_dict := make(map[string]types.CreateFreelancersRequest)
+	incoming_freelancer_dict := make(map[string]types.CreateUpworkFreelancerRequest)
 	for _, freelancer := range req {
 		incoming_freelancer_dict[freelancer.Url] = freelancer
 	}
-	current_freelancer_dict := make(map[string]ent.Freelancer)
+	current_freelancer_dict := make(map[string]ent.UpworkFreelancer)
 	for _, freelancer := range current_freelancers {
 		current_freelancer_dict[freelancer.ID] = *freelancer
 	}
@@ -174,7 +198,7 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	}
 
 	//create new freelancers
-	_, createFreelancerErr := s.ent.Freelancer.MapCreateBulk(freelancers_to_create, func(c *ent.FreelancerCreate, i int) {
+	_, createFreelancerErr := s.ent.UpworkFreelancer.MapCreateBulk(freelancers_to_create, func(c *ent.UpworkFreelancerCreate, i int) {
 		freelancer := freelancers_to_create[i]
 		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
@@ -213,7 +237,7 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 			SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue).
 			SetRecentEarnings(freelancer.Earnings_info.Recent_earnings).
 			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).
-			SetJobID(job_id)
+			AddJobIDs(job_id)
 
 	}).Save(r.Context())
 
@@ -222,39 +246,44 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 	}
 
 	for _, freelancer := range freelancers_to_create {
-		if len(freelancer.Attachements) == 0 {
-			continue
-		}
-		_, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
-			c.SetName(freelancer.Attachements[j].Name).
-				SetLink(freelancer.Attachements[j].Link).
-				SetFreelancerID(freelancer.Url)
-		}).Save(r.Context())
+		if len(freelancer.Attachements) != 0 {
+			_, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
+				c.SetName(freelancer.Attachements[j].Name).
+					SetLink(freelancer.Attachements[j].Link).
+					SetFreelancerID(freelancer.Url)
+			}).Save(r.Context())
 
-		if createAttachementErr != nil {
-			return createAttachementErr
+			if createAttachementErr != nil {
+				return createAttachementErr
+			}
 		}
-		if len(freelancer.Work_history) == 0 {
-			continue
+		if len(freelancer.Work_history) != 0 {
+			_, createWorkHistoryErr := s.ent.WorkHistory.MapCreateBulk(freelancer.Work_history, func(c *ent.WorkHistoryCreate, j int) {
+				work_history := freelancer.Work_history[j]
+				work_history_start_date, _ := time.Parse(time.RFC3339, work_history.Start_Date)
+				work_history_end_date, _ := time.Parse(time.RFC3339, work_history.End_Date)
+				c.SetTitle(work_history.Title).
+					SetStartDate(work_history_start_date).
+					SetEndDate(work_history_end_date).
+					SetDescription(work_history.Description).
+					SetClientFeedback(work_history.Client_Feedback).
+					SetOverallRating(work_history.Client_Rating).
+					SetClientTotalSpend(work_history.Client_Total_Spend).
+					SetClientTotalHires(work_history.Client_Total_Hires).
+					SetClientActiveHires(work_history.Client_Active_Hires).
+					SetBudget(work_history.Budget).
+					SetFreelancerEarnings(work_history.Total_Earned).
+					SetClientCountry(work_history.Client_Location).
+					SetFreelancerID(freelancer.Url)
+			}).Save(r.Context())
+			if createWorkHistoryErr != nil {
+				return createWorkHistoryErr
+			}
 		}
-		// _, createWorkHistoryErr := s.ent.WorkHistory.MapCreateBulk(freelancer.Work_history, func(c *ent.WorkHistoryCreate, j int) {
-		// 	c.SetTitle(freelancer.Work_history[j].Title).
-		// 		SetStartDate(freelancer.Work_history[j].Start_Date).
-		// 		SetEndDate(freelancer.Work_history[j].EndDate).
-		// 		SetDescription(freelancer.Work_history[j].Description).
-		// 		SetClientFeedback(freelancer.Work_history[j].Client_Feedback).
-		// 		SetOverallRating(freelancer.Work_history[j].Client_Rating).
-		// 		SetClientTotalSpend(freelancer.Work_history[j].Client_Total_Spend).
-		// 		SetClientTotalHires(freelancer.Work_history[j].Client_Total_Hires).
-		// 		SetBudget(freelancer.Work_history[j].Budget).
-		// 		SetFreelancerEarnings(freelancer.Work_history[j].Total_Earned)
-		// 	//todo: need to scrape the rest of the fields
-		// 	//missing fields: fixed / hourly, hours billed (if hourly), # of proposals, # of interviews, client company stuff, (need to determine if that is even worth using as I need to open a whole new thing)
-		// }).Save(r.Context())
 	}
 
 	//update freelancers
-	_ = s.ent.Freelancer.MapCreateBulk(freelancers_to_update, func(c *ent.FreelancerCreate, i int) {
+	updateFreelancersErr := s.ent.UpworkFreelancer.MapCreateBulk(freelancers_to_update, func(c *ent.UpworkFreelancerCreate, i int) {
 		freelancer := freelancers_to_update[i]
 		//guaranteed to be valid by freelancer.Validate()
 		parsed_fixed_charge_amount, _ := strconv.ParseFloat(freelancer.Fixed_charge_amount, 64)
@@ -292,57 +321,55 @@ func (s *Server) UpdateFreelancers(w http.ResponseWriter, r *http.Request) error
 			SetCombinedTotalEarnings(freelancer.Earnings_info.Combined_total_earnings).
 			SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue).
 			SetRecentEarnings(freelancer.Earnings_info.Recent_earnings).
-			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).
-			SetJobID(job_id)
-	}).OnConflict().UpdateNewValues().Exec(r.Context())
-	if createFreelancerErr != nil {
-		return createFreelancerErr
+			SetTotalRevenue(freelancer.Earnings_info.Total_revenue).AddJobIDs(job_id)
+	}).OnConflictColumns(upworkfreelancer.FieldID).UpdateNewValues().Exec(r.Context())
+	if updateFreelancersErr != nil {
+		return updateFreelancersErr
+	}
+	for _, freelancer := range freelancers_to_update {
+		if len(freelancer.Attachements) != 0 {
+			_, createAttachementErr := s.ent.AttachmentRef.MapCreateBulk(freelancer.Attachements, func(c *ent.AttachmentRefCreate, j int) {
+				c.SetName(freelancer.Attachements[j].Name).
+					SetLink(freelancer.Attachements[j].Link).
+					SetFreelancerID(freelancer.Url)
+			}).Save(r.Context())
+
+			if createAttachementErr != nil {
+				return createAttachementErr
+			}
+		}
+		if len(freelancer.Work_history) != 0 {
+			_, createWorkHistoryErr := s.ent.WorkHistory.MapCreateBulk(freelancer.Work_history, func(c *ent.WorkHistoryCreate, j int) {
+				work_history := freelancer.Work_history[j]
+				work_history_start_date, _ := time.Parse(time.RFC3339, work_history.Start_Date)
+				work_history_end_date, _ := time.Parse(time.RFC3339, work_history.End_Date)
+				c.SetTitle(work_history.Title).
+					SetStartDate(work_history_start_date).
+					SetEndDate(work_history_end_date).
+					SetDescription(work_history.Description).
+					SetClientFeedback(work_history.Client_Feedback).
+					SetOverallRating(work_history.Client_Rating).
+					SetClientTotalSpend(work_history.Client_Total_Spend).
+					SetClientTotalHires(work_history.Client_Total_Hires).
+					SetClientActiveHires(work_history.Client_Active_Hires).
+					SetBudget(work_history.Budget).
+					SetFreelancerEarnings(work_history.Total_Earned).
+					SetClientCountry(work_history.Client_Location).
+					SetFreelancerID(freelancer.Url)
+			}).Save(r.Context())
+			if createWorkHistoryErr != nil {
+				return createWorkHistoryErr
+			}
+		}
 	}
 
 	//delete freelancers
+	for _, freelancer_id := range freelancers_to_delete {
+		deleteFreelancerErr := s.ent.UpworkFreelancer.DeleteOneID(freelancer_id).Exec(r.Context())
+		if deleteFreelancerErr != nil {
+			return deleteFreelancerErr
+		}
+	}
 
 	return writeJSON(w, http.StatusCreated, nil)
-
-}
-
-// queueScraperJob queues the scraping job for the given job_id into our aws sqs queue for the scraper server to pick up
-func queueScraperJob(s *Server, scrape_obj types.QueueScrapeFreelancersReqest) error {
-	messageGroupId := "uprank-scraper-requests"
-	freelancers_json, err := json.Marshal(scrape_obj)
-	if err != nil {
-		return err
-	}
-	message_body := string(freelancers_json)
-	send_message_input := &sqs.SendMessageInput{
-		MessageBody:    &message_body,
-		MessageGroupId: &messageGroupId,
-		QueueUrl:       &s.scraper_queue_url,
-	}
-	result, err := s.scraper_queue_client.SendMessage(context.TODO(), send_message_input)
-	if err != nil {
-		return err
-	}
-	slog.Info("Sent message to queue", "message_id", *result.MessageId)
-	return nil
-}
-
-func (s *Server) TestQueue(w http.ResponseWriter, r *http.Request) error {
-	var freelancers []types.ScrapeFreelancerData
-
-	job_id := "1788207506953621504"
-	queryErr := s.ent.Freelancer.Query().Where(freelancer.HasJobWith(job.IDEQ(job_id))).Select(freelancer.FieldID, freelancer.FieldID).Scan(context.Background(), &freelancers)
-	if queryErr != nil {
-		return queryErr
-	}
-
-	scrape_obj := types.QueueScrapeFreelancersReqest{
-		Job_id:      job_id,
-		Freelancers: freelancers,
-	}
-
-	queueErr := queueScraperJob(s, scrape_obj)
-	if queueErr != nil {
-		return queueErr
-	}
-	return writeJSON(w, http.StatusOK, "success")
 }
