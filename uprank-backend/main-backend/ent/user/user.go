@@ -26,17 +26,26 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldLastLogin holds the string denoting the last_login field in the database.
 	FieldLastLogin = "last_login"
-	// EdgeJobs holds the string denoting the jobs edge name in mutations.
-	EdgeJobs = "jobs"
+	// EdgeJob holds the string denoting the job edge name in mutations.
+	EdgeJob = "job"
+	// EdgeUpworkjob holds the string denoting the upworkjob edge name in mutations.
+	EdgeUpworkjob = "upworkjob"
+	// JobFieldID holds the string denoting the ID field of the Job.
+	JobFieldID = "oid"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// JobsTable is the table that holds the jobs relation/edge.
-	JobsTable = "jobs"
-	// JobsInverseTable is the table name for the Job entity.
+	// JobTable is the table that holds the job relation/edge.
+	JobTable = "jobs"
+	// JobInverseTable is the table name for the Job entity.
 	// It exists in this package in order to avoid circular dependency with the "job" package.
-	JobsInverseTable = "jobs"
-	// JobsColumn is the table column denoting the jobs relation/edge.
-	JobsColumn = "user_jobs"
+	JobInverseTable = "jobs"
+	// JobColumn is the table column denoting the job relation/edge.
+	JobColumn = "user_job"
+	// UpworkjobTable is the table that holds the upworkjob relation/edge. The primary key declared below.
+	UpworkjobTable = "user_upworkjob"
+	// UpworkjobInverseTable is the table name for the UpworkJob entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkjob" package.
+	UpworkjobInverseTable = "upwork_jobs"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -49,6 +58,12 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldLastLogin,
 }
+
+var (
+	// UpworkjobPrimaryKey and UpworkjobColumn2 are the table columns denoting the
+	// primary key for the upworkjob relation (M2M).
+	UpworkjobPrimaryKey = []string{"user_id", "upwork_job_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -121,23 +136,44 @@ func ByLastLogin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastLogin, opts...).ToFunc()
 }
 
-// ByJobsCount orders the results by jobs count.
-func ByJobsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByJobCount orders the results by job count.
+func ByJobCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newJobsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newJobStep(), opts...)
 	}
 }
 
-// ByJobs orders the results by jobs terms.
-func ByJobs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByJob orders the results by job terms.
+func ByJob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newJobsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newJobStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newJobsStep() *sqlgraph.Step {
+
+// ByUpworkjobCount orders the results by upworkjob count.
+func ByUpworkjobCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUpworkjobStep(), opts...)
+	}
+}
+
+// ByUpworkjob orders the results by upworkjob terms.
+func ByUpworkjob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUpworkjobStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newJobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(JobsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, JobsTable, JobsColumn),
+		sqlgraph.To(JobInverseTable, JobFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, JobTable, JobColumn),
+	)
+}
+func newUpworkjobStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UpworkjobInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, UpworkjobTable, UpworkjobPrimaryKey...),
 	)
 }

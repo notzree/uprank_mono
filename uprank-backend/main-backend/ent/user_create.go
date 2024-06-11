@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -106,19 +108,34 @@ func (uc *UserCreate) SetID(s string) *UserCreate {
 	return uc
 }
 
-// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uc *UserCreate) AddJobIDs(ids ...string) *UserCreate {
+// AddJobIDs adds the "job" edge to the Job entity by IDs.
+func (uc *UserCreate) AddJobIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddJobIDs(ids...)
 	return uc
 }
 
-// AddJobs adds the "jobs" edges to the Job entity.
-func (uc *UserCreate) AddJobs(j ...*Job) *UserCreate {
-	ids := make([]string, len(j))
+// AddJob adds the "job" edges to the Job entity.
+func (uc *UserCreate) AddJob(j ...*Job) *UserCreate {
+	ids := make([]uuid.UUID, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
 	return uc.AddJobIDs(ids...)
+}
+
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
+func (uc *UserCreate) AddUpworkjobIDs(ids ...string) *UserCreate {
+	uc.mutation.AddUpworkjobIDs(ids...)
+	return uc
+}
+
+// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
+func (uc *UserCreate) AddUpworkjob(u ...*UpworkJob) *UserCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUpworkjobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -278,15 +295,31 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldLastLogin, field.TypeTime, value)
 		_node.LastLogin = value
 	}
-	if nodes := uc.mutation.JobsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.UpworkjobIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

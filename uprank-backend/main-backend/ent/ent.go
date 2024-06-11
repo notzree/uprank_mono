@@ -15,6 +15,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -80,6 +81,7 @@ func checkColumn(table, column string) error {
 			attachmentref.Table:    attachmentref.ValidColumn,
 			job.Table:              job.ValidColumn,
 			upworkfreelancer.Table: upworkfreelancer.ValidColumn,
+			upworkjob.Table:        upworkjob.ValidColumn,
 			user.Table:             user.ValidColumn,
 			workhistory.Table:      workhistory.ValidColumn,
 		})

@@ -18,6 +18,8 @@ type Tx struct {
 	Job *JobClient
 	// UpworkFreelancer is the client for interacting with the UpworkFreelancer builders.
 	UpworkFreelancer *UpworkFreelancerClient
+	// UpworkJob is the client for interacting with the UpworkJob builders.
+	UpworkJob *UpworkJobClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// WorkHistory is the client for interacting with the WorkHistory builders.
@@ -156,6 +158,7 @@ func (tx *Tx) init() {
 	tx.AttachmentRef = NewAttachmentRefClient(tx.config)
 	tx.Job = NewJobClient(tx.config)
 	tx.UpworkFreelancer = NewUpworkFreelancerClient(tx.config)
+	tx.UpworkJob = NewUpworkJobClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.WorkHistory = NewWorkHistoryClient(tx.config)
 }

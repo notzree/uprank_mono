@@ -410,21 +410,44 @@ func LastLoginLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldLastLogin, v))
 }
 
-// HasJobs applies the HasEdge predicate on the "jobs" edge.
-func HasJobs() predicate.User {
+// HasJob applies the HasEdge predicate on the "job" edge.
+func HasJob() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, JobsTable, JobsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, JobTable, JobColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasJobsWith applies the HasEdge predicate on the "jobs" edge with a given conditions (other predicates).
-func HasJobsWith(preds ...predicate.Job) predicate.User {
+// HasJobWith applies the HasEdge predicate on the "job" edge with a given conditions (other predicates).
+func HasJobWith(preds ...predicate.Job) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newJobsStep()
+		step := newJobStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUpworkjob applies the HasEdge predicate on the "upworkjob" edge.
+func HasUpworkjob() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, UpworkjobTable, UpworkjobPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUpworkjobWith applies the HasEdge predicate on the "upworkjob" edge with a given conditions (other predicates).
+func HasUpworkjobWith(preds ...predicate.UpworkJob) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUpworkjobStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

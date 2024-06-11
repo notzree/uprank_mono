@@ -6,15 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -31,260 +29,6 @@ func (ju *JobUpdate) Where(ps ...predicate.Job) *JobUpdate {
 	return ju
 }
 
-// SetTitle sets the "title" field.
-func (ju *JobUpdate) SetTitle(s string) *JobUpdate {
-	ju.mutation.SetTitle(s)
-	return ju
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableTitle(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetTitle(*s)
-	}
-	return ju
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (ju *JobUpdate) SetCreatedAt(t time.Time) *JobUpdate {
-	ju.mutation.SetCreatedAt(t)
-	return ju
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableCreatedAt(t *time.Time) *JobUpdate {
-	if t != nil {
-		ju.SetCreatedAt(*t)
-	}
-	return ju
-}
-
-// SetLocation sets the "location" field.
-func (ju *JobUpdate) SetLocation(s string) *JobUpdate {
-	ju.mutation.SetLocation(s)
-	return ju
-}
-
-// SetNillableLocation sets the "location" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableLocation(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetLocation(*s)
-	}
-	return ju
-}
-
-// ClearLocation clears the value of the "location" field.
-func (ju *JobUpdate) ClearLocation() *JobUpdate {
-	ju.mutation.ClearLocation()
-	return ju
-}
-
-// SetDescription sets the "description" field.
-func (ju *JobUpdate) SetDescription(s string) *JobUpdate {
-	ju.mutation.SetDescription(s)
-	return ju
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableDescription(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetDescription(*s)
-	}
-	return ju
-}
-
-// SetSkills sets the "skills" field.
-func (ju *JobUpdate) SetSkills(s []string) *JobUpdate {
-	ju.mutation.SetSkills(s)
-	return ju
-}
-
-// AppendSkills appends s to the "skills" field.
-func (ju *JobUpdate) AppendSkills(s []string) *JobUpdate {
-	ju.mutation.AppendSkills(s)
-	return ju
-}
-
-// ClearSkills clears the value of the "skills" field.
-func (ju *JobUpdate) ClearSkills() *JobUpdate {
-	ju.mutation.ClearSkills()
-	return ju
-}
-
-// SetExperienceLevel sets the "experience_level" field.
-func (ju *JobUpdate) SetExperienceLevel(s string) *JobUpdate {
-	ju.mutation.SetExperienceLevel(s)
-	return ju
-}
-
-// SetNillableExperienceLevel sets the "experience_level" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableExperienceLevel(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetExperienceLevel(*s)
-	}
-	return ju
-}
-
-// ClearExperienceLevel clears the value of the "experience_level" field.
-func (ju *JobUpdate) ClearExperienceLevel() *JobUpdate {
-	ju.mutation.ClearExperienceLevel()
-	return ju
-}
-
-// SetHourly sets the "hourly" field.
-func (ju *JobUpdate) SetHourly(b bool) *JobUpdate {
-	ju.mutation.SetHourly(b)
-	return ju
-}
-
-// SetNillableHourly sets the "hourly" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableHourly(b *bool) *JobUpdate {
-	if b != nil {
-		ju.SetHourly(*b)
-	}
-	return ju
-}
-
-// SetFixed sets the "fixed" field.
-func (ju *JobUpdate) SetFixed(b bool) *JobUpdate {
-	ju.mutation.SetFixed(b)
-	return ju
-}
-
-// SetNillableFixed sets the "fixed" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableFixed(b *bool) *JobUpdate {
-	if b != nil {
-		ju.SetFixed(*b)
-	}
-	return ju
-}
-
-// SetHourlyRate sets the "hourly_rate" field.
-func (ju *JobUpdate) SetHourlyRate(f []float32) *JobUpdate {
-	ju.mutation.SetHourlyRate(f)
-	return ju
-}
-
-// AppendHourlyRate appends f to the "hourly_rate" field.
-func (ju *JobUpdate) AppendHourlyRate(f []float32) *JobUpdate {
-	ju.mutation.AppendHourlyRate(f)
-	return ju
-}
-
-// ClearHourlyRate clears the value of the "hourly_rate" field.
-func (ju *JobUpdate) ClearHourlyRate() *JobUpdate {
-	ju.mutation.ClearHourlyRate()
-	return ju
-}
-
-// SetFixedRate sets the "fixed_rate" field.
-func (ju *JobUpdate) SetFixedRate(f float64) *JobUpdate {
-	ju.mutation.ResetFixedRate()
-	ju.mutation.SetFixedRate(f)
-	return ju
-}
-
-// SetNillableFixedRate sets the "fixed_rate" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableFixedRate(f *float64) *JobUpdate {
-	if f != nil {
-		ju.SetFixedRate(*f)
-	}
-	return ju
-}
-
-// AddFixedRate adds f to the "fixed_rate" field.
-func (ju *JobUpdate) AddFixedRate(f float64) *JobUpdate {
-	ju.mutation.AddFixedRate(f)
-	return ju
-}
-
-// ClearFixedRate clears the value of the "fixed_rate" field.
-func (ju *JobUpdate) ClearFixedRate() *JobUpdate {
-	ju.mutation.ClearFixedRate()
-	return ju
-}
-
-// SetAverageUprankScore sets the "average_uprank_score" field.
-func (ju *JobUpdate) SetAverageUprankScore(f float64) *JobUpdate {
-	ju.mutation.ResetAverageUprankScore()
-	ju.mutation.SetAverageUprankScore(f)
-	return ju
-}
-
-// SetNillableAverageUprankScore sets the "average_uprank_score" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableAverageUprankScore(f *float64) *JobUpdate {
-	if f != nil {
-		ju.SetAverageUprankScore(*f)
-	}
-	return ju
-}
-
-// AddAverageUprankScore adds f to the "average_uprank_score" field.
-func (ju *JobUpdate) AddAverageUprankScore(f float64) *JobUpdate {
-	ju.mutation.AddAverageUprankScore(f)
-	return ju
-}
-
-// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
-func (ju *JobUpdate) ClearAverageUprankScore() *JobUpdate {
-	ju.mutation.ClearAverageUprankScore()
-	return ju
-}
-
-// SetMaxUprankScore sets the "max_uprank_score" field.
-func (ju *JobUpdate) SetMaxUprankScore(f float64) *JobUpdate {
-	ju.mutation.ResetMaxUprankScore()
-	ju.mutation.SetMaxUprankScore(f)
-	return ju
-}
-
-// SetNillableMaxUprankScore sets the "max_uprank_score" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableMaxUprankScore(f *float64) *JobUpdate {
-	if f != nil {
-		ju.SetMaxUprankScore(*f)
-	}
-	return ju
-}
-
-// AddMaxUprankScore adds f to the "max_uprank_score" field.
-func (ju *JobUpdate) AddMaxUprankScore(f float64) *JobUpdate {
-	ju.mutation.AddMaxUprankScore(f)
-	return ju
-}
-
-// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
-func (ju *JobUpdate) ClearMaxUprankScore() *JobUpdate {
-	ju.mutation.ClearMaxUprankScore()
-	return ju
-}
-
-// SetMinUprankScore sets the "min_uprank_score" field.
-func (ju *JobUpdate) SetMinUprankScore(f float64) *JobUpdate {
-	ju.mutation.ResetMinUprankScore()
-	ju.mutation.SetMinUprankScore(f)
-	return ju
-}
-
-// SetNillableMinUprankScore sets the "min_uprank_score" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableMinUprankScore(f *float64) *JobUpdate {
-	if f != nil {
-		ju.SetMinUprankScore(*f)
-	}
-	return ju
-}
-
-// AddMinUprankScore adds f to the "min_uprank_score" field.
-func (ju *JobUpdate) AddMinUprankScore(f float64) *JobUpdate {
-	ju.mutation.AddMinUprankScore(f)
-	return ju
-}
-
-// ClearMinUprankScore clears the value of the "min_uprank_score" field.
-func (ju *JobUpdate) ClearMinUprankScore() *JobUpdate {
-	ju.mutation.ClearMinUprankScore()
-	return ju
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (ju *JobUpdate) SetUserID(id string) *JobUpdate {
 	ju.mutation.SetUserID(id)
@@ -296,19 +40,19 @@ func (ju *JobUpdate) SetUser(u *User) *JobUpdate {
 	return ju.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
-func (ju *JobUpdate) AddFreelancerIDs(ids ...string) *JobUpdate {
-	ju.mutation.AddFreelancerIDs(ids...)
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
+func (ju *JobUpdate) AddUpworkjobIDs(ids ...string) *JobUpdate {
+	ju.mutation.AddUpworkjobIDs(ids...)
 	return ju
 }
 
-// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
-func (ju *JobUpdate) AddFreelancers(u ...*UpworkFreelancer) *JobUpdate {
+// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
+func (ju *JobUpdate) AddUpworkjob(u ...*UpworkJob) *JobUpdate {
 	ids := make([]string, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return ju.AddFreelancerIDs(ids...)
+	return ju.AddUpworkjobIDs(ids...)
 }
 
 // Mutation returns the JobMutation object of the builder.
@@ -322,25 +66,25 @@ func (ju *JobUpdate) ClearUser() *JobUpdate {
 	return ju
 }
 
-// ClearFreelancers clears all "freelancers" edges to the UpworkFreelancer entity.
-func (ju *JobUpdate) ClearFreelancers() *JobUpdate {
-	ju.mutation.ClearFreelancers()
+// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+func (ju *JobUpdate) ClearUpworkjob() *JobUpdate {
+	ju.mutation.ClearUpworkjob()
 	return ju
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to UpworkFreelancer entities by IDs.
-func (ju *JobUpdate) RemoveFreelancerIDs(ids ...string) *JobUpdate {
-	ju.mutation.RemoveFreelancerIDs(ids...)
+// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
+func (ju *JobUpdate) RemoveUpworkjobIDs(ids ...string) *JobUpdate {
+	ju.mutation.RemoveUpworkjobIDs(ids...)
 	return ju
 }
 
-// RemoveFreelancers removes "freelancers" edges to UpworkFreelancer entities.
-func (ju *JobUpdate) RemoveFreelancers(u ...*UpworkFreelancer) *JobUpdate {
+// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
+func (ju *JobUpdate) RemoveUpworkjob(u ...*UpworkJob) *JobUpdate {
 	ids := make([]string, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return ju.RemoveFreelancerIDs(ids...)
+	return ju.RemoveUpworkjobIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -372,16 +116,6 @@ func (ju *JobUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ju *JobUpdate) check() error {
-	if v, ok := ju.mutation.Title(); ok {
-		if err := job.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Job.title": %w`, err)}
-		}
-	}
-	if v, ok := ju.mutation.Description(); ok {
-		if err := job.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Job.description": %w`, err)}
-		}
-	}
 	if _, ok := ju.mutation.UserID(); ju.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Job.user"`)
 	}
@@ -392,98 +126,13 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ju.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID))
 	if ps := ju.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := ju.mutation.Title(); ok {
-		_spec.SetField(job.FieldTitle, field.TypeString, value)
-	}
-	if value, ok := ju.mutation.CreatedAt(); ok {
-		_spec.SetField(job.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := ju.mutation.Location(); ok {
-		_spec.SetField(job.FieldLocation, field.TypeString, value)
-	}
-	if ju.mutation.LocationCleared() {
-		_spec.ClearField(job.FieldLocation, field.TypeString)
-	}
-	if value, ok := ju.mutation.Description(); ok {
-		_spec.SetField(job.FieldDescription, field.TypeString, value)
-	}
-	if value, ok := ju.mutation.Skills(); ok {
-		_spec.SetField(job.FieldSkills, field.TypeJSON, value)
-	}
-	if value, ok := ju.mutation.AppendedSkills(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, job.FieldSkills, value)
-		})
-	}
-	if ju.mutation.SkillsCleared() {
-		_spec.ClearField(job.FieldSkills, field.TypeJSON)
-	}
-	if value, ok := ju.mutation.ExperienceLevel(); ok {
-		_spec.SetField(job.FieldExperienceLevel, field.TypeString, value)
-	}
-	if ju.mutation.ExperienceLevelCleared() {
-		_spec.ClearField(job.FieldExperienceLevel, field.TypeString)
-	}
-	if value, ok := ju.mutation.Hourly(); ok {
-		_spec.SetField(job.FieldHourly, field.TypeBool, value)
-	}
-	if value, ok := ju.mutation.Fixed(); ok {
-		_spec.SetField(job.FieldFixed, field.TypeBool, value)
-	}
-	if value, ok := ju.mutation.HourlyRate(); ok {
-		_spec.SetField(job.FieldHourlyRate, field.TypeJSON, value)
-	}
-	if value, ok := ju.mutation.AppendedHourlyRate(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, job.FieldHourlyRate, value)
-		})
-	}
-	if ju.mutation.HourlyRateCleared() {
-		_spec.ClearField(job.FieldHourlyRate, field.TypeJSON)
-	}
-	if value, ok := ju.mutation.FixedRate(); ok {
-		_spec.SetField(job.FieldFixedRate, field.TypeFloat64, value)
-	}
-	if value, ok := ju.mutation.AddedFixedRate(); ok {
-		_spec.AddField(job.FieldFixedRate, field.TypeFloat64, value)
-	}
-	if ju.mutation.FixedRateCleared() {
-		_spec.ClearField(job.FieldFixedRate, field.TypeFloat64)
-	}
-	if value, ok := ju.mutation.AverageUprankScore(); ok {
-		_spec.SetField(job.FieldAverageUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := ju.mutation.AddedAverageUprankScore(); ok {
-		_spec.AddField(job.FieldAverageUprankScore, field.TypeFloat64, value)
-	}
-	if ju.mutation.AverageUprankScoreCleared() {
-		_spec.ClearField(job.FieldAverageUprankScore, field.TypeFloat64)
-	}
-	if value, ok := ju.mutation.MaxUprankScore(); ok {
-		_spec.SetField(job.FieldMaxUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := ju.mutation.AddedMaxUprankScore(); ok {
-		_spec.AddField(job.FieldMaxUprankScore, field.TypeFloat64, value)
-	}
-	if ju.mutation.MaxUprankScoreCleared() {
-		_spec.ClearField(job.FieldMaxUprankScore, field.TypeFloat64)
-	}
-	if value, ok := ju.mutation.MinUprankScore(); ok {
-		_spec.SetField(job.FieldMinUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := ju.mutation.AddedMinUprankScore(); ok {
-		_spec.AddField(job.FieldMinUprankScore, field.TypeFloat64, value)
-	}
-	if ju.mutation.MinUprankScoreCleared() {
-		_spec.ClearField(job.FieldMinUprankScore, field.TypeFloat64)
 	}
 	if ju.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -514,28 +163,28 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ju.mutation.FreelancersCleared() {
+	if ju.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ju.mutation.RemovedFreelancersIDs(); len(nodes) > 0 && !ju.mutation.FreelancersCleared() {
+	if nodes := ju.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !ju.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -543,15 +192,15 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ju.mutation.FreelancersIDs(); len(nodes) > 0 {
+	if nodes := ju.mutation.UpworkjobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -579,260 +228,6 @@ type JobUpdateOne struct {
 	mutation *JobMutation
 }
 
-// SetTitle sets the "title" field.
-func (juo *JobUpdateOne) SetTitle(s string) *JobUpdateOne {
-	juo.mutation.SetTitle(s)
-	return juo
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableTitle(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetTitle(*s)
-	}
-	return juo
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (juo *JobUpdateOne) SetCreatedAt(t time.Time) *JobUpdateOne {
-	juo.mutation.SetCreatedAt(t)
-	return juo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableCreatedAt(t *time.Time) *JobUpdateOne {
-	if t != nil {
-		juo.SetCreatedAt(*t)
-	}
-	return juo
-}
-
-// SetLocation sets the "location" field.
-func (juo *JobUpdateOne) SetLocation(s string) *JobUpdateOne {
-	juo.mutation.SetLocation(s)
-	return juo
-}
-
-// SetNillableLocation sets the "location" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableLocation(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetLocation(*s)
-	}
-	return juo
-}
-
-// ClearLocation clears the value of the "location" field.
-func (juo *JobUpdateOne) ClearLocation() *JobUpdateOne {
-	juo.mutation.ClearLocation()
-	return juo
-}
-
-// SetDescription sets the "description" field.
-func (juo *JobUpdateOne) SetDescription(s string) *JobUpdateOne {
-	juo.mutation.SetDescription(s)
-	return juo
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableDescription(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetDescription(*s)
-	}
-	return juo
-}
-
-// SetSkills sets the "skills" field.
-func (juo *JobUpdateOne) SetSkills(s []string) *JobUpdateOne {
-	juo.mutation.SetSkills(s)
-	return juo
-}
-
-// AppendSkills appends s to the "skills" field.
-func (juo *JobUpdateOne) AppendSkills(s []string) *JobUpdateOne {
-	juo.mutation.AppendSkills(s)
-	return juo
-}
-
-// ClearSkills clears the value of the "skills" field.
-func (juo *JobUpdateOne) ClearSkills() *JobUpdateOne {
-	juo.mutation.ClearSkills()
-	return juo
-}
-
-// SetExperienceLevel sets the "experience_level" field.
-func (juo *JobUpdateOne) SetExperienceLevel(s string) *JobUpdateOne {
-	juo.mutation.SetExperienceLevel(s)
-	return juo
-}
-
-// SetNillableExperienceLevel sets the "experience_level" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableExperienceLevel(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetExperienceLevel(*s)
-	}
-	return juo
-}
-
-// ClearExperienceLevel clears the value of the "experience_level" field.
-func (juo *JobUpdateOne) ClearExperienceLevel() *JobUpdateOne {
-	juo.mutation.ClearExperienceLevel()
-	return juo
-}
-
-// SetHourly sets the "hourly" field.
-func (juo *JobUpdateOne) SetHourly(b bool) *JobUpdateOne {
-	juo.mutation.SetHourly(b)
-	return juo
-}
-
-// SetNillableHourly sets the "hourly" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableHourly(b *bool) *JobUpdateOne {
-	if b != nil {
-		juo.SetHourly(*b)
-	}
-	return juo
-}
-
-// SetFixed sets the "fixed" field.
-func (juo *JobUpdateOne) SetFixed(b bool) *JobUpdateOne {
-	juo.mutation.SetFixed(b)
-	return juo
-}
-
-// SetNillableFixed sets the "fixed" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableFixed(b *bool) *JobUpdateOne {
-	if b != nil {
-		juo.SetFixed(*b)
-	}
-	return juo
-}
-
-// SetHourlyRate sets the "hourly_rate" field.
-func (juo *JobUpdateOne) SetHourlyRate(f []float32) *JobUpdateOne {
-	juo.mutation.SetHourlyRate(f)
-	return juo
-}
-
-// AppendHourlyRate appends f to the "hourly_rate" field.
-func (juo *JobUpdateOne) AppendHourlyRate(f []float32) *JobUpdateOne {
-	juo.mutation.AppendHourlyRate(f)
-	return juo
-}
-
-// ClearHourlyRate clears the value of the "hourly_rate" field.
-func (juo *JobUpdateOne) ClearHourlyRate() *JobUpdateOne {
-	juo.mutation.ClearHourlyRate()
-	return juo
-}
-
-// SetFixedRate sets the "fixed_rate" field.
-func (juo *JobUpdateOne) SetFixedRate(f float64) *JobUpdateOne {
-	juo.mutation.ResetFixedRate()
-	juo.mutation.SetFixedRate(f)
-	return juo
-}
-
-// SetNillableFixedRate sets the "fixed_rate" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableFixedRate(f *float64) *JobUpdateOne {
-	if f != nil {
-		juo.SetFixedRate(*f)
-	}
-	return juo
-}
-
-// AddFixedRate adds f to the "fixed_rate" field.
-func (juo *JobUpdateOne) AddFixedRate(f float64) *JobUpdateOne {
-	juo.mutation.AddFixedRate(f)
-	return juo
-}
-
-// ClearFixedRate clears the value of the "fixed_rate" field.
-func (juo *JobUpdateOne) ClearFixedRate() *JobUpdateOne {
-	juo.mutation.ClearFixedRate()
-	return juo
-}
-
-// SetAverageUprankScore sets the "average_uprank_score" field.
-func (juo *JobUpdateOne) SetAverageUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.ResetAverageUprankScore()
-	juo.mutation.SetAverageUprankScore(f)
-	return juo
-}
-
-// SetNillableAverageUprankScore sets the "average_uprank_score" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableAverageUprankScore(f *float64) *JobUpdateOne {
-	if f != nil {
-		juo.SetAverageUprankScore(*f)
-	}
-	return juo
-}
-
-// AddAverageUprankScore adds f to the "average_uprank_score" field.
-func (juo *JobUpdateOne) AddAverageUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.AddAverageUprankScore(f)
-	return juo
-}
-
-// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
-func (juo *JobUpdateOne) ClearAverageUprankScore() *JobUpdateOne {
-	juo.mutation.ClearAverageUprankScore()
-	return juo
-}
-
-// SetMaxUprankScore sets the "max_uprank_score" field.
-func (juo *JobUpdateOne) SetMaxUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.ResetMaxUprankScore()
-	juo.mutation.SetMaxUprankScore(f)
-	return juo
-}
-
-// SetNillableMaxUprankScore sets the "max_uprank_score" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableMaxUprankScore(f *float64) *JobUpdateOne {
-	if f != nil {
-		juo.SetMaxUprankScore(*f)
-	}
-	return juo
-}
-
-// AddMaxUprankScore adds f to the "max_uprank_score" field.
-func (juo *JobUpdateOne) AddMaxUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.AddMaxUprankScore(f)
-	return juo
-}
-
-// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
-func (juo *JobUpdateOne) ClearMaxUprankScore() *JobUpdateOne {
-	juo.mutation.ClearMaxUprankScore()
-	return juo
-}
-
-// SetMinUprankScore sets the "min_uprank_score" field.
-func (juo *JobUpdateOne) SetMinUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.ResetMinUprankScore()
-	juo.mutation.SetMinUprankScore(f)
-	return juo
-}
-
-// SetNillableMinUprankScore sets the "min_uprank_score" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableMinUprankScore(f *float64) *JobUpdateOne {
-	if f != nil {
-		juo.SetMinUprankScore(*f)
-	}
-	return juo
-}
-
-// AddMinUprankScore adds f to the "min_uprank_score" field.
-func (juo *JobUpdateOne) AddMinUprankScore(f float64) *JobUpdateOne {
-	juo.mutation.AddMinUprankScore(f)
-	return juo
-}
-
-// ClearMinUprankScore clears the value of the "min_uprank_score" field.
-func (juo *JobUpdateOne) ClearMinUprankScore() *JobUpdateOne {
-	juo.mutation.ClearMinUprankScore()
-	return juo
-}
-
 // SetUserID sets the "user" edge to the User entity by ID.
 func (juo *JobUpdateOne) SetUserID(id string) *JobUpdateOne {
 	juo.mutation.SetUserID(id)
@@ -844,19 +239,19 @@ func (juo *JobUpdateOne) SetUser(u *User) *JobUpdateOne {
 	return juo.SetUserID(u.ID)
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by IDs.
-func (juo *JobUpdateOne) AddFreelancerIDs(ids ...string) *JobUpdateOne {
-	juo.mutation.AddFreelancerIDs(ids...)
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
+func (juo *JobUpdateOne) AddUpworkjobIDs(ids ...string) *JobUpdateOne {
+	juo.mutation.AddUpworkjobIDs(ids...)
 	return juo
 }
 
-// AddFreelancers adds the "freelancers" edges to the UpworkFreelancer entity.
-func (juo *JobUpdateOne) AddFreelancers(u ...*UpworkFreelancer) *JobUpdateOne {
+// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
+func (juo *JobUpdateOne) AddUpworkjob(u ...*UpworkJob) *JobUpdateOne {
 	ids := make([]string, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return juo.AddFreelancerIDs(ids...)
+	return juo.AddUpworkjobIDs(ids...)
 }
 
 // Mutation returns the JobMutation object of the builder.
@@ -870,25 +265,25 @@ func (juo *JobUpdateOne) ClearUser() *JobUpdateOne {
 	return juo
 }
 
-// ClearFreelancers clears all "freelancers" edges to the UpworkFreelancer entity.
-func (juo *JobUpdateOne) ClearFreelancers() *JobUpdateOne {
-	juo.mutation.ClearFreelancers()
+// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+func (juo *JobUpdateOne) ClearUpworkjob() *JobUpdateOne {
+	juo.mutation.ClearUpworkjob()
 	return juo
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to UpworkFreelancer entities by IDs.
-func (juo *JobUpdateOne) RemoveFreelancerIDs(ids ...string) *JobUpdateOne {
-	juo.mutation.RemoveFreelancerIDs(ids...)
+// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
+func (juo *JobUpdateOne) RemoveUpworkjobIDs(ids ...string) *JobUpdateOne {
+	juo.mutation.RemoveUpworkjobIDs(ids...)
 	return juo
 }
 
-// RemoveFreelancers removes "freelancers" edges to UpworkFreelancer entities.
-func (juo *JobUpdateOne) RemoveFreelancers(u ...*UpworkFreelancer) *JobUpdateOne {
+// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
+func (juo *JobUpdateOne) RemoveUpworkjob(u ...*UpworkJob) *JobUpdateOne {
 	ids := make([]string, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return juo.RemoveFreelancerIDs(ids...)
+	return juo.RemoveUpworkjobIDs(ids...)
 }
 
 // Where appends a list predicates to the JobUpdate builder.
@@ -933,16 +328,6 @@ func (juo *JobUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (juo *JobUpdateOne) check() error {
-	if v, ok := juo.mutation.Title(); ok {
-		if err := job.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Job.title": %w`, err)}
-		}
-	}
-	if v, ok := juo.mutation.Description(); ok {
-		if err := job.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Job.description": %w`, err)}
-		}
-	}
 	if _, ok := juo.mutation.UserID(); juo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Job.user"`)
 	}
@@ -953,7 +338,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	if err := juo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID))
 	id, ok := juo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Job.id" for update`)}
@@ -977,91 +362,6 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := juo.mutation.Title(); ok {
-		_spec.SetField(job.FieldTitle, field.TypeString, value)
-	}
-	if value, ok := juo.mutation.CreatedAt(); ok {
-		_spec.SetField(job.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := juo.mutation.Location(); ok {
-		_spec.SetField(job.FieldLocation, field.TypeString, value)
-	}
-	if juo.mutation.LocationCleared() {
-		_spec.ClearField(job.FieldLocation, field.TypeString)
-	}
-	if value, ok := juo.mutation.Description(); ok {
-		_spec.SetField(job.FieldDescription, field.TypeString, value)
-	}
-	if value, ok := juo.mutation.Skills(); ok {
-		_spec.SetField(job.FieldSkills, field.TypeJSON, value)
-	}
-	if value, ok := juo.mutation.AppendedSkills(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, job.FieldSkills, value)
-		})
-	}
-	if juo.mutation.SkillsCleared() {
-		_spec.ClearField(job.FieldSkills, field.TypeJSON)
-	}
-	if value, ok := juo.mutation.ExperienceLevel(); ok {
-		_spec.SetField(job.FieldExperienceLevel, field.TypeString, value)
-	}
-	if juo.mutation.ExperienceLevelCleared() {
-		_spec.ClearField(job.FieldExperienceLevel, field.TypeString)
-	}
-	if value, ok := juo.mutation.Hourly(); ok {
-		_spec.SetField(job.FieldHourly, field.TypeBool, value)
-	}
-	if value, ok := juo.mutation.Fixed(); ok {
-		_spec.SetField(job.FieldFixed, field.TypeBool, value)
-	}
-	if value, ok := juo.mutation.HourlyRate(); ok {
-		_spec.SetField(job.FieldHourlyRate, field.TypeJSON, value)
-	}
-	if value, ok := juo.mutation.AppendedHourlyRate(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, job.FieldHourlyRate, value)
-		})
-	}
-	if juo.mutation.HourlyRateCleared() {
-		_spec.ClearField(job.FieldHourlyRate, field.TypeJSON)
-	}
-	if value, ok := juo.mutation.FixedRate(); ok {
-		_spec.SetField(job.FieldFixedRate, field.TypeFloat64, value)
-	}
-	if value, ok := juo.mutation.AddedFixedRate(); ok {
-		_spec.AddField(job.FieldFixedRate, field.TypeFloat64, value)
-	}
-	if juo.mutation.FixedRateCleared() {
-		_spec.ClearField(job.FieldFixedRate, field.TypeFloat64)
-	}
-	if value, ok := juo.mutation.AverageUprankScore(); ok {
-		_spec.SetField(job.FieldAverageUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := juo.mutation.AddedAverageUprankScore(); ok {
-		_spec.AddField(job.FieldAverageUprankScore, field.TypeFloat64, value)
-	}
-	if juo.mutation.AverageUprankScoreCleared() {
-		_spec.ClearField(job.FieldAverageUprankScore, field.TypeFloat64)
-	}
-	if value, ok := juo.mutation.MaxUprankScore(); ok {
-		_spec.SetField(job.FieldMaxUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := juo.mutation.AddedMaxUprankScore(); ok {
-		_spec.AddField(job.FieldMaxUprankScore, field.TypeFloat64, value)
-	}
-	if juo.mutation.MaxUprankScoreCleared() {
-		_spec.ClearField(job.FieldMaxUprankScore, field.TypeFloat64)
-	}
-	if value, ok := juo.mutation.MinUprankScore(); ok {
-		_spec.SetField(job.FieldMinUprankScore, field.TypeFloat64, value)
-	}
-	if value, ok := juo.mutation.AddedMinUprankScore(); ok {
-		_spec.AddField(job.FieldMinUprankScore, field.TypeFloat64, value)
-	}
-	if juo.mutation.MinUprankScoreCleared() {
-		_spec.ClearField(job.FieldMinUprankScore, field.TypeFloat64)
 	}
 	if juo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1092,28 +392,28 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if juo.mutation.FreelancersCleared() {
+	if juo.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := juo.mutation.RemovedFreelancersIDs(); len(nodes) > 0 && !juo.mutation.FreelancersCleared() {
+	if nodes := juo.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !juo.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1121,15 +421,15 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := juo.mutation.FreelancersIDs(); len(nodes) > 0 {
+	if nodes := juo.mutation.UpworkjobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   job.FreelancersTable,
-			Columns: job.FreelancersPrimaryKey,
+			Table:   job.UpworkjobTable,
+			Columns: []string{job.UpworkjobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

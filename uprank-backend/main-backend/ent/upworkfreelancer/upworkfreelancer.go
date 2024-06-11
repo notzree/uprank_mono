@@ -90,19 +90,19 @@ const (
 	FieldUprankReccomendedReasons = "uprank_reccomended_reasons"
 	// FieldUprankNotEnoughData holds the string denoting the uprank_not_enough_data field in the database.
 	FieldUprankNotEnoughData = "uprank_not_enough_data"
-	// EdgeJob holds the string denoting the job edge name in mutations.
-	EdgeJob = "job"
+	// EdgeUpworkJob holds the string denoting the upwork_job edge name in mutations.
+	EdgeUpworkJob = "upwork_job"
 	// EdgeAttachments holds the string denoting the attachments edge name in mutations.
 	EdgeAttachments = "attachments"
 	// EdgeWorkHistories holds the string denoting the work_histories edge name in mutations.
 	EdgeWorkHistories = "work_histories"
 	// Table holds the table name of the upworkfreelancer in the database.
 	Table = "upwork_freelancers"
-	// JobTable is the table that holds the job relation/edge. The primary key declared below.
-	JobTable = "job_freelancers"
-	// JobInverseTable is the table name for the Job entity.
-	// It exists in this package in order to avoid circular dependency with the "job" package.
-	JobInverseTable = "jobs"
+	// UpworkJobTable is the table that holds the upwork_job relation/edge. The primary key declared below.
+	UpworkJobTable = "upwork_job_upworkfreelancer"
+	// UpworkJobInverseTable is the table name for the UpworkJob entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkjob" package.
+	UpworkJobInverseTable = "upwork_jobs"
 	// AttachmentsTable is the table that holds the attachments relation/edge.
 	AttachmentsTable = "attachment_refs"
 	// AttachmentsInverseTable is the table name for the AttachmentRef entity.
@@ -163,9 +163,9 @@ var Columns = []string{
 }
 
 var (
-	// JobPrimaryKey and JobColumn2 are the table columns denoting the
-	// primary key for the job relation (M2M).
-	JobPrimaryKey = []string{"job_id", "upwork_freelancer_id"}
+	// UpworkJobPrimaryKey and UpworkJobColumn2 are the table columns denoting the
+	// primary key for the upwork_job relation (M2M).
+	UpworkJobPrimaryKey = []string{"upwork_job_id", "upwork_freelancer_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -386,17 +386,17 @@ func ByUprankNotEnoughData(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUprankNotEnoughData, opts...).ToFunc()
 }
 
-// ByJobCount orders the results by job count.
-func ByJobCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUpworkJobCount orders the results by upwork_job count.
+func ByUpworkJobCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newJobStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newUpworkJobStep(), opts...)
 	}
 }
 
-// ByJob orders the results by job terms.
-func ByJob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByUpworkJob orders the results by upwork_job terms.
+func ByUpworkJob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newJobStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUpworkJobStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -427,11 +427,11 @@ func ByWorkHistories(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newWorkHistoriesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newJobStep() *sqlgraph.Step {
+func newUpworkJobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(JobInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, JobTable, JobPrimaryKey...),
+		sqlgraph.To(UpworkJobInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, UpworkJobTable, UpworkJobPrimaryKey...),
 	)
 }
 func newAttachmentsStep() *sqlgraph.Step {

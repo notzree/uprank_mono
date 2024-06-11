@@ -9,6 +9,7 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/migrate"
 
 	"entgo.io/ent"
@@ -18,6 +19,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -33,6 +35,8 @@ type Client struct {
 	Job *JobClient
 	// UpworkFreelancer is the client for interacting with the UpworkFreelancer builders.
 	UpworkFreelancer *UpworkFreelancerClient
+	// UpworkJob is the client for interacting with the UpworkJob builders.
+	UpworkJob *UpworkJobClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// WorkHistory is the client for interacting with the WorkHistory builders.
@@ -51,6 +55,7 @@ func (c *Client) init() {
 	c.AttachmentRef = NewAttachmentRefClient(c.config)
 	c.Job = NewJobClient(c.config)
 	c.UpworkFreelancer = NewUpworkFreelancerClient(c.config)
+	c.UpworkJob = NewUpworkJobClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.WorkHistory = NewWorkHistoryClient(c.config)
 }
@@ -148,6 +153,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AttachmentRef:    NewAttachmentRefClient(cfg),
 		Job:              NewJobClient(cfg),
 		UpworkFreelancer: NewUpworkFreelancerClient(cfg),
+		UpworkJob:        NewUpworkJobClient(cfg),
 		User:             NewUserClient(cfg),
 		WorkHistory:      NewWorkHistoryClient(cfg),
 	}, nil
@@ -172,6 +178,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AttachmentRef:    NewAttachmentRefClient(cfg),
 		Job:              NewJobClient(cfg),
 		UpworkFreelancer: NewUpworkFreelancerClient(cfg),
+		UpworkJob:        NewUpworkJobClient(cfg),
 		User:             NewUserClient(cfg),
 		WorkHistory:      NewWorkHistoryClient(cfg),
 	}, nil
@@ -202,21 +209,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AttachmentRef.Use(hooks...)
-	c.Job.Use(hooks...)
-	c.UpworkFreelancer.Use(hooks...)
-	c.User.Use(hooks...)
-	c.WorkHistory.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AttachmentRef, c.Job, c.UpworkFreelancer, c.UpworkJob, c.User, c.WorkHistory,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AttachmentRef.Intercept(interceptors...)
-	c.Job.Intercept(interceptors...)
-	c.UpworkFreelancer.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
-	c.WorkHistory.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AttachmentRef, c.Job, c.UpworkFreelancer, c.UpworkJob, c.User, c.WorkHistory,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -228,6 +235,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Job.mutate(ctx, m)
 	case *UpworkFreelancerMutation:
 		return c.UpworkFreelancer.mutate(ctx, m)
+	case *UpworkJobMutation:
+		return c.UpworkJob.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *WorkHistoryMutation:
@@ -447,7 +456,7 @@ func (c *JobClient) UpdateOne(j *Job) *JobUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *JobClient) UpdateOneID(id string) *JobUpdateOne {
+func (c *JobClient) UpdateOneID(id uuid.UUID) *JobUpdateOne {
 	mutation := newJobMutation(c.config, OpUpdateOne, withJobID(id))
 	return &JobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -464,7 +473,7 @@ func (c *JobClient) DeleteOne(j *Job) *JobDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *JobClient) DeleteOneID(id string) *JobDeleteOne {
+func (c *JobClient) DeleteOneID(id uuid.UUID) *JobDeleteOne {
 	builder := c.Delete().Where(job.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -481,12 +490,12 @@ func (c *JobClient) Query() *JobQuery {
 }
 
 // Get returns a Job entity by its id.
-func (c *JobClient) Get(ctx context.Context, id string) (*Job, error) {
+func (c *JobClient) Get(ctx context.Context, id uuid.UUID) (*Job, error) {
 	return c.Query().Where(job.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *JobClient) GetX(ctx context.Context, id string) *Job {
+func (c *JobClient) GetX(ctx context.Context, id uuid.UUID) *Job {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -510,15 +519,15 @@ func (c *JobClient) QueryUser(j *Job) *UserQuery {
 	return query
 }
 
-// QueryFreelancers queries the freelancers edge of a Job.
-func (c *JobClient) QueryFreelancers(j *Job) *UpworkFreelancerQuery {
-	query := (&UpworkFreelancerClient{config: c.config}).Query()
+// QueryUpworkjob queries the upworkjob edge of a Job.
+func (c *JobClient) QueryUpworkjob(j *Job) *UpworkJobQuery {
+	query := (&UpworkJobClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := j.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(job.Table, job.FieldID, id),
-			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, job.FreelancersTable, job.FreelancersPrimaryKey...),
+			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, job.UpworkjobTable, job.UpworkjobColumn),
 		)
 		fromV = sqlgraph.Neighbors(j.driver.Dialect(), step)
 		return fromV, nil
@@ -659,15 +668,15 @@ func (c *UpworkFreelancerClient) GetX(ctx context.Context, id string) *UpworkFre
 	return obj
 }
 
-// QueryJob queries the job edge of a UpworkFreelancer.
-func (c *UpworkFreelancerClient) QueryJob(uf *UpworkFreelancer) *JobQuery {
-	query := (&JobClient{config: c.config}).Query()
+// QueryUpworkJob queries the upwork_job edge of a UpworkFreelancer.
+func (c *UpworkFreelancerClient) QueryUpworkJob(uf *UpworkFreelancer) *UpworkJobQuery {
+	query := (&UpworkJobClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := uf.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, id),
-			sqlgraph.To(job.Table, job.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, upworkfreelancer.JobTable, upworkfreelancer.JobPrimaryKey...),
+			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, upworkfreelancer.UpworkJobTable, upworkfreelancer.UpworkJobPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(uf.driver.Dialect(), step)
 		return fromV, nil
@@ -729,6 +738,187 @@ func (c *UpworkFreelancerClient) mutate(ctx context.Context, m *UpworkFreelancer
 		return (&UpworkFreelancerDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown UpworkFreelancer mutation op: %q", m.Op())
+	}
+}
+
+// UpworkJobClient is a client for the UpworkJob schema.
+type UpworkJobClient struct {
+	config
+}
+
+// NewUpworkJobClient returns a client for the UpworkJob from the given config.
+func NewUpworkJobClient(c config) *UpworkJobClient {
+	return &UpworkJobClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `upworkjob.Hooks(f(g(h())))`.
+func (c *UpworkJobClient) Use(hooks ...Hook) {
+	c.hooks.UpworkJob = append(c.hooks.UpworkJob, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `upworkjob.Intercept(f(g(h())))`.
+func (c *UpworkJobClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UpworkJob = append(c.inters.UpworkJob, interceptors...)
+}
+
+// Create returns a builder for creating a UpworkJob entity.
+func (c *UpworkJobClient) Create() *UpworkJobCreate {
+	mutation := newUpworkJobMutation(c.config, OpCreate)
+	return &UpworkJobCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UpworkJob entities.
+func (c *UpworkJobClient) CreateBulk(builders ...*UpworkJobCreate) *UpworkJobCreateBulk {
+	return &UpworkJobCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UpworkJobClient) MapCreateBulk(slice any, setFunc func(*UpworkJobCreate, int)) *UpworkJobCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UpworkJobCreateBulk{err: fmt.Errorf("calling to UpworkJobClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UpworkJobCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UpworkJobCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UpworkJob.
+func (c *UpworkJobClient) Update() *UpworkJobUpdate {
+	mutation := newUpworkJobMutation(c.config, OpUpdate)
+	return &UpworkJobUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UpworkJobClient) UpdateOne(uj *UpworkJob) *UpworkJobUpdateOne {
+	mutation := newUpworkJobMutation(c.config, OpUpdateOne, withUpworkJob(uj))
+	return &UpworkJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UpworkJobClient) UpdateOneID(id string) *UpworkJobUpdateOne {
+	mutation := newUpworkJobMutation(c.config, OpUpdateOne, withUpworkJobID(id))
+	return &UpworkJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UpworkJob.
+func (c *UpworkJobClient) Delete() *UpworkJobDelete {
+	mutation := newUpworkJobMutation(c.config, OpDelete)
+	return &UpworkJobDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UpworkJobClient) DeleteOne(uj *UpworkJob) *UpworkJobDeleteOne {
+	return c.DeleteOneID(uj.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UpworkJobClient) DeleteOneID(id string) *UpworkJobDeleteOne {
+	builder := c.Delete().Where(upworkjob.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UpworkJobDeleteOne{builder}
+}
+
+// Query returns a query builder for UpworkJob.
+func (c *UpworkJobClient) Query() *UpworkJobQuery {
+	return &UpworkJobQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUpworkJob},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UpworkJob entity by its id.
+func (c *UpworkJobClient) Get(ctx context.Context, id string) (*UpworkJob, error) {
+	return c.Query().Where(upworkjob.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UpworkJobClient) GetX(ctx context.Context, id string) *UpworkJob {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUpworkfreelancer queries the upworkfreelancer edge of a UpworkJob.
+func (c *UpworkJobClient) QueryUpworkfreelancer(uj *UpworkJob) *UpworkFreelancerQuery {
+	query := (&UpworkFreelancerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uj.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(upworkjob.Table, upworkjob.FieldID, id),
+			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, upworkjob.UpworkfreelancerTable, upworkjob.UpworkfreelancerPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(uj.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryJob queries the job edge of a UpworkJob.
+func (c *UpworkJobClient) QueryJob(uj *UpworkJob) *JobQuery {
+	query := (&JobClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uj.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(upworkjob.Table, upworkjob.FieldID, id),
+			sqlgraph.To(job.Table, job.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, upworkjob.JobTable, upworkjob.JobColumn),
+		)
+		fromV = sqlgraph.Neighbors(uj.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a UpworkJob.
+func (c *UpworkJobClient) QueryUser(uj *UpworkJob) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uj.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(upworkjob.Table, upworkjob.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, upworkjob.UserTable, upworkjob.UserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(uj.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UpworkJobClient) Hooks() []Hook {
+	return c.hooks.UpworkJob
+}
+
+// Interceptors returns the client interceptors.
+func (c *UpworkJobClient) Interceptors() []Interceptor {
+	return c.inters.UpworkJob
+}
+
+func (c *UpworkJobClient) mutate(ctx context.Context, m *UpworkJobMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UpworkJobCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UpworkJobUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UpworkJobUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UpworkJobDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UpworkJob mutation op: %q", m.Op())
 	}
 }
 
@@ -840,15 +1030,31 @@ func (c *UserClient) GetX(ctx context.Context, id string) *User {
 	return obj
 }
 
-// QueryJobs queries the jobs edge of a User.
-func (c *UserClient) QueryJobs(u *User) *JobQuery {
+// QueryJob queries the job edge of a User.
+func (c *UserClient) QueryJob(u *User) *JobQuery {
 	query := (&JobClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(job.Table, job.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.JobsTable, user.JobsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.JobTable, user.JobColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpworkjob queries the upworkjob edge of a User.
+func (c *UserClient) QueryUpworkjob(u *User) *UpworkJobQuery {
+	query := (&UpworkJobClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.UpworkjobTable, user.UpworkjobPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1033,9 +1239,10 @@ func (c *WorkHistoryClient) mutate(ctx context.Context, m *WorkHistoryMutation) 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AttachmentRef, Job, UpworkFreelancer, User, WorkHistory []ent.Hook
+		AttachmentRef, Job, UpworkFreelancer, UpworkJob, User, WorkHistory []ent.Hook
 	}
 	inters struct {
-		AttachmentRef, Job, UpworkFreelancer, User, WorkHistory []ent.Interceptor
+		AttachmentRef, Job, UpworkFreelancer, UpworkJob, User,
+		WorkHistory []ent.Interceptor
 	}
 )

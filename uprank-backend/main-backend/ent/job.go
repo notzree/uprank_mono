@@ -3,14 +3,14 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank-backend/main-backend/ent/schema"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -18,37 +18,13 @@ import (
 type Job struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// Location holds the value of the "location" field.
-	Location string `json:"location,omitempty"`
-	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
-	// Skills holds the value of the "skills" field.
-	Skills []string `json:"skills,omitempty"`
-	// ExperienceLevel holds the value of the "experience_level" field.
-	ExperienceLevel string `json:"experience_level,omitempty"`
-	// Hourly holds the value of the "hourly" field.
-	Hourly bool `json:"hourly,omitempty"`
-	// Fixed holds the value of the "fixed" field.
-	Fixed bool `json:"fixed,omitempty"`
-	// HourlyRate holds the value of the "hourly_rate" field.
-	HourlyRate []float32 `json:"hourly_rate,omitempty"`
-	// FixedRate holds the value of the "fixed_rate" field.
-	FixedRate float64 `json:"fixed_rate,omitempty"`
-	// AverageUprankScore holds the value of the "average_uprank_score" field.
-	AverageUprankScore float64 `json:"average_uprank_score,omitempty"`
-	// MaxUprankScore holds the value of the "max_uprank_score" field.
-	MaxUprankScore float64 `json:"max_uprank_score,omitempty"`
-	// MinUprankScore holds the value of the "min_uprank_score" field.
-	MinUprankScore float64 `json:"min_uprank_score,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// OriginPlatform holds the value of the "origin_platform" field.
+	OriginPlatform schema.Platform `json:"origin_platform,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the JobQuery when eager-loading is set.
 	Edges        JobEdges `json:"edges"`
-	user_jobs    *string
+	user_job     *string
 	selectValues sql.SelectValues
 }
 
@@ -56,8 +32,8 @@ type Job struct {
 type JobEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
-	// Freelancers holds the value of the freelancers edge.
-	Freelancers []*UpworkFreelancer `json:"freelancers,omitempty"`
+	// Upworkjob holds the value of the upworkjob edge.
+	Upworkjob []*UpworkJob `json:"upworkjob,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -74,13 +50,13 @@ func (e JobEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
-// FreelancersOrErr returns the Freelancers value or an error if the edge
+// UpworkjobOrErr returns the Upworkjob value or an error if the edge
 // was not loaded in eager-loading.
-func (e JobEdges) FreelancersOrErr() ([]*UpworkFreelancer, error) {
+func (e JobEdges) UpworkjobOrErr() ([]*UpworkJob, error) {
 	if e.loadedTypes[1] {
-		return e.Freelancers, nil
+		return e.Upworkjob, nil
 	}
-	return nil, &NotLoadedError{edge: "freelancers"}
+	return nil, &NotLoadedError{edge: "upworkjob"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -88,17 +64,11 @@ func (*Job) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case job.FieldSkills, job.FieldHourlyRate:
-			values[i] = new([]byte)
-		case job.FieldHourly, job.FieldFixed:
-			values[i] = new(sql.NullBool)
-		case job.FieldFixedRate, job.FieldAverageUprankScore, job.FieldMaxUprankScore, job.FieldMinUprankScore:
-			values[i] = new(sql.NullFloat64)
-		case job.FieldID, job.FieldTitle, job.FieldLocation, job.FieldDescription, job.FieldExperienceLevel:
+		case job.FieldOriginPlatform:
 			values[i] = new(sql.NullString)
-		case job.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
-		case job.ForeignKeys[0]: // user_jobs
+		case job.FieldID:
+			values[i] = new(uuid.UUID)
+		case job.ForeignKeys[0]: // user_job
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -116,99 +86,23 @@ func (j *Job) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case job.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				j.ID = value.String
+			} else if value != nil {
+				j.ID = *value
 			}
-		case job.FieldTitle:
+		case job.FieldOriginPlatform:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field origin_platform", values[i])
 			} else if value.Valid {
-				j.Title = value.String
-			}
-		case job.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				j.CreatedAt = value.Time
-			}
-		case job.FieldLocation:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field location", values[i])
-			} else if value.Valid {
-				j.Location = value.String
-			}
-		case job.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
-			} else if value.Valid {
-				j.Description = value.String
-			}
-		case job.FieldSkills:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field skills", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &j.Skills); err != nil {
-					return fmt.Errorf("unmarshal field skills: %w", err)
-				}
-			}
-		case job.FieldExperienceLevel:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field experience_level", values[i])
-			} else if value.Valid {
-				j.ExperienceLevel = value.String
-			}
-		case job.FieldHourly:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field hourly", values[i])
-			} else if value.Valid {
-				j.Hourly = value.Bool
-			}
-		case job.FieldFixed:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field fixed", values[i])
-			} else if value.Valid {
-				j.Fixed = value.Bool
-			}
-		case job.FieldHourlyRate:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field hourly_rate", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &j.HourlyRate); err != nil {
-					return fmt.Errorf("unmarshal field hourly_rate: %w", err)
-				}
-			}
-		case job.FieldFixedRate:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field fixed_rate", values[i])
-			} else if value.Valid {
-				j.FixedRate = value.Float64
-			}
-		case job.FieldAverageUprankScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field average_uprank_score", values[i])
-			} else if value.Valid {
-				j.AverageUprankScore = value.Float64
-			}
-		case job.FieldMaxUprankScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field max_uprank_score", values[i])
-			} else if value.Valid {
-				j.MaxUprankScore = value.Float64
-			}
-		case job.FieldMinUprankScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field min_uprank_score", values[i])
-			} else if value.Valid {
-				j.MinUprankScore = value.Float64
+				j.OriginPlatform = schema.Platform(value.String)
 			}
 		case job.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_jobs", values[i])
+				return fmt.Errorf("unexpected type %T for field user_job", values[i])
 			} else if value.Valid {
-				j.user_jobs = new(string)
-				*j.user_jobs = value.String
+				j.user_job = new(string)
+				*j.user_job = value.String
 			}
 		default:
 			j.selectValues.Set(columns[i], values[i])
@@ -228,9 +122,9 @@ func (j *Job) QueryUser() *UserQuery {
 	return NewJobClient(j.config).QueryUser(j)
 }
 
-// QueryFreelancers queries the "freelancers" edge of the Job entity.
-func (j *Job) QueryFreelancers() *UpworkFreelancerQuery {
-	return NewJobClient(j.config).QueryFreelancers(j)
+// QueryUpworkjob queries the "upworkjob" edge of the Job entity.
+func (j *Job) QueryUpworkjob() *UpworkJobQuery {
+	return NewJobClient(j.config).QueryUpworkjob(j)
 }
 
 // Update returns a builder for updating this Job.
@@ -256,44 +150,8 @@ func (j *Job) String() string {
 	var builder strings.Builder
 	builder.WriteString("Job(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", j.ID))
-	builder.WriteString("title=")
-	builder.WriteString(j.Title)
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(j.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("location=")
-	builder.WriteString(j.Location)
-	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(j.Description)
-	builder.WriteString(", ")
-	builder.WriteString("skills=")
-	builder.WriteString(fmt.Sprintf("%v", j.Skills))
-	builder.WriteString(", ")
-	builder.WriteString("experience_level=")
-	builder.WriteString(j.ExperienceLevel)
-	builder.WriteString(", ")
-	builder.WriteString("hourly=")
-	builder.WriteString(fmt.Sprintf("%v", j.Hourly))
-	builder.WriteString(", ")
-	builder.WriteString("fixed=")
-	builder.WriteString(fmt.Sprintf("%v", j.Fixed))
-	builder.WriteString(", ")
-	builder.WriteString("hourly_rate=")
-	builder.WriteString(fmt.Sprintf("%v", j.HourlyRate))
-	builder.WriteString(", ")
-	builder.WriteString("fixed_rate=")
-	builder.WriteString(fmt.Sprintf("%v", j.FixedRate))
-	builder.WriteString(", ")
-	builder.WriteString("average_uprank_score=")
-	builder.WriteString(fmt.Sprintf("%v", j.AverageUprankScore))
-	builder.WriteString(", ")
-	builder.WriteString("max_uprank_score=")
-	builder.WriteString(fmt.Sprintf("%v", j.MaxUprankScore))
-	builder.WriteString(", ")
-	builder.WriteString("min_uprank_score=")
-	builder.WriteString(fmt.Sprintf("%v", j.MinUprankScore))
+	builder.WriteString("origin_platform=")
+	builder.WriteString(fmt.Sprintf("%v", j.OriginPlatform))
 	builder.WriteByte(')')
 	return builder.String()
 }

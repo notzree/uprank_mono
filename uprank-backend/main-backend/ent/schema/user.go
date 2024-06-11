@@ -36,6 +36,7 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("jobs", Job.Type),
+		edge.To("job", Job.Type),
+		edge.To("upworkjob", UpworkJob.Type),
 	}
 }

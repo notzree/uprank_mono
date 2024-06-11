@@ -11,10 +11,13 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/schema"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
@@ -31,6 +34,7 @@ const (
 	TypeAttachmentRef    = "AttachmentRef"
 	TypeJob              = "Job"
 	TypeUpworkFreelancer = "UpworkFreelancer"
+	TypeUpworkJob        = "UpworkJob"
 	TypeUser             = "User"
 	TypeWorkHistory      = "WorkHistory"
 )
@@ -485,37 +489,19 @@ func (m *AttachmentRefMutation) ResetEdge(name string) error {
 // JobMutation represents an operation that mutates the Job nodes in the graph.
 type JobMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *string
-	title                   *string
-	created_at              *time.Time
-	location                *string
-	description             *string
-	skills                  *[]string
-	appendskills            []string
-	experience_level        *string
-	hourly                  *bool
-	fixed                   *bool
-	hourly_rate             *[]float32
-	appendhourly_rate       []float32
-	fixed_rate              *float64
-	addfixed_rate           *float64
-	average_uprank_score    *float64
-	addaverage_uprank_score *float64
-	max_uprank_score        *float64
-	addmax_uprank_score     *float64
-	min_uprank_score        *float64
-	addmin_uprank_score     *float64
-	clearedFields           map[string]struct{}
-	user                    *string
-	cleareduser             bool
-	freelancers             map[string]struct{}
-	removedfreelancers      map[string]struct{}
-	clearedfreelancers      bool
-	done                    bool
-	oldValue                func(context.Context) (*Job, error)
-	predicates              []predicate.Job
+	op               Op
+	typ              string
+	id               *uuid.UUID
+	origin_platform  *schema.Platform
+	clearedFields    map[string]struct{}
+	user             *string
+	cleareduser      bool
+	upworkjob        map[string]struct{}
+	removedupworkjob map[string]struct{}
+	clearedupworkjob bool
+	done             bool
+	oldValue         func(context.Context) (*Job, error)
+	predicates       []predicate.Job
 }
 
 var _ ent.Mutation = (*JobMutation)(nil)
@@ -538,7 +524,7 @@ func newJobMutation(c config, op Op, opts ...jobOption) *JobMutation {
 }
 
 // withJobID sets the ID field of the mutation.
-func withJobID(id string) jobOption {
+func withJobID(id uuid.UUID) jobOption {
 	return func(m *JobMutation) {
 		var (
 			err   error
@@ -590,13 +576,13 @@ func (m JobMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Job entities.
-func (m *JobMutation) SetID(id string) {
+func (m *JobMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *JobMutation) ID() (id string, exists bool) {
+func (m *JobMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -607,12 +593,12 @@ func (m *JobMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *JobMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *JobMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -622,692 +608,40 @@ func (m *JobMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetTitle sets the "title" field.
-func (m *JobMutation) SetTitle(s string) {
-	m.title = &s
+// SetOriginPlatform sets the "origin_platform" field.
+func (m *JobMutation) SetOriginPlatform(s schema.Platform) {
+	m.origin_platform = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *JobMutation) Title() (r string, exists bool) {
-	v := m.title
+// OriginPlatform returns the value of the "origin_platform" field in the mutation.
+func (m *JobMutation) OriginPlatform() (r schema.Platform, exists bool) {
+	v := m.origin_platform
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Job entity.
+// OldOriginPlatform returns the old "origin_platform" field's value of the Job entity.
 // If the Job object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *JobMutation) OldOriginPlatform(ctx context.Context) (v schema.Platform, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldOriginPlatform is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldOriginPlatform requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldOriginPlatform: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.OriginPlatform, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *JobMutation) ResetTitle() {
-	m.title = nil
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *JobMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *JobMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *JobMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetLocation sets the "location" field.
-func (m *JobMutation) SetLocation(s string) {
-	m.location = &s
-}
-
-// Location returns the value of the "location" field in the mutation.
-func (m *JobMutation) Location() (r string, exists bool) {
-	v := m.location
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLocation returns the old "location" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldLocation(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLocation requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
-	}
-	return oldValue.Location, nil
-}
-
-// ClearLocation clears the value of the "location" field.
-func (m *JobMutation) ClearLocation() {
-	m.location = nil
-	m.clearedFields[job.FieldLocation] = struct{}{}
-}
-
-// LocationCleared returns if the "location" field was cleared in this mutation.
-func (m *JobMutation) LocationCleared() bool {
-	_, ok := m.clearedFields[job.FieldLocation]
-	return ok
-}
-
-// ResetLocation resets all changes to the "location" field.
-func (m *JobMutation) ResetLocation() {
-	m.location = nil
-	delete(m.clearedFields, job.FieldLocation)
-}
-
-// SetDescription sets the "description" field.
-func (m *JobMutation) SetDescription(s string) {
-	m.description = &s
-}
-
-// Description returns the value of the "description" field in the mutation.
-func (m *JobMutation) Description() (r string, exists bool) {
-	v := m.description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDescription returns the old "description" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldDescription(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
-	}
-	return oldValue.Description, nil
-}
-
-// ResetDescription resets all changes to the "description" field.
-func (m *JobMutation) ResetDescription() {
-	m.description = nil
-}
-
-// SetSkills sets the "skills" field.
-func (m *JobMutation) SetSkills(s []string) {
-	m.skills = &s
-	m.appendskills = nil
-}
-
-// Skills returns the value of the "skills" field in the mutation.
-func (m *JobMutation) Skills() (r []string, exists bool) {
-	v := m.skills
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSkills returns the old "skills" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldSkills(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSkills requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
-	}
-	return oldValue.Skills, nil
-}
-
-// AppendSkills adds s to the "skills" field.
-func (m *JobMutation) AppendSkills(s []string) {
-	m.appendskills = append(m.appendskills, s...)
-}
-
-// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
-func (m *JobMutation) AppendedSkills() ([]string, bool) {
-	if len(m.appendskills) == 0 {
-		return nil, false
-	}
-	return m.appendskills, true
-}
-
-// ClearSkills clears the value of the "skills" field.
-func (m *JobMutation) ClearSkills() {
-	m.skills = nil
-	m.appendskills = nil
-	m.clearedFields[job.FieldSkills] = struct{}{}
-}
-
-// SkillsCleared returns if the "skills" field was cleared in this mutation.
-func (m *JobMutation) SkillsCleared() bool {
-	_, ok := m.clearedFields[job.FieldSkills]
-	return ok
-}
-
-// ResetSkills resets all changes to the "skills" field.
-func (m *JobMutation) ResetSkills() {
-	m.skills = nil
-	m.appendskills = nil
-	delete(m.clearedFields, job.FieldSkills)
-}
-
-// SetExperienceLevel sets the "experience_level" field.
-func (m *JobMutation) SetExperienceLevel(s string) {
-	m.experience_level = &s
-}
-
-// ExperienceLevel returns the value of the "experience_level" field in the mutation.
-func (m *JobMutation) ExperienceLevel() (r string, exists bool) {
-	v := m.experience_level
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExperienceLevel returns the old "experience_level" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldExperienceLevel(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExperienceLevel is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExperienceLevel requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExperienceLevel: %w", err)
-	}
-	return oldValue.ExperienceLevel, nil
-}
-
-// ClearExperienceLevel clears the value of the "experience_level" field.
-func (m *JobMutation) ClearExperienceLevel() {
-	m.experience_level = nil
-	m.clearedFields[job.FieldExperienceLevel] = struct{}{}
-}
-
-// ExperienceLevelCleared returns if the "experience_level" field was cleared in this mutation.
-func (m *JobMutation) ExperienceLevelCleared() bool {
-	_, ok := m.clearedFields[job.FieldExperienceLevel]
-	return ok
-}
-
-// ResetExperienceLevel resets all changes to the "experience_level" field.
-func (m *JobMutation) ResetExperienceLevel() {
-	m.experience_level = nil
-	delete(m.clearedFields, job.FieldExperienceLevel)
-}
-
-// SetHourly sets the "hourly" field.
-func (m *JobMutation) SetHourly(b bool) {
-	m.hourly = &b
-}
-
-// Hourly returns the value of the "hourly" field in the mutation.
-func (m *JobMutation) Hourly() (r bool, exists bool) {
-	v := m.hourly
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourly returns the old "hourly" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldHourly(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourly is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourly requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourly: %w", err)
-	}
-	return oldValue.Hourly, nil
-}
-
-// ResetHourly resets all changes to the "hourly" field.
-func (m *JobMutation) ResetHourly() {
-	m.hourly = nil
-}
-
-// SetFixed sets the "fixed" field.
-func (m *JobMutation) SetFixed(b bool) {
-	m.fixed = &b
-}
-
-// Fixed returns the value of the "fixed" field in the mutation.
-func (m *JobMutation) Fixed() (r bool, exists bool) {
-	v := m.fixed
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFixed returns the old "fixed" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldFixed(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixed is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixed requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixed: %w", err)
-	}
-	return oldValue.Fixed, nil
-}
-
-// ResetFixed resets all changes to the "fixed" field.
-func (m *JobMutation) ResetFixed() {
-	m.fixed = nil
-}
-
-// SetHourlyRate sets the "hourly_rate" field.
-func (m *JobMutation) SetHourlyRate(f []float32) {
-	m.hourly_rate = &f
-	m.appendhourly_rate = nil
-}
-
-// HourlyRate returns the value of the "hourly_rate" field in the mutation.
-func (m *JobMutation) HourlyRate() (r []float32, exists bool) {
-	v := m.hourly_rate
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHourlyRate returns the old "hourly_rate" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldHourlyRate(ctx context.Context) (v []float32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHourlyRate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHourlyRate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHourlyRate: %w", err)
-	}
-	return oldValue.HourlyRate, nil
-}
-
-// AppendHourlyRate adds f to the "hourly_rate" field.
-func (m *JobMutation) AppendHourlyRate(f []float32) {
-	m.appendhourly_rate = append(m.appendhourly_rate, f...)
-}
-
-// AppendedHourlyRate returns the list of values that were appended to the "hourly_rate" field in this mutation.
-func (m *JobMutation) AppendedHourlyRate() ([]float32, bool) {
-	if len(m.appendhourly_rate) == 0 {
-		return nil, false
-	}
-	return m.appendhourly_rate, true
-}
-
-// ClearHourlyRate clears the value of the "hourly_rate" field.
-func (m *JobMutation) ClearHourlyRate() {
-	m.hourly_rate = nil
-	m.appendhourly_rate = nil
-	m.clearedFields[job.FieldHourlyRate] = struct{}{}
-}
-
-// HourlyRateCleared returns if the "hourly_rate" field was cleared in this mutation.
-func (m *JobMutation) HourlyRateCleared() bool {
-	_, ok := m.clearedFields[job.FieldHourlyRate]
-	return ok
-}
-
-// ResetHourlyRate resets all changes to the "hourly_rate" field.
-func (m *JobMutation) ResetHourlyRate() {
-	m.hourly_rate = nil
-	m.appendhourly_rate = nil
-	delete(m.clearedFields, job.FieldHourlyRate)
-}
-
-// SetFixedRate sets the "fixed_rate" field.
-func (m *JobMutation) SetFixedRate(f float64) {
-	m.fixed_rate = &f
-	m.addfixed_rate = nil
-}
-
-// FixedRate returns the value of the "fixed_rate" field in the mutation.
-func (m *JobMutation) FixedRate() (r float64, exists bool) {
-	v := m.fixed_rate
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFixedRate returns the old "fixed_rate" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldFixedRate(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFixedRate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFixedRate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFixedRate: %w", err)
-	}
-	return oldValue.FixedRate, nil
-}
-
-// AddFixedRate adds f to the "fixed_rate" field.
-func (m *JobMutation) AddFixedRate(f float64) {
-	if m.addfixed_rate != nil {
-		*m.addfixed_rate += f
-	} else {
-		m.addfixed_rate = &f
-	}
-}
-
-// AddedFixedRate returns the value that was added to the "fixed_rate" field in this mutation.
-func (m *JobMutation) AddedFixedRate() (r float64, exists bool) {
-	v := m.addfixed_rate
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearFixedRate clears the value of the "fixed_rate" field.
-func (m *JobMutation) ClearFixedRate() {
-	m.fixed_rate = nil
-	m.addfixed_rate = nil
-	m.clearedFields[job.FieldFixedRate] = struct{}{}
-}
-
-// FixedRateCleared returns if the "fixed_rate" field was cleared in this mutation.
-func (m *JobMutation) FixedRateCleared() bool {
-	_, ok := m.clearedFields[job.FieldFixedRate]
-	return ok
-}
-
-// ResetFixedRate resets all changes to the "fixed_rate" field.
-func (m *JobMutation) ResetFixedRate() {
-	m.fixed_rate = nil
-	m.addfixed_rate = nil
-	delete(m.clearedFields, job.FieldFixedRate)
-}
-
-// SetAverageUprankScore sets the "average_uprank_score" field.
-func (m *JobMutation) SetAverageUprankScore(f float64) {
-	m.average_uprank_score = &f
-	m.addaverage_uprank_score = nil
-}
-
-// AverageUprankScore returns the value of the "average_uprank_score" field in the mutation.
-func (m *JobMutation) AverageUprankScore() (r float64, exists bool) {
-	v := m.average_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAverageUprankScore returns the old "average_uprank_score" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldAverageUprankScore(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAverageUprankScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAverageUprankScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAverageUprankScore: %w", err)
-	}
-	return oldValue.AverageUprankScore, nil
-}
-
-// AddAverageUprankScore adds f to the "average_uprank_score" field.
-func (m *JobMutation) AddAverageUprankScore(f float64) {
-	if m.addaverage_uprank_score != nil {
-		*m.addaverage_uprank_score += f
-	} else {
-		m.addaverage_uprank_score = &f
-	}
-}
-
-// AddedAverageUprankScore returns the value that was added to the "average_uprank_score" field in this mutation.
-func (m *JobMutation) AddedAverageUprankScore() (r float64, exists bool) {
-	v := m.addaverage_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
-func (m *JobMutation) ClearAverageUprankScore() {
-	m.average_uprank_score = nil
-	m.addaverage_uprank_score = nil
-	m.clearedFields[job.FieldAverageUprankScore] = struct{}{}
-}
-
-// AverageUprankScoreCleared returns if the "average_uprank_score" field was cleared in this mutation.
-func (m *JobMutation) AverageUprankScoreCleared() bool {
-	_, ok := m.clearedFields[job.FieldAverageUprankScore]
-	return ok
-}
-
-// ResetAverageUprankScore resets all changes to the "average_uprank_score" field.
-func (m *JobMutation) ResetAverageUprankScore() {
-	m.average_uprank_score = nil
-	m.addaverage_uprank_score = nil
-	delete(m.clearedFields, job.FieldAverageUprankScore)
-}
-
-// SetMaxUprankScore sets the "max_uprank_score" field.
-func (m *JobMutation) SetMaxUprankScore(f float64) {
-	m.max_uprank_score = &f
-	m.addmax_uprank_score = nil
-}
-
-// MaxUprankScore returns the value of the "max_uprank_score" field in the mutation.
-func (m *JobMutation) MaxUprankScore() (r float64, exists bool) {
-	v := m.max_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMaxUprankScore returns the old "max_uprank_score" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldMaxUprankScore(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaxUprankScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaxUprankScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaxUprankScore: %w", err)
-	}
-	return oldValue.MaxUprankScore, nil
-}
-
-// AddMaxUprankScore adds f to the "max_uprank_score" field.
-func (m *JobMutation) AddMaxUprankScore(f float64) {
-	if m.addmax_uprank_score != nil {
-		*m.addmax_uprank_score += f
-	} else {
-		m.addmax_uprank_score = &f
-	}
-}
-
-// AddedMaxUprankScore returns the value that was added to the "max_uprank_score" field in this mutation.
-func (m *JobMutation) AddedMaxUprankScore() (r float64, exists bool) {
-	v := m.addmax_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
-func (m *JobMutation) ClearMaxUprankScore() {
-	m.max_uprank_score = nil
-	m.addmax_uprank_score = nil
-	m.clearedFields[job.FieldMaxUprankScore] = struct{}{}
-}
-
-// MaxUprankScoreCleared returns if the "max_uprank_score" field was cleared in this mutation.
-func (m *JobMutation) MaxUprankScoreCleared() bool {
-	_, ok := m.clearedFields[job.FieldMaxUprankScore]
-	return ok
-}
-
-// ResetMaxUprankScore resets all changes to the "max_uprank_score" field.
-func (m *JobMutation) ResetMaxUprankScore() {
-	m.max_uprank_score = nil
-	m.addmax_uprank_score = nil
-	delete(m.clearedFields, job.FieldMaxUprankScore)
-}
-
-// SetMinUprankScore sets the "min_uprank_score" field.
-func (m *JobMutation) SetMinUprankScore(f float64) {
-	m.min_uprank_score = &f
-	m.addmin_uprank_score = nil
-}
-
-// MinUprankScore returns the value of the "min_uprank_score" field in the mutation.
-func (m *JobMutation) MinUprankScore() (r float64, exists bool) {
-	v := m.min_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMinUprankScore returns the old "min_uprank_score" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldMinUprankScore(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMinUprankScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMinUprankScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMinUprankScore: %w", err)
-	}
-	return oldValue.MinUprankScore, nil
-}
-
-// AddMinUprankScore adds f to the "min_uprank_score" field.
-func (m *JobMutation) AddMinUprankScore(f float64) {
-	if m.addmin_uprank_score != nil {
-		*m.addmin_uprank_score += f
-	} else {
-		m.addmin_uprank_score = &f
-	}
-}
-
-// AddedMinUprankScore returns the value that was added to the "min_uprank_score" field in this mutation.
-func (m *JobMutation) AddedMinUprankScore() (r float64, exists bool) {
-	v := m.addmin_uprank_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearMinUprankScore clears the value of the "min_uprank_score" field.
-func (m *JobMutation) ClearMinUprankScore() {
-	m.min_uprank_score = nil
-	m.addmin_uprank_score = nil
-	m.clearedFields[job.FieldMinUprankScore] = struct{}{}
-}
-
-// MinUprankScoreCleared returns if the "min_uprank_score" field was cleared in this mutation.
-func (m *JobMutation) MinUprankScoreCleared() bool {
-	_, ok := m.clearedFields[job.FieldMinUprankScore]
-	return ok
-}
-
-// ResetMinUprankScore resets all changes to the "min_uprank_score" field.
-func (m *JobMutation) ResetMinUprankScore() {
-	m.min_uprank_score = nil
-	m.addmin_uprank_score = nil
-	delete(m.clearedFields, job.FieldMinUprankScore)
+// ResetOriginPlatform resets all changes to the "origin_platform" field.
+func (m *JobMutation) ResetOriginPlatform() {
+	m.origin_platform = nil
 }
 
 // SetUserID sets the "user" edge to the User entity by id.
@@ -1349,58 +683,58 @@ func (m *JobMutation) ResetUser() {
 	m.cleareduser = false
 }
 
-// AddFreelancerIDs adds the "freelancers" edge to the UpworkFreelancer entity by ids.
-func (m *JobMutation) AddFreelancerIDs(ids ...string) {
-	if m.freelancers == nil {
-		m.freelancers = make(map[string]struct{})
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by ids.
+func (m *JobMutation) AddUpworkjobIDs(ids ...string) {
+	if m.upworkjob == nil {
+		m.upworkjob = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.freelancers[ids[i]] = struct{}{}
+		m.upworkjob[ids[i]] = struct{}{}
 	}
 }
 
-// ClearFreelancers clears the "freelancers" edge to the UpworkFreelancer entity.
-func (m *JobMutation) ClearFreelancers() {
-	m.clearedfreelancers = true
+// ClearUpworkjob clears the "upworkjob" edge to the UpworkJob entity.
+func (m *JobMutation) ClearUpworkjob() {
+	m.clearedupworkjob = true
 }
 
-// FreelancersCleared reports if the "freelancers" edge to the UpworkFreelancer entity was cleared.
-func (m *JobMutation) FreelancersCleared() bool {
-	return m.clearedfreelancers
+// UpworkjobCleared reports if the "upworkjob" edge to the UpworkJob entity was cleared.
+func (m *JobMutation) UpworkjobCleared() bool {
+	return m.clearedupworkjob
 }
 
-// RemoveFreelancerIDs removes the "freelancers" edge to the UpworkFreelancer entity by IDs.
-func (m *JobMutation) RemoveFreelancerIDs(ids ...string) {
-	if m.removedfreelancers == nil {
-		m.removedfreelancers = make(map[string]struct{})
+// RemoveUpworkjobIDs removes the "upworkjob" edge to the UpworkJob entity by IDs.
+func (m *JobMutation) RemoveUpworkjobIDs(ids ...string) {
+	if m.removedupworkjob == nil {
+		m.removedupworkjob = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.freelancers, ids[i])
-		m.removedfreelancers[ids[i]] = struct{}{}
+		delete(m.upworkjob, ids[i])
+		m.removedupworkjob[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedFreelancers returns the removed IDs of the "freelancers" edge to the UpworkFreelancer entity.
-func (m *JobMutation) RemovedFreelancersIDs() (ids []string) {
-	for id := range m.removedfreelancers {
+// RemovedUpworkjob returns the removed IDs of the "upworkjob" edge to the UpworkJob entity.
+func (m *JobMutation) RemovedUpworkjobIDs() (ids []string) {
+	for id := range m.removedupworkjob {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// FreelancersIDs returns the "freelancers" edge IDs in the mutation.
-func (m *JobMutation) FreelancersIDs() (ids []string) {
-	for id := range m.freelancers {
+// UpworkjobIDs returns the "upworkjob" edge IDs in the mutation.
+func (m *JobMutation) UpworkjobIDs() (ids []string) {
+	for id := range m.upworkjob {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetFreelancers resets all changes to the "freelancers" edge.
-func (m *JobMutation) ResetFreelancers() {
-	m.freelancers = nil
-	m.clearedfreelancers = false
-	m.removedfreelancers = nil
+// ResetUpworkjob resets all changes to the "upworkjob" edge.
+func (m *JobMutation) ResetUpworkjob() {
+	m.upworkjob = nil
+	m.clearedupworkjob = false
+	m.removedupworkjob = nil
 }
 
 // Where appends a list predicates to the JobMutation builder.
@@ -1437,45 +771,9 @@ func (m *JobMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *JobMutation) Fields() []string {
-	fields := make([]string, 0, 13)
-	if m.title != nil {
-		fields = append(fields, job.FieldTitle)
-	}
-	if m.created_at != nil {
-		fields = append(fields, job.FieldCreatedAt)
-	}
-	if m.location != nil {
-		fields = append(fields, job.FieldLocation)
-	}
-	if m.description != nil {
-		fields = append(fields, job.FieldDescription)
-	}
-	if m.skills != nil {
-		fields = append(fields, job.FieldSkills)
-	}
-	if m.experience_level != nil {
-		fields = append(fields, job.FieldExperienceLevel)
-	}
-	if m.hourly != nil {
-		fields = append(fields, job.FieldHourly)
-	}
-	if m.fixed != nil {
-		fields = append(fields, job.FieldFixed)
-	}
-	if m.hourly_rate != nil {
-		fields = append(fields, job.FieldHourlyRate)
-	}
-	if m.fixed_rate != nil {
-		fields = append(fields, job.FieldFixedRate)
-	}
-	if m.average_uprank_score != nil {
-		fields = append(fields, job.FieldAverageUprankScore)
-	}
-	if m.max_uprank_score != nil {
-		fields = append(fields, job.FieldMaxUprankScore)
-	}
-	if m.min_uprank_score != nil {
-		fields = append(fields, job.FieldMinUprankScore)
+	fields := make([]string, 0, 1)
+	if m.origin_platform != nil {
+		fields = append(fields, job.FieldOriginPlatform)
 	}
 	return fields
 }
@@ -1485,32 +783,8 @@ func (m *JobMutation) Fields() []string {
 // schema.
 func (m *JobMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case job.FieldTitle:
-		return m.Title()
-	case job.FieldCreatedAt:
-		return m.CreatedAt()
-	case job.FieldLocation:
-		return m.Location()
-	case job.FieldDescription:
-		return m.Description()
-	case job.FieldSkills:
-		return m.Skills()
-	case job.FieldExperienceLevel:
-		return m.ExperienceLevel()
-	case job.FieldHourly:
-		return m.Hourly()
-	case job.FieldFixed:
-		return m.Fixed()
-	case job.FieldHourlyRate:
-		return m.HourlyRate()
-	case job.FieldFixedRate:
-		return m.FixedRate()
-	case job.FieldAverageUprankScore:
-		return m.AverageUprankScore()
-	case job.FieldMaxUprankScore:
-		return m.MaxUprankScore()
-	case job.FieldMinUprankScore:
-		return m.MinUprankScore()
+	case job.FieldOriginPlatform:
+		return m.OriginPlatform()
 	}
 	return nil, false
 }
@@ -1520,32 +794,8 @@ func (m *JobMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *JobMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case job.FieldTitle:
-		return m.OldTitle(ctx)
-	case job.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case job.FieldLocation:
-		return m.OldLocation(ctx)
-	case job.FieldDescription:
-		return m.OldDescription(ctx)
-	case job.FieldSkills:
-		return m.OldSkills(ctx)
-	case job.FieldExperienceLevel:
-		return m.OldExperienceLevel(ctx)
-	case job.FieldHourly:
-		return m.OldHourly(ctx)
-	case job.FieldFixed:
-		return m.OldFixed(ctx)
-	case job.FieldHourlyRate:
-		return m.OldHourlyRate(ctx)
-	case job.FieldFixedRate:
-		return m.OldFixedRate(ctx)
-	case job.FieldAverageUprankScore:
-		return m.OldAverageUprankScore(ctx)
-	case job.FieldMaxUprankScore:
-		return m.OldMaxUprankScore(ctx)
-	case job.FieldMinUprankScore:
-		return m.OldMinUprankScore(ctx)
+	case job.FieldOriginPlatform:
+		return m.OldOriginPlatform(ctx)
 	}
 	return nil, fmt.Errorf("unknown Job field %s", name)
 }
@@ -1555,96 +805,12 @@ func (m *JobMutation) OldField(ctx context.Context, name string) (ent.Value, err
 // type.
 func (m *JobMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case job.FieldTitle:
-		v, ok := value.(string)
+	case job.FieldOriginPlatform:
+		v, ok := value.(schema.Platform)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
-		return nil
-	case job.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case job.FieldLocation:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLocation(v)
-		return nil
-	case job.FieldDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDescription(v)
-		return nil
-	case job.FieldSkills:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSkills(v)
-		return nil
-	case job.FieldExperienceLevel:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExperienceLevel(v)
-		return nil
-	case job.FieldHourly:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourly(v)
-		return nil
-	case job.FieldFixed:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFixed(v)
-		return nil
-	case job.FieldHourlyRate:
-		v, ok := value.([]float32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHourlyRate(v)
-		return nil
-	case job.FieldFixedRate:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFixedRate(v)
-		return nil
-	case job.FieldAverageUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAverageUprankScore(v)
-		return nil
-	case job.FieldMaxUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMaxUprankScore(v)
-		return nil
-	case job.FieldMinUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMinUprankScore(v)
+		m.SetOriginPlatform(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Job field %s", name)
@@ -1653,36 +819,13 @@ func (m *JobMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *JobMutation) AddedFields() []string {
-	var fields []string
-	if m.addfixed_rate != nil {
-		fields = append(fields, job.FieldFixedRate)
-	}
-	if m.addaverage_uprank_score != nil {
-		fields = append(fields, job.FieldAverageUprankScore)
-	}
-	if m.addmax_uprank_score != nil {
-		fields = append(fields, job.FieldMaxUprankScore)
-	}
-	if m.addmin_uprank_score != nil {
-		fields = append(fields, job.FieldMinUprankScore)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *JobMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case job.FieldFixedRate:
-		return m.AddedFixedRate()
-	case job.FieldAverageUprankScore:
-		return m.AddedAverageUprankScore()
-	case job.FieldMaxUprankScore:
-		return m.AddedMaxUprankScore()
-	case job.FieldMinUprankScore:
-		return m.AddedMinUprankScore()
-	}
 	return nil, false
 }
 
@@ -1691,34 +834,6 @@ func (m *JobMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *JobMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case job.FieldFixedRate:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddFixedRate(v)
-		return nil
-	case job.FieldAverageUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddAverageUprankScore(v)
-		return nil
-	case job.FieldMaxUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddMaxUprankScore(v)
-		return nil
-	case job.FieldMinUprankScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddMinUprankScore(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Job numeric field %s", name)
 }
@@ -1726,32 +841,7 @@ func (m *JobMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *JobMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(job.FieldLocation) {
-		fields = append(fields, job.FieldLocation)
-	}
-	if m.FieldCleared(job.FieldSkills) {
-		fields = append(fields, job.FieldSkills)
-	}
-	if m.FieldCleared(job.FieldExperienceLevel) {
-		fields = append(fields, job.FieldExperienceLevel)
-	}
-	if m.FieldCleared(job.FieldHourlyRate) {
-		fields = append(fields, job.FieldHourlyRate)
-	}
-	if m.FieldCleared(job.FieldFixedRate) {
-		fields = append(fields, job.FieldFixedRate)
-	}
-	if m.FieldCleared(job.FieldAverageUprankScore) {
-		fields = append(fields, job.FieldAverageUprankScore)
-	}
-	if m.FieldCleared(job.FieldMaxUprankScore) {
-		fields = append(fields, job.FieldMaxUprankScore)
-	}
-	if m.FieldCleared(job.FieldMinUprankScore) {
-		fields = append(fields, job.FieldMinUprankScore)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1764,32 +854,6 @@ func (m *JobMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *JobMutation) ClearField(name string) error {
-	switch name {
-	case job.FieldLocation:
-		m.ClearLocation()
-		return nil
-	case job.FieldSkills:
-		m.ClearSkills()
-		return nil
-	case job.FieldExperienceLevel:
-		m.ClearExperienceLevel()
-		return nil
-	case job.FieldHourlyRate:
-		m.ClearHourlyRate()
-		return nil
-	case job.FieldFixedRate:
-		m.ClearFixedRate()
-		return nil
-	case job.FieldAverageUprankScore:
-		m.ClearAverageUprankScore()
-		return nil
-	case job.FieldMaxUprankScore:
-		m.ClearMaxUprankScore()
-		return nil
-	case job.FieldMinUprankScore:
-		m.ClearMinUprankScore()
-		return nil
-	}
 	return fmt.Errorf("unknown Job nullable field %s", name)
 }
 
@@ -1797,44 +861,8 @@ func (m *JobMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *JobMutation) ResetField(name string) error {
 	switch name {
-	case job.FieldTitle:
-		m.ResetTitle()
-		return nil
-	case job.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case job.FieldLocation:
-		m.ResetLocation()
-		return nil
-	case job.FieldDescription:
-		m.ResetDescription()
-		return nil
-	case job.FieldSkills:
-		m.ResetSkills()
-		return nil
-	case job.FieldExperienceLevel:
-		m.ResetExperienceLevel()
-		return nil
-	case job.FieldHourly:
-		m.ResetHourly()
-		return nil
-	case job.FieldFixed:
-		m.ResetFixed()
-		return nil
-	case job.FieldHourlyRate:
-		m.ResetHourlyRate()
-		return nil
-	case job.FieldFixedRate:
-		m.ResetFixedRate()
-		return nil
-	case job.FieldAverageUprankScore:
-		m.ResetAverageUprankScore()
-		return nil
-	case job.FieldMaxUprankScore:
-		m.ResetMaxUprankScore()
-		return nil
-	case job.FieldMinUprankScore:
-		m.ResetMinUprankScore()
+	case job.FieldOriginPlatform:
+		m.ResetOriginPlatform()
 		return nil
 	}
 	return fmt.Errorf("unknown Job field %s", name)
@@ -1846,8 +874,8 @@ func (m *JobMutation) AddedEdges() []string {
 	if m.user != nil {
 		edges = append(edges, job.EdgeUser)
 	}
-	if m.freelancers != nil {
-		edges = append(edges, job.EdgeFreelancers)
+	if m.upworkjob != nil {
+		edges = append(edges, job.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -1860,9 +888,9 @@ func (m *JobMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
-	case job.EdgeFreelancers:
-		ids := make([]ent.Value, 0, len(m.freelancers))
-		for id := range m.freelancers {
+	case job.EdgeUpworkjob:
+		ids := make([]ent.Value, 0, len(m.upworkjob))
+		for id := range m.upworkjob {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1873,8 +901,8 @@ func (m *JobMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *JobMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedfreelancers != nil {
-		edges = append(edges, job.EdgeFreelancers)
+	if m.removedupworkjob != nil {
+		edges = append(edges, job.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -1883,9 +911,9 @@ func (m *JobMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *JobMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case job.EdgeFreelancers:
-		ids := make([]ent.Value, 0, len(m.removedfreelancers))
-		for id := range m.removedfreelancers {
+	case job.EdgeUpworkjob:
+		ids := make([]ent.Value, 0, len(m.removedupworkjob))
+		for id := range m.removedupworkjob {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1899,8 +927,8 @@ func (m *JobMutation) ClearedEdges() []string {
 	if m.cleareduser {
 		edges = append(edges, job.EdgeUser)
 	}
-	if m.clearedfreelancers {
-		edges = append(edges, job.EdgeFreelancers)
+	if m.clearedupworkjob {
+		edges = append(edges, job.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -1911,8 +939,8 @@ func (m *JobMutation) EdgeCleared(name string) bool {
 	switch name {
 	case job.EdgeUser:
 		return m.cleareduser
-	case job.EdgeFreelancers:
-		return m.clearedfreelancers
+	case job.EdgeUpworkjob:
+		return m.clearedupworkjob
 	}
 	return false
 }
@@ -1935,8 +963,8 @@ func (m *JobMutation) ResetEdge(name string) error {
 	case job.EdgeUser:
 		m.ResetUser()
 		return nil
-	case job.EdgeFreelancers:
-		m.ResetFreelancers()
+	case job.EdgeUpworkjob:
+		m.ResetUpworkjob()
 		return nil
 	}
 	return fmt.Errorf("unknown Job edge %s", name)
@@ -2005,9 +1033,9 @@ type UpworkFreelancerMutation struct {
 	uprank_reccomended_reasons          *string
 	uprank_not_enough_data              *bool
 	clearedFields                       map[string]struct{}
-	job                                 map[string]struct{}
-	removedjob                          map[string]struct{}
-	clearedjob                          bool
+	upwork_job                          map[string]struct{}
+	removedupwork_job                   map[string]struct{}
+	clearedupwork_job                   bool
 	attachments                         map[int]struct{}
 	removedattachments                  map[int]struct{}
 	clearedattachments                  bool
@@ -3927,58 +2955,58 @@ func (m *UpworkFreelancerMutation) ResetUprankNotEnoughData() {
 	delete(m.clearedFields, upworkfreelancer.FieldUprankNotEnoughData)
 }
 
-// AddJobIDs adds the "job" edge to the Job entity by ids.
-func (m *UpworkFreelancerMutation) AddJobIDs(ids ...string) {
-	if m.job == nil {
-		m.job = make(map[string]struct{})
+// AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by ids.
+func (m *UpworkFreelancerMutation) AddUpworkJobIDs(ids ...string) {
+	if m.upwork_job == nil {
+		m.upwork_job = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.job[ids[i]] = struct{}{}
+		m.upwork_job[ids[i]] = struct{}{}
 	}
 }
 
-// ClearJob clears the "job" edge to the Job entity.
-func (m *UpworkFreelancerMutation) ClearJob() {
-	m.clearedjob = true
+// ClearUpworkJob clears the "upwork_job" edge to the UpworkJob entity.
+func (m *UpworkFreelancerMutation) ClearUpworkJob() {
+	m.clearedupwork_job = true
 }
 
-// JobCleared reports if the "job" edge to the Job entity was cleared.
-func (m *UpworkFreelancerMutation) JobCleared() bool {
-	return m.clearedjob
+// UpworkJobCleared reports if the "upwork_job" edge to the UpworkJob entity was cleared.
+func (m *UpworkFreelancerMutation) UpworkJobCleared() bool {
+	return m.clearedupwork_job
 }
 
-// RemoveJobIDs removes the "job" edge to the Job entity by IDs.
-func (m *UpworkFreelancerMutation) RemoveJobIDs(ids ...string) {
-	if m.removedjob == nil {
-		m.removedjob = make(map[string]struct{})
+// RemoveUpworkJobIDs removes the "upwork_job" edge to the UpworkJob entity by IDs.
+func (m *UpworkFreelancerMutation) RemoveUpworkJobIDs(ids ...string) {
+	if m.removedupwork_job == nil {
+		m.removedupwork_job = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.job, ids[i])
-		m.removedjob[ids[i]] = struct{}{}
+		delete(m.upwork_job, ids[i])
+		m.removedupwork_job[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedJob returns the removed IDs of the "job" edge to the Job entity.
-func (m *UpworkFreelancerMutation) RemovedJobIDs() (ids []string) {
-	for id := range m.removedjob {
+// RemovedUpworkJob returns the removed IDs of the "upwork_job" edge to the UpworkJob entity.
+func (m *UpworkFreelancerMutation) RemovedUpworkJobIDs() (ids []string) {
+	for id := range m.removedupwork_job {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// JobIDs returns the "job" edge IDs in the mutation.
-func (m *UpworkFreelancerMutation) JobIDs() (ids []string) {
-	for id := range m.job {
+// UpworkJobIDs returns the "upwork_job" edge IDs in the mutation.
+func (m *UpworkFreelancerMutation) UpworkJobIDs() (ids []string) {
+	for id := range m.upwork_job {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetJob resets all changes to the "job" edge.
-func (m *UpworkFreelancerMutation) ResetJob() {
-	m.job = nil
-	m.clearedjob = false
-	m.removedjob = nil
+// ResetUpworkJob resets all changes to the "upwork_job" edge.
+func (m *UpworkFreelancerMutation) ResetUpworkJob() {
+	m.upwork_job = nil
+	m.clearedupwork_job = false
+	m.removedupwork_job = nil
 }
 
 // AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by ids.
@@ -5098,8 +4126,8 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UpworkFreelancerMutation) AddedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.job != nil {
-		edges = append(edges, upworkfreelancer.EdgeJob)
+	if m.upwork_job != nil {
+		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
 	if m.attachments != nil {
 		edges = append(edges, upworkfreelancer.EdgeAttachments)
@@ -5114,9 +4142,9 @@ func (m *UpworkFreelancerMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UpworkFreelancerMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case upworkfreelancer.EdgeJob:
-		ids := make([]ent.Value, 0, len(m.job))
-		for id := range m.job {
+	case upworkfreelancer.EdgeUpworkJob:
+		ids := make([]ent.Value, 0, len(m.upwork_job))
+		for id := range m.upwork_job {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5139,8 +4167,8 @@ func (m *UpworkFreelancerMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UpworkFreelancerMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedjob != nil {
-		edges = append(edges, upworkfreelancer.EdgeJob)
+	if m.removedupwork_job != nil {
+		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
 	if m.removedattachments != nil {
 		edges = append(edges, upworkfreelancer.EdgeAttachments)
@@ -5155,9 +4183,9 @@ func (m *UpworkFreelancerMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UpworkFreelancerMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case upworkfreelancer.EdgeJob:
-		ids := make([]ent.Value, 0, len(m.removedjob))
-		for id := range m.removedjob {
+	case upworkfreelancer.EdgeUpworkJob:
+		ids := make([]ent.Value, 0, len(m.removedupwork_job))
+		for id := range m.removedupwork_job {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5180,8 +4208,8 @@ func (m *UpworkFreelancerMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UpworkFreelancerMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.clearedjob {
-		edges = append(edges, upworkfreelancer.EdgeJob)
+	if m.clearedupwork_job {
+		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
 	if m.clearedattachments {
 		edges = append(edges, upworkfreelancer.EdgeAttachments)
@@ -5196,8 +4224,8 @@ func (m *UpworkFreelancerMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UpworkFreelancerMutation) EdgeCleared(name string) bool {
 	switch name {
-	case upworkfreelancer.EdgeJob:
-		return m.clearedjob
+	case upworkfreelancer.EdgeUpworkJob:
+		return m.clearedupwork_job
 	case upworkfreelancer.EdgeAttachments:
 		return m.clearedattachments
 	case upworkfreelancer.EdgeWorkHistories:
@@ -5218,8 +4246,8 @@ func (m *UpworkFreelancerMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UpworkFreelancerMutation) ResetEdge(name string) error {
 	switch name {
-	case upworkfreelancer.EdgeJob:
-		m.ResetJob()
+	case upworkfreelancer.EdgeUpworkJob:
+		m.ResetUpworkJob()
 		return nil
 	case upworkfreelancer.EdgeAttachments:
 		m.ResetAttachments()
@@ -5231,25 +4259,1571 @@ func (m *UpworkFreelancerMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown UpworkFreelancer edge %s", name)
 }
 
+// UpworkJobMutation represents an operation that mutates the UpworkJob nodes in the graph.
+type UpworkJobMutation struct {
+	config
+	op                      Op
+	typ                     string
+	id                      *string
+	title                   *string
+	created_at              *time.Time
+	location                *string
+	description             *string
+	skills                  *[]string
+	appendskills            []string
+	experience_level        *string
+	hourly                  *bool
+	fixed                   *bool
+	hourly_rate             *[]float32
+	appendhourly_rate       []float32
+	fixed_rate              *float64
+	addfixed_rate           *float64
+	average_uprank_score    *float64
+	addaverage_uprank_score *float64
+	max_uprank_score        *float64
+	addmax_uprank_score     *float64
+	min_uprank_score        *float64
+	addmin_uprank_score     *float64
+	clearedFields           map[string]struct{}
+	upworkfreelancer        map[string]struct{}
+	removedupworkfreelancer map[string]struct{}
+	clearedupworkfreelancer bool
+	job                     *uuid.UUID
+	clearedjob              bool
+	user                    map[string]struct{}
+	removeduser             map[string]struct{}
+	cleareduser             bool
+	done                    bool
+	oldValue                func(context.Context) (*UpworkJob, error)
+	predicates              []predicate.UpworkJob
+}
+
+var _ ent.Mutation = (*UpworkJobMutation)(nil)
+
+// upworkjobOption allows management of the mutation configuration using functional options.
+type upworkjobOption func(*UpworkJobMutation)
+
+// newUpworkJobMutation creates new mutation for the UpworkJob entity.
+func newUpworkJobMutation(c config, op Op, opts ...upworkjobOption) *UpworkJobMutation {
+	m := &UpworkJobMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUpworkJob,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUpworkJobID sets the ID field of the mutation.
+func withUpworkJobID(id string) upworkjobOption {
+	return func(m *UpworkJobMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UpworkJob
+		)
+		m.oldValue = func(ctx context.Context) (*UpworkJob, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UpworkJob.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUpworkJob sets the old UpworkJob of the mutation.
+func withUpworkJob(node *UpworkJob) upworkjobOption {
+	return func(m *UpworkJobMutation) {
+		m.oldValue = func(context.Context) (*UpworkJob, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UpworkJobMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UpworkJobMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of UpworkJob entities.
+func (m *UpworkJobMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *UpworkJobMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *UpworkJobMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().UpworkJob.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTitle sets the "title" field.
+func (m *UpworkJobMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *UpworkJobMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *UpworkJobMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *UpworkJobMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *UpworkJobMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *UpworkJobMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetLocation sets the "location" field.
+func (m *UpworkJobMutation) SetLocation(s string) {
+	m.location = &s
+}
+
+// Location returns the value of the "location" field in the mutation.
+func (m *UpworkJobMutation) Location() (r string, exists bool) {
+	v := m.location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocation returns the old "location" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
+	}
+	return oldValue.Location, nil
+}
+
+// ClearLocation clears the value of the "location" field.
+func (m *UpworkJobMutation) ClearLocation() {
+	m.location = nil
+	m.clearedFields[upworkjob.FieldLocation] = struct{}{}
+}
+
+// LocationCleared returns if the "location" field was cleared in this mutation.
+func (m *UpworkJobMutation) LocationCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldLocation]
+	return ok
+}
+
+// ResetLocation resets all changes to the "location" field.
+func (m *UpworkJobMutation) ResetLocation() {
+	m.location = nil
+	delete(m.clearedFields, upworkjob.FieldLocation)
+}
+
+// SetDescription sets the "description" field.
+func (m *UpworkJobMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *UpworkJobMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *UpworkJobMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetSkills sets the "skills" field.
+func (m *UpworkJobMutation) SetSkills(s []string) {
+	m.skills = &s
+	m.appendskills = nil
+}
+
+// Skills returns the value of the "skills" field in the mutation.
+func (m *UpworkJobMutation) Skills() (r []string, exists bool) {
+	v := m.skills
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSkills returns the old "skills" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldSkills(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSkills is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSkills requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSkills: %w", err)
+	}
+	return oldValue.Skills, nil
+}
+
+// AppendSkills adds s to the "skills" field.
+func (m *UpworkJobMutation) AppendSkills(s []string) {
+	m.appendskills = append(m.appendskills, s...)
+}
+
+// AppendedSkills returns the list of values that were appended to the "skills" field in this mutation.
+func (m *UpworkJobMutation) AppendedSkills() ([]string, bool) {
+	if len(m.appendskills) == 0 {
+		return nil, false
+	}
+	return m.appendskills, true
+}
+
+// ClearSkills clears the value of the "skills" field.
+func (m *UpworkJobMutation) ClearSkills() {
+	m.skills = nil
+	m.appendskills = nil
+	m.clearedFields[upworkjob.FieldSkills] = struct{}{}
+}
+
+// SkillsCleared returns if the "skills" field was cleared in this mutation.
+func (m *UpworkJobMutation) SkillsCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldSkills]
+	return ok
+}
+
+// ResetSkills resets all changes to the "skills" field.
+func (m *UpworkJobMutation) ResetSkills() {
+	m.skills = nil
+	m.appendskills = nil
+	delete(m.clearedFields, upworkjob.FieldSkills)
+}
+
+// SetExperienceLevel sets the "experience_level" field.
+func (m *UpworkJobMutation) SetExperienceLevel(s string) {
+	m.experience_level = &s
+}
+
+// ExperienceLevel returns the value of the "experience_level" field in the mutation.
+func (m *UpworkJobMutation) ExperienceLevel() (r string, exists bool) {
+	v := m.experience_level
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExperienceLevel returns the old "experience_level" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldExperienceLevel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExperienceLevel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExperienceLevel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExperienceLevel: %w", err)
+	}
+	return oldValue.ExperienceLevel, nil
+}
+
+// ClearExperienceLevel clears the value of the "experience_level" field.
+func (m *UpworkJobMutation) ClearExperienceLevel() {
+	m.experience_level = nil
+	m.clearedFields[upworkjob.FieldExperienceLevel] = struct{}{}
+}
+
+// ExperienceLevelCleared returns if the "experience_level" field was cleared in this mutation.
+func (m *UpworkJobMutation) ExperienceLevelCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldExperienceLevel]
+	return ok
+}
+
+// ResetExperienceLevel resets all changes to the "experience_level" field.
+func (m *UpworkJobMutation) ResetExperienceLevel() {
+	m.experience_level = nil
+	delete(m.clearedFields, upworkjob.FieldExperienceLevel)
+}
+
+// SetHourly sets the "hourly" field.
+func (m *UpworkJobMutation) SetHourly(b bool) {
+	m.hourly = &b
+}
+
+// Hourly returns the value of the "hourly" field in the mutation.
+func (m *UpworkJobMutation) Hourly() (r bool, exists bool) {
+	v := m.hourly
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHourly returns the old "hourly" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldHourly(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHourly is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHourly requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHourly: %w", err)
+	}
+	return oldValue.Hourly, nil
+}
+
+// ResetHourly resets all changes to the "hourly" field.
+func (m *UpworkJobMutation) ResetHourly() {
+	m.hourly = nil
+}
+
+// SetFixed sets the "fixed" field.
+func (m *UpworkJobMutation) SetFixed(b bool) {
+	m.fixed = &b
+}
+
+// Fixed returns the value of the "fixed" field in the mutation.
+func (m *UpworkJobMutation) Fixed() (r bool, exists bool) {
+	v := m.fixed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFixed returns the old "fixed" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldFixed(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFixed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFixed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFixed: %w", err)
+	}
+	return oldValue.Fixed, nil
+}
+
+// ResetFixed resets all changes to the "fixed" field.
+func (m *UpworkJobMutation) ResetFixed() {
+	m.fixed = nil
+}
+
+// SetHourlyRate sets the "hourly_rate" field.
+func (m *UpworkJobMutation) SetHourlyRate(f []float32) {
+	m.hourly_rate = &f
+	m.appendhourly_rate = nil
+}
+
+// HourlyRate returns the value of the "hourly_rate" field in the mutation.
+func (m *UpworkJobMutation) HourlyRate() (r []float32, exists bool) {
+	v := m.hourly_rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHourlyRate returns the old "hourly_rate" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldHourlyRate(ctx context.Context) (v []float32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHourlyRate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHourlyRate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHourlyRate: %w", err)
+	}
+	return oldValue.HourlyRate, nil
+}
+
+// AppendHourlyRate adds f to the "hourly_rate" field.
+func (m *UpworkJobMutation) AppendHourlyRate(f []float32) {
+	m.appendhourly_rate = append(m.appendhourly_rate, f...)
+}
+
+// AppendedHourlyRate returns the list of values that were appended to the "hourly_rate" field in this mutation.
+func (m *UpworkJobMutation) AppendedHourlyRate() ([]float32, bool) {
+	if len(m.appendhourly_rate) == 0 {
+		return nil, false
+	}
+	return m.appendhourly_rate, true
+}
+
+// ClearHourlyRate clears the value of the "hourly_rate" field.
+func (m *UpworkJobMutation) ClearHourlyRate() {
+	m.hourly_rate = nil
+	m.appendhourly_rate = nil
+	m.clearedFields[upworkjob.FieldHourlyRate] = struct{}{}
+}
+
+// HourlyRateCleared returns if the "hourly_rate" field was cleared in this mutation.
+func (m *UpworkJobMutation) HourlyRateCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldHourlyRate]
+	return ok
+}
+
+// ResetHourlyRate resets all changes to the "hourly_rate" field.
+func (m *UpworkJobMutation) ResetHourlyRate() {
+	m.hourly_rate = nil
+	m.appendhourly_rate = nil
+	delete(m.clearedFields, upworkjob.FieldHourlyRate)
+}
+
+// SetFixedRate sets the "fixed_rate" field.
+func (m *UpworkJobMutation) SetFixedRate(f float64) {
+	m.fixed_rate = &f
+	m.addfixed_rate = nil
+}
+
+// FixedRate returns the value of the "fixed_rate" field in the mutation.
+func (m *UpworkJobMutation) FixedRate() (r float64, exists bool) {
+	v := m.fixed_rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFixedRate returns the old "fixed_rate" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldFixedRate(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFixedRate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFixedRate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFixedRate: %w", err)
+	}
+	return oldValue.FixedRate, nil
+}
+
+// AddFixedRate adds f to the "fixed_rate" field.
+func (m *UpworkJobMutation) AddFixedRate(f float64) {
+	if m.addfixed_rate != nil {
+		*m.addfixed_rate += f
+	} else {
+		m.addfixed_rate = &f
+	}
+}
+
+// AddedFixedRate returns the value that was added to the "fixed_rate" field in this mutation.
+func (m *UpworkJobMutation) AddedFixedRate() (r float64, exists bool) {
+	v := m.addfixed_rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearFixedRate clears the value of the "fixed_rate" field.
+func (m *UpworkJobMutation) ClearFixedRate() {
+	m.fixed_rate = nil
+	m.addfixed_rate = nil
+	m.clearedFields[upworkjob.FieldFixedRate] = struct{}{}
+}
+
+// FixedRateCleared returns if the "fixed_rate" field was cleared in this mutation.
+func (m *UpworkJobMutation) FixedRateCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldFixedRate]
+	return ok
+}
+
+// ResetFixedRate resets all changes to the "fixed_rate" field.
+func (m *UpworkJobMutation) ResetFixedRate() {
+	m.fixed_rate = nil
+	m.addfixed_rate = nil
+	delete(m.clearedFields, upworkjob.FieldFixedRate)
+}
+
+// SetAverageUprankScore sets the "average_uprank_score" field.
+func (m *UpworkJobMutation) SetAverageUprankScore(f float64) {
+	m.average_uprank_score = &f
+	m.addaverage_uprank_score = nil
+}
+
+// AverageUprankScore returns the value of the "average_uprank_score" field in the mutation.
+func (m *UpworkJobMutation) AverageUprankScore() (r float64, exists bool) {
+	v := m.average_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAverageUprankScore returns the old "average_uprank_score" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldAverageUprankScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAverageUprankScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAverageUprankScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAverageUprankScore: %w", err)
+	}
+	return oldValue.AverageUprankScore, nil
+}
+
+// AddAverageUprankScore adds f to the "average_uprank_score" field.
+func (m *UpworkJobMutation) AddAverageUprankScore(f float64) {
+	if m.addaverage_uprank_score != nil {
+		*m.addaverage_uprank_score += f
+	} else {
+		m.addaverage_uprank_score = &f
+	}
+}
+
+// AddedAverageUprankScore returns the value that was added to the "average_uprank_score" field in this mutation.
+func (m *UpworkJobMutation) AddedAverageUprankScore() (r float64, exists bool) {
+	v := m.addaverage_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearAverageUprankScore clears the value of the "average_uprank_score" field.
+func (m *UpworkJobMutation) ClearAverageUprankScore() {
+	m.average_uprank_score = nil
+	m.addaverage_uprank_score = nil
+	m.clearedFields[upworkjob.FieldAverageUprankScore] = struct{}{}
+}
+
+// AverageUprankScoreCleared returns if the "average_uprank_score" field was cleared in this mutation.
+func (m *UpworkJobMutation) AverageUprankScoreCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldAverageUprankScore]
+	return ok
+}
+
+// ResetAverageUprankScore resets all changes to the "average_uprank_score" field.
+func (m *UpworkJobMutation) ResetAverageUprankScore() {
+	m.average_uprank_score = nil
+	m.addaverage_uprank_score = nil
+	delete(m.clearedFields, upworkjob.FieldAverageUprankScore)
+}
+
+// SetMaxUprankScore sets the "max_uprank_score" field.
+func (m *UpworkJobMutation) SetMaxUprankScore(f float64) {
+	m.max_uprank_score = &f
+	m.addmax_uprank_score = nil
+}
+
+// MaxUprankScore returns the value of the "max_uprank_score" field in the mutation.
+func (m *UpworkJobMutation) MaxUprankScore() (r float64, exists bool) {
+	v := m.max_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxUprankScore returns the old "max_uprank_score" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldMaxUprankScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxUprankScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxUprankScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxUprankScore: %w", err)
+	}
+	return oldValue.MaxUprankScore, nil
+}
+
+// AddMaxUprankScore adds f to the "max_uprank_score" field.
+func (m *UpworkJobMutation) AddMaxUprankScore(f float64) {
+	if m.addmax_uprank_score != nil {
+		*m.addmax_uprank_score += f
+	} else {
+		m.addmax_uprank_score = &f
+	}
+}
+
+// AddedMaxUprankScore returns the value that was added to the "max_uprank_score" field in this mutation.
+func (m *UpworkJobMutation) AddedMaxUprankScore() (r float64, exists bool) {
+	v := m.addmax_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMaxUprankScore clears the value of the "max_uprank_score" field.
+func (m *UpworkJobMutation) ClearMaxUprankScore() {
+	m.max_uprank_score = nil
+	m.addmax_uprank_score = nil
+	m.clearedFields[upworkjob.FieldMaxUprankScore] = struct{}{}
+}
+
+// MaxUprankScoreCleared returns if the "max_uprank_score" field was cleared in this mutation.
+func (m *UpworkJobMutation) MaxUprankScoreCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldMaxUprankScore]
+	return ok
+}
+
+// ResetMaxUprankScore resets all changes to the "max_uprank_score" field.
+func (m *UpworkJobMutation) ResetMaxUprankScore() {
+	m.max_uprank_score = nil
+	m.addmax_uprank_score = nil
+	delete(m.clearedFields, upworkjob.FieldMaxUprankScore)
+}
+
+// SetMinUprankScore sets the "min_uprank_score" field.
+func (m *UpworkJobMutation) SetMinUprankScore(f float64) {
+	m.min_uprank_score = &f
+	m.addmin_uprank_score = nil
+}
+
+// MinUprankScore returns the value of the "min_uprank_score" field in the mutation.
+func (m *UpworkJobMutation) MinUprankScore() (r float64, exists bool) {
+	v := m.min_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMinUprankScore returns the old "min_uprank_score" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldMinUprankScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMinUprankScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMinUprankScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMinUprankScore: %w", err)
+	}
+	return oldValue.MinUprankScore, nil
+}
+
+// AddMinUprankScore adds f to the "min_uprank_score" field.
+func (m *UpworkJobMutation) AddMinUprankScore(f float64) {
+	if m.addmin_uprank_score != nil {
+		*m.addmin_uprank_score += f
+	} else {
+		m.addmin_uprank_score = &f
+	}
+}
+
+// AddedMinUprankScore returns the value that was added to the "min_uprank_score" field in this mutation.
+func (m *UpworkJobMutation) AddedMinUprankScore() (r float64, exists bool) {
+	v := m.addmin_uprank_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMinUprankScore clears the value of the "min_uprank_score" field.
+func (m *UpworkJobMutation) ClearMinUprankScore() {
+	m.min_uprank_score = nil
+	m.addmin_uprank_score = nil
+	m.clearedFields[upworkjob.FieldMinUprankScore] = struct{}{}
+}
+
+// MinUprankScoreCleared returns if the "min_uprank_score" field was cleared in this mutation.
+func (m *UpworkJobMutation) MinUprankScoreCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldMinUprankScore]
+	return ok
+}
+
+// ResetMinUprankScore resets all changes to the "min_uprank_score" field.
+func (m *UpworkJobMutation) ResetMinUprankScore() {
+	m.min_uprank_score = nil
+	m.addmin_uprank_score = nil
+	delete(m.clearedFields, upworkjob.FieldMinUprankScore)
+}
+
+// AddUpworkfreelancerIDs adds the "upworkfreelancer" edge to the UpworkFreelancer entity by ids.
+func (m *UpworkJobMutation) AddUpworkfreelancerIDs(ids ...string) {
+	if m.upworkfreelancer == nil {
+		m.upworkfreelancer = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.upworkfreelancer[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUpworkfreelancer clears the "upworkfreelancer" edge to the UpworkFreelancer entity.
+func (m *UpworkJobMutation) ClearUpworkfreelancer() {
+	m.clearedupworkfreelancer = true
+}
+
+// UpworkfreelancerCleared reports if the "upworkfreelancer" edge to the UpworkFreelancer entity was cleared.
+func (m *UpworkJobMutation) UpworkfreelancerCleared() bool {
+	return m.clearedupworkfreelancer
+}
+
+// RemoveUpworkfreelancerIDs removes the "upworkfreelancer" edge to the UpworkFreelancer entity by IDs.
+func (m *UpworkJobMutation) RemoveUpworkfreelancerIDs(ids ...string) {
+	if m.removedupworkfreelancer == nil {
+		m.removedupworkfreelancer = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.upworkfreelancer, ids[i])
+		m.removedupworkfreelancer[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUpworkfreelancer returns the removed IDs of the "upworkfreelancer" edge to the UpworkFreelancer entity.
+func (m *UpworkJobMutation) RemovedUpworkfreelancerIDs() (ids []string) {
+	for id := range m.removedupworkfreelancer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UpworkfreelancerIDs returns the "upworkfreelancer" edge IDs in the mutation.
+func (m *UpworkJobMutation) UpworkfreelancerIDs() (ids []string) {
+	for id := range m.upworkfreelancer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUpworkfreelancer resets all changes to the "upworkfreelancer" edge.
+func (m *UpworkJobMutation) ResetUpworkfreelancer() {
+	m.upworkfreelancer = nil
+	m.clearedupworkfreelancer = false
+	m.removedupworkfreelancer = nil
+}
+
+// SetJobID sets the "job" edge to the Job entity by id.
+func (m *UpworkJobMutation) SetJobID(id uuid.UUID) {
+	m.job = &id
+}
+
+// ClearJob clears the "job" edge to the Job entity.
+func (m *UpworkJobMutation) ClearJob() {
+	m.clearedjob = true
+}
+
+// JobCleared reports if the "job" edge to the Job entity was cleared.
+func (m *UpworkJobMutation) JobCleared() bool {
+	return m.clearedjob
+}
+
+// JobID returns the "job" edge ID in the mutation.
+func (m *UpworkJobMutation) JobID() (id uuid.UUID, exists bool) {
+	if m.job != nil {
+		return *m.job, true
+	}
+	return
+}
+
+// JobIDs returns the "job" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// JobID instead. It exists only for internal usage by the builders.
+func (m *UpworkJobMutation) JobIDs() (ids []uuid.UUID) {
+	if id := m.job; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetJob resets all changes to the "job" edge.
+func (m *UpworkJobMutation) ResetJob() {
+	m.job = nil
+	m.clearedjob = false
+}
+
+// AddUserIDs adds the "user" edge to the User entity by ids.
+func (m *UpworkJobMutation) AddUserIDs(ids ...string) {
+	if m.user == nil {
+		m.user = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *UpworkJobMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *UpworkJobMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// RemoveUserIDs removes the "user" edge to the User entity by IDs.
+func (m *UpworkJobMutation) RemoveUserIDs(ids ...string) {
+	if m.removeduser == nil {
+		m.removeduser = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.user, ids[i])
+		m.removeduser[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUser returns the removed IDs of the "user" edge to the User entity.
+func (m *UpworkJobMutation) RemovedUserIDs() (ids []string) {
+	for id := range m.removeduser {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+func (m *UpworkJobMutation) UserIDs() (ids []string) {
+	for id := range m.user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *UpworkJobMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+	m.removeduser = nil
+}
+
+// Where appends a list predicates to the UpworkJobMutation builder.
+func (m *UpworkJobMutation) Where(ps ...predicate.UpworkJob) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the UpworkJobMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *UpworkJobMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.UpworkJob, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *UpworkJobMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *UpworkJobMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (UpworkJob).
+func (m *UpworkJobMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UpworkJobMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.title != nil {
+		fields = append(fields, upworkjob.FieldTitle)
+	}
+	if m.created_at != nil {
+		fields = append(fields, upworkjob.FieldCreatedAt)
+	}
+	if m.location != nil {
+		fields = append(fields, upworkjob.FieldLocation)
+	}
+	if m.description != nil {
+		fields = append(fields, upworkjob.FieldDescription)
+	}
+	if m.skills != nil {
+		fields = append(fields, upworkjob.FieldSkills)
+	}
+	if m.experience_level != nil {
+		fields = append(fields, upworkjob.FieldExperienceLevel)
+	}
+	if m.hourly != nil {
+		fields = append(fields, upworkjob.FieldHourly)
+	}
+	if m.fixed != nil {
+		fields = append(fields, upworkjob.FieldFixed)
+	}
+	if m.hourly_rate != nil {
+		fields = append(fields, upworkjob.FieldHourlyRate)
+	}
+	if m.fixed_rate != nil {
+		fields = append(fields, upworkjob.FieldFixedRate)
+	}
+	if m.average_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldAverageUprankScore)
+	}
+	if m.max_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldMaxUprankScore)
+	}
+	if m.min_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldMinUprankScore)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UpworkJobMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case upworkjob.FieldTitle:
+		return m.Title()
+	case upworkjob.FieldCreatedAt:
+		return m.CreatedAt()
+	case upworkjob.FieldLocation:
+		return m.Location()
+	case upworkjob.FieldDescription:
+		return m.Description()
+	case upworkjob.FieldSkills:
+		return m.Skills()
+	case upworkjob.FieldExperienceLevel:
+		return m.ExperienceLevel()
+	case upworkjob.FieldHourly:
+		return m.Hourly()
+	case upworkjob.FieldFixed:
+		return m.Fixed()
+	case upworkjob.FieldHourlyRate:
+		return m.HourlyRate()
+	case upworkjob.FieldFixedRate:
+		return m.FixedRate()
+	case upworkjob.FieldAverageUprankScore:
+		return m.AverageUprankScore()
+	case upworkjob.FieldMaxUprankScore:
+		return m.MaxUprankScore()
+	case upworkjob.FieldMinUprankScore:
+		return m.MinUprankScore()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UpworkJobMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case upworkjob.FieldTitle:
+		return m.OldTitle(ctx)
+	case upworkjob.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case upworkjob.FieldLocation:
+		return m.OldLocation(ctx)
+	case upworkjob.FieldDescription:
+		return m.OldDescription(ctx)
+	case upworkjob.FieldSkills:
+		return m.OldSkills(ctx)
+	case upworkjob.FieldExperienceLevel:
+		return m.OldExperienceLevel(ctx)
+	case upworkjob.FieldHourly:
+		return m.OldHourly(ctx)
+	case upworkjob.FieldFixed:
+		return m.OldFixed(ctx)
+	case upworkjob.FieldHourlyRate:
+		return m.OldHourlyRate(ctx)
+	case upworkjob.FieldFixedRate:
+		return m.OldFixedRate(ctx)
+	case upworkjob.FieldAverageUprankScore:
+		return m.OldAverageUprankScore(ctx)
+	case upworkjob.FieldMaxUprankScore:
+		return m.OldMaxUprankScore(ctx)
+	case upworkjob.FieldMinUprankScore:
+		return m.OldMinUprankScore(ctx)
+	}
+	return nil, fmt.Errorf("unknown UpworkJob field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UpworkJobMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case upworkjob.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case upworkjob.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case upworkjob.FieldLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocation(v)
+		return nil
+	case upworkjob.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case upworkjob.FieldSkills:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSkills(v)
+		return nil
+	case upworkjob.FieldExperienceLevel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExperienceLevel(v)
+		return nil
+	case upworkjob.FieldHourly:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHourly(v)
+		return nil
+	case upworkjob.FieldFixed:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFixed(v)
+		return nil
+	case upworkjob.FieldHourlyRate:
+		v, ok := value.([]float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHourlyRate(v)
+		return nil
+	case upworkjob.FieldFixedRate:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFixedRate(v)
+		return nil
+	case upworkjob.FieldAverageUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAverageUprankScore(v)
+		return nil
+	case upworkjob.FieldMaxUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxUprankScore(v)
+		return nil
+	case upworkjob.FieldMinUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMinUprankScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UpworkJobMutation) AddedFields() []string {
+	var fields []string
+	if m.addfixed_rate != nil {
+		fields = append(fields, upworkjob.FieldFixedRate)
+	}
+	if m.addaverage_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldAverageUprankScore)
+	}
+	if m.addmax_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldMaxUprankScore)
+	}
+	if m.addmin_uprank_score != nil {
+		fields = append(fields, upworkjob.FieldMinUprankScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UpworkJobMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case upworkjob.FieldFixedRate:
+		return m.AddedFixedRate()
+	case upworkjob.FieldAverageUprankScore:
+		return m.AddedAverageUprankScore()
+	case upworkjob.FieldMaxUprankScore:
+		return m.AddedMaxUprankScore()
+	case upworkjob.FieldMinUprankScore:
+		return m.AddedMinUprankScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UpworkJobMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case upworkjob.FieldFixedRate:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFixedRate(v)
+		return nil
+	case upworkjob.FieldAverageUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAverageUprankScore(v)
+		return nil
+	case upworkjob.FieldMaxUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxUprankScore(v)
+		return nil
+	case upworkjob.FieldMinUprankScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMinUprankScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UpworkJobMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(upworkjob.FieldLocation) {
+		fields = append(fields, upworkjob.FieldLocation)
+	}
+	if m.FieldCleared(upworkjob.FieldSkills) {
+		fields = append(fields, upworkjob.FieldSkills)
+	}
+	if m.FieldCleared(upworkjob.FieldExperienceLevel) {
+		fields = append(fields, upworkjob.FieldExperienceLevel)
+	}
+	if m.FieldCleared(upworkjob.FieldHourlyRate) {
+		fields = append(fields, upworkjob.FieldHourlyRate)
+	}
+	if m.FieldCleared(upworkjob.FieldFixedRate) {
+		fields = append(fields, upworkjob.FieldFixedRate)
+	}
+	if m.FieldCleared(upworkjob.FieldAverageUprankScore) {
+		fields = append(fields, upworkjob.FieldAverageUprankScore)
+	}
+	if m.FieldCleared(upworkjob.FieldMaxUprankScore) {
+		fields = append(fields, upworkjob.FieldMaxUprankScore)
+	}
+	if m.FieldCleared(upworkjob.FieldMinUprankScore) {
+		fields = append(fields, upworkjob.FieldMinUprankScore)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UpworkJobMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UpworkJobMutation) ClearField(name string) error {
+	switch name {
+	case upworkjob.FieldLocation:
+		m.ClearLocation()
+		return nil
+	case upworkjob.FieldSkills:
+		m.ClearSkills()
+		return nil
+	case upworkjob.FieldExperienceLevel:
+		m.ClearExperienceLevel()
+		return nil
+	case upworkjob.FieldHourlyRate:
+		m.ClearHourlyRate()
+		return nil
+	case upworkjob.FieldFixedRate:
+		m.ClearFixedRate()
+		return nil
+	case upworkjob.FieldAverageUprankScore:
+		m.ClearAverageUprankScore()
+		return nil
+	case upworkjob.FieldMaxUprankScore:
+		m.ClearMaxUprankScore()
+		return nil
+	case upworkjob.FieldMinUprankScore:
+		m.ClearMinUprankScore()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UpworkJobMutation) ResetField(name string) error {
+	switch name {
+	case upworkjob.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case upworkjob.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case upworkjob.FieldLocation:
+		m.ResetLocation()
+		return nil
+	case upworkjob.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case upworkjob.FieldSkills:
+		m.ResetSkills()
+		return nil
+	case upworkjob.FieldExperienceLevel:
+		m.ResetExperienceLevel()
+		return nil
+	case upworkjob.FieldHourly:
+		m.ResetHourly()
+		return nil
+	case upworkjob.FieldFixed:
+		m.ResetFixed()
+		return nil
+	case upworkjob.FieldHourlyRate:
+		m.ResetHourlyRate()
+		return nil
+	case upworkjob.FieldFixedRate:
+		m.ResetFixedRate()
+		return nil
+	case upworkjob.FieldAverageUprankScore:
+		m.ResetAverageUprankScore()
+		return nil
+	case upworkjob.FieldMaxUprankScore:
+		m.ResetMaxUprankScore()
+		return nil
+	case upworkjob.FieldMinUprankScore:
+		m.ResetMinUprankScore()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UpworkJobMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.upworkfreelancer != nil {
+		edges = append(edges, upworkjob.EdgeUpworkfreelancer)
+	}
+	if m.job != nil {
+		edges = append(edges, upworkjob.EdgeJob)
+	}
+	if m.user != nil {
+		edges = append(edges, upworkjob.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UpworkJobMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case upworkjob.EdgeUpworkfreelancer:
+		ids := make([]ent.Value, 0, len(m.upworkfreelancer))
+		for id := range m.upworkfreelancer {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkjob.EdgeJob:
+		if id := m.job; id != nil {
+			return []ent.Value{*id}
+		}
+	case upworkjob.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.user))
+		for id := range m.user {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UpworkJobMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedupworkfreelancer != nil {
+		edges = append(edges, upworkjob.EdgeUpworkfreelancer)
+	}
+	if m.removeduser != nil {
+		edges = append(edges, upworkjob.EdgeUser)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UpworkJobMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case upworkjob.EdgeUpworkfreelancer:
+		ids := make([]ent.Value, 0, len(m.removedupworkfreelancer))
+		for id := range m.removedupworkfreelancer {
+			ids = append(ids, id)
+		}
+		return ids
+	case upworkjob.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.removeduser))
+		for id := range m.removeduser {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UpworkJobMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedupworkfreelancer {
+		edges = append(edges, upworkjob.EdgeUpworkfreelancer)
+	}
+	if m.clearedjob {
+		edges = append(edges, upworkjob.EdgeJob)
+	}
+	if m.cleareduser {
+		edges = append(edges, upworkjob.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UpworkJobMutation) EdgeCleared(name string) bool {
+	switch name {
+	case upworkjob.EdgeUpworkfreelancer:
+		return m.clearedupworkfreelancer
+	case upworkjob.EdgeJob:
+		return m.clearedjob
+	case upworkjob.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UpworkJobMutation) ClearEdge(name string) error {
+	switch name {
+	case upworkjob.EdgeJob:
+		m.ClearJob()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UpworkJobMutation) ResetEdge(name string) error {
+	switch name {
+	case upworkjob.EdgeUpworkfreelancer:
+		m.ResetUpworkfreelancer()
+		return nil
+	case upworkjob.EdgeJob:
+		m.ResetJob()
+		return nil
+	case upworkjob.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown UpworkJob edge %s", name)
+}
+
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	first_name    *string
-	company_name  *string
-	email         *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	last_login    *time.Time
-	clearedFields map[string]struct{}
-	jobs          map[string]struct{}
-	removedjobs   map[string]struct{}
-	clearedjobs   bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op               Op
+	typ              string
+	id               *string
+	first_name       *string
+	company_name     *string
+	email            *string
+	created_at       *time.Time
+	updated_at       *time.Time
+	last_login       *time.Time
+	clearedFields    map[string]struct{}
+	job              map[uuid.UUID]struct{}
+	removedjob       map[uuid.UUID]struct{}
+	clearedjob       bool
+	upworkjob        map[string]struct{}
+	removedupworkjob map[string]struct{}
+	clearedupworkjob bool
+	done             bool
+	oldValue         func(context.Context) (*User, error)
+	predicates       []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -5572,58 +6146,112 @@ func (m *UserMutation) ResetLastLogin() {
 	m.last_login = nil
 }
 
-// AddJobIDs adds the "jobs" edge to the Job entity by ids.
-func (m *UserMutation) AddJobIDs(ids ...string) {
-	if m.jobs == nil {
-		m.jobs = make(map[string]struct{})
+// AddJobIDs adds the "job" edge to the Job entity by ids.
+func (m *UserMutation) AddJobIDs(ids ...uuid.UUID) {
+	if m.job == nil {
+		m.job = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		m.jobs[ids[i]] = struct{}{}
+		m.job[ids[i]] = struct{}{}
 	}
 }
 
-// ClearJobs clears the "jobs" edge to the Job entity.
-func (m *UserMutation) ClearJobs() {
-	m.clearedjobs = true
+// ClearJob clears the "job" edge to the Job entity.
+func (m *UserMutation) ClearJob() {
+	m.clearedjob = true
 }
 
-// JobsCleared reports if the "jobs" edge to the Job entity was cleared.
-func (m *UserMutation) JobsCleared() bool {
-	return m.clearedjobs
+// JobCleared reports if the "job" edge to the Job entity was cleared.
+func (m *UserMutation) JobCleared() bool {
+	return m.clearedjob
 }
 
-// RemoveJobIDs removes the "jobs" edge to the Job entity by IDs.
-func (m *UserMutation) RemoveJobIDs(ids ...string) {
-	if m.removedjobs == nil {
-		m.removedjobs = make(map[string]struct{})
+// RemoveJobIDs removes the "job" edge to the Job entity by IDs.
+func (m *UserMutation) RemoveJobIDs(ids ...uuid.UUID) {
+	if m.removedjob == nil {
+		m.removedjob = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		delete(m.jobs, ids[i])
-		m.removedjobs[ids[i]] = struct{}{}
+		delete(m.job, ids[i])
+		m.removedjob[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedJobs returns the removed IDs of the "jobs" edge to the Job entity.
-func (m *UserMutation) RemovedJobsIDs() (ids []string) {
-	for id := range m.removedjobs {
+// RemovedJob returns the removed IDs of the "job" edge to the Job entity.
+func (m *UserMutation) RemovedJobIDs() (ids []uuid.UUID) {
+	for id := range m.removedjob {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// JobsIDs returns the "jobs" edge IDs in the mutation.
-func (m *UserMutation) JobsIDs() (ids []string) {
-	for id := range m.jobs {
+// JobIDs returns the "job" edge IDs in the mutation.
+func (m *UserMutation) JobIDs() (ids []uuid.UUID) {
+	for id := range m.job {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetJobs resets all changes to the "jobs" edge.
-func (m *UserMutation) ResetJobs() {
-	m.jobs = nil
-	m.clearedjobs = false
-	m.removedjobs = nil
+// ResetJob resets all changes to the "job" edge.
+func (m *UserMutation) ResetJob() {
+	m.job = nil
+	m.clearedjob = false
+	m.removedjob = nil
+}
+
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by ids.
+func (m *UserMutation) AddUpworkjobIDs(ids ...string) {
+	if m.upworkjob == nil {
+		m.upworkjob = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.upworkjob[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUpworkjob clears the "upworkjob" edge to the UpworkJob entity.
+func (m *UserMutation) ClearUpworkjob() {
+	m.clearedupworkjob = true
+}
+
+// UpworkjobCleared reports if the "upworkjob" edge to the UpworkJob entity was cleared.
+func (m *UserMutation) UpworkjobCleared() bool {
+	return m.clearedupworkjob
+}
+
+// RemoveUpworkjobIDs removes the "upworkjob" edge to the UpworkJob entity by IDs.
+func (m *UserMutation) RemoveUpworkjobIDs(ids ...string) {
+	if m.removedupworkjob == nil {
+		m.removedupworkjob = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.upworkjob, ids[i])
+		m.removedupworkjob[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUpworkjob returns the removed IDs of the "upworkjob" edge to the UpworkJob entity.
+func (m *UserMutation) RemovedUpworkjobIDs() (ids []string) {
+	for id := range m.removedupworkjob {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UpworkjobIDs returns the "upworkjob" edge IDs in the mutation.
+func (m *UserMutation) UpworkjobIDs() (ids []string) {
+	for id := range m.upworkjob {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUpworkjob resets all changes to the "upworkjob" edge.
+func (m *UserMutation) ResetUpworkjob() {
+	m.upworkjob = nil
+	m.clearedupworkjob = false
+	m.removedupworkjob = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -5844,9 +6472,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.jobs != nil {
-		edges = append(edges, user.EdgeJobs)
+	edges := make([]string, 0, 2)
+	if m.job != nil {
+		edges = append(edges, user.EdgeJob)
+	}
+	if m.upworkjob != nil {
+		edges = append(edges, user.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -5855,9 +6486,15 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeJobs:
-		ids := make([]ent.Value, 0, len(m.jobs))
-		for id := range m.jobs {
+	case user.EdgeJob:
+		ids := make([]ent.Value, 0, len(m.job))
+		for id := range m.job {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeUpworkjob:
+		ids := make([]ent.Value, 0, len(m.upworkjob))
+		for id := range m.upworkjob {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5867,9 +6504,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedjobs != nil {
-		edges = append(edges, user.EdgeJobs)
+	edges := make([]string, 0, 2)
+	if m.removedjob != nil {
+		edges = append(edges, user.EdgeJob)
+	}
+	if m.removedupworkjob != nil {
+		edges = append(edges, user.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -5878,9 +6518,15 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeJobs:
-		ids := make([]ent.Value, 0, len(m.removedjobs))
-		for id := range m.removedjobs {
+	case user.EdgeJob:
+		ids := make([]ent.Value, 0, len(m.removedjob))
+		for id := range m.removedjob {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeUpworkjob:
+		ids := make([]ent.Value, 0, len(m.removedupworkjob))
+		for id := range m.removedupworkjob {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5890,9 +6536,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedjobs {
-		edges = append(edges, user.EdgeJobs)
+	edges := make([]string, 0, 2)
+	if m.clearedjob {
+		edges = append(edges, user.EdgeJob)
+	}
+	if m.clearedupworkjob {
+		edges = append(edges, user.EdgeUpworkjob)
 	}
 	return edges
 }
@@ -5901,8 +6550,10 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
-	case user.EdgeJobs:
-		return m.clearedjobs
+	case user.EdgeJob:
+		return m.clearedjob
+	case user.EdgeUpworkjob:
+		return m.clearedupworkjob
 	}
 	return false
 }
@@ -5919,8 +6570,11 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
-	case user.EdgeJobs:
-		m.ResetJobs()
+	case user.EdgeJob:
+		m.ResetJob()
+		return nil
+	case user.EdgeUpworkjob:
+		m.ResetUpworkjob()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

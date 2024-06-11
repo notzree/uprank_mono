@@ -3,47 +3,29 @@
 package job
 
 import (
-	"time"
+	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
+	"github.com/notzree/uprank-backend/main-backend/ent/schema"
 )
 
 const (
 	// Label holds the string label denoting the job type in the database.
 	Label = "job"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "id"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldLocation holds the string denoting the location field in the database.
-	FieldLocation = "location"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
-	// FieldSkills holds the string denoting the skills field in the database.
-	FieldSkills = "skills"
-	// FieldExperienceLevel holds the string denoting the experience_level field in the database.
-	FieldExperienceLevel = "experience_level"
-	// FieldHourly holds the string denoting the hourly field in the database.
-	FieldHourly = "hourly"
-	// FieldFixed holds the string denoting the fixed field in the database.
-	FieldFixed = "fixed"
-	// FieldHourlyRate holds the string denoting the hourly_rate field in the database.
-	FieldHourlyRate = "hourly_rate"
-	// FieldFixedRate holds the string denoting the fixed_rate field in the database.
-	FieldFixedRate = "fixed_rate"
-	// FieldAverageUprankScore holds the string denoting the average_uprank_score field in the database.
-	FieldAverageUprankScore = "average_uprank_score"
-	// FieldMaxUprankScore holds the string denoting the max_uprank_score field in the database.
-	FieldMaxUprankScore = "max_uprank_score"
-	// FieldMinUprankScore holds the string denoting the min_uprank_score field in the database.
-	FieldMinUprankScore = "min_uprank_score"
+	FieldID = "oid"
+	// FieldOriginPlatform holds the string denoting the origin_platform field in the database.
+	FieldOriginPlatform = "origin_platform"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
-	// EdgeFreelancers holds the string denoting the freelancers edge name in mutations.
-	EdgeFreelancers = "freelancers"
+	// EdgeUpworkjob holds the string denoting the upworkjob edge name in mutations.
+	EdgeUpworkjob = "upworkjob"
+	// UserFieldID holds the string denoting the ID field of the User.
+	UserFieldID = "id"
+	// UpworkJobFieldID holds the string denoting the ID field of the UpworkJob.
+	UpworkJobFieldID = "id"
 	// Table holds the table name of the job in the database.
 	Table = "jobs"
 	// UserTable is the table that holds the user relation/edge.
@@ -52,43 +34,27 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_jobs"
-	// FreelancersTable is the table that holds the freelancers relation/edge. The primary key declared below.
-	FreelancersTable = "job_freelancers"
-	// FreelancersInverseTable is the table name for the UpworkFreelancer entity.
-	// It exists in this package in order to avoid circular dependency with the "upworkfreelancer" package.
-	FreelancersInverseTable = "upwork_freelancers"
+	UserColumn = "user_job"
+	// UpworkjobTable is the table that holds the upworkjob relation/edge.
+	UpworkjobTable = "upwork_jobs"
+	// UpworkjobInverseTable is the table name for the UpworkJob entity.
+	// It exists in this package in order to avoid circular dependency with the "upworkjob" package.
+	UpworkjobInverseTable = "upwork_jobs"
+	// UpworkjobColumn is the table column denoting the upworkjob relation/edge.
+	UpworkjobColumn = "job_upworkjob"
 )
 
 // Columns holds all SQL columns for job fields.
 var Columns = []string{
 	FieldID,
-	FieldTitle,
-	FieldCreatedAt,
-	FieldLocation,
-	FieldDescription,
-	FieldSkills,
-	FieldExperienceLevel,
-	FieldHourly,
-	FieldFixed,
-	FieldHourlyRate,
-	FieldFixedRate,
-	FieldAverageUprankScore,
-	FieldMaxUprankScore,
-	FieldMinUprankScore,
+	FieldOriginPlatform,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "jobs"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_jobs",
+	"user_job",
 }
-
-var (
-	// FreelancersPrimaryKey and FreelancersColumn2 are the table columns denoting the
-	// primary key for the freelancers relation (M2M).
-	FreelancersPrimaryKey = []string{"job_id", "upwork_freelancer_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -106,15 +72,19 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	TitleValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	DescriptionValidator func(string) error
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
+
+// OriginPlatformValidator is a validator for the "origin_platform" field enum values. It is called by the builders before save.
+func OriginPlatformValidator(op schema.Platform) error {
+	switch op {
+	case "upwork", "uprank":
+		return nil
+	default:
+		return fmt.Errorf("job: invalid enum value for origin_platform field: %q", op)
+	}
+}
 
 // OrderOption defines the ordering options for the Job queries.
 type OrderOption func(*sql.Selector)
@@ -124,59 +94,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByTitle orders the results by the title field.
-func ByTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTitle, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByLocation orders the results by the location field.
-func ByLocation(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLocation, opts...).ToFunc()
-}
-
-// ByDescription orders the results by the description field.
-func ByDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
-// ByExperienceLevel orders the results by the experience_level field.
-func ByExperienceLevel(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldExperienceLevel, opts...).ToFunc()
-}
-
-// ByHourly orders the results by the hourly field.
-func ByHourly(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHourly, opts...).ToFunc()
-}
-
-// ByFixed orders the results by the fixed field.
-func ByFixed(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixed, opts...).ToFunc()
-}
-
-// ByFixedRate orders the results by the fixed_rate field.
-func ByFixedRate(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFixedRate, opts...).ToFunc()
-}
-
-// ByAverageUprankScore orders the results by the average_uprank_score field.
-func ByAverageUprankScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAverageUprankScore, opts...).ToFunc()
-}
-
-// ByMaxUprankScore orders the results by the max_uprank_score field.
-func ByMaxUprankScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMaxUprankScore, opts...).ToFunc()
-}
-
-// ByMinUprankScore orders the results by the min_uprank_score field.
-func ByMinUprankScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMinUprankScore, opts...).ToFunc()
+// ByOriginPlatform orders the results by the origin_platform field.
+func ByOriginPlatform(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOriginPlatform, opts...).ToFunc()
 }
 
 // ByUserField orders the results by user field.
@@ -186,30 +106,30 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByFreelancersCount orders the results by freelancers count.
-func ByFreelancersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUpworkjobCount orders the results by upworkjob count.
+func ByUpworkjobCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newFreelancersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newUpworkjobStep(), opts...)
 	}
 }
 
-// ByFreelancers orders the results by freelancers terms.
-func ByFreelancers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByUpworkjob orders the results by upworkjob terms.
+func ByUpworkjob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newFreelancersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUpworkjobStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.To(UserInverseTable, UserFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 	)
 }
-func newFreelancersStep() *sqlgraph.Step {
+func newUpworkjobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(FreelancersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, FreelancersTable, FreelancersPrimaryKey...),
+		sqlgraph.To(UpworkjobInverseTable, UpworkJobFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UpworkjobTable, UpworkjobColumn),
 	)
 }
