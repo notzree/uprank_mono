@@ -102,8 +102,8 @@ type UpworkFreelancer struct {
 
 // UpworkFreelancerEdges holds the relations/edges for other nodes in the graph.
 type UpworkFreelancerEdges struct {
-	// Job holds the value of the job edge.
-	Job []*Job `json:"job,omitempty"`
+	// UpworkJob holds the value of the upwork_job edge.
+	UpworkJob []*UpworkJob `json:"upwork_job,omitempty"`
 	// Attachments holds the value of the attachments edge.
 	Attachments []*AttachmentRef `json:"attachments,omitempty"`
 	// WorkHistories holds the value of the work_histories edge.
@@ -113,13 +113,13 @@ type UpworkFreelancerEdges struct {
 	loadedTypes [3]bool
 }
 
-// JobOrErr returns the Job value or an error if the edge
+// UpworkJobOrErr returns the UpworkJob value or an error if the edge
 // was not loaded in eager-loading.
-func (e UpworkFreelancerEdges) JobOrErr() ([]*Job, error) {
+func (e UpworkFreelancerEdges) UpworkJobOrErr() ([]*UpworkJob, error) {
 	if e.loadedTypes[0] {
-		return e.Job, nil
+		return e.UpworkJob, nil
 	}
-	return nil, &NotLoadedError{edge: "job"}
+	return nil, &NotLoadedError{edge: "upwork_job"}
 }
 
 // AttachmentsOrErr returns the Attachments value or an error if the edge
@@ -421,9 +421,9 @@ func (uf *UpworkFreelancer) Value(name string) (ent.Value, error) {
 	return uf.selectValues.Get(name)
 }
 
-// QueryJob queries the "job" edge of the UpworkFreelancer entity.
-func (uf *UpworkFreelancer) QueryJob() *JobQuery {
-	return NewUpworkFreelancerClient(uf.config).QueryJob(uf)
+// QueryUpworkJob queries the "upwork_job" edge of the UpworkFreelancer entity.
+func (uf *UpworkFreelancer) QueryUpworkJob() *UpworkJobQuery {
+	return NewUpworkFreelancerClient(uf.config).QueryUpworkJob(uf)
 }
 
 // QueryAttachments queries the "attachments" edge of the UpworkFreelancer entity.

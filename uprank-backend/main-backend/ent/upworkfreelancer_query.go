@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
@@ -25,7 +25,7 @@ type UpworkFreelancerQuery struct {
 	order             []upworkfreelancer.OrderOption
 	inters            []Interceptor
 	predicates        []predicate.UpworkFreelancer
-	withJob           *JobQuery
+	withUpworkJob     *UpworkJobQuery
 	withAttachments   *AttachmentRefQuery
 	withWorkHistories *WorkHistoryQuery
 	// intermediate query (i.e. traversal path).
@@ -64,9 +64,9 @@ func (ufq *UpworkFreelancerQuery) Order(o ...upworkfreelancer.OrderOption) *Upwo
 	return ufq
 }
 
-// QueryJob chains the current query on the "job" edge.
-func (ufq *UpworkFreelancerQuery) QueryJob() *JobQuery {
-	query := (&JobClient{config: ufq.config}).Query()
+// QueryUpworkJob chains the current query on the "upwork_job" edge.
+func (ufq *UpworkFreelancerQuery) QueryUpworkJob() *UpworkJobQuery {
+	query := (&UpworkJobClient{config: ufq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ufq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -77,8 +77,8 @@ func (ufq *UpworkFreelancerQuery) QueryJob() *JobQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, selector),
-			sqlgraph.To(job.Table, job.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, upworkfreelancer.JobTable, upworkfreelancer.JobPrimaryKey...),
+			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, upworkfreelancer.UpworkJobTable, upworkfreelancer.UpworkJobPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(ufq.driver.Dialect(), step)
 		return fromU, nil
@@ -322,7 +322,7 @@ func (ufq *UpworkFreelancerQuery) Clone() *UpworkFreelancerQuery {
 		order:             append([]upworkfreelancer.OrderOption{}, ufq.order...),
 		inters:            append([]Interceptor{}, ufq.inters...),
 		predicates:        append([]predicate.UpworkFreelancer{}, ufq.predicates...),
-		withJob:           ufq.withJob.Clone(),
+		withUpworkJob:     ufq.withUpworkJob.Clone(),
 		withAttachments:   ufq.withAttachments.Clone(),
 		withWorkHistories: ufq.withWorkHistories.Clone(),
 		// clone intermediate query.
@@ -331,14 +331,14 @@ func (ufq *UpworkFreelancerQuery) Clone() *UpworkFreelancerQuery {
 	}
 }
 
-// WithJob tells the query-builder to eager-load the nodes that are connected to
-// the "job" edge. The optional arguments are used to configure the query builder of the edge.
-func (ufq *UpworkFreelancerQuery) WithJob(opts ...func(*JobQuery)) *UpworkFreelancerQuery {
-	query := (&JobClient{config: ufq.config}).Query()
+// WithUpworkJob tells the query-builder to eager-load the nodes that are connected to
+// the "upwork_job" edge. The optional arguments are used to configure the query builder of the edge.
+func (ufq *UpworkFreelancerQuery) WithUpworkJob(opts ...func(*UpworkJobQuery)) *UpworkFreelancerQuery {
+	query := (&UpworkJobClient{config: ufq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ufq.withJob = query
+	ufq.withUpworkJob = query
 	return ufq
 }
 
@@ -443,7 +443,7 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 		nodes       = []*UpworkFreelancer{}
 		_spec       = ufq.querySpec()
 		loadedTypes = [3]bool{
-			ufq.withJob != nil,
+			ufq.withUpworkJob != nil,
 			ufq.withAttachments != nil,
 			ufq.withWorkHistories != nil,
 		}
@@ -466,10 +466,10 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := ufq.withJob; query != nil {
-		if err := ufq.loadJob(ctx, query, nodes,
-			func(n *UpworkFreelancer) { n.Edges.Job = []*Job{} },
-			func(n *UpworkFreelancer, e *Job) { n.Edges.Job = append(n.Edges.Job, e) }); err != nil {
+	if query := ufq.withUpworkJob; query != nil {
+		if err := ufq.loadUpworkJob(ctx, query, nodes,
+			func(n *UpworkFreelancer) { n.Edges.UpworkJob = []*UpworkJob{} },
+			func(n *UpworkFreelancer, e *UpworkJob) { n.Edges.UpworkJob = append(n.Edges.UpworkJob, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -490,7 +490,7 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	return nodes, nil
 }
 
-func (ufq *UpworkFreelancerQuery) loadJob(ctx context.Context, query *JobQuery, nodes []*UpworkFreelancer, init func(*UpworkFreelancer), assign func(*UpworkFreelancer, *Job)) error {
+func (ufq *UpworkFreelancerQuery) loadUpworkJob(ctx context.Context, query *UpworkJobQuery, nodes []*UpworkFreelancer, init func(*UpworkFreelancer), assign func(*UpworkFreelancer, *UpworkJob)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*UpworkFreelancer)
 	nids := make(map[string]map[*UpworkFreelancer]struct{})
@@ -502,11 +502,11 @@ func (ufq *UpworkFreelancerQuery) loadJob(ctx context.Context, query *JobQuery, 
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(upworkfreelancer.JobTable)
-		s.Join(joinT).On(s.C(job.FieldID), joinT.C(upworkfreelancer.JobPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(upworkfreelancer.JobPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(upworkfreelancer.UpworkJobTable)
+		s.Join(joinT).On(s.C(upworkjob.FieldID), joinT.C(upworkfreelancer.UpworkJobPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(upworkfreelancer.UpworkJobPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(upworkfreelancer.JobPrimaryKey[1]))
+		s.Select(joinT.C(upworkfreelancer.UpworkJobPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -536,14 +536,14 @@ func (ufq *UpworkFreelancerQuery) loadJob(ctx context.Context, query *JobQuery, 
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Job](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*UpworkJob](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "job" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "upwork_job" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
