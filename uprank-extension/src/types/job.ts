@@ -1,3 +1,5 @@
+import type { UUID } from "crypto";
+
 export type Job = {
     id: string;
     title: string;
@@ -32,17 +34,54 @@ export type Job = {
 
   }
 
-  export type CreateJobProxyRequest = {
-    authentication_token: string;
-    job: ScrapedJobData;
-  }
+
 
   export type UnstableScrapedJobData = {
     job: ScrapedJobData;
     missingFields: boolean;
   }
 
+  export type GetUpworkJobClientResponse = {
+    upwork_job: GetUpworkJobResponse | null
+    error_msg: string | null
+  };
 
+  type GetUpworkJobResponse = {
+    id: string;
+    title: string;
+    created_at: string;
+    location: string;
+    description: string;
+    skills: string[];
+    experience_level: string;
+    hourly: boolean;
+    hourly_rate: number[];
+    edges: EdgeFreelancers | null;
+  }
+
+  type EdgeFreelancers = {
+    freelancers: any[];
+  };
+
+  //Type that gets sent to the service worker
+  export type CreateJobProxyRequest = {
+    authentication_token: string;
+    job: ScrapedJobData;
+  }
+  //Type that the service worker sends to the backend
+  export type CreateJobClientRequest = {
+    upwork_job_request: ScrapedJobData | null;
+  }
+
+  export type CreateJobClientResponse = {
+    job: CreateJobResponse | null;
+    error_msg: string | null;
+  }
+
+  type CreateJobResponse = {
+    id?: UUID;
+    originPlatform?: string;
+  }
 
 
   
