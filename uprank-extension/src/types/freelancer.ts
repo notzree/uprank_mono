@@ -1,5 +1,5 @@
 //This is the backend DB Schema
-type Upwork_Freelancer_Proposal = {
+type CreateUpworkFreelancerResponse = {
   url: string
   name: string
   title: string
@@ -95,19 +95,30 @@ export interface Attachements {
   link: string
 }
 
-export interface CreateFreelancerProxyRequest {
+export type CreateFreelancerProxyRequest = {
   update: boolean
   authentication_token: string
   freelancers: Scraped_Freelancer_Data[]
   job_id: string
 }
 
-
-export interface CreateFreelancerResponse {
-    result: BatchPayload
+export type CreateUpworkFreelancerClientRequest = {
+    freelancers: Scraped_Freelancer_Data[]
 }
-interface BatchPayload {
-    count: number;  
+
+export type CreateUpworkFreelancerClientResponse = {
+    result: CreateUpworkFreelancerResponse | null
+    error_msg: string | null;
+}
+
+export type UpdateUpworkFreelancerClientResponse = {
+    result: UpdateUpworkFreelancerResponse | null
+    error_msg: string | null;
+}
+type UpdateUpworkFreelancerResponse = {
+  created_freelancer_count: number
+  updated_freelancer_count: number
+  deleted_freelancer_count: number
 }
 
 export interface ScrapeFreelancerResponse {

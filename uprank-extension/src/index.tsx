@@ -7,7 +7,8 @@ import Header from "./components/header"
 import { extractJobId, is_upwork_freelancer, is_upwork_job } from "./utils/url-functions"
 import { getWithExpiry, removeItem, setWithExpiry } from "./utils/local-storage-functions"
 import { sendToBackground } from "@plasmohq/messaging"
-import type { Job } from "~types/job"
+import type { CreateJobClientResponse, Job } from "~types/job"
+import { V1Client } from "~client/v1-client"
 import type { CreateFreelancerProxyRequest, CreateFreelancerResponse, ScrapeFreelancerResponse } from "~types/freelancer"
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -16,6 +17,7 @@ export const getStyle = () => {
 }
 
 export default function PopUpEntry() {
+  const client = new V1Client()
   const { isSignedIn, user, isLoaded } = useUser()
   const { getToken } = useAuth()
   const [currentURL, setCurrentURL] = useState(null)
@@ -32,21 +34,11 @@ export default function PopUpEntry() {
       //   return
       // }
 
-      const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_BACKEND_URL}/v1/private/jobs/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${await getToken()}`
-          }
-        }
-      )
-        if (response.ok){
-          const data = await response.json() as GetJobResponse
+      const upwork_job_response = await client.getUpworkJob(id, await getToken())
+        if (upwork_job_response.error_msg == null){
           setIsJobValid(true);
-          if (data.edges.freelancers != null){
-            setJobFreelancerCount(data.edges.freelancers.length);
+          if (upwork_job_response.upwork_job.edges.freelancers != null){
+            setJobFreelancerCount(upwork_job_response.upwork_job.edges.freelancers.length);
           }
         } else {
           setIsJobValid(false);
@@ -108,9 +100,9 @@ export default function PopUpEntry() {
                 job: scrape_response.job,
                 authentication_token: await getToken()
               }
-            });
-            if (!db_response.ok){
-              setMessage("Error persisting data to DB. Please try again.")
+            }) as CreateJobClientResponse;
+            if (db_response.error_msg != null){
+              setMessage(`Error ${db_response.error_msg} `)
             } 
             setMessage("Job added successfully!")
             removeItem(extractJobId(currentURL)) //Remove stale data from cache
@@ -136,11 +128,11 @@ export default function PopUpEntry() {
             setMessage("Error communicating with content script.");
             return;
           }
-          console.log(scrape_response);
           if ( scrape_response && !scrape_response.missing_fields && scrape_response.freelancers.length > 0){ //not missing any fields and greater than 0 and not equal to current count (equal to current count => no new freelancers to add)
-            const db_response: CreateFreelancerResponse  = await sendToBackground({
+            console.log("sending freelancer create req from indx")
+            const db_response = await sendToBackground({
               //@ts-ignore
-              name: "create-freelancer-proxy",
+              name: "create-upwork-freelancer-proxy",
               body: {
                 update: jobFreelancerCount > 0,
                 freelancers: scrape_response.freelancers,
@@ -148,11 +140,10 @@ export default function PopUpEntry() {
                 job_id: extractJobId(currentURL)
               } as CreateFreelancerProxyRequest
             });
-            if (!db_response.ok){
+            if (db_response.error_msg != null){
               setMessage("Error persisting data to DB. Please try again.")
             }
             setMessage("Success! You will be notified shortly when your Uprank is ready.")
-
             removeItem(extractJobId(currentURL)) //Remove stale data from cache
             setJobFreelancerCount(db_response.count);
           } else {
@@ -201,19 +192,5 @@ export default function PopUpEntry() {
 
 
 
-type EdgeFreelancers = {
-  freelancers: any[];
-};
 
-type GetJobResponse = {
-  id: string;
-  title: string;
-  created_at: string;
-  location: string;
-  description: string;
-  skills: string[];
-  experience_level: string;
-  hourly: boolean;
-  hourly_rate: number[];
-  edges: EdgeFreelancers | null;
-};
+
