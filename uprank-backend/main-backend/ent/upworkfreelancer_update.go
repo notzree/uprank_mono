@@ -13,9 +13,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
@@ -709,19 +709,19 @@ func (ufu *UpworkFreelancerUpdate) ClearUprankNotEnoughData() *UpworkFreelancerU
 	return ufu
 }
 
-// AddJobIDs adds the "job" edge to the Job entity by IDs.
-func (ufu *UpworkFreelancerUpdate) AddJobIDs(ids ...string) *UpworkFreelancerUpdate {
-	ufu.mutation.AddJobIDs(ids...)
+// AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
+func (ufu *UpworkFreelancerUpdate) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdate {
+	ufu.mutation.AddUpworkJobIDs(ids...)
 	return ufu
 }
 
-// AddJob adds the "job" edges to the Job entity.
-func (ufu *UpworkFreelancerUpdate) AddJob(j ...*Job) *UpworkFreelancerUpdate {
-	ids := make([]string, len(j))
-	for i := range j {
-		ids[i] = j[i].ID
+// AddUpworkJob adds the "upwork_job" edges to the UpworkJob entity.
+func (ufu *UpworkFreelancerUpdate) AddUpworkJob(u ...*UpworkJob) *UpworkFreelancerUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
-	return ufu.AddJobIDs(ids...)
+	return ufu.AddUpworkJobIDs(ids...)
 }
 
 // AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by IDs.
@@ -759,25 +759,25 @@ func (ufu *UpworkFreelancerUpdate) Mutation() *UpworkFreelancerMutation {
 	return ufu.mutation
 }
 
-// ClearJob clears all "job" edges to the Job entity.
-func (ufu *UpworkFreelancerUpdate) ClearJob() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearJob()
+// ClearUpworkJob clears all "upwork_job" edges to the UpworkJob entity.
+func (ufu *UpworkFreelancerUpdate) ClearUpworkJob() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearUpworkJob()
 	return ufu
 }
 
-// RemoveJobIDs removes the "job" edge to Job entities by IDs.
-func (ufu *UpworkFreelancerUpdate) RemoveJobIDs(ids ...string) *UpworkFreelancerUpdate {
-	ufu.mutation.RemoveJobIDs(ids...)
+// RemoveUpworkJobIDs removes the "upwork_job" edge to UpworkJob entities by IDs.
+func (ufu *UpworkFreelancerUpdate) RemoveUpworkJobIDs(ids ...string) *UpworkFreelancerUpdate {
+	ufu.mutation.RemoveUpworkJobIDs(ids...)
 	return ufu
 }
 
-// RemoveJob removes "job" edges to Job entities.
-func (ufu *UpworkFreelancerUpdate) RemoveJob(j ...*Job) *UpworkFreelancerUpdate {
-	ids := make([]string, len(j))
-	for i := range j {
-		ids[i] = j[i].ID
+// RemoveUpworkJob removes "upwork_job" edges to UpworkJob entities.
+func (ufu *UpworkFreelancerUpdate) RemoveUpworkJob(u ...*UpworkJob) *UpworkFreelancerUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
-	return ufu.RemoveJobIDs(ids...)
+	return ufu.RemoveUpworkJobIDs(ids...)
 }
 
 // ClearAttachments clears all "attachments" edges to the AttachmentRef entity.
@@ -1055,28 +1055,28 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if ufu.mutation.UprankNotEnoughDataCleared() {
 		_spec.ClearField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool)
 	}
-	if ufu.mutation.JobCleared() {
+	if ufu.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ufu.mutation.RemovedJobIDs(); len(nodes) > 0 && !ufu.mutation.JobCleared() {
+	if nodes := ufu.mutation.RemovedUpworkJobIDs(); len(nodes) > 0 && !ufu.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1084,15 +1084,15 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ufu.mutation.JobIDs(); len(nodes) > 0 {
+	if nodes := ufu.mutation.UpworkJobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1887,19 +1887,19 @@ func (ufuo *UpworkFreelancerUpdateOne) ClearUprankNotEnoughData() *UpworkFreelan
 	return ufuo
 }
 
-// AddJobIDs adds the "job" edge to the Job entity by IDs.
-func (ufuo *UpworkFreelancerUpdateOne) AddJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.AddJobIDs(ids...)
+// AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
+func (ufuo *UpworkFreelancerUpdateOne) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.AddUpworkJobIDs(ids...)
 	return ufuo
 }
 
-// AddJob adds the "job" edges to the Job entity.
-func (ufuo *UpworkFreelancerUpdateOne) AddJob(j ...*Job) *UpworkFreelancerUpdateOne {
-	ids := make([]string, len(j))
-	for i := range j {
-		ids[i] = j[i].ID
+// AddUpworkJob adds the "upwork_job" edges to the UpworkJob entity.
+func (ufuo *UpworkFreelancerUpdateOne) AddUpworkJob(u ...*UpworkJob) *UpworkFreelancerUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
-	return ufuo.AddJobIDs(ids...)
+	return ufuo.AddUpworkJobIDs(ids...)
 }
 
 // AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by IDs.
@@ -1937,25 +1937,25 @@ func (ufuo *UpworkFreelancerUpdateOne) Mutation() *UpworkFreelancerMutation {
 	return ufuo.mutation
 }
 
-// ClearJob clears all "job" edges to the Job entity.
-func (ufuo *UpworkFreelancerUpdateOne) ClearJob() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearJob()
+// ClearUpworkJob clears all "upwork_job" edges to the UpworkJob entity.
+func (ufuo *UpworkFreelancerUpdateOne) ClearUpworkJob() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearUpworkJob()
 	return ufuo
 }
 
-// RemoveJobIDs removes the "job" edge to Job entities by IDs.
-func (ufuo *UpworkFreelancerUpdateOne) RemoveJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.RemoveJobIDs(ids...)
+// RemoveUpworkJobIDs removes the "upwork_job" edge to UpworkJob entities by IDs.
+func (ufuo *UpworkFreelancerUpdateOne) RemoveUpworkJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.RemoveUpworkJobIDs(ids...)
 	return ufuo
 }
 
-// RemoveJob removes "job" edges to Job entities.
-func (ufuo *UpworkFreelancerUpdateOne) RemoveJob(j ...*Job) *UpworkFreelancerUpdateOne {
-	ids := make([]string, len(j))
-	for i := range j {
-		ids[i] = j[i].ID
+// RemoveUpworkJob removes "upwork_job" edges to UpworkJob entities.
+func (ufuo *UpworkFreelancerUpdateOne) RemoveUpworkJob(u ...*UpworkJob) *UpworkFreelancerUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
-	return ufuo.RemoveJobIDs(ids...)
+	return ufuo.RemoveUpworkJobIDs(ids...)
 }
 
 // ClearAttachments clears all "attachments" edges to the AttachmentRef entity.
@@ -2263,28 +2263,28 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	if ufuo.mutation.UprankNotEnoughDataCleared() {
 		_spec.ClearField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool)
 	}
-	if ufuo.mutation.JobCleared() {
+	if ufuo.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ufuo.mutation.RemovedJobIDs(); len(nodes) > 0 && !ufuo.mutation.JobCleared() {
+	if nodes := ufuo.mutation.RemovedUpworkJobIDs(); len(nodes) > 0 && !ufuo.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -2292,15 +2292,15 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ufuo.mutation.JobIDs(); len(nodes) > 0 {
+	if nodes := ufuo.mutation.UpworkJobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
