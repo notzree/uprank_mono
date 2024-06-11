@@ -1825,21 +1825,21 @@ func UprankNotEnoughDataNotNil() predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankNotEnoughData))
 }
 
-// HasJob applies the HasEdge predicate on the "job" edge.
-func HasJob() predicate.UpworkFreelancer {
+// HasUpworkJob applies the HasEdge predicate on the "upwork_job" edge.
+func HasUpworkJob() predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, JobTable, JobPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, UpworkJobTable, UpworkJobPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasJobWith applies the HasEdge predicate on the "job" edge with a given conditions (other predicates).
-func HasJobWith(preds ...predicate.Job) predicate.UpworkFreelancer {
+// HasUpworkJobWith applies the HasEdge predicate on the "upwork_job" edge with a given conditions (other predicates).
+func HasUpworkJobWith(preds ...predicate.UpworkJob) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(func(s *sql.Selector) {
-		step := newJobStep()
+		step := newUpworkJobStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

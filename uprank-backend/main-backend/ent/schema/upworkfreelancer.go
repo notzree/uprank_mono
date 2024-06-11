@@ -64,8 +64,8 @@ func (UpworkFreelancer) Fields() []ent.Field {
 // Edges of the Freelancer.
 func (UpworkFreelancer) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("job", Job.Type).
-			Ref("freelancers"),
+		edge.From("upwork_job", UpworkJob.Type).
+			Ref("upworkfreelancer"),
 		edge.To("attachments", AttachmentRef.Type),
 		edge.To("work_histories", WorkHistory.Type),
 	}

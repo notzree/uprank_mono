@@ -11,22 +11,23 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
 // JobQuery is the builder for querying Job entities.
 type JobQuery struct {
 	config
-	ctx             *QueryContext
-	order           []job.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Job
-	withUser        *UserQuery
-	withFreelancers *UpworkFreelancerQuery
-	withFKs         bool
+	ctx           *QueryContext
+	order         []job.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Job
+	withUser      *UserQuery
+	withUpworkjob *UpworkJobQuery
+	withFKs       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,9 +86,9 @@ func (jq *JobQuery) QueryUser() *UserQuery {
 	return query
 }
 
-// QueryFreelancers chains the current query on the "freelancers" edge.
-func (jq *JobQuery) QueryFreelancers() *UpworkFreelancerQuery {
-	query := (&UpworkFreelancerClient{config: jq.config}).Query()
+// QueryUpworkjob chains the current query on the "upworkjob" edge.
+func (jq *JobQuery) QueryUpworkjob() *UpworkJobQuery {
+	query := (&UpworkJobClient{config: jq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := jq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,8 +99,8 @@ func (jq *JobQuery) QueryFreelancers() *UpworkFreelancerQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(job.Table, job.FieldID, selector),
-			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, job.FreelancersTable, job.FreelancersPrimaryKey...),
+			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, job.UpworkjobTable, job.UpworkjobColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(jq.driver.Dialect(), step)
 		return fromU, nil
@@ -131,8 +132,8 @@ func (jq *JobQuery) FirstX(ctx context.Context) *Job {
 
 // FirstID returns the first Job ID from the query.
 // Returns a *NotFoundError when no Job ID was found.
-func (jq *JobQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (jq *JobQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = jq.Limit(1).IDs(setContextOp(ctx, jq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -144,7 +145,7 @@ func (jq *JobQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (jq *JobQuery) FirstIDX(ctx context.Context) string {
+func (jq *JobQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := jq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +183,8 @@ func (jq *JobQuery) OnlyX(ctx context.Context) *Job {
 // OnlyID is like Only, but returns the only Job ID in the query.
 // Returns a *NotSingularError when more than one Job ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (jq *JobQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (jq *JobQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = jq.Limit(2).IDs(setContextOp(ctx, jq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -199,7 +200,7 @@ func (jq *JobQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (jq *JobQuery) OnlyIDX(ctx context.Context) string {
+func (jq *JobQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := jq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +228,7 @@ func (jq *JobQuery) AllX(ctx context.Context) []*Job {
 }
 
 // IDs executes the query and returns a list of Job IDs.
-func (jq *JobQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (jq *JobQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if jq.ctx.Unique == nil && jq.path != nil {
 		jq.Unique(true)
 	}
@@ -239,7 +240,7 @@ func (jq *JobQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (jq *JobQuery) IDsX(ctx context.Context) []string {
+func (jq *JobQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := jq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -294,13 +295,13 @@ func (jq *JobQuery) Clone() *JobQuery {
 		return nil
 	}
 	return &JobQuery{
-		config:          jq.config,
-		ctx:             jq.ctx.Clone(),
-		order:           append([]job.OrderOption{}, jq.order...),
-		inters:          append([]Interceptor{}, jq.inters...),
-		predicates:      append([]predicate.Job{}, jq.predicates...),
-		withUser:        jq.withUser.Clone(),
-		withFreelancers: jq.withFreelancers.Clone(),
+		config:        jq.config,
+		ctx:           jq.ctx.Clone(),
+		order:         append([]job.OrderOption{}, jq.order...),
+		inters:        append([]Interceptor{}, jq.inters...),
+		predicates:    append([]predicate.Job{}, jq.predicates...),
+		withUser:      jq.withUser.Clone(),
+		withUpworkjob: jq.withUpworkjob.Clone(),
 		// clone intermediate query.
 		sql:  jq.sql.Clone(),
 		path: jq.path,
@@ -318,14 +319,14 @@ func (jq *JobQuery) WithUser(opts ...func(*UserQuery)) *JobQuery {
 	return jq
 }
 
-// WithFreelancers tells the query-builder to eager-load the nodes that are connected to
-// the "freelancers" edge. The optional arguments are used to configure the query builder of the edge.
-func (jq *JobQuery) WithFreelancers(opts ...func(*UpworkFreelancerQuery)) *JobQuery {
-	query := (&UpworkFreelancerClient{config: jq.config}).Query()
+// WithUpworkjob tells the query-builder to eager-load the nodes that are connected to
+// the "upworkjob" edge. The optional arguments are used to configure the query builder of the edge.
+func (jq *JobQuery) WithUpworkjob(opts ...func(*UpworkJobQuery)) *JobQuery {
+	query := (&UpworkJobClient{config: jq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	jq.withFreelancers = query
+	jq.withUpworkjob = query
 	return jq
 }
 
@@ -335,12 +336,12 @@ func (jq *JobQuery) WithFreelancers(opts ...func(*UpworkFreelancerQuery)) *JobQu
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		OriginPlatform schema.Platform `json:"origin_platform,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Job.Query().
-//		GroupBy(job.FieldTitle).
+//		GroupBy(job.FieldOriginPlatform).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (jq *JobQuery) GroupBy(field string, fields ...string) *JobGroupBy {
@@ -358,11 +359,11 @@ func (jq *JobQuery) GroupBy(field string, fields ...string) *JobGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		OriginPlatform schema.Platform `json:"origin_platform,omitempty"`
 //	}
 //
 //	client.Job.Query().
-//		Select(job.FieldTitle).
+//		Select(job.FieldOriginPlatform).
 //		Scan(ctx, &v)
 func (jq *JobQuery) Select(fields ...string) *JobSelect {
 	jq.ctx.Fields = append(jq.ctx.Fields, fields...)
@@ -410,7 +411,7 @@ func (jq *JobQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Job, err
 		_spec       = jq.querySpec()
 		loadedTypes = [2]bool{
 			jq.withUser != nil,
-			jq.withFreelancers != nil,
+			jq.withUpworkjob != nil,
 		}
 	)
 	if jq.withUser != nil {
@@ -443,10 +444,10 @@ func (jq *JobQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Job, err
 			return nil, err
 		}
 	}
-	if query := jq.withFreelancers; query != nil {
-		if err := jq.loadFreelancers(ctx, query, nodes,
-			func(n *Job) { n.Edges.Freelancers = []*UpworkFreelancer{} },
-			func(n *Job, e *UpworkFreelancer) { n.Edges.Freelancers = append(n.Edges.Freelancers, e) }); err != nil {
+	if query := jq.withUpworkjob; query != nil {
+		if err := jq.loadUpworkjob(ctx, query, nodes,
+			func(n *Job) { n.Edges.Upworkjob = []*UpworkJob{} },
+			func(n *Job, e *UpworkJob) { n.Edges.Upworkjob = append(n.Edges.Upworkjob, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -457,10 +458,10 @@ func (jq *JobQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Job
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Job)
 	for i := range nodes {
-		if nodes[i].user_jobs == nil {
+		if nodes[i].user_job == nil {
 			continue
 		}
-		fk := *nodes[i].user_jobs
+		fk := *nodes[i].user_job
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -477,7 +478,7 @@ func (jq *JobQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Job
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_jobs" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_job" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -485,64 +486,34 @@ func (jq *JobQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Job
 	}
 	return nil
 }
-func (jq *JobQuery) loadFreelancers(ctx context.Context, query *UpworkFreelancerQuery, nodes []*Job, init func(*Job), assign func(*Job, *UpworkFreelancer)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Job)
-	nids := make(map[string]map[*Job]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+func (jq *JobQuery) loadUpworkjob(ctx context.Context, query *UpworkJobQuery, nodes []*Job, init func(*Job), assign func(*Job, *UpworkJob)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Job)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(job.FreelancersTable)
-		s.Join(joinT).On(s.C(upworkfreelancer.FieldID), joinT.C(job.FreelancersPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(job.FreelancersPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(job.FreelancersPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullString)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
-				inValue := values[1].(*sql.NullString).String
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Job]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*UpworkFreelancer](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.UpworkJob(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(job.UpworkjobColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.job_upworkjob
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "job_upworkjob" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "freelancers" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "job_upworkjob" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -557,7 +528,7 @@ func (jq *JobQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (jq *JobQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(job.Table, job.Columns, sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID))
 	_spec.From = jq.sql
 	if unique := jq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

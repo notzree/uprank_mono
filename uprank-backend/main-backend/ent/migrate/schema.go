@@ -31,21 +31,9 @@ var (
 	}
 	// JobsColumns holds the columns for the "jobs" table.
 	JobsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "title", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "location", Type: field.TypeString, Nullable: true},
-		{Name: "description", Type: field.TypeString},
-		{Name: "skills", Type: field.TypeJSON, Nullable: true},
-		{Name: "experience_level", Type: field.TypeString, Nullable: true},
-		{Name: "hourly", Type: field.TypeBool},
-		{Name: "fixed", Type: field.TypeBool},
-		{Name: "hourly_rate", Type: field.TypeJSON, Nullable: true},
-		{Name: "fixed_rate", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "numeric"}},
-		{Name: "average_uprank_score", Type: field.TypeFloat64, Nullable: true},
-		{Name: "max_uprank_score", Type: field.TypeFloat64, Nullable: true},
-		{Name: "min_uprank_score", Type: field.TypeFloat64, Nullable: true},
-		{Name: "user_jobs", Type: field.TypeString},
+		{Name: "oid", Type: field.TypeUUID},
+		{Name: "origin_platform", Type: field.TypeEnum, Enums: []string{"upwork", "uprank"}},
+		{Name: "user_job", Type: field.TypeString},
 	}
 	// JobsTable holds the schema information for the "jobs" table.
 	JobsTable = &schema.Table{
@@ -54,8 +42,8 @@ var (
 		PrimaryKey: []*schema.Column{JobsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "jobs_users_jobs",
-				Columns:    []*schema.Column{JobsColumns[14]},
+				Symbol:     "jobs_users_job",
+				Columns:    []*schema.Column{JobsColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -108,6 +96,38 @@ var (
 		Name:       "upwork_freelancers",
 		Columns:    UpworkFreelancersColumns,
 		PrimaryKey: []*schema.Column{UpworkFreelancersColumns[0]},
+	}
+	// UpworkJobsColumns holds the columns for the "upwork_jobs" table.
+	UpworkJobsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "location", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString},
+		{Name: "skills", Type: field.TypeJSON, Nullable: true},
+		{Name: "experience_level", Type: field.TypeString, Nullable: true},
+		{Name: "hourly", Type: field.TypeBool},
+		{Name: "fixed", Type: field.TypeBool},
+		{Name: "hourly_rate", Type: field.TypeJSON, Nullable: true},
+		{Name: "fixed_rate", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "numeric"}},
+		{Name: "average_uprank_score", Type: field.TypeFloat64, Nullable: true},
+		{Name: "max_uprank_score", Type: field.TypeFloat64, Nullable: true},
+		{Name: "min_uprank_score", Type: field.TypeFloat64, Nullable: true},
+		{Name: "job_upworkjob", Type: field.TypeUUID},
+	}
+	// UpworkJobsTable holds the schema information for the "upwork_jobs" table.
+	UpworkJobsTable = &schema.Table{
+		Name:       "upwork_jobs",
+		Columns:    UpworkJobsColumns,
+		PrimaryKey: []*schema.Column{UpworkJobsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "upwork_jobs_jobs_upworkjob",
+				Columns:    []*schema.Column{UpworkJobsColumns[14]},
+				RefColumns: []*schema.Column{JobsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -166,27 +186,52 @@ var (
 			},
 		},
 	}
-	// JobFreelancersColumns holds the columns for the "job_freelancers" table.
-	JobFreelancersColumns = []*schema.Column{
-		{Name: "job_id", Type: field.TypeString},
+	// UpworkJobUpworkfreelancerColumns holds the columns for the "upwork_job_upworkfreelancer" table.
+	UpworkJobUpworkfreelancerColumns = []*schema.Column{
+		{Name: "upwork_job_id", Type: field.TypeString},
 		{Name: "upwork_freelancer_id", Type: field.TypeString},
 	}
-	// JobFreelancersTable holds the schema information for the "job_freelancers" table.
-	JobFreelancersTable = &schema.Table{
-		Name:       "job_freelancers",
-		Columns:    JobFreelancersColumns,
-		PrimaryKey: []*schema.Column{JobFreelancersColumns[0], JobFreelancersColumns[1]},
+	// UpworkJobUpworkfreelancerTable holds the schema information for the "upwork_job_upworkfreelancer" table.
+	UpworkJobUpworkfreelancerTable = &schema.Table{
+		Name:       "upwork_job_upworkfreelancer",
+		Columns:    UpworkJobUpworkfreelancerColumns,
+		PrimaryKey: []*schema.Column{UpworkJobUpworkfreelancerColumns[0], UpworkJobUpworkfreelancerColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "job_freelancers_job_id",
-				Columns:    []*schema.Column{JobFreelancersColumns[0]},
-				RefColumns: []*schema.Column{JobsColumns[0]},
+				Symbol:     "upwork_job_upworkfreelancer_upwork_job_id",
+				Columns:    []*schema.Column{UpworkJobUpworkfreelancerColumns[0]},
+				RefColumns: []*schema.Column{UpworkJobsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "job_freelancers_upwork_freelancer_id",
-				Columns:    []*schema.Column{JobFreelancersColumns[1]},
+				Symbol:     "upwork_job_upworkfreelancer_upwork_freelancer_id",
+				Columns:    []*schema.Column{UpworkJobUpworkfreelancerColumns[1]},
 				RefColumns: []*schema.Column{UpworkFreelancersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// UserUpworkjobColumns holds the columns for the "user_upworkjob" table.
+	UserUpworkjobColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "upwork_job_id", Type: field.TypeString},
+	}
+	// UserUpworkjobTable holds the schema information for the "user_upworkjob" table.
+	UserUpworkjobTable = &schema.Table{
+		Name:       "user_upworkjob",
+		Columns:    UserUpworkjobColumns,
+		PrimaryKey: []*schema.Column{UserUpworkjobColumns[0], UserUpworkjobColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_upworkjob_user_id",
+				Columns:    []*schema.Column{UserUpworkjobColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_upworkjob_upwork_job_id",
+				Columns:    []*schema.Column{UserUpworkjobColumns[1]},
+				RefColumns: []*schema.Column{UpworkJobsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -196,16 +241,21 @@ var (
 		AttachmentRefsTable,
 		JobsTable,
 		UpworkFreelancersTable,
+		UpworkJobsTable,
 		UsersTable,
 		WorkHistoriesTable,
-		JobFreelancersTable,
+		UpworkJobUpworkfreelancerTable,
+		UserUpworkjobTable,
 	}
 )
 
 func init() {
 	AttachmentRefsTable.ForeignKeys[0].RefTable = UpworkFreelancersTable
 	JobsTable.ForeignKeys[0].RefTable = UsersTable
+	UpworkJobsTable.ForeignKeys[0].RefTable = JobsTable
 	WorkHistoriesTable.ForeignKeys[0].RefTable = UpworkFreelancersTable
-	JobFreelancersTable.ForeignKeys[0].RefTable = JobsTable
-	JobFreelancersTable.ForeignKeys[1].RefTable = UpworkFreelancersTable
+	UpworkJobUpworkfreelancerTable.ForeignKeys[0].RefTable = UpworkJobsTable
+	UpworkJobUpworkfreelancerTable.ForeignKeys[1].RefTable = UpworkFreelancersTable
+	UserUpworkjobTable.ForeignKeys[0].RefTable = UsersTable
+	UserUpworkjobTable.ForeignKeys[1].RefTable = UpworkJobsTable
 }

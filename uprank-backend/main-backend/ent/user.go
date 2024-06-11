@@ -37,20 +37,31 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Jobs holds the value of the jobs edge.
-	Jobs []*Job `json:"jobs,omitempty"`
+	// Job holds the value of the job edge.
+	Job []*Job `json:"job,omitempty"`
+	// Upworkjob holds the value of the upworkjob edge.
+	Upworkjob []*UpworkJob `json:"upworkjob,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// JobsOrErr returns the Jobs value or an error if the edge
+// JobOrErr returns the Job value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) JobsOrErr() ([]*Job, error) {
+func (e UserEdges) JobOrErr() ([]*Job, error) {
 	if e.loadedTypes[0] {
-		return e.Jobs, nil
+		return e.Job, nil
 	}
-	return nil, &NotLoadedError{edge: "jobs"}
+	return nil, &NotLoadedError{edge: "job"}
+}
+
+// UpworkjobOrErr returns the Upworkjob value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UpworkjobOrErr() ([]*UpworkJob, error) {
+	if e.loadedTypes[1] {
+		return e.Upworkjob, nil
+	}
+	return nil, &NotLoadedError{edge: "upworkjob"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -132,9 +143,14 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryJobs queries the "jobs" edge of the User entity.
-func (u *User) QueryJobs() *JobQuery {
-	return NewUserClient(u.config).QueryJobs(u)
+// QueryJob queries the "job" edge of the User entity.
+func (u *User) QueryJob() *JobQuery {
+	return NewUserClient(u.config).QueryJob(u)
+}
+
+// QueryUpworkjob queries the "upworkjob" edge of the User entity.
+func (u *User) QueryUpworkjob() *UpworkJobQuery {
+	return NewUserClient(u.config).QueryUpworkjob(u)
 }
 
 // Update returns a builder for updating this User.

@@ -1,2 +1,0 @@
--- Modify "work_histories" table
-ALTER TABLE "work_histories" ALTER COLUMN "client_feedback" DROP NOT NULL, ALTER COLUMN "start_date" DROP NOT NULL, ALTER COLUMN "description" DROP NOT NULL, ALTER COLUMN "total_proposals" DROP NOT NULL, ALTER COLUMN "number_of_interviews" DROP NOT NULL, ALTER COLUMN "skills" DROP NOT NULL, ALTER COLUMN "client_review_count" DROP NOT NULL, ALTER COLUMN "client_country" DROP NOT NULL;

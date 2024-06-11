@@ -5,9 +5,11 @@ package ent
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/schema"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -17,22 +19,10 @@ import (
 func init() {
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
-	// jobDescTitle is the schema descriptor for title field.
-	jobDescTitle := jobFields[1].Descriptor()
-	// job.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	job.TitleValidator = jobDescTitle.Validators[0].(func(string) error)
-	// jobDescCreatedAt is the schema descriptor for created_at field.
-	jobDescCreatedAt := jobFields[2].Descriptor()
-	// job.DefaultCreatedAt holds the default value on creation for the created_at field.
-	job.DefaultCreatedAt = jobDescCreatedAt.Default.(func() time.Time)
-	// jobDescDescription is the schema descriptor for description field.
-	jobDescDescription := jobFields[4].Descriptor()
-	// job.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	job.DescriptionValidator = jobDescDescription.Validators[0].(func(string) error)
 	// jobDescID is the schema descriptor for id field.
 	jobDescID := jobFields[0].Descriptor()
-	// job.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	job.IDValidator = jobDescID.Validators[0].(func(string) error)
+	// job.DefaultID holds the default value on creation for the id field.
+	job.DefaultID = jobDescID.Default.(func() uuid.UUID)
 	upworkfreelancerFields := schema.UpworkFreelancer{}.Fields()
 	_ = upworkfreelancerFields
 	// upworkfreelancerDescUprankScore is the schema descriptor for uprank_score field.
@@ -57,6 +47,24 @@ func init() {
 	upworkfreelancerDescID := upworkfreelancerFields[0].Descriptor()
 	// upworkfreelancer.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	upworkfreelancer.IDValidator = upworkfreelancerDescID.Validators[0].(func(string) error)
+	upworkjobFields := schema.UpworkJob{}.Fields()
+	_ = upworkjobFields
+	// upworkjobDescTitle is the schema descriptor for title field.
+	upworkjobDescTitle := upworkjobFields[1].Descriptor()
+	// upworkjob.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	upworkjob.TitleValidator = upworkjobDescTitle.Validators[0].(func(string) error)
+	// upworkjobDescCreatedAt is the schema descriptor for created_at field.
+	upworkjobDescCreatedAt := upworkjobFields[2].Descriptor()
+	// upworkjob.DefaultCreatedAt holds the default value on creation for the created_at field.
+	upworkjob.DefaultCreatedAt = upworkjobDescCreatedAt.Default.(func() time.Time)
+	// upworkjobDescDescription is the schema descriptor for description field.
+	upworkjobDescDescription := upworkjobFields[4].Descriptor()
+	// upworkjob.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	upworkjob.DescriptionValidator = upworkjobDescDescription.Validators[0].(func(string) error)
+	// upworkjobDescID is the schema descriptor for id field.
+	upworkjobDescID := upworkjobFields[0].Descriptor()
+	// upworkjob.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	upworkjob.IDValidator = upworkjobDescID.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescFirstName is the schema descriptor for first_name field.

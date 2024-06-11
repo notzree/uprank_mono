@@ -1,12 +1,10 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 type Job struct {
@@ -15,26 +13,10 @@ type Job struct {
 
 func (Job) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").NotEmpty().
-			Unique().
-			Immutable(),
-		field.String("title").NotEmpty(),
-		field.Time("created_at").
-			Default(time.Now),
-		field.String("location").Optional(),
-		field.String("description").NotEmpty(),
-		field.JSON("skills", []string{}).Optional(),
-		field.String("experience_level").Optional(),
-		field.Bool("hourly"),
-		field.Bool("fixed"),
-		field.JSON("hourly_rate", []float32{}).Optional(), // hourly rate can be an array of floats with length 1 or 2 (for a range of hourly rates)
-		field.Float("fixed_rate").
-			SchemaType(map[string]string{
-				dialect.Postgres: "numeric",
-			}).Optional(),
-		field.Float("average_uprank_score").Optional(),
-		field.Float("max_uprank_score").Optional(),
-		field.Float("min_uprank_score").Optional(),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
+			StorageKey("oid"),
+		field.Enum("origin_platform").GoType(Platform("")).Immutable(), //Enum for the starting platform type the job was created. Can be created either through Uprank or through extension (fiverr, upwork, etc)
 	}
 }
 
@@ -42,8 +24,23 @@ func (Job) Fields() []ent.Field {
 func (Job) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
-			Ref("jobs").
+			Ref("job").
 			Unique().Required(),
-		edge.To("freelancers", UpworkFreelancer.Type),
+		edge.To("upworkjob", UpworkJob.Type),
 	}
+}
+
+// Enum for platform type
+type Platform string
+
+const (
+	Upwork Platform = "upwork"
+	Uprank Platform = "uprank"
+)
+
+func (Platform) Values() (kinds []string) {
+	for _, s := range []Platform{Upwork, Uprank} {
+		kinds = append(kinds, string(s))
+	}
+	return
 }

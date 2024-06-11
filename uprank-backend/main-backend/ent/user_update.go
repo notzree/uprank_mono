@@ -11,8 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -105,19 +107,34 @@ func (uu *UserUpdate) SetNillableLastLogin(t *time.Time) *UserUpdate {
 	return uu
 }
 
-// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uu *UserUpdate) AddJobIDs(ids ...string) *UserUpdate {
+// AddJobIDs adds the "job" edge to the Job entity by IDs.
+func (uu *UserUpdate) AddJobIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddJobIDs(ids...)
 	return uu
 }
 
-// AddJobs adds the "jobs" edges to the Job entity.
-func (uu *UserUpdate) AddJobs(j ...*Job) *UserUpdate {
-	ids := make([]string, len(j))
+// AddJob adds the "job" edges to the Job entity.
+func (uu *UserUpdate) AddJob(j ...*Job) *UserUpdate {
+	ids := make([]uuid.UUID, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
 	return uu.AddJobIDs(ids...)
+}
+
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
+func (uu *UserUpdate) AddUpworkjobIDs(ids ...string) *UserUpdate {
+	uu.mutation.AddUpworkjobIDs(ids...)
+	return uu
+}
+
+// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
+func (uu *UserUpdate) AddUpworkjob(u ...*UpworkJob) *UserUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUpworkjobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -125,25 +142,46 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearJobs clears all "jobs" edges to the Job entity.
-func (uu *UserUpdate) ClearJobs() *UserUpdate {
-	uu.mutation.ClearJobs()
+// ClearJob clears all "job" edges to the Job entity.
+func (uu *UserUpdate) ClearJob() *UserUpdate {
+	uu.mutation.ClearJob()
 	return uu
 }
 
-// RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
-func (uu *UserUpdate) RemoveJobIDs(ids ...string) *UserUpdate {
+// RemoveJobIDs removes the "job" edge to Job entities by IDs.
+func (uu *UserUpdate) RemoveJobIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveJobIDs(ids...)
 	return uu
 }
 
-// RemoveJobs removes "jobs" edges to Job entities.
-func (uu *UserUpdate) RemoveJobs(j ...*Job) *UserUpdate {
-	ids := make([]string, len(j))
+// RemoveJob removes "job" edges to Job entities.
+func (uu *UserUpdate) RemoveJob(j ...*Job) *UserUpdate {
+	ids := make([]uuid.UUID, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
 	return uu.RemoveJobIDs(ids...)
+}
+
+// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+func (uu *UserUpdate) ClearUpworkjob() *UserUpdate {
+	uu.mutation.ClearUpworkjob()
+	return uu
+}
+
+// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
+func (uu *UserUpdate) RemoveUpworkjobIDs(ids ...string) *UserUpdate {
+	uu.mutation.RemoveUpworkjobIDs(ids...)
+	return uu
+}
+
+// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
+func (uu *UserUpdate) RemoveUpworkjob(u ...*UpworkJob) *UserUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUpworkjobIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -232,28 +270,28 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.LastLogin(); ok {
 		_spec.SetField(user.FieldLastLogin, field.TypeTime, value)
 	}
-	if uu.mutation.JobsCleared() {
+	if uu.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedJobsIDs(); len(nodes) > 0 && !uu.mutation.JobsCleared() {
+	if nodes := uu.mutation.RemovedJobIDs(); len(nodes) > 0 && !uu.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -261,15 +299,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.JobsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UpworkjobCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !uu.mutation.UpworkjobCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UpworkjobIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -373,19 +456,34 @@ func (uuo *UserUpdateOne) SetNillableLastLogin(t *time.Time) *UserUpdateOne {
 	return uuo
 }
 
-// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
-func (uuo *UserUpdateOne) AddJobIDs(ids ...string) *UserUpdateOne {
+// AddJobIDs adds the "job" edge to the Job entity by IDs.
+func (uuo *UserUpdateOne) AddJobIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddJobIDs(ids...)
 	return uuo
 }
 
-// AddJobs adds the "jobs" edges to the Job entity.
-func (uuo *UserUpdateOne) AddJobs(j ...*Job) *UserUpdateOne {
-	ids := make([]string, len(j))
+// AddJob adds the "job" edges to the Job entity.
+func (uuo *UserUpdateOne) AddJob(j ...*Job) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
 	return uuo.AddJobIDs(ids...)
+}
+
+// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
+func (uuo *UserUpdateOne) AddUpworkjobIDs(ids ...string) *UserUpdateOne {
+	uuo.mutation.AddUpworkjobIDs(ids...)
+	return uuo
+}
+
+// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
+func (uuo *UserUpdateOne) AddUpworkjob(u ...*UpworkJob) *UserUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUpworkjobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -393,25 +491,46 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearJobs clears all "jobs" edges to the Job entity.
-func (uuo *UserUpdateOne) ClearJobs() *UserUpdateOne {
-	uuo.mutation.ClearJobs()
+// ClearJob clears all "job" edges to the Job entity.
+func (uuo *UserUpdateOne) ClearJob() *UserUpdateOne {
+	uuo.mutation.ClearJob()
 	return uuo
 }
 
-// RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
-func (uuo *UserUpdateOne) RemoveJobIDs(ids ...string) *UserUpdateOne {
+// RemoveJobIDs removes the "job" edge to Job entities by IDs.
+func (uuo *UserUpdateOne) RemoveJobIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveJobIDs(ids...)
 	return uuo
 }
 
-// RemoveJobs removes "jobs" edges to Job entities.
-func (uuo *UserUpdateOne) RemoveJobs(j ...*Job) *UserUpdateOne {
-	ids := make([]string, len(j))
+// RemoveJob removes "job" edges to Job entities.
+func (uuo *UserUpdateOne) RemoveJob(j ...*Job) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(j))
 	for i := range j {
 		ids[i] = j[i].ID
 	}
 	return uuo.RemoveJobIDs(ids...)
+}
+
+// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+func (uuo *UserUpdateOne) ClearUpworkjob() *UserUpdateOne {
+	uuo.mutation.ClearUpworkjob()
+	return uuo
+}
+
+// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
+func (uuo *UserUpdateOne) RemoveUpworkjobIDs(ids ...string) *UserUpdateOne {
+	uuo.mutation.RemoveUpworkjobIDs(ids...)
+	return uuo
+}
+
+// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
+func (uuo *UserUpdateOne) RemoveUpworkjob(u ...*UpworkJob) *UserUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUpworkjobIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -530,28 +649,28 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.LastLogin(); ok {
 		_spec.SetField(user.FieldLastLogin, field.TypeTime, value)
 	}
-	if uuo.mutation.JobsCleared() {
+	if uuo.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedJobsIDs(); len(nodes) > 0 && !uuo.mutation.JobsCleared() {
+	if nodes := uuo.mutation.RemovedJobIDs(); len(nodes) > 0 && !uuo.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -559,15 +678,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.JobsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.JobsTable,
-			Columns: []string{user.JobsColumn},
+			Table:   user.JobTable,
+			Columns: []string{user.JobColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UpworkjobCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !uuo.mutation.UpworkjobCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UpworkjobIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.UpworkjobTable,
+			Columns: user.UpworkjobPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
