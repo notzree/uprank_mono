@@ -20,7 +20,7 @@ func NewAPIError(statusCode int, err error) APIError {
 	return APIError{StatusCode: statusCode, Msg: err.Error()}
 }
 
-func InvalidRequestData(errors map[string]string) APIError {
+func InvalidRequestData(errors map[string]interface{}) APIError {
 	return APIError{
 		StatusCode: http.StatusUnprocessableEntity,
 		Msg:        errors,
@@ -35,6 +35,10 @@ func ResourceMisMatch() APIError {
 	return NewAPIError(http.StatusBadRequest, fmt.Errorf("mismatch between user_id and resource"))
 }
 
+func NotFound() APIError {
+	return NewAPIError(http.StatusNotFound, fmt.Errorf("resource not found"))
+}
+
 type APIFunc func(w http.ResponseWriter, r *http.Request) error
 
 // converts an APIFunc (a function that returns an error) into a function that does not return an error http.HandlerFunc
@@ -44,7 +48,7 @@ func Make(handler APIFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := handler(w, r); err != nil {
 			if apiErr, ok := err.(APIError); ok {
-				writeJSON(w, apiErr.StatusCode, apiErr)
+				writeJSON(w, apiErr.StatusCode, apiErr.Msg)
 			} else {
 				errResp := map[string]any{
 					"statusCode": http.StatusInternalServerError,

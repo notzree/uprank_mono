@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
@@ -316,19 +316,19 @@ func (ufc *UpworkFreelancerCreate) SetID(s string) *UpworkFreelancerCreate {
 	return ufc
 }
 
-// AddJobIDs adds the "job" edge to the Job entity by IDs.
-func (ufc *UpworkFreelancerCreate) AddJobIDs(ids ...string) *UpworkFreelancerCreate {
-	ufc.mutation.AddJobIDs(ids...)
+// AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
+func (ufc *UpworkFreelancerCreate) AddUpworkJobIDs(ids ...string) *UpworkFreelancerCreate {
+	ufc.mutation.AddUpworkJobIDs(ids...)
 	return ufc
 }
 
-// AddJob adds the "job" edges to the Job entity.
-func (ufc *UpworkFreelancerCreate) AddJob(j ...*Job) *UpworkFreelancerCreate {
-	ids := make([]string, len(j))
-	for i := range j {
-		ids[i] = j[i].ID
+// AddUpworkJob adds the "upwork_job" edges to the UpworkJob entity.
+func (ufc *UpworkFreelancerCreate) AddUpworkJob(u ...*UpworkJob) *UpworkFreelancerCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
-	return ufc.AddJobIDs(ids...)
+	return ufc.AddUpworkJobIDs(ids...)
 }
 
 // AddAttachmentIDs adds the "attachments" edge to the AttachmentRef entity by IDs.
@@ -705,15 +705,15 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 		_spec.SetField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool, value)
 		_node.UprankNotEnoughData = value
 	}
-	if nodes := ufc.mutation.JobIDs(); len(nodes) > 0 {
+	if nodes := ufc.mutation.UpworkJobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   upworkfreelancer.JobTable,
-			Columns: upworkfreelancer.JobPrimaryKey,
+			Table:   upworkfreelancer.UpworkJobTable,
+			Columns: upworkfreelancer.UpworkJobPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

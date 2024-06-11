@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/notzree/uprank-backend/main-backend/types"
 )
@@ -15,17 +14,12 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) error {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return InvalidJSON()
 	}
-
 	defer r.Body.Close()
 	if errors := req.Validate(); len(errors) > 0 {
 		return InvalidRequestData(errors)
 	}
-	new_user, err := s.ent.User.Create().
-		SetID(req.User.ID).
-		SetFirstName(req.User.FirstName).
-		SetCompanyName(req.User.CompanyName).
-		SetEmail(req.User.Email).
-		Save(r.Context())
+
+	new_user, err := s.svc.CreateUser(req, r.Context())
 	if err != nil {
 		return err
 	}
@@ -40,12 +34,7 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) error {
 	}
 	defer r.Body.Close()
 
-	updated_user, err := s.ent.User.
-		UpdateOneID(req.ClerkUserData.ID).
-		SetFirstName(req.ClerkUserData.FirstName).
-		SetLastLogin(time.Unix(req.ClerkUserData.LastSignInAt, 0)). //Convert timestamp into time.Time
-		SetUpdatedAt(time.Unix(req.ClerkUserData.UpdatedAt, 0)).
-		Save(r.Context())
+	updated_user, err := s.svc.UpdateUser(req, r.Context())
 
 	if err != nil {
 		return err
