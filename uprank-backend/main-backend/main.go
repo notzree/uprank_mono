@@ -16,6 +16,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/api"
 	"github.com/notzree/uprank-backend/main-backend/authenticator"
 	"github.com/notzree/uprank-backend/main-backend/ent"
+	svc "github.com/notzree/uprank-backend/main-backend/service"
 )
 
 func main() {
@@ -25,11 +26,11 @@ func main() {
 	scraper_queue_url := os.Getenv("SCRAPER_QUEUE_URL")
 
 	//Create db connection
-	client, err := ent.Open("postgres", db_connection_string)
+	ent_client, err := ent.Open("postgres", db_connection_string)
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
-	defer client.Close()
+	defer ent_client.Close()
 
 	// create sqs session
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-east-2"))
@@ -39,6 +40,8 @@ func main() {
 		return
 	}
 	sqs_client := sqs.NewFromConfig(sdkConfig)
+
+	servicer := svc.NewV1Servicer(ent_client, sqs_client, scraper_queue_url)
 
 	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key)
 
@@ -64,7 +67,7 @@ func main() {
 		w.Write([]byte("method is not valid"))
 	})
 
-	server := api.NewServer(server_port, router, client, scraper_queue_url, sqs_client, authenticator)
+	server := api.NewServer(server_port, router, authenticator, servicer)
 	fmt.Println("Server listening on port:", server_port)
 	log.Fatal(server.Start())
 }

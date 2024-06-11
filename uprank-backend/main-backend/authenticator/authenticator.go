@@ -11,7 +11,6 @@ import (
 
 type Authenticator interface {
 	AuthenticationMiddleware(next http.Handler) http.Handler
-
 	GetIdFromContext(ctx context.Context) (string, error)
 }
 
