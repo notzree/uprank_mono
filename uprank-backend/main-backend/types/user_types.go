@@ -12,8 +12,8 @@ type CreateUserRequest struct {
 	Completed_onboarding bool      `json:"completed_onboarding"`
 }
 
-func (req *CreateUserRequest) Validate() map[string]string {
-	errors := make(map[string]string)
+func (req *CreateUserRequest) Validate() map[string]interface{} {
+	errors := make(map[string]interface{})
 
 	if req.User == nil {
 		errors["user"] = "User cannot be nil"
