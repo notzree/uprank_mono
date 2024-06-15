@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	sqs_types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
@@ -20,14 +22,14 @@ import (
 type V1Servicer struct {
 	ent               *ent.Client
 	sqs_client        *sqs.Client
-	Scraper_queue_url string
+	ranking_queue_url string
 }
 
-func NewV1Servicer(ent *ent.Client, sqs_client *sqs.Client, scraper_queue_url string) *V1Servicer {
+func NewV1Servicer(ent *ent.Client, sqs_client *sqs.Client, ranking_queue_url string) *V1Servicer {
 	return &V1Servicer{
 		ent:               ent,
 		sqs_client:        sqs_client,
-		Scraper_queue_url: scraper_queue_url,
+		ranking_queue_url: ranking_queue_url,
 	}
 }
 
@@ -109,8 +111,17 @@ func (s *V1Servicer) GetUpworkJob(upwork_job_id string, user_id string, ctx cont
 				job.HasUserWith(user.IDEQ(user_id)),
 			),
 		).
+		WithUpworkfreelancer().
 		Only(ctx)
 	return job, err
+}
+
+func (s *V1Servicer) GetFreelancersFromUpworkJob(upwork_job_id string, user_id string, ctx context.Context) ([]*ent.UpworkFreelancer, error) {
+	freelancers, err := s.ent.UpworkJob.Query().
+		Where(upworkjob.IDEQ(upwork_job_id)).
+		Where(upworkjob.HasJobWith(job.HasUserWith(user.IDEQ(user_id)))).
+		QueryUpworkfreelancer().All(ctx)
+	return freelancers, err
 }
 
 func (s *V1Servicer) CreateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) ([]*ent.UpworkFreelancer, error) {
@@ -422,4 +433,28 @@ func (s *V1Servicer) UpdateUpworkFreelancer(data []types.CreateUpworkFreelancerR
 		}
 	}
 	return len(freelancers_to_create), len(freelancers_to_update), len(freelancers_to_delete), nil
+}
+
+// So Basically, the fifo queue uses the messagebody as the deduplication id so if we send a message with the same body within a span of 5 mins it will be discarded.
+func (s *V1Servicer) SendRankingrequest(job_id uuid.UUID, user_id string, ctx context.Context) error {
+	_, err := s.sqs_client.SendMessage(ctx, &sqs.SendMessageInput{
+		MessageAttributes: map[string]sqs_types.MessageAttributeValue{
+			"job_id": {
+				DataType:    aws.String("String"),
+				StringValue: aws.String(job_id.String()),
+			},
+			"user_id": {
+				DataType:    aws.String("String"),
+				StringValue: aws.String(user_id),
+			},
+		},
+		QueueUrl:       &s.ranking_queue_url,
+		MessageBody:    aws.String("Ranking Request"),
+		MessageGroupId: aws.String("RankingRequest"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -37,6 +37,7 @@ func (s *Server) Start() error {
 					users_router.Post("/update", Make(s.UpdateUser))
 				})
 			})
+			v1_router.Post("/test", Make(s.TestRanking))
 		})
 		//private apis
 		v1_router.Group(func(private_router chi.Router) {
