@@ -14,7 +14,7 @@ func main() {
 	)
 	pulumi.Run(func(ctx *pulumi.Context) error {
 
-		scraper_queue, err := sqs.NewQueue(ctx, CreateResourceName(env, application_name, "scraper_queue"), &sqs.QueueArgs{
+		ranking_queue, err := sqs.NewQueue(ctx, CreateResourceName(env, application_name, "ranking_queue"), &sqs.QueueArgs{
 			FifoQueue:                 pulumi.Bool(true),
 			ContentBasedDeduplication: pulumi.Bool(true),
 			SqsManagedSseEnabled:      pulumi.Bool(true),
@@ -32,8 +32,8 @@ func main() {
 			return err
 		}
 
-		ctx.Export("scraper_queue_url", scraper_queue.Url)
-		ctx.Export("scraper_queue_arn", scraper_queue.Arn)
+		ctx.Export("ranking_queue_url", ranking_queue.Url)
+		ctx.Export("ranking_queue_arn", ranking_queue.Arn)
 		ctx.Export("notification_queue_url", notification_queue.Url)
 		return nil
 	})

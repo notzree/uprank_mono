@@ -23,7 +23,7 @@ func main() {
 	clerk_secret_key := os.Getenv("CLERK_SECRET_KEY")
 	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
 	server_port := os.Getenv("SERVER_PORT")
-	scraper_queue_url := os.Getenv("SCRAPER_QUEUE_URL")
+	ranking_queue_url := os.Getenv("RANKING_QUEUE_URL")
 
 	//Create db connection
 	ent_client, err := ent.Open("postgres", db_connection_string)
@@ -41,7 +41,7 @@ func main() {
 	}
 	sqs_client := sqs.NewFromConfig(sdkConfig)
 
-	servicer := svc.NewV1Servicer(ent_client, sqs_client, scraper_queue_url)
+	servicer := svc.NewV1Servicer(ent_client, sqs_client, ranking_queue_url)
 
 	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key)
 
