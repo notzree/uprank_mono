@@ -8,7 +8,9 @@ import type {
 } from "~types/freelancer";
 
 //Bit weird bc all of the private functions are intended to be ran on the browser, they don't return anyth and just change the state of the dom
-export class UpworkFreelancerScraper implements Scraper<ScrapeFreelancerResponse> {
+export class UpworkFreelancerScraper
+    implements Scraper<ScrapeFreelancerResponse>
+{
     private locator: Locator;
 
     constructor(locator: Locator) {
@@ -49,7 +51,6 @@ export class UpworkFreelancerScraper implements Scraper<ScrapeFreelancerResponse
         for (const freelancer of unstableFreelancerArray) {
             freelancer.work_history = freelancer_job_map[freelancer.name];
         }
-
 
         if (unstableFreelancerArray.length != expectedFreelancerCount) {
             console.log(
@@ -129,249 +130,292 @@ export class UpworkFreelancerScraper implements Scraper<ScrapeFreelancerResponse
                 closeButtonSelector
             )) as HTMLButtonElement;
             if (popup && closeButton) {
-                const workHistoryDivs = await this.locator.locateAll(
-                    'div[id="jobs_completed_desktop"] div.assignments-item'
-                );
-                if (workHistoryDivs === null) {
-                    console.log("no work history found");
-                    closeButton.click();
-                    return {
-                        name: freelancer_name,
-                        jobs: [],
-                    };
-                }
                 const jobs = [];
-                for (const div of workHistoryDivs as any) {
-                    const linkElement = (await this.locator.locate(
-                        "a.up-n-link",
-                        div
-                    )) as HTMLAnchorElement;
-                    const jobTitle = linkElement.textContent.trim();
-                    linkElement.click();
-                    const jobPopupModal = await this.locator.locate(
-                        "div.air3-modal-body"
+                let num_jobs_with_ratings = 0;
+                let itr =0;
+                const MAX_ITERATIONS = 25;
+                while (num_jobs_with_ratings < 20 && itr < MAX_ITERATIONS) {
+                    const workHistoryDivs = await this.locator.locateAll(
+                        'div[id="jobs_completed_desktop"] div.assignments-item'
                     );
-
-                    const jobCombinedDateElementSelector =
-                        'div[data-test="assignment-date"]';
-                    const jobCloseButtonSelector =
-                        'button.air3-modal-close[data-test="UpCModalClose"]';
-                    const jobDetailDivSelector = 'div[data-test="job-details"]';
-                    const jobDescriptionElementSelector =
-                        'div[data-ev-sublocation="!line_clamp"]';
-                    const jobBudgetElementSelector =
-                        'div[data-test="job-details"] div.air3-grid-container strong';
-                    const totalEarnedElementSelector =
-                        'div[data-test="assignment-summary"] div.mb-3x span';
-                    const clientTotalSpendElementSelector =
-                        'span[data-test="total-spent"] span';
-                    const clientTotalHiresElementSelector =
-                        "div.mt-6x small.text-light-on-inverse";
-                    const clientFeedbackElementSelector =
-                        'div[data-test="assignment-client-feedback"] em';
-                    const clientRatingElementSelector =
-                        'div[data-ev-sublocation="!rating"] span.sr-only';
-                    const clientLocationElementSelector =
-                        "div.span-md-5 div.mt-6x strong";
-                    const result = await this.locator.locateMany<
-                        Element | NodeList
-                    >({
-                        [jobCombinedDateElementSelector]: [
-                            this.locator.querySelector,
-                        ],
-                        [jobCloseButtonSelector]: [this.locator.querySelector],
-                        [jobDetailDivSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [jobDescriptionElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [jobBudgetElementSelector]: [
-                            this.locator.nestedSelectorAll,
-                            jobPopupModal,
-                        ],
-                        [totalEarnedElementSelector]: [
-                            this.locator.nestedSelectorAll,
-                            jobPopupModal,
-                        ],
-                        [clientTotalSpendElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [clientTotalHiresElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [clientFeedbackElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [clientRatingElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                        [clientLocationElementSelector]: [
-                            this.locator.nestedSelector,
-                            jobPopupModal,
-                        ],
-                    });
-                    if (jobPopupModal === null) {
-                        console.log("no job popup modal found");
+                    if (workHistoryDivs === null) {
+                        console.log("no work history found");
                         closeButton.click();
                         return {
                             name: freelancer_name,
                             jobs: [],
                         };
                     }
-                    const combined_dateElement = result[
-                        jobCombinedDateElementSelector
-                    ] as Element;
-                    const combined_date =
-                        combined_dateElement.textContent.trim();
+                    for (const div of workHistoryDivs as any) {
+                        const linkElement = (await this.locator.locate(
+                            "a.up-n-link",
+                            div
+                        )) as HTMLAnchorElement;
+                        const jobTitle = linkElement.textContent.trim();
+                        linkElement.click();
+                        const jobPopupModal = await this.locator.locate(
+                            "div.air3-modal-body"
+                        );
+                        const jobCombinedDateElementSelector =
+                            'div[data-test="assignment-date"]';
+                        const jobCloseButtonSelector =
+                            'button.air3-modal-close[data-test="UpCModalClose"]';
+                        const jobDetailDivSelector =
+                            'div[data-test="job-details"]';
+                        const jobDescriptionElementSelector =
+                            'div[data-ev-sublocation="!line_clamp"]';
+                        const jobBudgetElementSelector =
+                            'div[data-test="job-details"] div.air3-grid-container strong';
+                        const totalEarnedElementSelector =
+                            'div[data-test="assignment-summary"] div.mb-3x span';
+                        const clientTotalSpendElementSelector =
+                            'span[data-test="total-spent"] span';
+                        const clientTotalHiresElementSelector =
+                            "div.mt-6x small.text-light-on-inverse";
+                        const clientFeedbackElementSelector =
+                            'div[data-test="assignment-client-feedback"] em';
+                        const clientRatingElementSelector =
+                            'div[data-ev-sublocation="!rating"] span.sr-only';
+                        const clientLocationElementSelector =
+                            "div.span-md-5 div.mt-6x strong";
+                        const result = await this.locator.locateMany<
+                            Element | NodeList
+                        >({
+                            [jobCombinedDateElementSelector]: [
+                                this.locator.querySelector,
+                            ],
+                            [jobCloseButtonSelector]: [
+                                this.locator.querySelector,
+                            ],
+                            [jobDetailDivSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [jobDescriptionElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [jobBudgetElementSelector]: [
+                                this.locator.nestedSelectorAll,
+                                jobPopupModal,
+                            ],
+                            [totalEarnedElementSelector]: [
+                                this.locator.nestedSelectorAll,
+                                jobPopupModal,
+                            ],
+                            [clientTotalSpendElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [clientTotalHiresElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [clientFeedbackElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [clientRatingElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                            [clientLocationElementSelector]: [
+                                this.locator.nestedSelector,
+                                jobPopupModal,
+                            ],
+                        });
+                        if (jobPopupModal === null) {
+                            console.log("no job popup modal found");
+                            closeButton.click();
+                            return {
+                                name: freelancer_name,
+                                jobs: [],
+                            };
+                        }
+                        const combined_dateElement = result[
+                            jobCombinedDateElementSelector
+                        ] as Element;
+                        const combined_date =
+                            combined_dateElement.textContent.trim();
 
-                    const start_date = new Date(combined_date.split(" - ")[0]);
-                    const end_date = new Date(combined_date.split(" - ")[1]);
+                        const start_date = new Date(
+                            combined_date.split(" - ")[0]
+                        );
+                        const end_date = new Date(
+                            combined_date.split(" - ")[1]
+                        );
 
-                    const jobCloseButton = result[
-                        jobCloseButtonSelector
-                    ] as HTMLButtonElement;
+                        const jobCloseButton = result[
+                            jobCloseButtonSelector
+                        ] as HTMLButtonElement;
 
-                    const jobDetailDiv = result[jobDetailDivSelector];
+                        const jobDetailDiv = result[jobDetailDivSelector];
 
-                    if (jobDetailDiv === null) {
+                        if (jobDetailDiv === null) {
+                            const job: FreelancerJobHistory = {
+                                title: jobTitle,
+                                start_date: start_date.toISOString(),
+                                end_date: end_date.toISOString(),
+                                description: null,
+                                budget: null,
+                                total_earned: null,
+                                client_total_spend: null,
+                                client_total_hires: null,
+                                client_active_hires: null,
+                                client_rating: null,
+                                client_feedback: null,
+                                client_location: null,
+                            };
+                            jobs.push(job);
+                            jobCloseButton.click();
+                            continue;
+                        }
+
+                        const jobDescriptionElement =
+                            result[jobDescriptionElementSelector];
+                        const jobDescription = jobDescriptionElement
+                            ? (jobDescriptionElement as Element).getAttribute(
+                                  "data-test-key"
+                              )
+                            : null;
+
+                        const jobBudgetElementAll = result[
+                            jobBudgetElementSelector
+                        ] as NodeList;
+                        var jobBudget = null;
+                        for (const jobBudgetElement of jobBudgetElementAll) {
+                            if (jobBudgetElement.textContent.includes("$")) {
+                                jobBudget = parseFloat(
+                                    jobBudgetElement.textContent
+                                        .trim()
+                                        .replace("$", "")
+                                        .replace(",", "")
+                                );
+                                break;
+                            }
+                        }
+                        // console.log(jobBudget);
+
+                        const totalEarnedElementAll = result[
+                            totalEarnedElementSelector
+                        ] as NodeList;
+                        
+                        var totalEarned = null;
+                        if (totalEarnedElementAll!=null){
+                            for (const totalEarnedElement of totalEarnedElementAll) {
+                                if (
+                                    totalEarnedElement.textContent.includes("$") &&
+                                    totalEarnedElement.textContent.includes(
+                                        "earned"
+                                    )
+                                ) {
+                                    totalEarned = parseFloat(
+                                        totalEarnedElement.textContent
+                                            .trim()
+                                            .replace("$", "")
+                                            .replace("earned", "")
+                                            .replace(",", "")
+                                    );
+                                    break;
+                                }
+                            }
+                        }
+                            
+                        const clientTotalSpendElement =
+                            result[clientTotalSpendElementSelector];
+                        const clientTotalSpend = clientTotalSpendElement
+                            ? this.extractAmount(
+                                  (
+                                      clientTotalSpendElement as Element
+                                  ).textContent.trim()
+                              )
+                            : null;
+
+                        const clientTotalHiresElement =
+                            result[clientTotalHiresElementSelector];
+                        const clientTotalHiresString = clientTotalHiresElement
+                            ? (
+                                  clientTotalHiresElement as Element
+                              ).textContent.trim()
+                            : null;
+                        const clientTotalHires = this.parseHireString(
+                            clientTotalHiresString
+                        ).total_hires;
+                        const clientActiveHires = this.parseHireString(
+                            clientTotalHiresString
+                        ).active_hire;
+
+                        const clientFeedbackElement =
+                            result[clientFeedbackElementSelector];
+                        const clientFeedback = clientFeedbackElement
+                            ? (
+                                  clientFeedbackElement as Element
+                              ).textContent.trim()
+                            : null;
+
+                        const clientRatingElement =
+                            result[clientRatingElementSelector];
+                        const clientRating = clientRatingElement
+                            ? parseFloat(
+                                  (clientRatingElement as Element).textContent
+                                      .trim()
+                                      .split(" ")[2]
+                              )
+                            : null;
+
+                        const clientLocationElement =
+                            result[clientLocationElementSelector];
+                        const clientLocation = clientLocationElement
+                            ? (
+                                  clientLocationElement as Element
+                              ).textContent.trim()
+                            : null;
+
+                        jobCloseButton.click();
+                        await this.locator.waitForClose(
+                            'button.air3-modal-close[data-test="UpCModalClose"]'
+                        );
+
                         const job: FreelancerJobHistory = {
                             title: jobTitle,
                             start_date: start_date.toISOString(),
                             end_date: end_date.toISOString(),
-                            description: null,
-                            budget: null,
-                            total_earned: null,
-                            client_total_spend: null,
-                            client_total_hires: null,
-                            client_active_hires: null,
-                            client_rating: null,
-                            client_feedback: null,
-                            client_location: null,
+                            description: jobDescription,
+                            budget: jobBudget,
+                            total_earned: totalEarned,
+                            client_total_spend: clientTotalSpend,
+                            client_total_hires: clientTotalHires,
+                            client_active_hires: clientActiveHires,
+                            client_rating: clientRating,
+                            client_feedback: clientFeedback,
+                            client_location: clientLocation,
                         };
                         jobs.push(job);
-                        jobCloseButton.click();
-                        continue;
-                    }
-
-                    const jobDescriptionElement =
-                        result[jobDescriptionElementSelector];
-                    const jobDescription = jobDescriptionElement
-                        ? (jobDescriptionElement as Element).getAttribute(
-                              "data-test-key"
-                          )
-                        : null;
-
-                    const jobBudgetElementAll = result[
-                        jobBudgetElementSelector
-                    ] as NodeList;
-                    var jobBudget = null;
-                    for (const jobBudgetElement of jobBudgetElementAll) {
-                        if (jobBudgetElement.textContent.includes("$")) {
-                            jobBudget = parseFloat(
-                                jobBudgetElement.textContent
-                                    .trim()
-                                    .replace("$", "")
-                                    .replace(",", "")
-                            );
-                            break;
+                        num_jobs_with_ratings += 1;
+                        if (num_jobs_with_ratings >= 50) {
+                            closeButton.click();
+                            return {
+                                name: freelancer_name,
+                                jobs: jobs,
+                            };
                         }
                     }
-                    // console.log(jobBudget);
-
-                    const totalEarnedElementAll = result[
-                        totalEarnedElementSelector
-                    ] as NodeList;
-                    var totalEarned = null;
-                    for (const totalEarnedElement of totalEarnedElementAll) {
-                        if (
-                            totalEarnedElement.textContent.includes("$") &&
-                            totalEarnedElement.textContent.includes("earned")
-                        ) {
-                            totalEarned = parseFloat(
-                                totalEarnedElement.textContent
-                                    .trim()
-                                    .replace("$", "")
-                                    .replace("earned", "")
-                                    .replace(",", "")
-                            );
-                            break;
-                        }
+                    const nextButtonElementSelector =
+                        'div[id="jobs_completed_desktop"] button[data-ev-label="pagination_next_page"]';
+                    const nextButton = (await this.locator.locate(
+                        nextButtonElementSelector
+                    )) as HTMLButtonElement;
+                    if (!nextButton || nextButton.getAttribute("disabled") == "disabled") {
+                        break;
                     }
-
-                    const clientTotalSpendElement =
-                        result[clientTotalSpendElementSelector];
-                    const clientTotalSpend = clientTotalSpendElement
-                        ? this.extractAmount((clientTotalSpendElement as Element).textContent.trim())
-                        : null;
-                    console.log(clientTotalSpend);
-
-                    const clientTotalHiresElement =
-                        result[clientTotalHiresElementSelector];
-                    const clientTotalHiresString = clientTotalHiresElement
-                        ? (
-                              clientTotalHiresElement as Element
-                          ).textContent.trim()
-                        : null;
-                    const clientTotalHires = this.parseHireString(
-                        clientTotalHiresString
-                    ).total_hires;
-                    const clientActiveHires = this.parseHireString(
-                        clientTotalHiresString
-                    ).active_hire;
-
-                    const clientFeedbackElement =
-                        result[clientFeedbackElementSelector];
-                    const clientFeedback = clientFeedbackElement
-                        ? (clientFeedbackElement as Element).textContent.trim()
-                        : null;
-
-                    const clientRatingElement =
-                        result[clientRatingElementSelector];
-                    const clientRating = clientRatingElement
-                        ? parseFloat(
-                              (clientRatingElement as Element).textContent
-                                  .trim()
-                                  .split(" ")[2]
-                          )
-                        : null;
-
-                    const clientLocationElement =
-                        result[clientLocationElementSelector];
-                    const clientLocation = clientLocationElement
-                        ? (clientLocationElement as Element).textContent.trim()
-                        : null;
-
-                    jobCloseButton.click();
-                    await this.locator.waitForClose(
-                        'button.air3-modal-close[data-test="UpCModalClose"]'
-                    );
-
-                    const job: FreelancerJobHistory = {
-                        title: jobTitle,
-                        start_date: start_date.toISOString(),
-                        end_date: end_date.toISOString(),
-                        description: jobDescription,
-                        budget: jobBudget,
-                        total_earned: totalEarned,
-                        client_total_spend: clientTotalSpend,
-                        client_total_hires: clientTotalHires,
-                        client_active_hires: clientActiveHires,
-                        client_rating: clientRating,
-                        client_feedback: clientFeedback,
-                        client_location: clientLocation,
-                    };
-                    jobs.push(job);
+                    else {
+                        nextButton.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    itr++;
                 }
-
+                //Reached max jobs or no more jobs left
                 closeButton.click();
-
                 return {
                     name: freelancer_name,
                     jobs: jobs,
@@ -560,7 +604,7 @@ export class UpworkFreelancerScraper implements Scraper<ScrapeFreelancerResponse
         const match = input.match(/\$([0-9,]+(\.[0-9]+)?)/);
         if (match && match[1]) {
             // Remove commas and parse the number as a float
-            const amount = parseFloat(match[1].replace(/,/g, ''));
+            const amount = parseFloat(match[1].replace(/,/g, ""));
             return isNaN(amount) ? null : amount;
         }
         return null;

@@ -7,10 +7,7 @@ func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) error {
 	if clerkErr := checkClerk(); clerkErr != nil {
 		return clerkErr
 	}
-	_, err := s.ent.User.Query().First(r.Context())
-	if err != nil {
-		return err
-	}
+	//todo: Implement healthcehck for db
 
 	return writeJSON(w, http.StatusOK, "healthy")
 }

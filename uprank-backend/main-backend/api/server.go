@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	auth "github.com/notzree/uprank-backend/main-backend/authenticator"
-	"github.com/notzree/uprank-backend/main-backend/ent"
 	svc "github.com/notzree/uprank-backend/main-backend/service"
 )
 
@@ -14,7 +13,6 @@ type Server struct {
 	Port          string
 	authenticator auth.Authenticator
 	Router        *chi.Mux
-	ent           *ent.Client
 	svc           svc.Servicer
 }
 

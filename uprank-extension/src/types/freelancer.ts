@@ -1,5 +1,5 @@
 //This is the backend DB Schema
-type CreateUpworkFreelancerResponse = {
+export type CreateUpworkFreelancerResponse = {
   url: string
   name: string
   title: string

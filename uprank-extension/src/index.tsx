@@ -35,10 +35,11 @@ export default function PopUpEntry() {
       // }
 
       const upwork_job_response = await client.getUpworkJob(id, await getToken())
+      console.log(upwork_job_response);
         if (upwork_job_response.error_msg == null){
           setIsJobValid(true);
-          if (upwork_job_response.upwork_job.edges.freelancers != null){
-            setJobFreelancerCount(upwork_job_response.upwork_job.edges.freelancers.length);
+          if (upwork_job_response.upwork_job.edges.upworkfreelancer != null){
+            setJobFreelancerCount(upwork_job_response.upwork_job.edges.upworkfreelancer.length);
           }
         } else {
           setIsJobValid(false);
