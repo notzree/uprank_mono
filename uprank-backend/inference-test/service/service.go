@@ -7,5 +7,5 @@ import (
 )
 
 type Service interface {
-	RankUpworkJob(data types.UpworkRankingMessage, ctx context.Context) (types.UpworkRankingResult, error)
+	RankUpworkJob(data types.UpworkRankingMessage, ctx context.Context) (*types.UpworkRankingResult, error)
 }

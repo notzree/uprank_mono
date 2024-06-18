@@ -9,7 +9,6 @@ import (
 )
 
 type SqsQueue struct {
-	// ent        *ent.Client
 	sqs_client *sqs.Client
 	queue_url  string
 }
@@ -29,6 +28,7 @@ func (s *SqsQueue) ReceiveRankingRequest(ctx context.Context) ([]types.UpworkRan
 			"job_id",
 			"user_id",
 		},
+		WaitTimeSeconds: 5,
 	})
 	if err != nil {
 		return nil, err

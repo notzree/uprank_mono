@@ -13,6 +13,9 @@ type APIError struct {
 }
 
 func (e APIError) Error() string {
+	if msg, ok := e.Msg.(string); ok && msg != "" {
+		return fmt.Sprintf("api error: %d: %s", e.StatusCode, msg)
+	}
 	return fmt.Sprintf("api error: %d", e.StatusCode)
 }
 

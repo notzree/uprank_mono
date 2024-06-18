@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -69,8 +70,8 @@ func (s *V1Servicer) CreateJob(data types.CreateJobRequest, user_id string, ctx 
 		return new_job, nil
 
 	}
+	//technically should never happen because the type validation should catch this
 	return nil, errors.New("missing platform job request")
-
 }
 
 // Creates an upwork job and attaches it to a job.
@@ -101,6 +102,11 @@ func (s *V1Servicer) AttachUpworkJob(data types.AttachUpworkJobRequest, user_id 
 		return nil, create_upwork_job_err
 	}
 	return new_upwork_job, create_upwork_job_err
+}
+func (s *V1Servicer) GetJob(ctx context.Context) (*ent.Job, error) {
+	//todo: implement this
+	job, err := s.ent.Job.Query().First(ctx)
+	return job, err
 }
 
 func (s *V1Servicer) GetUpworkJob(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
@@ -449,7 +455,7 @@ func (s *V1Servicer) SendRankingrequest(job_id uuid.UUID, user_id string, ctx co
 			},
 		},
 		QueueUrl:       &s.ranking_queue_url,
-		MessageBody:    aws.String("Ranking Request"),
+		MessageBody:    aws.String(fmt.Sprint("Ranking request for job ", job_id, " by user ", user_id, time.Now())),
 		MessageGroupId: aws.String("RankingRequest"),
 	})
 	if err != nil {

@@ -1,5 +1,5 @@
 import type { UUID } from "crypto";
-
+import type { CreateUpworkFreelancerResponse } from "~types/freelancer";
 export type Job = {
     id: string;
     title: string;
@@ -60,7 +60,7 @@ export type Job = {
   }
 
   type EdgeFreelancers = {
-    freelancers: any[];
+    upworkfreelancer: CreateUpworkFreelancerResponse[];
   };
 
   //Type that gets sent to the service worker
