@@ -12,8 +12,9 @@ from service import UpworkService
 if __name__ == '__main__':
     sqs_client = boto3.client('sqs', region_name='us-east-2')
     ranking_queue_url = os.environ.get("RANKING_QUEUE_URL")
+    main_backend_url = os.environ.get("MAIN_BACKED_URL")
     q = SQSQueue(sqs_client, ranking_queue_url)
-    svc = UpworkService("http://localhost:8080")
+    svc = UpworkService(main_backend_url)
     server = Server(q, svc, 4)
     try:
         print("starting listener")
