@@ -24,6 +24,7 @@ func main() {
 	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
 	server_port := os.Getenv("SERVER_PORT")
 	ranking_queue_url := os.Getenv("RANKING_QUEUE_URL")
+	inference_server_url := os.Getenv("INFERENCE_SERVER_URL")
 
 	//Create db connection
 	ent_client, err := ent.Open("postgres", db_connection_string)
@@ -43,7 +44,7 @@ func main() {
 
 	servicer := svc.NewV1Servicer(ent_client, sqs_client, ranking_queue_url)
 
-	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key)
+	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key, inference_server_url)
 
 	//Create router
 	router := chi.NewRouter()

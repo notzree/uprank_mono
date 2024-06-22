@@ -20,5 +20,5 @@ type Servicer interface {
 	CreateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) ([]*ent.UpworkFreelancer, error)
 	UpdateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) (created_freelancer_count int, updated_freelancer_count int, deleted_freelancer_count int, err error)
 	GetFreelancersFromUpworkJob(upwork_job_id string, user_id string, ctx context.Context) ([]*ent.UpworkFreelancer, error)
-	SendRankingrequest(job_id uuid.UUID, user_id string, ctx context.Context) error //sends request to messaging queue to rank the job
+	SendRankingrequest(data types.RankJobRequest, ctx context.Context) error //sends request to messaging queue to rank the job
 }

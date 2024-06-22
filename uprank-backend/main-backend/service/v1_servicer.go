@@ -442,20 +442,32 @@ func (s *V1Servicer) UpdateUpworkFreelancer(data []types.CreateUpworkFreelancerR
 }
 
 // So Basically, the fifo queue uses the messagebody as the deduplication id so if we send a message with the same body within a span of 5 mins it will be discarded.
-func (s *V1Servicer) SendRankingrequest(job_id uuid.UUID, user_id string, ctx context.Context) error {
+func (s *V1Servicer) SendRankingrequest(data types.RankJobRequest, ctx context.Context) error {
 	_, err := s.sqs_client.SendMessage(ctx, &sqs.SendMessageInput{
 		MessageAttributes: map[string]sqs_types.MessageAttributeValue{
 			"job_id": {
 				DataType:    aws.String("String"),
-				StringValue: aws.String(job_id.String()),
+				StringValue: aws.String(data.Job_id.String()),
 			},
 			"user_id": {
 				DataType:    aws.String("String"),
-				StringValue: aws.String(user_id),
+				StringValue: aws.String(data.User_id),
+			},
+			"short_lived_token": {
+				DataType:    aws.String("String"),
+				StringValue: aws.String(data.Short_lived_token),
+			},
+			"platform": {
+				DataType:    aws.String("String"),
+				StringValue: aws.String(data.Platform),
+			},
+			"platform_id": {
+				DataType:    aws.String("String"),
+				StringValue: aws.String(data.Platform_id),
 			},
 		},
 		QueueUrl:       &s.ranking_queue_url,
-		MessageBody:    aws.String(fmt.Sprint("Ranking request for job ", job_id, " by user ", user_id, time.Now())),
+		MessageBody:    aws.String(fmt.Sprint("Ranking request for job ", data.Job_id, " by user ", data.User_id, time.Now())),
 		MessageGroupId: aws.String("RankingRequest"),
 	})
 	if err != nil {

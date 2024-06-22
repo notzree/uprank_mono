@@ -35,8 +35,9 @@ func (s *Server) Start() error {
 					users_router.Post("/update", Make(s.UpdateUser))
 				})
 			})
-			v1_router.Post("/test", Make(s.TestRanking))
 		})
+		v1_router.Post("/test", Make(s.TestRanking))
+		v1_router.Get("/test/jobs/{job_id}/upwork/{upwork_job_id}", Make(s.GetUpworkJob))
 		//private apis
 		v1_router.Group(func(private_router chi.Router) {
 			private_router.Use(func(next http.Handler) http.Handler {

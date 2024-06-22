@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) AttachUpworkJob(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
@@ -32,7 +32,7 @@ func (s *Server) AttachUpworkJob(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) GetUpworkJob(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
