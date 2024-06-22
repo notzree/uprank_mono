@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromContext(r.Context())
+	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
