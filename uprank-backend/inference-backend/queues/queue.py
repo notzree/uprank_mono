@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 from .types import RankingRequest
 
 
@@ -11,5 +12,3 @@ class Queue(ABC):
     @abstractmethod
     def delete_message(self, message):
         pass
-
-
