@@ -33,8 +33,10 @@ export default function PopUpEntry() {
       //   setIsJobValid(cachedData.exists)
       //   return
       // }
-
-      const upwork_job_response = await client.getUpworkJob(id, await getToken())
+      let token = await getToken({template: "uprank_inference_template"})
+      
+      
+      const upwork_job_response = await client.getUpworkJob(id, await getToken({template: "uprank_inference_template"}))
       console.log(upwork_job_response);
         if (upwork_job_response.error_msg == null){
           setIsJobValid(true);
@@ -117,7 +119,8 @@ export default function PopUpEntry() {
       )
     })
   }
-
+  const token = getToken()
+  console.log(token)
   const handleAddFreelancers = async () => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
