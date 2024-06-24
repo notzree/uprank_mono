@@ -5,19 +5,27 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class EmbedVectorRequest(_message.Message):
+class EmbedTextRequest(_message.Message):
     __slots__ = ("text",)
     TEXT_FIELD_NUMBER: _ClassVar[int]
     text: str
     def __init__(self, text: _Optional[str] = ...) -> None: ...
 
-class EmbedVectorResponse(_message.Message):
+class EmbedTextResponse(_message.Message):
     __slots__ = ("vector",)
     VECTOR_FIELD_NUMBER: _ClassVar[int]
     vector: _containers.RepeatedScalarFieldContainer[float]
     def __init__(self, vector: _Optional[_Iterable[float]] = ...) -> None: ...
 
 class UpsertVectorRequest(_message.Message):
+    __slots__ = ("namespace", "vectors")
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    VECTORS_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    vectors: _containers.RepeatedCompositeFieldContainer[Vector]
+    def __init__(self, namespace: _Optional[str] = ..., vectors: _Optional[_Iterable[_Union[Vector, _Mapping]]] = ...) -> None: ...
+
+class Vector(_message.Message):
     __slots__ = ("id", "vector", "metadata")
     class MetadataEntry(_message.Message):
         __slots__ = ("key", "value")
@@ -35,14 +43,12 @@ class UpsertVectorRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ..., vector: _Optional[_Iterable[float]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpsertVectorResponse(_message.Message):
-    __slots__ = ("id", "ok", "error")
+    __slots__ = ("id", "error")
     ID_FIELD_NUMBER: _ClassVar[int]
-    OK_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     id: str
-    ok: bool
     error: str
-    def __init__(self, id: _Optional[str] = ..., ok: bool = ..., error: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., error: _Optional[str] = ...) -> None: ...
 
 class QueryVectorRequest(_message.Message):
     __slots__ = ("namespace", "vector", "top_k", "filter")
@@ -88,3 +94,21 @@ class Usage(_message.Message):
     READ_UNITS_FIELD_NUMBER: _ClassVar[int]
     read_units: int
     def __init__(self, read_units: _Optional[int] = ...) -> None: ...
+
+class DeleteVectorRequest(_message.Message):
+    __slots__ = ("ids", "namespace")
+    IDS_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    ids: _containers.RepeatedScalarFieldContainer[str]
+    namespace: str
+    def __init__(self, ids: _Optional[_Iterable[str]] = ..., namespace: _Optional[str] = ...) -> None: ...
+
+class DeleteVectorResponse(_message.Message):
+    __slots__ = ("ids", "ok", "error")
+    IDS_FIELD_NUMBER: _ClassVar[int]
+    OK_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    ids: _containers.RepeatedScalarFieldContainer[str]
+    ok: bool
+    error: str
+    def __init__(self, ids: _Optional[_Iterable[str]] = ..., ok: bool = ..., error: _Optional[str] = ...) -> None: ...
