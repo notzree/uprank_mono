@@ -2,4 +2,4 @@
 from .service import Service
 from .upwork_service import UpworkService
 
-__all__ = ['Service', 'UpworkService']
+__all__ = ["Service", "UpworkService"]

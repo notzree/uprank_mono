@@ -17,13 +17,14 @@ services:
       - SERVER_PORT=${SERVER_PORT}
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
       - RANKING_QUEUE_URL=${RANKING_QUEUE_URL}
+      - INFERENCE_SERVER_URL=${INFERENCE_SERVER_URL}
   inference-server:
     image: notzree/uprank/uprank-backend/inference-backend:1.0
     container_name: uprank-inference-backend
     stdin_open: true
     tty: true
     ports:
-      - ${EXPOSED_INFERNCE_SERVER_PORT}:${EXPOSED_INFERENCE_SERVER_PORT}
+      - ${EXPOSED_INFERENCE_SERVER_PORT}:${EXPOSED_INFERENCE_SERVER_PORT}
     build:
       context: ./inference-backend
       dockerfile: Dockerfile.dev
@@ -36,5 +37,9 @@ services:
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
       - RANKING_QUEUE_URL=${RANKING_QUEUE_URL}
       - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - MAIN_BACKEND_URL=${MAIN_BACKEND_URL}
+      - INFERENCE_SERVER_URL=${INFERENCE_SERVER_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - NOTIFICATION_QUEUE_URL=${NOTIFICATION_QUEUE_URL}
 
 
