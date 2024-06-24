@@ -3,28 +3,33 @@ syntax = "proto3";
 package inference;
 
 service Inference {
-  rpc EmbedVector(EmbedVectorRequest) returns (EmbedVectorResponse);
+  rpc EmbedText(EmbedTextRequest) returns (EmbedTextResponse);
   rpc UpsertVector(UpsertVectorRequest) returns (UpsertVectorResponse);
   rpc QueryVector (QueryVectorRequest) returns (QueryVectorResponse);
+  rpc DeleteVector(DeleteVectorRequest) returns (DeleteVectorResponse);
 }
 
-message EmbedVectorRequest {
+message EmbedTextRequest {
   string text = 1;
 }
 
-message EmbedVectorResponse {
+message EmbedTextResponse {
   repeated float vector = 1;
 }
 
 message UpsertVectorRequest{
+  string namespace = 1;
+  repeated Vector vectors = 2;
+}
+
+message Vector {
   string id = 1;
   repeated float vector = 2;
-  map<string, string> metadata = 3; 
+  map<string, string> metadata = 3;
 }
 
 message UpsertVectorResponse {
   string id = 1;
-  bool ok = 2;
   string error = 3;
 }
 
@@ -55,6 +60,16 @@ message Usage {
   int32 read_units = 1;
 }
 
+message DeleteVectorRequest {
+  repeated string ids = 1;
+  string namespace = 2;
+}
+
+message DeleteVectorResponse {
+  repeated string ids = 1;
+  bool ok = 2;
+  string error = 3;
+}
 
 
 

@@ -3,7 +3,8 @@
 import grpc
 import warnings
 
-import inference_pb2 as inference__pb2
+# import inference_pb2 as inference__pb2
+from . import inference_pb2 as inference__pb2
 
 GRPC_GENERATED_VERSION = '1.64.1'
 GRPC_VERSION = grpc.__version__
@@ -39,10 +40,10 @@ class InferenceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.EmbedVector = channel.unary_unary(
-                '/inference.Inference/EmbedVector',
-                request_serializer=inference__pb2.EmbedVectorRequest.SerializeToString,
-                response_deserializer=inference__pb2.EmbedVectorResponse.FromString,
+        self.EmbedText = channel.unary_unary(
+                '/inference.Inference/EmbedText',
+                request_serializer=inference__pb2.EmbedTextRequest.SerializeToString,
+                response_deserializer=inference__pb2.EmbedTextResponse.FromString,
                 _registered_method=True)
         self.UpsertVector = channel.unary_unary(
                 '/inference.Inference/UpsertVector',
@@ -54,12 +55,17 @@ class InferenceStub(object):
                 request_serializer=inference__pb2.QueryVectorRequest.SerializeToString,
                 response_deserializer=inference__pb2.QueryVectorResponse.FromString,
                 _registered_method=True)
+        self.DeleteVector = channel.unary_unary(
+                '/inference.Inference/DeleteVector',
+                request_serializer=inference__pb2.DeleteVectorRequest.SerializeToString,
+                response_deserializer=inference__pb2.DeleteVectorResponse.FromString,
+                _registered_method=True)
 
 
 class InferenceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def EmbedVector(self, request, context):
+    def EmbedText(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -77,13 +83,19 @@ class InferenceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteVector(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_InferenceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'EmbedVector': grpc.unary_unary_rpc_method_handler(
-                    servicer.EmbedVector,
-                    request_deserializer=inference__pb2.EmbedVectorRequest.FromString,
-                    response_serializer=inference__pb2.EmbedVectorResponse.SerializeToString,
+            'EmbedText': grpc.unary_unary_rpc_method_handler(
+                    servicer.EmbedText,
+                    request_deserializer=inference__pb2.EmbedTextRequest.FromString,
+                    response_serializer=inference__pb2.EmbedTextResponse.SerializeToString,
             ),
             'UpsertVector': grpc.unary_unary_rpc_method_handler(
                     servicer.UpsertVector,
@@ -94,6 +106,11 @@ def add_InferenceServicer_to_server(servicer, server):
                     servicer.QueryVector,
                     request_deserializer=inference__pb2.QueryVectorRequest.FromString,
                     response_serializer=inference__pb2.QueryVectorResponse.SerializeToString,
+            ),
+            'DeleteVector': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteVector,
+                    request_deserializer=inference__pb2.DeleteVectorRequest.FromString,
+                    response_serializer=inference__pb2.DeleteVectorResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -107,7 +124,7 @@ class Inference(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def EmbedVector(request,
+    def EmbedText(request,
             target,
             options=(),
             channel_credentials=None,
@@ -120,9 +137,9 @@ class Inference(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/inference.Inference/EmbedVector',
-            inference__pb2.EmbedVectorRequest.SerializeToString,
-            inference__pb2.EmbedVectorResponse.FromString,
+            '/inference.Inference/EmbedText',
+            inference__pb2.EmbedTextRequest.SerializeToString,
+            inference__pb2.EmbedTextResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -177,6 +194,33 @@ class Inference(object):
             '/inference.Inference/QueryVector',
             inference__pb2.QueryVectorRequest.SerializeToString,
             inference__pb2.QueryVectorResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteVector(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/inference.Inference/DeleteVector',
+            inference__pb2.DeleteVectorRequest.SerializeToString,
+            inference__pb2.DeleteVectorResponse.FromString,
             options,
             channel_credentials,
             insecure,
