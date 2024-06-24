@@ -6,8 +6,8 @@ import type {  CreateFreelancerProxyRequest, CreateFreelancerResponse, Scraped_F
 const handler: PlasmoMessaging.MessageHandler = async (req, res)   => {
   console.log("sending freelancer create req")
   const client = new V1Client();
-    const body: CreateFreelancerProxyRequest = req.body;
-    var response = null;
+  const body: CreateFreelancerProxyRequest = req.body;
+  var response = null;
     if (body.update){
       response = await client.updateUpworkFreelancers(body.job_id, body, body.authentication_token)
     } else {

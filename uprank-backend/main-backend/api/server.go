@@ -54,6 +54,7 @@ func (s *Server) Start() error {
 					jobs_router.Route("/upwork", func(upwork_router chi.Router) {
 						upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
 							upwork_job_id_router.Get("/", Make(s.GetUpworkJob))
+							upwork_job_id_router.Get("/all_data", Make(s.GetUpworkJobWithAllFreelancerData))
 							upwork_job_id_router.Route("/freelancers", func(upwork_freelancers_router chi.Router) {
 								upwork_freelancers_router.Post("/", Make(s.CreateUpworkFreelancers))       //create freelancers
 								upwork_freelancers_router.Post("/update", Make(s.UpdateUpworkFreelancers)) //update freelancers

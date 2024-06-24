@@ -476,3 +476,19 @@ func (s *V1Servicer) SendRankingrequest(data types.RankJobRequest, ctx context.C
 
 	return nil
 }
+
+func (s *V1Servicer) GetUpworkJobWithAllFreelancerData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
+	job, err := s.ent.UpworkJob.Query().
+		Where(upworkjob.IDEQ(upwork_job_id)).
+		Where(
+			upworkjob.HasJobWith(
+				job.HasUserWith(user.IDEQ(user_id)),
+			),
+		).
+		WithUpworkfreelancer(func(query *ent.UpworkFreelancerQuery) {
+			query.WithAttachments()
+			query.WithWorkHistories()
+		}).
+		Only(ctx)
+	return job, err
+}
