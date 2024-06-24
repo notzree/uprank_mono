@@ -1,6 +1,4 @@
 uprank-backend/.env
 .DS_Store
 uprank-backend/inference-backend/.venv/
-uprank-backend/inference-backend2/.venv/
-
-git rm -r --cached inference-backend2/.venv/
+uprank-backend/inference-backend2/
