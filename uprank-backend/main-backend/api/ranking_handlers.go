@@ -18,7 +18,7 @@ func (s *Server) TestRanking(w http.ResponseWriter, r *http.Request) error {
 	data := types.RankJobRequest{
 		Job_id:            req.JobID,
 		User_id:           req.UserID,
-		Short_lived_token: "poo",
+		Short_lived_token: "unimplemented",
 		Platform:          req.Platform,
 		Platform_id:       req.PlatformID,
 	}
