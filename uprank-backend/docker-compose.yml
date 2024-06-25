@@ -11,7 +11,6 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./main-backend:/app
-      - ~/.aws:/root/.aws
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
       - SERVER_PORT=${SERVER_PORT}
@@ -30,16 +29,29 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./inference-backend:/app
-      - ~/.aws:/root/.aws
     environment:
-      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
       - SERVER_PORT=${EXPOSED_INFERENCE_SERVER_PORT}
-      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
-      - RANKING_QUEUE_URL=${RANKING_QUEUE_URL}
       - PINECONE_API_KEY=${PINECONE_API_KEY}
       - MAIN_BACKEND_URL=${MAIN_BACKEND_URL}
-      - INFERENCE_SERVER_URL=${INFERENCE_SERVER_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+  queue-handler:
+    image: notzree/uprank/uprank-backend/inference-backend:1.0
+    container_name: uprank-queue-handler
+    stdin_open: true
+    tty: true
+    ports:
+      - ${EXPOSED_INFERENCE_SERVER_PORT}:${EXPOSED_INFERENCE_SERVER_PORT}
+    build:
+      context: ./queue-handler
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./inference-backend:/app
+      - ~/.aws:/root/.aws
+    environment:
+      - SERVER_PORT=${EXPOSED_INFERENCE_SERVER_PORT}
+      - RANKING_QUEUE_URL=${RANKING_QUEUE_URL}
+      - MAIN_BACKEND_URL=${MAIN_BACKEND_URL}
+      - INFERENCE_SERVER_URL=${INFERENCE_SERVER_URL}
       - NOTIFICATION_QUEUE_URL=${NOTIFICATION_QUEUE_URL}
 
 
