@@ -1,13 +1,19 @@
 syntax = "proto3";
-
 package inference;
+option go_package = "github.com/notzree/uprank.ai/backend/inference-backend";
 
 service Inference {
   rpc EmbedText(EmbedTextRequest) returns (EmbedTextResponse);
+  // rpc Embed()
   rpc UpsertVector(UpsertVectorRequest) returns (UpsertVectorResponse);
   rpc QueryVector (QueryVectorRequest) returns (QueryVectorResponse);
   rpc DeleteVector(DeleteVectorRequest) returns (DeleteVectorResponse);
 }
+
+//consider merging upsert and embed into 1 method that takes an optioanal param to upsert after embedding...
+// message EmbedRequest {
+//   string text = 1;
+// }
 
 message EmbedTextRequest {
   string text = 1;
