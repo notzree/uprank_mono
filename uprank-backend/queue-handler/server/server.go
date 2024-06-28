@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	_ "github.com/lib/pq"
@@ -15,28 +16,33 @@ import (
 	"github.com/notzree/uprank-backend/queue-handler/types"
 )
 
+const (
+	DESCRIPTION_NAMESPACE = "description"
+	SKILL_NAMESPACE       = "skill"
+)
+
 type Server struct {
 	messenger_url string
 	backend_url   string
+	ms_api_key    string
 	queue         queue.Queue
 	infer         proto.InferenceClient
+	httpClient    http.Client
 }
 
-func NewServer(messenger_url string, backend_url string, queue queue.Queue, infer proto.InferenceClient) *Server {
+func NewServer(messenger_url string, backend_url string, queue queue.Queue, infer proto.InferenceClient, ms_api_key string, httpClient http.Client) *Server {
 	return &Server{
 		messenger_url: messenger_url,
 		backend_url:   backend_url,
 		queue:         queue,
 		infer:         infer,
+		ms_api_key:    ms_api_key,
+		httpClient:    httpClient,
 	}
 }
 
 func (s *Server) Start() {
-	//So in the future we can add more listners
-	//also need to figure out middleware and logging
-	//maybe have a makefunction here that wraps functions that returns errors into return void
-	//wrapping this with make makes it not run
-	log.Println("Listening for requests")
+	log.Println("Starting queue_handler...")
 	for {
 		Make(s.PollForRankingRequest)()
 	}
@@ -57,6 +63,7 @@ func (s *Server) PollForRankingRequest() error {
 		if ranking_err != nil {
 			return NewServiceError(ranking_err)
 		}
+		log.Default().Println("Successfully upserted vectors")
 
 		err = s.queue.DeleteMessage(context.TODO(), req.Receipt_handle)
 		if err != nil {
@@ -66,79 +73,123 @@ func (s *Server) PollForRankingRequest() error {
 	return nil
 }
 
-func (s *Server) UpsertVectors(req types.JobDataAll, user_id string) (*string, error) {
+func (s *Server) Rank() {
+	//todo: impl rank
+}
+
+func (s *Server) UpsertVectors(req types.JobDataAll, user_id string) (*types.UpsertVectorResponse, error) {
 	ctx := context.Background()
-	job_description_vector, err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
-		Text: req.Description,
-	})
-	description_metadata := CreateMetadata(user_id, req.ID, "job_description", "upwork")
-
-	job_description_pc_vector := &proto.Vector{
+	job_description_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 		Id:       req.ID,
-		Vector:   job_description_vector.Vector,
-		Metadata: description_metadata,
-	}
-
-	description_upsert_result, err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
-		Vectors: []*proto.Vector{job_description_pc_vector},
+		Text:     req.Description,
+		Metadata: CreateMetadata(user_id, req.ID, "job_description", "upwork"),
 	})
-	if err != nil {
-		return nil, err
+	if embed_err != nil {
+		return nil, embed_err
 	}
 	job_skills_as_string := strings.Join(req.Skills, " ")
-	job_skill_vector, err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
-		Text: job_skills_as_string,
-	})
-	if err != nil {
-		return nil, err
-	}
-	skill_metadata := CreateMetadata(user_id, req.ID, "job_skills", "upwork")
-
-	job_skill_pc_vector := &proto.Vector{
+	job_skill_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
+		Text:     job_skills_as_string,
 		Id:       req.ID,
-		Vector:   job_skill_vector.Vector,
-		Metadata: skill_metadata,
-	}
-
-	skills_upsert_result, err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
-		Vectors: []*proto.Vector{job_skill_pc_vector},
+		Metadata: CreateMetadata(user_id, req.ID, "job_skills", "upwork"),
 	})
-	if err != nil {
-		return nil, err
+	if embed_err != nil {
+		return nil, embed_err
+	}
+	_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+		Namespace: DESCRIPTION_NAMESPACE,
+		Vectors:   []*proto.Vector{job_description_vector.Vector},
+	})
+	if upsert_vector_err != nil {
+		return nil, upsert_vector_err
+	}
+	_, upsert_vector_err = s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+		Namespace: SKILL_NAMESPACE,
+		Vectors:   []*proto.Vector{job_skill_vector.Vector},
+	})
+	if upsert_vector_err != nil {
+		return nil, upsert_vector_err
 	}
 
 	for _, freelancer := range req.Edges.UpworkFreelancer {
+		description_vectors := []*proto.Vector{}
+		skill_vectors := []*proto.Vector{}
+
+		//Embed and add vectors to array to embed in 1 trip
 		freelancer_description_vector, embed_description_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
-			Text: freelancer.Description,
+			Id:       freelancer.ID,
+			Text:     freelancer.Description,
+			Metadata: CreateMetadata(user_id, req.ID, "freelancer_description", "upwork"),
 		})
 		if embed_description_vector_err != nil {
 			return nil, embed_description_vector_err
 		}
+
+		description_vectors = append(description_vectors, freelancer_description_vector.Vector)
+
 		freelancer_skills_as_string := strings.Join(freelancer.Skills, " ")
 		freelancer_skill_vector, embed_skill_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
-			Text: freelancer_skills_as_string,
+			Id:       freelancer.ID,
+			Text:     freelancer_skills_as_string,
+			Metadata: CreateMetadata(user_id, req.ID, "freelancer_skills", "upwork"),
 		})
 		if embed_skill_vector_err != nil {
 			return nil, embed_skill_vector_err
 		}
-		for _, work_history := range freelancer.Edges.WorkHistories {
+		skill_vectors = append(skill_vectors, freelancer_skill_vector.Vector)
 
+		for _, work_history := range freelancer.Edges.WorkHistories {
+			if work_history.Description == "" {
+				continue
+			}
+			work_history_description_vector, embed_work_history_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
+				Id:       strconv.Itoa(work_history.ID),
+				Text:     work_history.Description,
+				Metadata: CreateMetadata(user_id, req.ID, "work_history_description", "upwork"),
+			})
+			if embed_work_history_vector_err != nil {
+				return nil, embed_work_history_vector_err
+			}
+
+			description_vectors = append(description_vectors, work_history_description_vector.Vector)
 		}
 
-		//TODO: Implement upserting of the work histories
-		//todo: prob should have a batch upsert option
-		//Also should have a way to embed + upsert in 1 round trip so better performance
-
+		_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+			Namespace: DESCRIPTION_NAMESPACE,
+			Vectors:   description_vectors,
+		})
+		if upsert_vector_err != nil {
+			return nil, upsert_vector_err
+		}
+		_, upsert_vector_err = s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+			Namespace: SKILL_NAMESPACE,
+			Vectors:   skill_vectors,
+		})
+		if upsert_vector_err != nil {
+			return nil, upsert_vector_err
+		}
 	}
+
+	return &types.UpsertVectorResponse{
+		Job_description_vector: job_description_vector.Vector,
+		Job_skill_vector:       job_skill_vector.Vector,
+	}, nil
 
 }
 
 func (s *Server) FetchJobData(req types.UpworkRankingMessage) (*types.JobDataAll, error) {
 	fetch_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/all_data", s.backend_url, req.Platform, req.Platform_id)
 	log.Println("Fetching data from:", fetch_url)
-	resp, err := http.Get(fetch_url)
+	httpreq, err := http.NewRequest("GET", fetch_url, nil)
 	if err != nil {
 		return nil, err
+	}
+	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("User_id", req.User_id)
+	resp, err := s.httpClient.Do(httpreq)
+	if err != nil {
+		return nil, err
+
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
@@ -153,11 +204,11 @@ func (s *Server) FetchJobData(req types.UpworkRankingMessage) (*types.JobDataAll
 	return &job_data, nil
 }
 
-func CreateMetadata(user_id string, job_id string, job_type string, platform string) map[string]string {
+func CreateMetadata(user_id string, job_id string, vector_type string, platform string) map[string]string {
 	metadata := make(map[string]string)
 	metadata["user_id"] = user_id
 	metadata["job_id"] = job_id
-	metadata["type"] = job_type
+	metadata["type"] = vector_type
 	metadata["platform"] = platform
 	return metadata
 }
