@@ -70,7 +70,12 @@ export type Job = {
   }
   //Type that the service worker sends to the backend
   export type CreateJobClientRequest = {
-    upwork_job_request: ScrapedJobData | null;
+    origin: string;
+    platform_job_requests: PlatformJobRequests;
+  }
+
+  export type PlatformJobRequests = {
+    upwork_request: ScrapedJobData | null;
   }
 
   export type CreateJobClientResponse = {

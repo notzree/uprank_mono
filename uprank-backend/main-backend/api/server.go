@@ -48,7 +48,7 @@ func (s *Server) Start() error {
 				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
 					jobs_router.Post("/", Make(s.CreateJob))
 					jobs_router.Route("/{job_id}", func(job_id_router chi.Router) {
-						jobs_router.Post("/attach", Make(s.AttachUpworkJob)) //todo: move this attach upwork job into a general attach func
+						jobs_router.Post("/attach", Make(s.AttachPlatformSpecificJobs)) //todo: move this attach upwork job into a general attach func
 						jobs_router.Route("/upwork", func(upwork_router chi.Router) {
 							upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
 								upwork_job_id_router.Get("/", Make(s.GetUpworkJob))

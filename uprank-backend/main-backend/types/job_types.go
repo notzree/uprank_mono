@@ -3,24 +3,43 @@ package types
 import "github.com/google/uuid"
 
 type CreateJobRequest struct {
-	UpworkJobRequest *AttachUpworkJobRequest `json:"upwork_job_request,omitempty"`
+	Origin              string                            `json:"origin,omitempty"`
+	PlatformJobRequests AttachPlatformSpecificJobsRequest `json:"platform_job_requests"`
 }
 
 func (req *CreateJobRequest) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 
-	// Validate Upwork job request if it exists
-	if req.UpworkJobRequest != nil {
-		upworkErrors := req.UpworkJobRequest.Validate()
-		if len(upworkErrors) > 0 {
-			errors["UpworkJobRequest"] = upworkErrors
-		}
-	}
-	//todo: When we add on more platforms, check and ensure that at least one platform is specified
-	if req.UpworkJobRequest == nil {
-		errors["UpworkJobRequest"] = "UpworkJobRequest is required"
+	platform_errors := req.PlatformJobRequests.Validate()
+	if len(platform_errors) > 0 {
+		errors["PlatformJobRequests"] = platform_errors
 	}
 	return errors
+}
+
+type AttachPlatformSpecificJobsRequest struct {
+	UpworkRequest *AttachUpworkJobRequest `json:"upwork_request,omitempty"`
+}
+
+func (req *AttachPlatformSpecificJobsRequest) Validate() map[string]interface{} {
+	errors := make(map[string]interface{})
+	nil_array := findNilFields(req)
+	if len(nil_array) == getNumFields(req) {
+		errors["PlatformJobRequests"] = "At least one platform request is required"
+	}
+	if req.UpworkRequest != nil {
+		upwork_errors := req.UpworkRequest.Validate()
+		if len(upwork_errors) > 0 {
+			errors["UpworkRequest"] = upwork_errors
+		}
+	}
+
+	if req.UpworkRequest == nil { //When we add in more platforms, we will need to
+		errors["UpworkRequest"] = "UpworkRequest is required"
+
+	}
+	return errors
+
 }
 
 type RankJobRequest struct {

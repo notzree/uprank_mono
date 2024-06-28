@@ -8,12 +8,12 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/types"
 )
 
-func (s *Server) AttachUpworkJob(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) AttachPlatformSpecificJobs(w http.ResponseWriter, r *http.Request) error {
 	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
-	var req types.AttachUpworkJobRequest
+	var req types.AttachPlatformSpecificJobsRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return InvalidJSON()
@@ -23,7 +23,7 @@ func (s *Server) AttachUpworkJob(w http.ResponseWriter, r *http.Request) error {
 	if errors := req.Validate(); len(errors) > 0 {
 		return InvalidRequestData(errors)
 	}
-	new_upwork_job, err := s.svc.AttachUpworkJob(req, user_id, nil, r.Context())
+	new_upwork_job, err := s.svc.AttachPlatformSpecificjobs(req, user_id, nil, r.Context())
 	if err != nil {
 		return err
 	}
