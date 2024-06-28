@@ -47,6 +47,48 @@ func (ujc *UpworkJobCreate) SetNillableCreatedAt(t *time.Time) *UpworkJobCreate 
 	return ujc
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (ujc *UpworkJobCreate) SetUpdatedAt(t time.Time) *UpworkJobCreate {
+	ujc.mutation.SetUpdatedAt(t)
+	return ujc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ujc *UpworkJobCreate) SetNillableUpdatedAt(t *time.Time) *UpworkJobCreate {
+	if t != nil {
+		ujc.SetUpdatedAt(*t)
+	}
+	return ujc
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ujc *UpworkJobCreate) SetEmbeddedAt(t time.Time) *UpworkJobCreate {
+	ujc.mutation.SetEmbeddedAt(t)
+	return ujc
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ujc *UpworkJobCreate) SetNillableEmbeddedAt(t *time.Time) *UpworkJobCreate {
+	if t != nil {
+		ujc.SetEmbeddedAt(*t)
+	}
+	return ujc
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (ujc *UpworkJobCreate) SetRankedAt(t time.Time) *UpworkJobCreate {
+	ujc.mutation.SetRankedAt(t)
+	return ujc
+}
+
+// SetNillableRankedAt sets the "ranked_at" field if the given value is not nil.
+func (ujc *UpworkJobCreate) SetNillableRankedAt(t *time.Time) *UpworkJobCreate {
+	if t != nil {
+		ujc.SetRankedAt(*t)
+	}
+	return ujc
+}
+
 // SetLocation sets the "location" field.
 func (ujc *UpworkJobCreate) SetLocation(s string) *UpworkJobCreate {
 	ujc.mutation.SetLocation(s)
@@ -247,6 +289,10 @@ func (ujc *UpworkJobCreate) defaults() {
 		v := upworkjob.DefaultCreatedAt()
 		ujc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := ujc.mutation.UpdatedAt(); !ok {
+		v := upworkjob.DefaultUpdatedAt()
+		ujc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -261,6 +307,9 @@ func (ujc *UpworkJobCreate) check() error {
 	}
 	if _, ok := ujc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "UpworkJob.created_at"`)}
+	}
+	if _, ok := ujc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "UpworkJob.updated_at"`)}
 	}
 	if _, ok := ujc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "UpworkJob.description"`)}
@@ -327,6 +376,18 @@ func (ujc *UpworkJobCreate) createSpec() (*UpworkJob, *sqlgraph.CreateSpec) {
 	if value, ok := ujc.mutation.CreatedAt(); ok {
 		_spec.SetField(upworkjob.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := ujc.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkjob.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := ujc.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkjob.FieldEmbeddedAt, field.TypeTime, value)
+		_node.EmbeddedAt = value
+	}
+	if value, ok := ujc.mutation.RankedAt(); ok {
+		_spec.SetField(upworkjob.FieldRankedAt, field.TypeTime, value)
+		_node.RankedAt = value
 	}
 	if value, ok := ujc.mutation.Location(); ok {
 		_spec.SetField(upworkjob.FieldLocation, field.TypeString, value)
@@ -494,6 +555,54 @@ func (u *UpworkJobUpsert) SetCreatedAt(v time.Time) *UpworkJobUpsert {
 // UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
 func (u *UpworkJobUpsert) UpdateCreatedAt() *UpworkJobUpsert {
 	u.SetExcluded(upworkjob.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkJobUpsert) SetUpdatedAt(v time.Time) *UpworkJobUpsert {
+	u.Set(upworkjob.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkJobUpsert) UpdateUpdatedAt() *UpworkJobUpsert {
+	u.SetExcluded(upworkjob.FieldUpdatedAt)
+	return u
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkJobUpsert) SetEmbeddedAt(v time.Time) *UpworkJobUpsert {
+	u.Set(upworkjob.FieldEmbeddedAt, v)
+	return u
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkJobUpsert) UpdateEmbeddedAt() *UpworkJobUpsert {
+	u.SetExcluded(upworkjob.FieldEmbeddedAt)
+	return u
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkJobUpsert) ClearEmbeddedAt() *UpworkJobUpsert {
+	u.SetNull(upworkjob.FieldEmbeddedAt)
+	return u
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (u *UpworkJobUpsert) SetRankedAt(v time.Time) *UpworkJobUpsert {
+	u.Set(upworkjob.FieldRankedAt, v)
+	return u
+}
+
+// UpdateRankedAt sets the "ranked_at" field to the value that was provided on create.
+func (u *UpworkJobUpsert) UpdateRankedAt() *UpworkJobUpsert {
+	u.SetExcluded(upworkjob.FieldRankedAt)
+	return u
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (u *UpworkJobUpsert) ClearRankedAt() *UpworkJobUpsert {
+	u.SetNull(upworkjob.FieldRankedAt)
 	return u
 }
 
@@ -774,6 +883,62 @@ func (u *UpworkJobUpsertOne) SetCreatedAt(v time.Time) *UpworkJobUpsertOne {
 func (u *UpworkJobUpsertOne) UpdateCreatedAt() *UpworkJobUpsertOne {
 	return u.Update(func(s *UpworkJobUpsert) {
 		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkJobUpsertOne) SetUpdatedAt(v time.Time) *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertOne) UpdateUpdatedAt() *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkJobUpsertOne) SetEmbeddedAt(v time.Time) *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetEmbeddedAt(v)
+	})
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertOne) UpdateEmbeddedAt() *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkJobUpsertOne) ClearEmbeddedAt() *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.ClearEmbeddedAt()
+	})
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (u *UpworkJobUpsertOne) SetRankedAt(v time.Time) *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetRankedAt(v)
+	})
+}
+
+// UpdateRankedAt sets the "ranked_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertOne) UpdateRankedAt() *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateRankedAt()
+	})
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (u *UpworkJobUpsertOne) ClearRankedAt() *UpworkJobUpsertOne {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.ClearRankedAt()
 	})
 }
 
@@ -1255,6 +1420,62 @@ func (u *UpworkJobUpsertBulk) SetCreatedAt(v time.Time) *UpworkJobUpsertBulk {
 func (u *UpworkJobUpsertBulk) UpdateCreatedAt() *UpworkJobUpsertBulk {
 	return u.Update(func(s *UpworkJobUpsert) {
 		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkJobUpsertBulk) SetUpdatedAt(v time.Time) *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertBulk) UpdateUpdatedAt() *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkJobUpsertBulk) SetEmbeddedAt(v time.Time) *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetEmbeddedAt(v)
+	})
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertBulk) UpdateEmbeddedAt() *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkJobUpsertBulk) ClearEmbeddedAt() *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.ClearEmbeddedAt()
+	})
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (u *UpworkJobUpsertBulk) SetRankedAt(v time.Time) *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.SetRankedAt(v)
+	})
+}
+
+// UpdateRankedAt sets the "ranked_at" field to the value that was provided on create.
+func (u *UpworkJobUpsertBulk) UpdateRankedAt() *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.UpdateRankedAt()
+	})
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (u *UpworkJobUpsertBulk) ClearRankedAt() *UpworkJobUpsertBulk {
+	return u.Update(func(s *UpworkJobUpsert) {
+		s.ClearRankedAt()
 	})
 }
 

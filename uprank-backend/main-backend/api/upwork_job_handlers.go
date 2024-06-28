@@ -45,14 +45,14 @@ func (s *Server) GetUpworkJob(w http.ResponseWriter, r *http.Request) error {
 	return writeJSON(w, http.StatusOK, job)
 }
 
-func (s *Server) GetUpworkJobWithAllFreelancerData(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) GetUpworkJobEmbeddingData(w http.ResponseWriter, r *http.Request) error {
 	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
 	upwork_job_id := chi.URLParam(r, "upwork_job_id")
 
-	job, err := s.svc.GetUpworkJobWithAllFreelancerData(upwork_job_id, user_id, r.Context())
+	job, err := s.svc.GetUpworkJobEmbeddingData(upwork_job_id, user_id, r.Context())
 	if err != nil {
 		return err
 	}

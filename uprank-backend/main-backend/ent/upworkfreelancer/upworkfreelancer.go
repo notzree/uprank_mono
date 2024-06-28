@@ -46,6 +46,10 @@ const (
 	FieldRecentHours = "recent_hours"
 	// FieldTotalHours holds the string denoting the total_hours field in the database.
 	FieldTotalHours = "total_hours"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// FieldTotalPortfolioItems holds the string denoting the total_portfolio_items field in the database.
 	FieldTotalPortfolioItems = "total_portfolio_items"
 	// FieldTotalPortfolioV2Items holds the string denoting the total_portfolio_v2_items field in the database.
@@ -82,8 +86,8 @@ const (
 	FieldTotalRevenue = "total_revenue"
 	// FieldUprankScore holds the string denoting the uprank_score field in the database.
 	FieldUprankScore = "uprank_score"
-	// FieldUprankUpdatedAt holds the string denoting the uprank_updated_at field in the database.
-	FieldUprankUpdatedAt = "uprank_updated_at"
+	// FieldEmbeddedAt holds the string denoting the embedded_at field in the database.
+	FieldEmbeddedAt = "embedded_at"
 	// FieldUprankReccomended holds the string denoting the uprank_reccomended field in the database.
 	FieldUprankReccomended = "uprank_reccomended"
 	// FieldUprankReccomendedReasons holds the string denoting the uprank_reccomended_reasons field in the database.
@@ -138,6 +142,8 @@ var Columns = []string{
 	FieldPhotoURL,
 	FieldRecentHours,
 	FieldTotalHours,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 	FieldTotalPortfolioItems,
 	FieldTotalPortfolioV2Items,
 	FieldUpworkTotalFeedback,
@@ -156,7 +162,7 @@ var Columns = []string{
 	FieldRecentEarnings,
 	FieldTotalRevenue,
 	FieldUprankScore,
-	FieldUprankUpdatedAt,
+	FieldEmbeddedAt,
 	FieldUprankReccomended,
 	FieldUprankReccomendedReasons,
 	FieldUprankNotEnoughData,
@@ -179,12 +185,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultUprankScore holds the default value on creation for the "uprank_score" field.
 	DefaultUprankScore int
-	// DefaultUprankUpdatedAt holds the default value on creation for the "uprank_updated_at" field.
-	DefaultUprankUpdatedAt func() time.Time
-	// UpdateDefaultUprankUpdatedAt holds the default value on update for the "uprank_updated_at" field.
-	UpdateDefaultUprankUpdatedAt func() time.Time
 	// DefaultUprankReccomended holds the default value on creation for the "uprank_reccomended" field.
 	DefaultUprankReccomended bool
 	// DefaultUprankNotEnoughData holds the default value on creation for the "uprank_not_enough_data" field.
@@ -281,6 +289,16 @@ func ByTotalHours(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalHours, opts...).ToFunc()
 }
 
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
 // ByTotalPortfolioItems orders the results by the total_portfolio_items field.
 func ByTotalPortfolioItems(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalPortfolioItems, opts...).ToFunc()
@@ -366,9 +384,9 @@ func ByUprankScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUprankScore, opts...).ToFunc()
 }
 
-// ByUprankUpdatedAt orders the results by the uprank_updated_at field.
-func ByUprankUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankUpdatedAt, opts...).ToFunc()
+// ByEmbeddedAt orders the results by the embedded_at field.
+func ByEmbeddedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmbeddedAt, opts...).ToFunc()
 }
 
 // ByUprankReccomended orders the results by the uprank_reccomended field.

@@ -16,13 +16,13 @@ type Authenticator interface {
 }
 
 type ClerkAuthenticator struct {
-	clerk_secret_key     string
-	inference_server_url string
+	clerk_secret_key string
+	ms_api_key       string
 }
 
-func NewClerkAuthenticator(clerk_secret_key string, inference_server_url string) *ClerkAuthenticator {
+func NewClerkAuthenticator(clerk_secret_key string, ms_api_key string) *ClerkAuthenticator {
 	clerk.SetKey(clerk_secret_key)
-	return &ClerkAuthenticator{clerk_secret_key: clerk_secret_key, inference_server_url: inference_server_url}
+	return &ClerkAuthenticator{clerk_secret_key: clerk_secret_key, ms_api_key: ms_api_key}
 }
 
 // func (c *ClerkAuthenticator) AuthenticationMiddleware(next http.Handler) http.Handler {
@@ -31,10 +31,7 @@ func NewClerkAuthenticator(clerk_secret_key string, inference_server_url string)
 
 func (c *ClerkAuthenticator) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Origin") == c.inference_server_url {
-			//request made from inference server
-			//TODO BEFORE PROD: Use api key or smth to ensure req is from inference server
-			//maybe acc use jwt
+		if r.Header.Get("X-API-KEY") == c.ms_api_key {
 			next.ServeHTTP(w, r)
 		} else {
 			token, err := c.GetToken(r)

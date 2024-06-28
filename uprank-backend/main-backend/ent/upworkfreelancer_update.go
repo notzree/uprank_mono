@@ -296,6 +296,12 @@ func (ufu *UpworkFreelancerUpdate) AddTotalHours(f float64) *UpworkFreelancerUpd
 	return ufu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (ufu *UpworkFreelancerUpdate) SetUpdatedAt(t time.Time) *UpworkFreelancerUpdate {
+	ufu.mutation.SetUpdatedAt(t)
+	return ufu
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (ufu *UpworkFreelancerUpdate) SetTotalPortfolioItems(i int) *UpworkFreelancerUpdate {
 	ufu.mutation.ResetTotalPortfolioItems()
@@ -643,9 +649,23 @@ func (ufu *UpworkFreelancerUpdate) ClearUprankScore() *UpworkFreelancerUpdate {
 	return ufu
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankUpdatedAt(t time.Time) *UpworkFreelancerUpdate {
-	ufu.mutation.SetUprankUpdatedAt(t)
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ufu *UpworkFreelancerUpdate) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdate {
+	ufu.mutation.SetEmbeddedAt(t)
+	return ufu
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ufu *UpworkFreelancerUpdate) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdate {
+	if t != nil {
+		ufu.SetEmbeddedAt(*t)
+	}
+	return ufu
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (ufu *UpworkFreelancerUpdate) ClearEmbeddedAt() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearEmbeddedAt()
 	return ufu
 }
 
@@ -852,9 +872,9 @@ func (ufu *UpworkFreelancerUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ufu *UpworkFreelancerUpdate) defaults() {
-	if _, ok := ufu.mutation.UprankUpdatedAt(); !ok {
-		v := upworkfreelancer.UpdateDefaultUprankUpdatedAt()
-		ufu.mutation.SetUprankUpdatedAt(v)
+	if _, ok := ufu.mutation.UpdatedAt(); !ok {
+		v := upworkfreelancer.UpdateDefaultUpdatedAt()
+		ufu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -932,6 +952,9 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if value, ok := ufu.mutation.AddedTotalHours(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalHours, field.TypeFloat64, value)
+	}
+	if value, ok := ufu.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := ufu.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalPortfolioItems, field.TypeInt, value)
@@ -1034,8 +1057,11 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if ufu.mutation.UprankScoreCleared() {
 		_spec.ClearField(upworkfreelancer.FieldUprankScore, field.TypeInt)
 	}
-	if value, ok := ufu.mutation.UprankUpdatedAt(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankUpdatedAt, field.TypeTime, value)
+	if value, ok := ufu.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if ufu.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
 	}
 	if value, ok := ufu.mutation.UprankReccomended(); ok {
 		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
@@ -1474,6 +1500,12 @@ func (ufuo *UpworkFreelancerUpdateOne) AddTotalHours(f float64) *UpworkFreelance
 	return ufuo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetUpdatedAt(t time.Time) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetUpdatedAt(t)
+	return ufuo
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (ufuo *UpworkFreelancerUpdateOne) SetTotalPortfolioItems(i int) *UpworkFreelancerUpdateOne {
 	ufuo.mutation.ResetTotalPortfolioItems()
@@ -1821,9 +1853,23 @@ func (ufuo *UpworkFreelancerUpdateOne) ClearUprankScore() *UpworkFreelancerUpdat
 	return ufuo
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankUpdatedAt(t time.Time) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetUprankUpdatedAt(t)
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetEmbeddedAt(t)
+	return ufuo
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ufuo *UpworkFreelancerUpdateOne) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdateOne {
+	if t != nil {
+		ufuo.SetEmbeddedAt(*t)
+	}
+	return ufuo
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (ufuo *UpworkFreelancerUpdateOne) ClearEmbeddedAt() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearEmbeddedAt()
 	return ufuo
 }
 
@@ -2043,9 +2089,9 @@ func (ufuo *UpworkFreelancerUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ufuo *UpworkFreelancerUpdateOne) defaults() {
-	if _, ok := ufuo.mutation.UprankUpdatedAt(); !ok {
-		v := upworkfreelancer.UpdateDefaultUprankUpdatedAt()
-		ufuo.mutation.SetUprankUpdatedAt(v)
+	if _, ok := ufuo.mutation.UpdatedAt(); !ok {
+		v := upworkfreelancer.UpdateDefaultUpdatedAt()
+		ufuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -2140,6 +2186,9 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	}
 	if value, ok := ufuo.mutation.AddedTotalHours(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalHours, field.TypeFloat64, value)
+	}
+	if value, ok := ufuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := ufuo.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalPortfolioItems, field.TypeInt, value)
@@ -2242,8 +2291,11 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	if ufuo.mutation.UprankScoreCleared() {
 		_spec.ClearField(upworkfreelancer.FieldUprankScore, field.TypeInt)
 	}
-	if value, ok := ufuo.mutation.UprankUpdatedAt(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankUpdatedAt, field.TypeTime, value)
+	if value, ok := ufuo.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if ufuo.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
 	}
 	if value, ok := ufuo.mutation.UprankReccomended(); ok {
 		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)

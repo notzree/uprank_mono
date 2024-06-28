@@ -55,6 +55,21 @@ func IDLTE(id int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldLTE(FieldID, id))
 }
 
+// EmbeddedAt applies equality check predicate on the "embedded_at" field. It's identical to EmbeddedAtEQ.
+func EmbeddedAt(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldEmbeddedAt, v))
+}
+
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldTitle, v))
@@ -158,6 +173,136 @@ func TotalProposals(v int) predicate.WorkHistory {
 // NumberOfInterviews applies equality check predicate on the "number_of_interviews" field. It's identical to NumberOfInterviewsEQ.
 func NumberOfInterviews(v int) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.FieldEQ(FieldNumberOfInterviews, v))
+}
+
+// EmbeddedAtEQ applies the EQ predicate on the "embedded_at" field.
+func EmbeddedAtEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtNEQ applies the NEQ predicate on the "embedded_at" field.
+func EmbeddedAtNEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtIn applies the In predicate on the "embedded_at" field.
+func EmbeddedAtIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldEmbeddedAt, vs...))
+}
+
+// EmbeddedAtNotIn applies the NotIn predicate on the "embedded_at" field.
+func EmbeddedAtNotIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldEmbeddedAt, vs...))
+}
+
+// EmbeddedAtGT applies the GT predicate on the "embedded_at" field.
+func EmbeddedAtGT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtGTE applies the GTE predicate on the "embedded_at" field.
+func EmbeddedAtGTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtLT applies the LT predicate on the "embedded_at" field.
+func EmbeddedAtLT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtLTE applies the LTE predicate on the "embedded_at" field.
+func EmbeddedAtLTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtIsNil applies the IsNil predicate on the "embedded_at" field.
+func EmbeddedAtIsNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIsNull(FieldEmbeddedAt))
+}
+
+// EmbeddedAtNotNil applies the NotNil predicate on the "embedded_at" field.
+func EmbeddedAtNotNil() predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotNull(FieldEmbeddedAt))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.WorkHistory {
+	return predicate.WorkHistory(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.

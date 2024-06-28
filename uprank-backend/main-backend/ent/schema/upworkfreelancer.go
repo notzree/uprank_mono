@@ -35,6 +35,8 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.String("photo_url"),
 		field.Float("recent_hours"),
 		field.Float("total_hours"),
+		field.Time("created_at").Default(time.Now).Immutable(),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Int("total_portfolio_items"),
 		field.Int("total_portfolio_v2_items"),
 		field.Float("upwork_total_feedback").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
@@ -53,8 +55,7 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.Float("recent_earnings").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Int("uprank_score").Default(0).Optional(),
-		field.Time("uprank_updated_at").Default(time.Now).
-			UpdateDefault(time.Now),
+		field.Time("embedded_at").Optional(),
 		field.Bool("uprank_reccomended").Default(false).Optional(),
 		field.String("uprank_reccomended_reasons").Optional(),
 		field.Bool("uprank_not_enough_data").Default(false).Optional(),

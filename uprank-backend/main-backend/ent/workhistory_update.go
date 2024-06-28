@@ -30,6 +30,32 @@ func (whu *WorkHistoryUpdate) Where(ps ...predicate.WorkHistory) *WorkHistoryUpd
 	return whu
 }
 
+// SetEmbeddedAt sets the "embedded_at" field.
+func (whu *WorkHistoryUpdate) SetEmbeddedAt(t time.Time) *WorkHistoryUpdate {
+	whu.mutation.SetEmbeddedAt(t)
+	return whu
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (whu *WorkHistoryUpdate) SetNillableEmbeddedAt(t *time.Time) *WorkHistoryUpdate {
+	if t != nil {
+		whu.SetEmbeddedAt(*t)
+	}
+	return whu
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (whu *WorkHistoryUpdate) ClearEmbeddedAt() *WorkHistoryUpdate {
+	whu.mutation.ClearEmbeddedAt()
+	return whu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (whu *WorkHistoryUpdate) SetUpdatedAt(t time.Time) *WorkHistoryUpdate {
+	whu.mutation.SetUpdatedAt(t)
+	return whu
+}
+
 // SetTitle sets the "title" field.
 func (whu *WorkHistoryUpdate) SetTitle(s string) *WorkHistoryUpdate {
 	whu.mutation.SetTitle(s)
@@ -577,6 +603,7 @@ func (whu *WorkHistoryUpdate) ClearFreelancer() *WorkHistoryUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (whu *WorkHistoryUpdate) Save(ctx context.Context) (int, error) {
+	whu.defaults()
 	return withHooks(ctx, whu.sqlSave, whu.mutation, whu.hooks)
 }
 
@@ -602,6 +629,14 @@ func (whu *WorkHistoryUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (whu *WorkHistoryUpdate) defaults() {
+	if _, ok := whu.mutation.UpdatedAt(); !ok {
+		v := workhistory.UpdateDefaultUpdatedAt()
+		whu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (whu *WorkHistoryUpdate) check() error {
 	if _, ok := whu.mutation.FreelancerID(); whu.mutation.FreelancerCleared() && !ok {
@@ -621,6 +656,15 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := whu.mutation.EmbeddedAt(); ok {
+		_spec.SetField(workhistory.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if whu.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(workhistory.FieldEmbeddedAt, field.TypeTime)
+	}
+	if value, ok := whu.mutation.UpdatedAt(); ok {
+		_spec.SetField(workhistory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := whu.mutation.Title(); ok {
 		_spec.SetField(workhistory.FieldTitle, field.TypeString, value)
@@ -842,6 +886,32 @@ type WorkHistoryUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *WorkHistoryMutation
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (whuo *WorkHistoryUpdateOne) SetEmbeddedAt(t time.Time) *WorkHistoryUpdateOne {
+	whuo.mutation.SetEmbeddedAt(t)
+	return whuo
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (whuo *WorkHistoryUpdateOne) SetNillableEmbeddedAt(t *time.Time) *WorkHistoryUpdateOne {
+	if t != nil {
+		whuo.SetEmbeddedAt(*t)
+	}
+	return whuo
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (whuo *WorkHistoryUpdateOne) ClearEmbeddedAt() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearEmbeddedAt()
+	return whuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (whuo *WorkHistoryUpdateOne) SetUpdatedAt(t time.Time) *WorkHistoryUpdateOne {
+	whuo.mutation.SetUpdatedAt(t)
+	return whuo
 }
 
 // SetTitle sets the "title" field.
@@ -1404,6 +1474,7 @@ func (whuo *WorkHistoryUpdateOne) Select(field string, fields ...string) *WorkHi
 
 // Save executes the query and returns the updated WorkHistory entity.
 func (whuo *WorkHistoryUpdateOne) Save(ctx context.Context) (*WorkHistory, error) {
+	whuo.defaults()
 	return withHooks(ctx, whuo.sqlSave, whuo.mutation, whuo.hooks)
 }
 
@@ -1426,6 +1497,14 @@ func (whuo *WorkHistoryUpdateOne) Exec(ctx context.Context) error {
 func (whuo *WorkHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := whuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (whuo *WorkHistoryUpdateOne) defaults() {
+	if _, ok := whuo.mutation.UpdatedAt(); !ok {
+		v := workhistory.UpdateDefaultUpdatedAt()
+		whuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -1465,6 +1544,15 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := whuo.mutation.EmbeddedAt(); ok {
+		_spec.SetField(workhistory.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if whuo.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(workhistory.FieldEmbeddedAt, field.TypeTime)
+	}
+	if value, ok := whuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(workhistory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := whuo.mutation.Title(); ok {
 		_spec.SetField(workhistory.FieldTitle, field.TypeString, value)

@@ -68,6 +68,8 @@ var (
 		{Name: "photo_url", Type: field.TypeString},
 		{Name: "recent_hours", Type: field.TypeFloat64},
 		{Name: "total_hours", Type: field.TypeFloat64},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "total_portfolio_items", Type: field.TypeInt},
 		{Name: "total_portfolio_v2_items", Type: field.TypeInt},
 		{Name: "upwork_total_feedback", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
@@ -86,7 +88,7 @@ var (
 		{Name: "recent_earnings", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "total_revenue", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "uprank_score", Type: field.TypeInt, Nullable: true, Default: 0},
-		{Name: "uprank_updated_at", Type: field.TypeTime},
+		{Name: "embedded_at", Type: field.TypeTime, Nullable: true},
 		{Name: "uprank_reccomended", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "uprank_reccomended_reasons", Type: field.TypeString, Nullable: true},
 		{Name: "uprank_not_enough_data", Type: field.TypeBool, Nullable: true, Default: false},
@@ -102,6 +104,9 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "title", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "embedded_at", Type: field.TypeTime, Nullable: true},
+		{Name: "ranked_at", Type: field.TypeTime, Nullable: true},
 		{Name: "location", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "skills", Type: field.TypeJSON, Nullable: true},
@@ -123,7 +128,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "upwork_jobs_jobs_upworkjob",
-				Columns:    []*schema.Column{UpworkJobsColumns[14]},
+				Columns:    []*schema.Column{UpworkJobsColumns[17]},
 				RefColumns: []*schema.Column{JobsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -148,6 +153,9 @@ var (
 	// WorkHistoriesColumns holds the columns for the "work_histories" table.
 	WorkHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "embedded_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString},
 		{Name: "client_feedback", Type: field.TypeString, Nullable: true},
 		{Name: "overall_rating", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "DECIMAL"}},
@@ -180,7 +188,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "work_histories_upwork_freelancers_work_histories",
-				Columns:    []*schema.Column{WorkHistoriesColumns[23]},
+				Columns:    []*schema.Column{WorkHistoriesColumns[26]},
 				RefColumns: []*schema.Column{UpworkFreelancersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

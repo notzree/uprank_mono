@@ -61,6 +61,52 @@ func (uju *UpworkJobUpdate) SetNillableCreatedAt(t *time.Time) *UpworkJobUpdate 
 	return uju
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (uju *UpworkJobUpdate) SetUpdatedAt(t time.Time) *UpworkJobUpdate {
+	uju.mutation.SetUpdatedAt(t)
+	return uju
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (uju *UpworkJobUpdate) SetEmbeddedAt(t time.Time) *UpworkJobUpdate {
+	uju.mutation.SetEmbeddedAt(t)
+	return uju
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (uju *UpworkJobUpdate) SetNillableEmbeddedAt(t *time.Time) *UpworkJobUpdate {
+	if t != nil {
+		uju.SetEmbeddedAt(*t)
+	}
+	return uju
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (uju *UpworkJobUpdate) ClearEmbeddedAt() *UpworkJobUpdate {
+	uju.mutation.ClearEmbeddedAt()
+	return uju
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (uju *UpworkJobUpdate) SetRankedAt(t time.Time) *UpworkJobUpdate {
+	uju.mutation.SetRankedAt(t)
+	return uju
+}
+
+// SetNillableRankedAt sets the "ranked_at" field if the given value is not nil.
+func (uju *UpworkJobUpdate) SetNillableRankedAt(t *time.Time) *UpworkJobUpdate {
+	if t != nil {
+		uju.SetRankedAt(*t)
+	}
+	return uju
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (uju *UpworkJobUpdate) ClearRankedAt() *UpworkJobUpdate {
+	uju.mutation.ClearRankedAt()
+	return uju
+}
+
 // SetLocation sets the "location" field.
 func (uju *UpworkJobUpdate) SetLocation(s string) *UpworkJobUpdate {
 	uju.mutation.SetLocation(s)
@@ -383,6 +429,7 @@ func (uju *UpworkJobUpdate) RemoveUser(u ...*User) *UpworkJobUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uju *UpworkJobUpdate) Save(ctx context.Context) (int, error) {
+	uju.defaults()
 	return withHooks(ctx, uju.sqlSave, uju.mutation, uju.hooks)
 }
 
@@ -405,6 +452,14 @@ func (uju *UpworkJobUpdate) Exec(ctx context.Context) error {
 func (uju *UpworkJobUpdate) ExecX(ctx context.Context) {
 	if err := uju.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (uju *UpworkJobUpdate) defaults() {
+	if _, ok := uju.mutation.UpdatedAt(); !ok {
+		v := upworkjob.UpdateDefaultUpdatedAt()
+		uju.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -443,6 +498,21 @@ func (uju *UpworkJobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uju.mutation.CreatedAt(); ok {
 		_spec.SetField(upworkjob.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := uju.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkjob.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := uju.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkjob.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if uju.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkjob.FieldEmbeddedAt, field.TypeTime)
+	}
+	if value, ok := uju.mutation.RankedAt(); ok {
+		_spec.SetField(upworkjob.FieldRankedAt, field.TypeTime, value)
+	}
+	if uju.mutation.RankedAtCleared() {
+		_spec.ClearField(upworkjob.FieldRankedAt, field.TypeTime)
 	}
 	if value, ok := uju.mutation.Location(); ok {
 		_spec.SetField(upworkjob.FieldLocation, field.TypeString, value)
@@ -687,6 +757,52 @@ func (ujuo *UpworkJobUpdateOne) SetNillableCreatedAt(t *time.Time) *UpworkJobUpd
 	if t != nil {
 		ujuo.SetCreatedAt(*t)
 	}
+	return ujuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (ujuo *UpworkJobUpdateOne) SetUpdatedAt(t time.Time) *UpworkJobUpdateOne {
+	ujuo.mutation.SetUpdatedAt(t)
+	return ujuo
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ujuo *UpworkJobUpdateOne) SetEmbeddedAt(t time.Time) *UpworkJobUpdateOne {
+	ujuo.mutation.SetEmbeddedAt(t)
+	return ujuo
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ujuo *UpworkJobUpdateOne) SetNillableEmbeddedAt(t *time.Time) *UpworkJobUpdateOne {
+	if t != nil {
+		ujuo.SetEmbeddedAt(*t)
+	}
+	return ujuo
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (ujuo *UpworkJobUpdateOne) ClearEmbeddedAt() *UpworkJobUpdateOne {
+	ujuo.mutation.ClearEmbeddedAt()
+	return ujuo
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (ujuo *UpworkJobUpdateOne) SetRankedAt(t time.Time) *UpworkJobUpdateOne {
+	ujuo.mutation.SetRankedAt(t)
+	return ujuo
+}
+
+// SetNillableRankedAt sets the "ranked_at" field if the given value is not nil.
+func (ujuo *UpworkJobUpdateOne) SetNillableRankedAt(t *time.Time) *UpworkJobUpdateOne {
+	if t != nil {
+		ujuo.SetRankedAt(*t)
+	}
+	return ujuo
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (ujuo *UpworkJobUpdateOne) ClearRankedAt() *UpworkJobUpdateOne {
+	ujuo.mutation.ClearRankedAt()
 	return ujuo
 }
 
@@ -1025,6 +1141,7 @@ func (ujuo *UpworkJobUpdateOne) Select(field string, fields ...string) *UpworkJo
 
 // Save executes the query and returns the updated UpworkJob entity.
 func (ujuo *UpworkJobUpdateOne) Save(ctx context.Context) (*UpworkJob, error) {
+	ujuo.defaults()
 	return withHooks(ctx, ujuo.sqlSave, ujuo.mutation, ujuo.hooks)
 }
 
@@ -1047,6 +1164,14 @@ func (ujuo *UpworkJobUpdateOne) Exec(ctx context.Context) error {
 func (ujuo *UpworkJobUpdateOne) ExecX(ctx context.Context) {
 	if err := ujuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (ujuo *UpworkJobUpdateOne) defaults() {
+	if _, ok := ujuo.mutation.UpdatedAt(); !ok {
+		v := upworkjob.UpdateDefaultUpdatedAt()
+		ujuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -1102,6 +1227,21 @@ func (ujuo *UpworkJobUpdateOne) sqlSave(ctx context.Context) (_node *UpworkJob, 
 	}
 	if value, ok := ujuo.mutation.CreatedAt(); ok {
 		_spec.SetField(upworkjob.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := ujuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkjob.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := ujuo.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkjob.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if ujuo.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkjob.FieldEmbeddedAt, field.TypeTime)
+	}
+	if value, ok := ujuo.mutation.RankedAt(); ok {
+		_spec.SetField(upworkjob.FieldRankedAt, field.TypeTime, value)
+	}
+	if ujuo.mutation.RankedAtCleared() {
+		_spec.ClearField(upworkjob.FieldRankedAt, field.TypeTime)
 	}
 	if value, ok := ujuo.mutation.Location(); ok {
 		_spec.SetField(upworkjob.FieldLocation, field.TypeString, value)

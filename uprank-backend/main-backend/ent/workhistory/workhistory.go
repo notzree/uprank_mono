@@ -3,6 +3,8 @@
 package workhistory
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,6 +14,12 @@ const (
 	Label = "work_history"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldEmbeddedAt holds the string denoting the embedded_at field in the database.
+	FieldEmbeddedAt = "embedded_at"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldClientFeedback holds the string denoting the client_feedback field in the database.
@@ -72,6 +80,9 @@ const (
 // Columns holds all SQL columns for workhistory fields.
 var Columns = []string{
 	FieldID,
+	FieldEmbeddedAt,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 	FieldTitle,
 	FieldClientFeedback,
 	FieldOverallRating,
@@ -117,12 +128,36 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
+)
+
 // OrderOption defines the ordering options for the WorkHistory queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByEmbeddedAt orders the results by the embedded_at field.
+func ByEmbeddedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmbeddedAt, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.
