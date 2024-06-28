@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqs_types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -466,9 +467,10 @@ func (s *V1Servicer) SendRankingrequest(data types.RankJobRequest, ctx context.C
 				StringValue: aws.String(data.Platform_id),
 			},
 		},
-		QueueUrl:       &s.ranking_queue_url,
-		MessageBody:    aws.String(fmt.Sprint("Ranking request for job ", data.Job_id, " by user ", data.User_id, time.Now())),
-		MessageGroupId: aws.String("RankingRequest"),
+		QueueUrl:               &s.ranking_queue_url,
+		MessageBody:            aws.String(fmt.Sprint("Ranking request for job ", data.Job_id, " by user ", data.User_id)),
+		MessageDeduplicationId: aws.String(data.Job_id.String()),
+		MessageGroupId:         aws.String("RankingRequest"),
 	})
 	if err != nil {
 		return err
@@ -477,7 +479,10 @@ func (s *V1Servicer) SendRankingrequest(data types.RankJobRequest, ctx context.C
 	return nil
 }
 
-func (s *V1Servicer) GetUpworkJobWithAllFreelancerData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
+// Fetches all required data for a job to be embedded. Also only fetches the relevant freelancer data that needs to be re-embedded incase the job
+// is enqueued multiple times. It is acceptable to re-embed a job again, as this only takes 2 operations to do so. However re-embedding a freelancer
+// may take up to 10+ ops per freelancer.
+func (s *V1Servicer) GetUpworkJobEmbeddingData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
 	job, err := s.ent.UpworkJob.Query().
 		Where(upworkjob.IDEQ(upwork_job_id)).
 		Where(
@@ -486,6 +491,12 @@ func (s *V1Servicer) GetUpworkJobWithAllFreelancerData(upwork_job_id string, use
 			),
 		).
 		WithUpworkfreelancer(func(query *ent.UpworkFreelancerQuery) {
+			query.Where(
+				upworkfreelancer.Or(
+					upworkfreelancer.EmbeddedAtIsNil(),
+					sql.FieldsLT(upworkfreelancer.FieldEmbeddedAt, upworkfreelancer.FieldUpdatedAt),
+				),
+			)
 			query.WithAttachments()
 			query.WithWorkHistories()
 		}).
