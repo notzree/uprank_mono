@@ -38,7 +38,7 @@ type Freelancer struct {
 	UpworkTotalFeedback           float64            `json:"upwork_total_feedback"`
 	UpworkRecentFeedback          float64            `json:"upwork_recent_feedback"`
 	UpworkTopRatedStatus          bool               `json:"upwork_top_rated_status"`
-	UpworkJobSuccessScore         int                `json:"upwork_job_success_score"`
+	UpworkJobSuccessScore         float64            `json:"upwork_job_success_score"`
 	Skills                        []string           `json:"skills"`
 	AverageRecentEarnings         float64            `json:"average_recent_earnings"`
 	CombinedAverageRecentEarnings float64            `json:"combined_average_recent_earnings"`
@@ -59,7 +59,7 @@ type WorkHistory struct {
 	ID                 int     `json:"id"`
 	Title              string  `json:"title"`
 	ClientFeedback     string  `json:"client_feedback"`
-	OverallRating      int     `json:"overall_rating"`
+	OverallRating      float64 `json:"overall_rating"`
 	FreelancerEarnings float64 `json:"freelancer_earnings"`
 	StartDate          string  `json:"start_date"`
 	EndDate            string  `json:"end_date"`
