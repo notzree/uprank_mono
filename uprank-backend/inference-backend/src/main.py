@@ -19,7 +19,7 @@ if __name__ == '__main__':
     embeddings = OpenAIEmbeddings(
         model=model_name,
     )
-    infer = InferenceService(embed=embeddings, pc=pc, logger=service_logger)
+    infer = InferenceService(embed=embeddings, pc=pc, index_name="uprank-dev", logger=service_logger)
     s = Server(infer=infer, max_workers=10, port=server_port, logger=server_logger)
 
     def handle_signal(sig, frame):

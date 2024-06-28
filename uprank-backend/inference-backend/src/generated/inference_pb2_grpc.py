@@ -3,7 +3,6 @@
 import grpc
 import warnings
 
-# import inference_pb2 as inference__pb2
 from . import inference_pb2 as inference__pb2
 
 GRPC_GENERATED_VERSION = '1.64.1'
@@ -72,7 +71,8 @@ class InferenceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UpsertVector(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """rpc Embed()
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
