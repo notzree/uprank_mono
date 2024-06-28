@@ -49,16 +49,16 @@ func (s *Server) Start() error {
 					jobs_router.Post("/", Make(s.CreateJob))
 					jobs_router.Route("/{job_id}", func(job_id_router chi.Router) {
 						jobs_router.Post("/attach", Make(s.AttachUpworkJob)) //todo: move this attach upwork job into a general attach func
-					})
-					jobs_router.Route("/upwork", func(upwork_router chi.Router) {
-						upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
-							upwork_job_id_router.Get("/", Make(s.GetUpworkJob))
-							upwork_job_id_router.Route("/freelancers", func(upwork_freelancers_router chi.Router) {
-								upwork_freelancers_router.Post("/", Make(s.CreateUpworkFreelancers))       //create freelancers
-								upwork_freelancers_router.Post("/update", Make(s.UpdateUpworkFreelancers)) //update freelancers
-							})
-							upwork_job_id_router.Route("/embeddings", func(upwork_job_id_embedding_router chi.Router) {
-								upwork_job_id_router.Get("/", Make(s.GetUpworkJobEmbeddingData))
+						jobs_router.Route("/upwork", func(upwork_router chi.Router) {
+							upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
+								upwork_job_id_router.Get("/", Make(s.GetUpworkJob))
+								upwork_job_id_router.Route("/freelancers", func(upwork_freelancers_router chi.Router) {
+									upwork_freelancers_router.Post("/", Make(s.CreateUpworkFreelancers))       //create freelancers
+									upwork_freelancers_router.Post("/update", Make(s.UpdateUpworkFreelancers)) //update freelancers
+								})
+								upwork_job_id_router.Route("/embeddings", func(upwork_job_id_embedding_router chi.Router) {
+									upwork_job_id_router.Get("/", Make(s.GetUpworkJobEmbeddingData))
+								})
 							})
 						})
 					})

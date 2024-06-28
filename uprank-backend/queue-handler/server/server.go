@@ -178,7 +178,7 @@ func (s *Server) UpsertVectors(req types.JobDataAll, user_id string) (*types.Ups
 }
 
 func (s *Server) FetchJobData(req types.UpworkRankingMessage) (*types.JobDataAll, error) {
-	fetch_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/all_data", s.backend_url, req.Platform, req.Platform_id)
+	fetch_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/all_data", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
 	log.Println("Fetching data from:", fetch_url)
 	httpreq, err := http.NewRequest("GET", fetch_url, nil)
 	if err != nil {
