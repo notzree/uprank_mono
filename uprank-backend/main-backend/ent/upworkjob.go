@@ -24,6 +24,12 @@ type UpworkJob struct {
 	Title string `json:"title,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// EmbeddedAt holds the value of the "embedded_at" field.
+	EmbeddedAt time.Time `json:"embedded_at,omitempty"`
+	// RankedAt holds the value of the "ranked_at" field.
+	RankedAt time.Time `json:"ranked_at,omitempty"`
 	// Location holds the value of the "location" field.
 	Location string `json:"location,omitempty"`
 	// Description holds the value of the "description" field.
@@ -108,7 +114,7 @@ func (*UpworkJob) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case upworkjob.FieldID, upworkjob.FieldTitle, upworkjob.FieldLocation, upworkjob.FieldDescription, upworkjob.FieldExperienceLevel:
 			values[i] = new(sql.NullString)
-		case upworkjob.FieldCreatedAt:
+		case upworkjob.FieldCreatedAt, upworkjob.FieldUpdatedAt, upworkjob.FieldEmbeddedAt, upworkjob.FieldRankedAt:
 			values[i] = new(sql.NullTime)
 		case upworkjob.ForeignKeys[0]: // job_upworkjob
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
@@ -144,6 +150,24 @@ func (uj *UpworkJob) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				uj.CreatedAt = value.Time
+			}
+		case upworkjob.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				uj.UpdatedAt = value.Time
+			}
+		case upworkjob.FieldEmbeddedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field embedded_at", values[i])
+			} else if value.Valid {
+				uj.EmbeddedAt = value.Time
+			}
+		case upworkjob.FieldRankedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field ranked_at", values[i])
+			} else if value.Valid {
+				uj.RankedAt = value.Time
 			}
 		case upworkjob.FieldLocation:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -278,6 +302,15 @@ func (uj *UpworkJob) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(uj.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(uj.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("embedded_at=")
+	builder.WriteString(uj.EmbeddedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("ranked_at=")
+	builder.WriteString(uj.RankedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("location=")
 	builder.WriteString(uj.Location)

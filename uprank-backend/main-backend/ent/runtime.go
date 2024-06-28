@@ -11,6 +11,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -25,22 +26,26 @@ func init() {
 	job.DefaultID = jobDescID.Default.(func() uuid.UUID)
 	upworkfreelancerFields := schema.UpworkFreelancer{}.Fields()
 	_ = upworkfreelancerFields
+	// upworkfreelancerDescCreatedAt is the schema descriptor for created_at field.
+	upworkfreelancerDescCreatedAt := upworkfreelancerFields[17].Descriptor()
+	// upworkfreelancer.DefaultCreatedAt holds the default value on creation for the created_at field.
+	upworkfreelancer.DefaultCreatedAt = upworkfreelancerDescCreatedAt.Default.(func() time.Time)
+	// upworkfreelancerDescUpdatedAt is the schema descriptor for updated_at field.
+	upworkfreelancerDescUpdatedAt := upworkfreelancerFields[18].Descriptor()
+	// upworkfreelancer.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	upworkfreelancer.DefaultUpdatedAt = upworkfreelancerDescUpdatedAt.Default.(func() time.Time)
+	// upworkfreelancer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	upworkfreelancer.UpdateDefaultUpdatedAt = upworkfreelancerDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// upworkfreelancerDescUprankScore is the schema descriptor for uprank_score field.
-	upworkfreelancerDescUprankScore := upworkfreelancerFields[34].Descriptor()
+	upworkfreelancerDescUprankScore := upworkfreelancerFields[36].Descriptor()
 	// upworkfreelancer.DefaultUprankScore holds the default value on creation for the uprank_score field.
 	upworkfreelancer.DefaultUprankScore = upworkfreelancerDescUprankScore.Default.(int)
-	// upworkfreelancerDescUprankUpdatedAt is the schema descriptor for uprank_updated_at field.
-	upworkfreelancerDescUprankUpdatedAt := upworkfreelancerFields[35].Descriptor()
-	// upworkfreelancer.DefaultUprankUpdatedAt holds the default value on creation for the uprank_updated_at field.
-	upworkfreelancer.DefaultUprankUpdatedAt = upworkfreelancerDescUprankUpdatedAt.Default.(func() time.Time)
-	// upworkfreelancer.UpdateDefaultUprankUpdatedAt holds the default value on update for the uprank_updated_at field.
-	upworkfreelancer.UpdateDefaultUprankUpdatedAt = upworkfreelancerDescUprankUpdatedAt.UpdateDefault.(func() time.Time)
 	// upworkfreelancerDescUprankReccomended is the schema descriptor for uprank_reccomended field.
-	upworkfreelancerDescUprankReccomended := upworkfreelancerFields[36].Descriptor()
+	upworkfreelancerDescUprankReccomended := upworkfreelancerFields[38].Descriptor()
 	// upworkfreelancer.DefaultUprankReccomended holds the default value on creation for the uprank_reccomended field.
 	upworkfreelancer.DefaultUprankReccomended = upworkfreelancerDescUprankReccomended.Default.(bool)
 	// upworkfreelancerDescUprankNotEnoughData is the schema descriptor for uprank_not_enough_data field.
-	upworkfreelancerDescUprankNotEnoughData := upworkfreelancerFields[38].Descriptor()
+	upworkfreelancerDescUprankNotEnoughData := upworkfreelancerFields[40].Descriptor()
 	// upworkfreelancer.DefaultUprankNotEnoughData holds the default value on creation for the uprank_not_enough_data field.
 	upworkfreelancer.DefaultUprankNotEnoughData = upworkfreelancerDescUprankNotEnoughData.Default.(bool)
 	// upworkfreelancerDescID is the schema descriptor for id field.
@@ -57,8 +62,14 @@ func init() {
 	upworkjobDescCreatedAt := upworkjobFields[2].Descriptor()
 	// upworkjob.DefaultCreatedAt holds the default value on creation for the created_at field.
 	upworkjob.DefaultCreatedAt = upworkjobDescCreatedAt.Default.(func() time.Time)
+	// upworkjobDescUpdatedAt is the schema descriptor for updated_at field.
+	upworkjobDescUpdatedAt := upworkjobFields[3].Descriptor()
+	// upworkjob.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	upworkjob.DefaultUpdatedAt = upworkjobDescUpdatedAt.Default.(func() time.Time)
+	// upworkjob.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	upworkjob.UpdateDefaultUpdatedAt = upworkjobDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// upworkjobDescDescription is the schema descriptor for description field.
-	upworkjobDescDescription := upworkjobFields[4].Descriptor()
+	upworkjobDescDescription := upworkjobFields[7].Descriptor()
 	// upworkjob.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	upworkjob.DescriptionValidator = upworkjobDescDescription.Validators[0].(func(string) error)
 	// upworkjobDescID is the schema descriptor for id field.
@@ -101,4 +112,16 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	user.IDValidator = userDescID.Validators[0].(func(string) error)
+	workhistoryFields := schema.WorkHistory{}.Fields()
+	_ = workhistoryFields
+	// workhistoryDescCreatedAt is the schema descriptor for created_at field.
+	workhistoryDescCreatedAt := workhistoryFields[1].Descriptor()
+	// workhistory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	workhistory.DefaultCreatedAt = workhistoryDescCreatedAt.Default.(func() time.Time)
+	// workhistoryDescUpdatedAt is the schema descriptor for updated_at field.
+	workhistoryDescUpdatedAt := workhistoryFields[2].Descriptor()
+	// workhistory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	workhistory.DefaultUpdatedAt = workhistoryDescUpdatedAt.Default.(func() time.Time)
+	// workhistory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	workhistory.UpdateDefaultUpdatedAt = workhistoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

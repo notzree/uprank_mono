@@ -21,6 +21,9 @@ func (UpworkJob) Fields() []ent.Field {
 		field.String("title").NotEmpty(),
 		field.Time("created_at").
 			Default(time.Now),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+		field.Time("embedded_at").Optional(),
+		field.Time("ranked_at").Optional(),
 		field.String("location").Optional(),
 		field.String("description").NotEmpty(),
 		field.JSON("skills", []string{}).Optional(),

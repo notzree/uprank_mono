@@ -19,6 +19,12 @@ type WorkHistory struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// EmbeddedAt holds the value of the "embedded_at" field.
+	EmbeddedAt time.Time `json:"embedded_at,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// ClientFeedback holds the value of the "client_feedback" field.
@@ -103,7 +109,7 @@ func (*WorkHistory) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case workhistory.FieldTitle, workhistory.FieldClientFeedback, workhistory.FieldDescription, workhistory.FieldClientCountry, workhistory.FieldClientCompanyCategory, workhistory.FieldClientCompanySize:
 			values[i] = new(sql.NullString)
-		case workhistory.FieldStartDate, workhistory.FieldEndDate:
+		case workhistory.FieldEmbeddedAt, workhistory.FieldCreatedAt, workhistory.FieldUpdatedAt, workhistory.FieldStartDate, workhistory.FieldEndDate:
 			values[i] = new(sql.NullTime)
 		case workhistory.ForeignKeys[0]: // upwork_freelancer_work_histories
 			values[i] = new(sql.NullString)
@@ -128,6 +134,24 @@ func (wh *WorkHistory) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			wh.ID = int(value.Int64)
+		case workhistory.FieldEmbeddedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field embedded_at", values[i])
+			} else if value.Valid {
+				wh.EmbeddedAt = value.Time
+			}
+		case workhistory.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				wh.CreatedAt = value.Time
+			}
+		case workhistory.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				wh.UpdatedAt = value.Time
+			}
 		case workhistory.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
@@ -310,6 +334,15 @@ func (wh *WorkHistory) String() string {
 	var builder strings.Builder
 	builder.WriteString("WorkHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", wh.ID))
+	builder.WriteString("embedded_at=")
+	builder.WriteString(wh.EmbeddedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(wh.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(wh.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(wh.Title)
 	builder.WriteString(", ")

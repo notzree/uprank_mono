@@ -50,6 +50,10 @@ type UpworkFreelancer struct {
 	RecentHours float64 `json:"recent_hours,omitempty"`
 	// TotalHours holds the value of the "total_hours" field.
 	TotalHours float64 `json:"total_hours,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// TotalPortfolioItems holds the value of the "total_portfolio_items" field.
 	TotalPortfolioItems int `json:"total_portfolio_items,omitempty"`
 	// TotalPortfolioV2Items holds the value of the "total_portfolio_v2_items" field.
@@ -86,8 +90,8 @@ type UpworkFreelancer struct {
 	TotalRevenue float64 `json:"total_revenue,omitempty"`
 	// UprankScore holds the value of the "uprank_score" field.
 	UprankScore int `json:"uprank_score,omitempty"`
-	// UprankUpdatedAt holds the value of the "uprank_updated_at" field.
-	UprankUpdatedAt time.Time `json:"uprank_updated_at,omitempty"`
+	// EmbeddedAt holds the value of the "embedded_at" field.
+	EmbeddedAt time.Time `json:"embedded_at,omitempty"`
 	// UprankReccomended holds the value of the "uprank_reccomended" field.
 	UprankReccomended bool `json:"uprank_reccomended,omitempty"`
 	// UprankReccomendedReasons holds the value of the "uprank_reccomended_reasons" field.
@@ -155,7 +159,7 @@ func (*UpworkFreelancer) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case upworkfreelancer.FieldID, upworkfreelancer.FieldName, upworkfreelancer.FieldTitle, upworkfreelancer.FieldDescription, upworkfreelancer.FieldCity, upworkfreelancer.FieldCountry, upworkfreelancer.FieldTimezone, upworkfreelancer.FieldCv, upworkfreelancer.FieldFixedChargeCurrency, upworkfreelancer.FieldHourlyChargeCurrency, upworkfreelancer.FieldPhotoURL, upworkfreelancer.FieldUprankReccomendedReasons:
 			values[i] = new(sql.NullString)
-		case upworkfreelancer.FieldUprankUpdatedAt:
+		case upworkfreelancer.FieldCreatedAt, upworkfreelancer.FieldUpdatedAt, upworkfreelancer.FieldEmbeddedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -274,6 +278,18 @@ func (uf *UpworkFreelancer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				uf.TotalHours = value.Float64
 			}
+		case upworkfreelancer.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				uf.CreatedAt = value.Time
+			}
+		case upworkfreelancer.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				uf.UpdatedAt = value.Time
+			}
 		case upworkfreelancer.FieldTotalPortfolioItems:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_portfolio_items", values[i])
@@ -384,11 +400,11 @@ func (uf *UpworkFreelancer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				uf.UprankScore = int(value.Int64)
 			}
-		case upworkfreelancer.FieldUprankUpdatedAt:
+		case upworkfreelancer.FieldEmbeddedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field embedded_at", values[i])
 			} else if value.Valid {
-				uf.UprankUpdatedAt = value.Time
+				uf.EmbeddedAt = value.Time
 			}
 		case upworkfreelancer.FieldUprankReccomended:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -507,6 +523,12 @@ func (uf *UpworkFreelancer) String() string {
 	builder.WriteString("total_hours=")
 	builder.WriteString(fmt.Sprintf("%v", uf.TotalHours))
 	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(uf.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(uf.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("total_portfolio_items=")
 	builder.WriteString(fmt.Sprintf("%v", uf.TotalPortfolioItems))
 	builder.WriteString(", ")
@@ -561,8 +583,8 @@ func (uf *UpworkFreelancer) String() string {
 	builder.WriteString("uprank_score=")
 	builder.WriteString(fmt.Sprintf("%v", uf.UprankScore))
 	builder.WriteString(", ")
-	builder.WriteString("uprank_updated_at=")
-	builder.WriteString(uf.UprankUpdatedAt.Format(time.ANSIC))
+	builder.WriteString("embedded_at=")
+	builder.WriteString(uf.EmbeddedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("uprank_reccomended=")
 	builder.WriteString(fmt.Sprintf("%v", uf.UprankReccomended))

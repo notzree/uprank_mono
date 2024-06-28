@@ -18,6 +18,12 @@ const (
 	FieldTitle = "title"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldEmbeddedAt holds the string denoting the embedded_at field in the database.
+	FieldEmbeddedAt = "embedded_at"
+	// FieldRankedAt holds the string denoting the ranked_at field in the database.
+	FieldRankedAt = "ranked_at"
 	// FieldLocation holds the string denoting the location field in the database.
 	FieldLocation = "location"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -74,6 +80,9 @@ var Columns = []string{
 	FieldID,
 	FieldTitle,
 	FieldCreatedAt,
+	FieldUpdatedAt,
+	FieldEmbeddedAt,
+	FieldRankedAt,
 	FieldLocation,
 	FieldDescription,
 	FieldSkills,
@@ -122,6 +131,10 @@ var (
 	TitleValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -144,6 +157,21 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByEmbeddedAt orders the results by the embedded_at field.
+func ByEmbeddedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmbeddedAt, opts...).ToFunc()
+}
+
+// ByRankedAt orders the results by the ranked_at field.
+func ByRankedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRankedAt, opts...).ToFunc()
 }
 
 // ByLocation orders the results by the location field.

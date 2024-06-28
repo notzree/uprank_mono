@@ -996,6 +996,8 @@ type UpworkFreelancerMutation struct {
 	addrecent_hours                     *float64
 	total_hours                         *float64
 	addtotal_hours                      *float64
+	created_at                          *time.Time
+	updated_at                          *time.Time
 	total_portfolio_items               *int
 	addtotal_portfolio_items            *int
 	total_portfolio_v2_items            *int
@@ -1028,7 +1030,7 @@ type UpworkFreelancerMutation struct {
 	addtotal_revenue                    *float64
 	uprank_score                        *int
 	adduprank_score                     *int
-	uprank_updated_at                   *time.Time
+	embedded_at                         *time.Time
 	uprank_reccomended                  *bool
 	uprank_reccomended_reasons          *string
 	uprank_not_enough_data              *bool
@@ -1833,6 +1835,78 @@ func (m *UpworkFreelancerMutation) AddedTotalHours() (r float64, exists bool) {
 func (m *UpworkFreelancerMutation) ResetTotalHours() {
 	m.total_hours = nil
 	m.addtotal_hours = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *UpworkFreelancerMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *UpworkFreelancerMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *UpworkFreelancerMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *UpworkFreelancerMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *UpworkFreelancerMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *UpworkFreelancerMutation) ResetUpdatedAt() {
+	m.updated_at = nil
 }
 
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
@@ -2772,40 +2846,53 @@ func (m *UpworkFreelancerMutation) ResetUprankScore() {
 	delete(m.clearedFields, upworkfreelancer.FieldUprankScore)
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (m *UpworkFreelancerMutation) SetUprankUpdatedAt(t time.Time) {
-	m.uprank_updated_at = &t
+// SetEmbeddedAt sets the "embedded_at" field.
+func (m *UpworkFreelancerMutation) SetEmbeddedAt(t time.Time) {
+	m.embedded_at = &t
 }
 
-// UprankUpdatedAt returns the value of the "uprank_updated_at" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankUpdatedAt() (r time.Time, exists bool) {
-	v := m.uprank_updated_at
+// EmbeddedAt returns the value of the "embedded_at" field in the mutation.
+func (m *UpworkFreelancerMutation) EmbeddedAt() (r time.Time, exists bool) {
+	v := m.embedded_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUprankUpdatedAt returns the old "uprank_updated_at" field's value of the UpworkFreelancer entity.
+// OldEmbeddedAt returns the old "embedded_at" field's value of the UpworkFreelancer entity.
 // If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *UpworkFreelancerMutation) OldEmbeddedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankUpdatedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldEmbeddedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankUpdatedAt requires an ID field in the mutation")
+		return v, errors.New("OldEmbeddedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankUpdatedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldEmbeddedAt: %w", err)
 	}
-	return oldValue.UprankUpdatedAt, nil
+	return oldValue.EmbeddedAt, nil
 }
 
-// ResetUprankUpdatedAt resets all changes to the "uprank_updated_at" field.
-func (m *UpworkFreelancerMutation) ResetUprankUpdatedAt() {
-	m.uprank_updated_at = nil
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (m *UpworkFreelancerMutation) ClearEmbeddedAt() {
+	m.embedded_at = nil
+	m.clearedFields[upworkfreelancer.FieldEmbeddedAt] = struct{}{}
+}
+
+// EmbeddedAtCleared returns if the "embedded_at" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) EmbeddedAtCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldEmbeddedAt]
+	return ok
+}
+
+// ResetEmbeddedAt resets all changes to the "embedded_at" field.
+func (m *UpworkFreelancerMutation) ResetEmbeddedAt() {
+	m.embedded_at = nil
+	delete(m.clearedFields, upworkfreelancer.FieldEmbeddedAt)
 }
 
 // SetUprankReccomended sets the "uprank_reccomended" field.
@@ -3151,7 +3238,7 @@ func (m *UpworkFreelancerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UpworkFreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 38)
+	fields := make([]string, 0, 40)
 	if m.name != nil {
 		fields = append(fields, upworkfreelancer.FieldName)
 	}
@@ -3199,6 +3286,12 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	}
 	if m.total_hours != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalHours)
+	}
+	if m.created_at != nil {
+		fields = append(fields, upworkfreelancer.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, upworkfreelancer.FieldUpdatedAt)
 	}
 	if m.total_portfolio_items != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalPortfolioItems)
@@ -3254,8 +3347,8 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	if m.uprank_score != nil {
 		fields = append(fields, upworkfreelancer.FieldUprankScore)
 	}
-	if m.uprank_updated_at != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankUpdatedAt)
+	if m.embedded_at != nil {
+		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
 	}
 	if m.uprank_reccomended != nil {
 		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
@@ -3306,6 +3399,10 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.RecentHours()
 	case upworkfreelancer.FieldTotalHours:
 		return m.TotalHours()
+	case upworkfreelancer.FieldCreatedAt:
+		return m.CreatedAt()
+	case upworkfreelancer.FieldUpdatedAt:
+		return m.UpdatedAt()
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		return m.TotalPortfolioItems()
 	case upworkfreelancer.FieldTotalPortfolioV2Items:
@@ -3342,8 +3439,8 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.TotalRevenue()
 	case upworkfreelancer.FieldUprankScore:
 		return m.UprankScore()
-	case upworkfreelancer.FieldUprankUpdatedAt:
-		return m.UprankUpdatedAt()
+	case upworkfreelancer.FieldEmbeddedAt:
+		return m.EmbeddedAt()
 	case upworkfreelancer.FieldUprankReccomended:
 		return m.UprankReccomended()
 	case upworkfreelancer.FieldUprankReccomendedReasons:
@@ -3391,6 +3488,10 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldRecentHours(ctx)
 	case upworkfreelancer.FieldTotalHours:
 		return m.OldTotalHours(ctx)
+	case upworkfreelancer.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case upworkfreelancer.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		return m.OldTotalPortfolioItems(ctx)
 	case upworkfreelancer.FieldTotalPortfolioV2Items:
@@ -3427,8 +3528,8 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldTotalRevenue(ctx)
 	case upworkfreelancer.FieldUprankScore:
 		return m.OldUprankScore(ctx)
-	case upworkfreelancer.FieldUprankUpdatedAt:
-		return m.OldUprankUpdatedAt(ctx)
+	case upworkfreelancer.FieldEmbeddedAt:
+		return m.OldEmbeddedAt(ctx)
 	case upworkfreelancer.FieldUprankReccomended:
 		return m.OldUprankReccomended(ctx)
 	case upworkfreelancer.FieldUprankReccomendedReasons:
@@ -3556,6 +3657,20 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetTotalHours(v)
 		return nil
+	case upworkfreelancer.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case upworkfreelancer.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		v, ok := value.(int)
 		if !ok {
@@ -3682,12 +3797,12 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetUprankScore(v)
 		return nil
-	case upworkfreelancer.FieldUprankUpdatedAt:
+	case upworkfreelancer.FieldEmbeddedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUprankUpdatedAt(v)
+		m.SetEmbeddedAt(v)
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		v, ok := value.(bool)
@@ -3956,6 +4071,9 @@ func (m *UpworkFreelancerMutation) ClearedFields() []string {
 	if m.FieldCleared(upworkfreelancer.FieldUprankScore) {
 		fields = append(fields, upworkfreelancer.FieldUprankScore)
 	}
+	if m.FieldCleared(upworkfreelancer.FieldEmbeddedAt) {
+		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
+	}
 	if m.FieldCleared(upworkfreelancer.FieldUprankReccomended) {
 		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
 	}
@@ -3987,6 +4105,9 @@ func (m *UpworkFreelancerMutation) ClearField(name string) error {
 		return nil
 	case upworkfreelancer.FieldUprankScore:
 		m.ClearUprankScore()
+		return nil
+	case upworkfreelancer.FieldEmbeddedAt:
+		m.ClearEmbeddedAt()
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		m.ClearUprankReccomended()
@@ -4053,6 +4174,12 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 	case upworkfreelancer.FieldTotalHours:
 		m.ResetTotalHours()
 		return nil
+	case upworkfreelancer.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case upworkfreelancer.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		m.ResetTotalPortfolioItems()
 		return nil
@@ -4107,8 +4234,8 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 	case upworkfreelancer.FieldUprankScore:
 		m.ResetUprankScore()
 		return nil
-	case upworkfreelancer.FieldUprankUpdatedAt:
-		m.ResetUprankUpdatedAt()
+	case upworkfreelancer.FieldEmbeddedAt:
+		m.ResetEmbeddedAt()
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		m.ResetUprankReccomended()
@@ -4267,6 +4394,9 @@ type UpworkJobMutation struct {
 	id                      *string
 	title                   *string
 	created_at              *time.Time
+	updated_at              *time.Time
+	embedded_at             *time.Time
+	ranked_at               *time.Time
 	location                *string
 	description             *string
 	skills                  *[]string
@@ -4472,6 +4602,140 @@ func (m *UpworkJobMutation) OldCreatedAt(ctx context.Context) (v time.Time, err 
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *UpworkJobMutation) ResetCreatedAt() {
 	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *UpworkJobMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *UpworkJobMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *UpworkJobMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (m *UpworkJobMutation) SetEmbeddedAt(t time.Time) {
+	m.embedded_at = &t
+}
+
+// EmbeddedAt returns the value of the "embedded_at" field in the mutation.
+func (m *UpworkJobMutation) EmbeddedAt() (r time.Time, exists bool) {
+	v := m.embedded_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmbeddedAt returns the old "embedded_at" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldEmbeddedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmbeddedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmbeddedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmbeddedAt: %w", err)
+	}
+	return oldValue.EmbeddedAt, nil
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (m *UpworkJobMutation) ClearEmbeddedAt() {
+	m.embedded_at = nil
+	m.clearedFields[upworkjob.FieldEmbeddedAt] = struct{}{}
+}
+
+// EmbeddedAtCleared returns if the "embedded_at" field was cleared in this mutation.
+func (m *UpworkJobMutation) EmbeddedAtCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldEmbeddedAt]
+	return ok
+}
+
+// ResetEmbeddedAt resets all changes to the "embedded_at" field.
+func (m *UpworkJobMutation) ResetEmbeddedAt() {
+	m.embedded_at = nil
+	delete(m.clearedFields, upworkjob.FieldEmbeddedAt)
+}
+
+// SetRankedAt sets the "ranked_at" field.
+func (m *UpworkJobMutation) SetRankedAt(t time.Time) {
+	m.ranked_at = &t
+}
+
+// RankedAt returns the value of the "ranked_at" field in the mutation.
+func (m *UpworkJobMutation) RankedAt() (r time.Time, exists bool) {
+	v := m.ranked_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRankedAt returns the old "ranked_at" field's value of the UpworkJob entity.
+// If the UpworkJob object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkJobMutation) OldRankedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRankedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRankedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRankedAt: %w", err)
+	}
+	return oldValue.RankedAt, nil
+}
+
+// ClearRankedAt clears the value of the "ranked_at" field.
+func (m *UpworkJobMutation) ClearRankedAt() {
+	m.ranked_at = nil
+	m.clearedFields[upworkjob.FieldRankedAt] = struct{}{}
+}
+
+// RankedAtCleared returns if the "ranked_at" field was cleared in this mutation.
+func (m *UpworkJobMutation) RankedAtCleared() bool {
+	_, ok := m.clearedFields[upworkjob.FieldRankedAt]
+	return ok
+}
+
+// ResetRankedAt resets all changes to the "ranked_at" field.
+func (m *UpworkJobMutation) ResetRankedAt() {
+	m.ranked_at = nil
+	delete(m.clearedFields, upworkjob.FieldRankedAt)
 }
 
 // SetLocation sets the "location" field.
@@ -5271,12 +5535,21 @@ func (m *UpworkJobMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UpworkJobMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 16)
 	if m.title != nil {
 		fields = append(fields, upworkjob.FieldTitle)
 	}
 	if m.created_at != nil {
 		fields = append(fields, upworkjob.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, upworkjob.FieldUpdatedAt)
+	}
+	if m.embedded_at != nil {
+		fields = append(fields, upworkjob.FieldEmbeddedAt)
+	}
+	if m.ranked_at != nil {
+		fields = append(fields, upworkjob.FieldRankedAt)
 	}
 	if m.location != nil {
 		fields = append(fields, upworkjob.FieldLocation)
@@ -5323,6 +5596,12 @@ func (m *UpworkJobMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case upworkjob.FieldCreatedAt:
 		return m.CreatedAt()
+	case upworkjob.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case upworkjob.FieldEmbeddedAt:
+		return m.EmbeddedAt()
+	case upworkjob.FieldRankedAt:
+		return m.RankedAt()
 	case upworkjob.FieldLocation:
 		return m.Location()
 	case upworkjob.FieldDescription:
@@ -5358,6 +5637,12 @@ func (m *UpworkJobMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldTitle(ctx)
 	case upworkjob.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case upworkjob.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case upworkjob.FieldEmbeddedAt:
+		return m.OldEmbeddedAt(ctx)
+	case upworkjob.FieldRankedAt:
+		return m.OldRankedAt(ctx)
 	case upworkjob.FieldLocation:
 		return m.OldLocation(ctx)
 	case upworkjob.FieldDescription:
@@ -5402,6 +5687,27 @@ func (m *UpworkJobMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case upworkjob.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case upworkjob.FieldEmbeddedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmbeddedAt(v)
+		return nil
+	case upworkjob.FieldRankedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRankedAt(v)
 		return nil
 	case upworkjob.FieldLocation:
 		v, ok := value.(string)
@@ -5561,6 +5867,12 @@ func (m *UpworkJobMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *UpworkJobMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(upworkjob.FieldEmbeddedAt) {
+		fields = append(fields, upworkjob.FieldEmbeddedAt)
+	}
+	if m.FieldCleared(upworkjob.FieldRankedAt) {
+		fields = append(fields, upworkjob.FieldRankedAt)
+	}
 	if m.FieldCleared(upworkjob.FieldLocation) {
 		fields = append(fields, upworkjob.FieldLocation)
 	}
@@ -5599,6 +5911,12 @@ func (m *UpworkJobMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *UpworkJobMutation) ClearField(name string) error {
 	switch name {
+	case upworkjob.FieldEmbeddedAt:
+		m.ClearEmbeddedAt()
+		return nil
+	case upworkjob.FieldRankedAt:
+		m.ClearRankedAt()
+		return nil
 	case upworkjob.FieldLocation:
 		m.ClearLocation()
 		return nil
@@ -5636,6 +5954,15 @@ func (m *UpworkJobMutation) ResetField(name string) error {
 		return nil
 	case upworkjob.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case upworkjob.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case upworkjob.FieldEmbeddedAt:
+		m.ResetEmbeddedAt()
+		return nil
+	case upworkjob.FieldRankedAt:
+		m.ResetRankedAt()
 		return nil
 	case upworkjob.FieldLocation:
 		m.ResetLocation()
@@ -6586,6 +6913,9 @@ type WorkHistoryMutation struct {
 	op                                 Op
 	typ                                string
 	id                                 *int
+	embedded_at                        *time.Time
+	created_at                         *time.Time
+	updated_at                         *time.Time
 	title                              *string
 	client_feedback                    *string
 	overall_rating                     *float64
@@ -6726,6 +7056,127 @@ func (m *WorkHistoryMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (m *WorkHistoryMutation) SetEmbeddedAt(t time.Time) {
+	m.embedded_at = &t
+}
+
+// EmbeddedAt returns the value of the "embedded_at" field in the mutation.
+func (m *WorkHistoryMutation) EmbeddedAt() (r time.Time, exists bool) {
+	v := m.embedded_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmbeddedAt returns the old "embedded_at" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldEmbeddedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmbeddedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmbeddedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmbeddedAt: %w", err)
+	}
+	return oldValue.EmbeddedAt, nil
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (m *WorkHistoryMutation) ClearEmbeddedAt() {
+	m.embedded_at = nil
+	m.clearedFields[workhistory.FieldEmbeddedAt] = struct{}{}
+}
+
+// EmbeddedAtCleared returns if the "embedded_at" field was cleared in this mutation.
+func (m *WorkHistoryMutation) EmbeddedAtCleared() bool {
+	_, ok := m.clearedFields[workhistory.FieldEmbeddedAt]
+	return ok
+}
+
+// ResetEmbeddedAt resets all changes to the "embedded_at" field.
+func (m *WorkHistoryMutation) ResetEmbeddedAt() {
+	m.embedded_at = nil
+	delete(m.clearedFields, workhistory.FieldEmbeddedAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *WorkHistoryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *WorkHistoryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *WorkHistoryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *WorkHistoryMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *WorkHistoryMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the WorkHistory entity.
+// If the WorkHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkHistoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *WorkHistoryMutation) ResetUpdatedAt() {
+	m.updated_at = nil
 }
 
 // SetTitle sets the "title" field.
@@ -8155,7 +8606,16 @@ func (m *WorkHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WorkHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 22)
+	fields := make([]string, 0, 25)
+	if m.embedded_at != nil {
+		fields = append(fields, workhistory.FieldEmbeddedAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, workhistory.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, workhistory.FieldUpdatedAt)
+	}
 	if m.title != nil {
 		fields = append(fields, workhistory.FieldTitle)
 	}
@@ -8230,6 +8690,12 @@ func (m *WorkHistoryMutation) Fields() []string {
 // schema.
 func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case workhistory.FieldEmbeddedAt:
+		return m.EmbeddedAt()
+	case workhistory.FieldCreatedAt:
+		return m.CreatedAt()
+	case workhistory.FieldUpdatedAt:
+		return m.UpdatedAt()
 	case workhistory.FieldTitle:
 		return m.Title()
 	case workhistory.FieldClientFeedback:
@@ -8283,6 +8749,12 @@ func (m *WorkHistoryMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case workhistory.FieldEmbeddedAt:
+		return m.OldEmbeddedAt(ctx)
+	case workhistory.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case workhistory.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	case workhistory.FieldTitle:
 		return m.OldTitle(ctx)
 	case workhistory.FieldClientFeedback:
@@ -8336,6 +8808,27 @@ func (m *WorkHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *WorkHistoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case workhistory.FieldEmbeddedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmbeddedAt(v)
+		return nil
+	case workhistory.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case workhistory.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
 	case workhistory.FieldTitle:
 		v, ok := value.(string)
 		if !ok {
@@ -8679,6 +9172,9 @@ func (m *WorkHistoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *WorkHistoryMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(workhistory.FieldEmbeddedAt) {
+		fields = append(fields, workhistory.FieldEmbeddedAt)
+	}
 	if m.FieldCleared(workhistory.FieldClientFeedback) {
 		fields = append(fields, workhistory.FieldClientFeedback)
 	}
@@ -8756,6 +9252,9 @@ func (m *WorkHistoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *WorkHistoryMutation) ClearField(name string) error {
 	switch name {
+	case workhistory.FieldEmbeddedAt:
+		m.ClearEmbeddedAt()
+		return nil
 	case workhistory.FieldClientFeedback:
 		m.ClearClientFeedback()
 		return nil
@@ -8827,6 +9326,15 @@ func (m *WorkHistoryMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *WorkHistoryMutation) ResetField(name string) error {
 	switch name {
+	case workhistory.FieldEmbeddedAt:
+		m.ResetEmbeddedAt()
+		return nil
+	case workhistory.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case workhistory.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
 	case workhistory.FieldTitle:
 		m.ResetTitle()
 		return nil

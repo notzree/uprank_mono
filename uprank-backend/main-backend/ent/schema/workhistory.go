@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
@@ -15,6 +17,9 @@ type WorkHistory struct {
 // Fields of the WorkHistory.
 func (WorkHistory) Fields() []ent.Field {
 	return []ent.Field{
+		field.Time("embedded_at").Optional(),
+		field.Time("created_at").Default(time.Now).Immutable(),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.String("title"),
 		field.String("client_feedback").Optional(),
 		field.Float("overall_rating").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}).Optional(),

@@ -23,6 +23,48 @@ type WorkHistoryCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetEmbeddedAt sets the "embedded_at" field.
+func (whc *WorkHistoryCreate) SetEmbeddedAt(t time.Time) *WorkHistoryCreate {
+	whc.mutation.SetEmbeddedAt(t)
+	return whc
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (whc *WorkHistoryCreate) SetNillableEmbeddedAt(t *time.Time) *WorkHistoryCreate {
+	if t != nil {
+		whc.SetEmbeddedAt(*t)
+	}
+	return whc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (whc *WorkHistoryCreate) SetCreatedAt(t time.Time) *WorkHistoryCreate {
+	whc.mutation.SetCreatedAt(t)
+	return whc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (whc *WorkHistoryCreate) SetNillableCreatedAt(t *time.Time) *WorkHistoryCreate {
+	if t != nil {
+		whc.SetCreatedAt(*t)
+	}
+	return whc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (whc *WorkHistoryCreate) SetUpdatedAt(t time.Time) *WorkHistoryCreate {
+	whc.mutation.SetUpdatedAt(t)
+	return whc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (whc *WorkHistoryCreate) SetNillableUpdatedAt(t *time.Time) *WorkHistoryCreate {
+	if t != nil {
+		whc.SetUpdatedAt(*t)
+	}
+	return whc
+}
+
 // SetTitle sets the "title" field.
 func (whc *WorkHistoryCreate) SetTitle(s string) *WorkHistoryCreate {
 	whc.mutation.SetTitle(s)
@@ -333,6 +375,7 @@ func (whc *WorkHistoryCreate) Mutation() *WorkHistoryMutation {
 
 // Save creates the WorkHistory in the database.
 func (whc *WorkHistoryCreate) Save(ctx context.Context) (*WorkHistory, error) {
+	whc.defaults()
 	return withHooks(ctx, whc.sqlSave, whc.mutation, whc.hooks)
 }
 
@@ -358,8 +401,26 @@ func (whc *WorkHistoryCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (whc *WorkHistoryCreate) defaults() {
+	if _, ok := whc.mutation.CreatedAt(); !ok {
+		v := workhistory.DefaultCreatedAt()
+		whc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := whc.mutation.UpdatedAt(); !ok {
+		v := workhistory.DefaultUpdatedAt()
+		whc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (whc *WorkHistoryCreate) check() error {
+	if _, ok := whc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "WorkHistory.created_at"`)}
+	}
+	if _, ok := whc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "WorkHistory.updated_at"`)}
+	}
 	if _, ok := whc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "WorkHistory.title"`)}
 	}
@@ -393,6 +454,18 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 		_spec = sqlgraph.NewCreateSpec(workhistory.Table, sqlgraph.NewFieldSpec(workhistory.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = whc.conflict
+	if value, ok := whc.mutation.EmbeddedAt(); ok {
+		_spec.SetField(workhistory.FieldEmbeddedAt, field.TypeTime, value)
+		_node.EmbeddedAt = value
+	}
+	if value, ok := whc.mutation.CreatedAt(); ok {
+		_spec.SetField(workhistory.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := whc.mutation.UpdatedAt(); ok {
+		_spec.SetField(workhistory.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if value, ok := whc.mutation.Title(); ok {
 		_spec.SetField(workhistory.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -505,7 +578,7 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 // of the `INSERT` statement. For example:
 //
 //	client.WorkHistory.Create().
-//		SetTitle(v).
+//		SetEmbeddedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -514,7 +587,7 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.WorkHistoryUpsert) {
-//			SetTitle(v+v).
+//			SetEmbeddedAt(v+v).
 //		}).
 //		Exec(ctx)
 func (whc *WorkHistoryCreate) OnConflict(opts ...sql.ConflictOption) *WorkHistoryUpsertOne {
@@ -549,6 +622,36 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *WorkHistoryUpsert) SetEmbeddedAt(v time.Time) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldEmbeddedAt, v)
+	return u
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateEmbeddedAt() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldEmbeddedAt)
+	return u
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *WorkHistoryUpsert) ClearEmbeddedAt() *WorkHistoryUpsert {
+	u.SetNull(workhistory.FieldEmbeddedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *WorkHistoryUpsert) SetUpdatedAt(v time.Time) *WorkHistoryUpsert {
+	u.Set(workhistory.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsert) UpdateUpdatedAt() *WorkHistoryUpsert {
+	u.SetExcluded(workhistory.FieldUpdatedAt)
+	return u
+}
 
 // SetTitle sets the "title" field.
 func (u *WorkHistoryUpsert) SetTitle(v string) *WorkHistoryUpsert {
@@ -1028,6 +1131,11 @@ func (u *WorkHistoryUpsert) ClearSkills() *WorkHistoryUpsert {
 //		Exec(ctx)
 func (u *WorkHistoryUpsertOne) UpdateNewValues() *WorkHistoryUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(workhistory.FieldCreatedAt)
+		}
+	}))
 	return u
 }
 
@@ -1056,6 +1164,41 @@ func (u *WorkHistoryUpsertOne) Update(set func(*WorkHistoryUpsert)) *WorkHistory
 		set(&WorkHistoryUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *WorkHistoryUpsertOne) SetEmbeddedAt(v time.Time) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetEmbeddedAt(v)
+	})
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateEmbeddedAt() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *WorkHistoryUpsertOne) ClearEmbeddedAt() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearEmbeddedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *WorkHistoryUpsertOne) SetUpdatedAt(v time.Time) *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsertOne) UpdateUpdatedAt() *WorkHistoryUpsertOne {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateUpdatedAt()
+	})
 }
 
 // SetTitle sets the "title" field.
@@ -1656,6 +1799,7 @@ func (whcb *WorkHistoryCreateBulk) Save(ctx context.Context) ([]*WorkHistory, er
 	for i := range whcb.builders {
 		func(i int, root context.Context) {
 			builder := whcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*WorkHistoryMutation)
 				if !ok {
@@ -1738,7 +1882,7 @@ func (whcb *WorkHistoryCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.WorkHistoryUpsert) {
-//			SetTitle(v+v).
+//			SetEmbeddedAt(v+v).
 //		}).
 //		Exec(ctx)
 func (whcb *WorkHistoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *WorkHistoryUpsertBulk {
@@ -1777,6 +1921,13 @@ type WorkHistoryUpsertBulk struct {
 //		Exec(ctx)
 func (u *WorkHistoryUpsertBulk) UpdateNewValues() *WorkHistoryUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(workhistory.FieldCreatedAt)
+			}
+		}
+	}))
 	return u
 }
 
@@ -1805,6 +1956,41 @@ func (u *WorkHistoryUpsertBulk) Update(set func(*WorkHistoryUpsert)) *WorkHistor
 		set(&WorkHistoryUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *WorkHistoryUpsertBulk) SetEmbeddedAt(v time.Time) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetEmbeddedAt(v)
+	})
+}
+
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateEmbeddedAt() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *WorkHistoryUpsertBulk) ClearEmbeddedAt() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.ClearEmbeddedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *WorkHistoryUpsertBulk) SetUpdatedAt(v time.Time) *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *WorkHistoryUpsertBulk) UpdateUpdatedAt() *WorkHistoryUpsertBulk {
+	return u.Update(func(s *WorkHistoryUpsert) {
+		s.UpdateUpdatedAt()
+	})
 }
 
 // SetTitle sets the "title" field.

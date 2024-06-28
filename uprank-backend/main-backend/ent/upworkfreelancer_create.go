@@ -138,6 +138,34 @@ func (ufc *UpworkFreelancerCreate) SetTotalHours(f float64) *UpworkFreelancerCre
 	return ufc
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (ufc *UpworkFreelancerCreate) SetCreatedAt(t time.Time) *UpworkFreelancerCreate {
+	ufc.mutation.SetCreatedAt(t)
+	return ufc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ufc *UpworkFreelancerCreate) SetNillableCreatedAt(t *time.Time) *UpworkFreelancerCreate {
+	if t != nil {
+		ufc.SetCreatedAt(*t)
+	}
+	return ufc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (ufc *UpworkFreelancerCreate) SetUpdatedAt(t time.Time) *UpworkFreelancerCreate {
+	ufc.mutation.SetUpdatedAt(t)
+	return ufc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ufc *UpworkFreelancerCreate) SetNillableUpdatedAt(t *time.Time) *UpworkFreelancerCreate {
+	if t != nil {
+		ufc.SetUpdatedAt(*t)
+	}
+	return ufc
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (ufc *UpworkFreelancerCreate) SetTotalPortfolioItems(i int) *UpworkFreelancerCreate {
 	ufc.mutation.SetTotalPortfolioItems(i)
@@ -254,16 +282,16 @@ func (ufc *UpworkFreelancerCreate) SetNillableUprankScore(i *int) *UpworkFreelan
 	return ufc
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (ufc *UpworkFreelancerCreate) SetUprankUpdatedAt(t time.Time) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankUpdatedAt(t)
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ufc *UpworkFreelancerCreate) SetEmbeddedAt(t time.Time) *UpworkFreelancerCreate {
+	ufc.mutation.SetEmbeddedAt(t)
 	return ufc
 }
 
-// SetNillableUprankUpdatedAt sets the "uprank_updated_at" field if the given value is not nil.
-func (ufc *UpworkFreelancerCreate) SetNillableUprankUpdatedAt(t *time.Time) *UpworkFreelancerCreate {
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ufc *UpworkFreelancerCreate) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerCreate {
 	if t != nil {
-		ufc.SetUprankUpdatedAt(*t)
+		ufc.SetEmbeddedAt(*t)
 	}
 	return ufc
 }
@@ -396,13 +424,17 @@ func (ufc *UpworkFreelancerCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ufc *UpworkFreelancerCreate) defaults() {
+	if _, ok := ufc.mutation.CreatedAt(); !ok {
+		v := upworkfreelancer.DefaultCreatedAt()
+		ufc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := ufc.mutation.UpdatedAt(); !ok {
+		v := upworkfreelancer.DefaultUpdatedAt()
+		ufc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := ufc.mutation.UprankScore(); !ok {
 		v := upworkfreelancer.DefaultUprankScore
 		ufc.mutation.SetUprankScore(v)
-	}
-	if _, ok := ufc.mutation.UprankUpdatedAt(); !ok {
-		v := upworkfreelancer.DefaultUprankUpdatedAt()
-		ufc.mutation.SetUprankUpdatedAt(v)
 	}
 	if _, ok := ufc.mutation.UprankReccomended(); !ok {
 		v := upworkfreelancer.DefaultUprankReccomended
@@ -458,6 +490,12 @@ func (ufc *UpworkFreelancerCreate) check() error {
 	if _, ok := ufc.mutation.TotalHours(); !ok {
 		return &ValidationError{Name: "total_hours", err: errors.New(`ent: missing required field "UpworkFreelancer.total_hours"`)}
 	}
+	if _, ok := ufc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "UpworkFreelancer.created_at"`)}
+	}
+	if _, ok := ufc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "UpworkFreelancer.updated_at"`)}
+	}
 	if _, ok := ufc.mutation.TotalPortfolioItems(); !ok {
 		return &ValidationError{Name: "total_portfolio_items", err: errors.New(`ent: missing required field "UpworkFreelancer.total_portfolio_items"`)}
 	}
@@ -508,9 +546,6 @@ func (ufc *UpworkFreelancerCreate) check() error {
 	}
 	if _, ok := ufc.mutation.TotalRevenue(); !ok {
 		return &ValidationError{Name: "total_revenue", err: errors.New(`ent: missing required field "UpworkFreelancer.total_revenue"`)}
-	}
-	if _, ok := ufc.mutation.UprankUpdatedAt(); !ok {
-		return &ValidationError{Name: "uprank_updated_at", err: errors.New(`ent: missing required field "UpworkFreelancer.uprank_updated_at"`)}
 	}
 	if v, ok := ufc.mutation.ID(); ok {
 		if err := upworkfreelancer.IDValidator(v); err != nil {
@@ -617,6 +652,14 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 		_spec.SetField(upworkfreelancer.FieldTotalHours, field.TypeFloat64, value)
 		_node.TotalHours = value
 	}
+	if value, ok := ufc.mutation.CreatedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := ufc.mutation.UpdatedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if value, ok := ufc.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalPortfolioItems, field.TypeInt, value)
 		_node.TotalPortfolioItems = value
@@ -689,9 +732,9 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 		_spec.SetField(upworkfreelancer.FieldUprankScore, field.TypeInt, value)
 		_node.UprankScore = value
 	}
-	if value, ok := ufc.mutation.UprankUpdatedAt(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankUpdatedAt, field.TypeTime, value)
-		_node.UprankUpdatedAt = value
+	if value, ok := ufc.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+		_node.EmbeddedAt = value
 	}
 	if value, ok := ufc.mutation.UprankReccomended(); ok {
 		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
@@ -1033,6 +1076,18 @@ func (u *UpworkFreelancerUpsert) AddTotalHours(v float64) *UpworkFreelancerUpser
 	return u
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkFreelancerUpsert) SetUpdatedAt(v time.Time) *UpworkFreelancerUpsert {
+	u.Set(upworkfreelancer.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsert) UpdateUpdatedAt() *UpworkFreelancerUpsert {
+	u.SetExcluded(upworkfreelancer.FieldUpdatedAt)
+	return u
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (u *UpworkFreelancerUpsert) SetTotalPortfolioItems(v int) *UpworkFreelancerUpsert {
 	u.Set(upworkfreelancer.FieldTotalPortfolioItems, v)
@@ -1333,15 +1388,21 @@ func (u *UpworkFreelancerUpsert) ClearUprankScore() *UpworkFreelancerUpsert {
 	return u
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (u *UpworkFreelancerUpsert) SetUprankUpdatedAt(v time.Time) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankUpdatedAt, v)
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkFreelancerUpsert) SetEmbeddedAt(v time.Time) *UpworkFreelancerUpsert {
+	u.Set(upworkfreelancer.FieldEmbeddedAt, v)
 	return u
 }
 
-// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankUpdatedAt() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankUpdatedAt)
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsert) UpdateEmbeddedAt() *UpworkFreelancerUpsert {
+	u.SetExcluded(upworkfreelancer.FieldEmbeddedAt)
+	return u
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkFreelancerUpsert) ClearEmbeddedAt() *UpworkFreelancerUpsert {
+	u.SetNull(upworkfreelancer.FieldEmbeddedAt)
 	return u
 }
 
@@ -1415,6 +1476,9 @@ func (u *UpworkFreelancerUpsertOne) UpdateNewValues() *UpworkFreelancerUpsertOne
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(upworkfreelancer.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(upworkfreelancer.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -1710,6 +1774,20 @@ func (u *UpworkFreelancerUpsertOne) AddTotalHours(v float64) *UpworkFreelancerUp
 func (u *UpworkFreelancerUpsertOne) UpdateTotalHours() *UpworkFreelancerUpsertOne {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalHours()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkFreelancerUpsertOne) SetUpdatedAt(v time.Time) *UpworkFreelancerUpsertOne {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertOne) UpdateUpdatedAt() *UpworkFreelancerUpsertOne {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.UpdateUpdatedAt()
 	})
 }
 
@@ -2063,17 +2141,24 @@ func (u *UpworkFreelancerUpsertOne) ClearUprankScore() *UpworkFreelancerUpsertOn
 	})
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankUpdatedAt(v time.Time) *UpworkFreelancerUpsertOne {
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkFreelancerUpsertOne) SetEmbeddedAt(v time.Time) *UpworkFreelancerUpsertOne {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankUpdatedAt(v)
+		s.SetEmbeddedAt(v)
 	})
 }
 
-// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankUpdatedAt() *UpworkFreelancerUpsertOne {
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertOne) UpdateEmbeddedAt() *UpworkFreelancerUpsertOne {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankUpdatedAt()
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkFreelancerUpsertOne) ClearEmbeddedAt() *UpworkFreelancerUpsertOne {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.ClearEmbeddedAt()
 	})
 }
 
@@ -2322,6 +2407,9 @@ func (u *UpworkFreelancerUpsertBulk) UpdateNewValues() *UpworkFreelancerUpsertBu
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(upworkfreelancer.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(upworkfreelancer.FieldCreatedAt)
 			}
 		}
 	}))
@@ -2618,6 +2706,20 @@ func (u *UpworkFreelancerUpsertBulk) AddTotalHours(v float64) *UpworkFreelancerU
 func (u *UpworkFreelancerUpsertBulk) UpdateTotalHours() *UpworkFreelancerUpsertBulk {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalHours()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UpworkFreelancerUpsertBulk) SetUpdatedAt(v time.Time) *UpworkFreelancerUpsertBulk {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertBulk) UpdateUpdatedAt() *UpworkFreelancerUpsertBulk {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.UpdateUpdatedAt()
 	})
 }
 
@@ -2971,17 +3073,24 @@ func (u *UpworkFreelancerUpsertBulk) ClearUprankScore() *UpworkFreelancerUpsertB
 	})
 }
 
-// SetUprankUpdatedAt sets the "uprank_updated_at" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankUpdatedAt(v time.Time) *UpworkFreelancerUpsertBulk {
+// SetEmbeddedAt sets the "embedded_at" field.
+func (u *UpworkFreelancerUpsertBulk) SetEmbeddedAt(v time.Time) *UpworkFreelancerUpsertBulk {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankUpdatedAt(v)
+		s.SetEmbeddedAt(v)
 	})
 }
 
-// UpdateUprankUpdatedAt sets the "uprank_updated_at" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankUpdatedAt() *UpworkFreelancerUpsertBulk {
+// UpdateEmbeddedAt sets the "embedded_at" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertBulk) UpdateEmbeddedAt() *UpworkFreelancerUpsertBulk {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankUpdatedAt()
+		s.UpdateEmbeddedAt()
+	})
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (u *UpworkFreelancerUpsertBulk) ClearEmbeddedAt() *UpworkFreelancerUpsertBulk {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.ClearEmbeddedAt()
 	})
 }
 

@@ -75,6 +75,21 @@ func CreatedAt(v time.Time) predicate.UpworkJob {
 	return predicate.UpworkJob(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// EmbeddedAt applies equality check predicate on the "embedded_at" field. It's identical to EmbeddedAtEQ.
+func EmbeddedAt(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldEmbeddedAt, v))
+}
+
+// RankedAt applies equality check predicate on the "ranked_at" field. It's identical to RankedAtEQ.
+func RankedAt(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldRankedAt, v))
+}
+
 // Location applies equality check predicate on the "location" field. It's identical to LocationEQ.
 func Location(v string) predicate.UpworkJob {
 	return predicate.UpworkJob(sql.FieldEQ(FieldLocation, v))
@@ -223,6 +238,146 @@ func CreatedAtLT(v time.Time) predicate.UpworkJob {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.UpworkJob {
 	return predicate.UpworkJob(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// EmbeddedAtEQ applies the EQ predicate on the "embedded_at" field.
+func EmbeddedAtEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtNEQ applies the NEQ predicate on the "embedded_at" field.
+func EmbeddedAtNEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNEQ(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtIn applies the In predicate on the "embedded_at" field.
+func EmbeddedAtIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldIn(FieldEmbeddedAt, vs...))
+}
+
+// EmbeddedAtNotIn applies the NotIn predicate on the "embedded_at" field.
+func EmbeddedAtNotIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNotIn(FieldEmbeddedAt, vs...))
+}
+
+// EmbeddedAtGT applies the GT predicate on the "embedded_at" field.
+func EmbeddedAtGT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGT(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtGTE applies the GTE predicate on the "embedded_at" field.
+func EmbeddedAtGTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGTE(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtLT applies the LT predicate on the "embedded_at" field.
+func EmbeddedAtLT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLT(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtLTE applies the LTE predicate on the "embedded_at" field.
+func EmbeddedAtLTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLTE(FieldEmbeddedAt, v))
+}
+
+// EmbeddedAtIsNil applies the IsNil predicate on the "embedded_at" field.
+func EmbeddedAtIsNil() predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldIsNull(FieldEmbeddedAt))
+}
+
+// EmbeddedAtNotNil applies the NotNil predicate on the "embedded_at" field.
+func EmbeddedAtNotNil() predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNotNull(FieldEmbeddedAt))
+}
+
+// RankedAtEQ applies the EQ predicate on the "ranked_at" field.
+func RankedAtEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldEQ(FieldRankedAt, v))
+}
+
+// RankedAtNEQ applies the NEQ predicate on the "ranked_at" field.
+func RankedAtNEQ(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNEQ(FieldRankedAt, v))
+}
+
+// RankedAtIn applies the In predicate on the "ranked_at" field.
+func RankedAtIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldIn(FieldRankedAt, vs...))
+}
+
+// RankedAtNotIn applies the NotIn predicate on the "ranked_at" field.
+func RankedAtNotIn(vs ...time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNotIn(FieldRankedAt, vs...))
+}
+
+// RankedAtGT applies the GT predicate on the "ranked_at" field.
+func RankedAtGT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGT(FieldRankedAt, v))
+}
+
+// RankedAtGTE applies the GTE predicate on the "ranked_at" field.
+func RankedAtGTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldGTE(FieldRankedAt, v))
+}
+
+// RankedAtLT applies the LT predicate on the "ranked_at" field.
+func RankedAtLT(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLT(FieldRankedAt, v))
+}
+
+// RankedAtLTE applies the LTE predicate on the "ranked_at" field.
+func RankedAtLTE(v time.Time) predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldLTE(FieldRankedAt, v))
+}
+
+// RankedAtIsNil applies the IsNil predicate on the "ranked_at" field.
+func RankedAtIsNil() predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldIsNull(FieldRankedAt))
+}
+
+// RankedAtNotNil applies the NotNil predicate on the "ranked_at" field.
+func RankedAtNotNil() predicate.UpworkJob {
+	return predicate.UpworkJob(sql.FieldNotNull(FieldRankedAt))
 }
 
 // LocationEQ applies the EQ predicate on the "location" field.

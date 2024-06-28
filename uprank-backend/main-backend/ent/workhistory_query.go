@@ -298,12 +298,12 @@ func (whq *WorkHistoryQuery) WithFreelancer(opts ...func(*UpworkFreelancerQuery)
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		EmbeddedAt time.Time `json:"embedded_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.WorkHistory.Query().
-//		GroupBy(workhistory.FieldTitle).
+//		GroupBy(workhistory.FieldEmbeddedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (whq *WorkHistoryQuery) GroupBy(field string, fields ...string) *WorkHistoryGroupBy {
@@ -321,11 +321,11 @@ func (whq *WorkHistoryQuery) GroupBy(field string, fields ...string) *WorkHistor
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		EmbeddedAt time.Time `json:"embedded_at,omitempty"`
 //	}
 //
 //	client.WorkHistory.Query().
-//		Select(workhistory.FieldTitle).
+//		Select(workhistory.FieldEmbeddedAt).
 //		Scan(ctx, &v)
 func (whq *WorkHistoryQuery) Select(fields ...string) *WorkHistorySelect {
 	whq.ctx.Fields = append(whq.ctx.Fields, fields...)

@@ -16,7 +16,7 @@ type Servicer interface {
 	CreateJob(data types.CreateJobRequest, user_id string, ctx context.Context) (*ent.Job, error)
 	AttachUpworkJob(data types.AttachUpworkJobRequest, user_id string, job_id *uuid.UUID, ctx context.Context) (*ent.UpworkJob, error)
 	GetUpworkJob(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error)
-	GetUpworkJobWithAllFreelancerData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error)
+	GetUpworkJobEmbeddingData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error)
 	// UpdateUpworkJob(data types.CreateUpworkJobRequest, user_id string, ctx context.Context) (*ent.Job, *ent.UpworkJob, error)
 	CreateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) ([]*ent.UpworkFreelancer, error)
 	UpdateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) (created_freelancer_count int, updated_freelancer_count int, deleted_freelancer_count int, err error)
