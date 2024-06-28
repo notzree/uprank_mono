@@ -18,6 +18,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 	"github.com/notzree/uprank-backend/main-backend/types"
 )
 
@@ -498,7 +499,15 @@ func (s *V1Servicer) GetUpworkJobEmbeddingData(upwork_job_id string, user_id str
 				),
 			)
 			query.WithAttachments()
-			query.WithWorkHistories()
+			query.WithWorkHistories(
+				func(workhistory_query *ent.WorkHistoryQuery) {
+					workhistory_query.Where(
+						workhistory.Or(
+							workhistory.EmbeddedAtIsNil(),
+							sql.FieldsLT(workhistory.FieldEmbeddedAt, workhistory.FieldUpdatedAt),
+						),
+					)
+				})
 		}).
 		Only(ctx)
 	return job, err
