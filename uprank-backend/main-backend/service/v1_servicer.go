@@ -60,20 +60,27 @@ func (s *V1Servicer) UpdateUser(data types.UpdateUserRequest, ctx context.Contex
 // TODO: ADD VALIDATION OT THE CREATE JOB REQUEST
 // THERE SHOULD ONLY BE ONE PLATFORM JOB REQUEST PER JOB CREATION REQUEST
 func (s *V1Servicer) CreateJob(data types.CreateJobRequest, user_id string, ctx context.Context) (*ent.Job, error) {
-	new_job, create_job_err := s.ent.Job.Create().SetUserID(user_id).SetOriginPlatform(schema.Platform("uprank")).Save(ctx) //TODO: Make the origin platform dynamic
-	if data.UpworkJobRequest != nil {
-		if create_job_err != nil {
-			return nil, create_job_err
-		}
-		_, create_upwork_job_err := s.AttachUpworkJob(*data.UpworkJobRequest, user_id, &new_job.ID, ctx)
+	new_job, create_job_err := s.ent.Job.Create().SetUserID(user_id).SetOriginPlatform(schema.Platform(data.Origin)).Save(ctx) //TODO: Make the origin platform dynamic
+	if create_job_err != nil {
+		return nil, create_job_err
+	}
+	_, attach_platform_jobs_err := s.AttachPlatformSpecificjobs(data.PlatformJobRequests, user_id, &new_job.ID, ctx)
+	if attach_platform_jobs_err != nil {
+		return nil, attach_platform_jobs_err
+	}
+	return new_job, nil
+}
+
+func (s *V1Servicer) AttachPlatformSpecificjobs(data types.AttachPlatformSpecificJobsRequest, user_id string, job_id *uuid.UUID, ctx context.Context) (*ent.Job, error) {
+	if data.UpworkRequest != nil {
+		_, create_upwork_job_err := s.AttachUpworkJob(*data.UpworkRequest, user_id, job_id, ctx)
 		if create_upwork_job_err != nil {
 			return nil, create_upwork_job_err
 		}
-		return new_job, nil
-
 	}
-	//technically should never happen because the type validation should catch this
-	return nil, errors.New("missing platform job request")
+
+	//add more platforms here
+	return nil, nil
 }
 
 // Creates an upwork job and attaches it to a job.
@@ -105,6 +112,7 @@ func (s *V1Servicer) AttachUpworkJob(data types.AttachUpworkJobRequest, user_id 
 	}
 	return new_upwork_job, create_upwork_job_err
 }
+
 func (s *V1Servicer) GetJob(ctx context.Context) (*ent.Job, error) {
 	//todo: implement this
 	job, err := s.ent.Job.Query().First(ctx)
@@ -512,3 +520,5 @@ func (s *V1Servicer) GetUpworkJobEmbeddingData(upwork_job_id string, user_id str
 		Only(ctx)
 	return job, err
 }
+
+//need method for queue-handler to mark shit as embedded or ranked.
