@@ -30,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type InferenceClient interface {
 	EmbedText(ctx context.Context, in *EmbedTextRequest, opts ...grpc.CallOption) (*EmbedTextResponse, error)
+	// rpc Embed()
 	UpsertVector(ctx context.Context, in *UpsertVectorRequest, opts ...grpc.CallOption) (*UpsertVectorResponse, error)
 	QueryVector(ctx context.Context, in *QueryVectorRequest, opts ...grpc.CallOption) (*QueryVectorResponse, error)
 	DeleteVector(ctx context.Context, in *DeleteVectorRequest, opts ...grpc.CallOption) (*DeleteVectorResponse, error)
@@ -84,6 +85,7 @@ func (c *inferenceClient) DeleteVector(ctx context.Context, in *DeleteVectorRequ
 // for forward compatibility
 type InferenceServer interface {
 	EmbedText(context.Context, *EmbedTextRequest) (*EmbedTextResponse, error)
+	// rpc Embed()
 	UpsertVector(context.Context, *UpsertVectorRequest) (*UpsertVectorResponse, error)
 	QueryVector(context.Context, *QueryVectorRequest) (*QueryVectorResponse, error)
 	DeleteVector(context.Context, *DeleteVectorRequest) (*DeleteVectorResponse, error)

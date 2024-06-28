@@ -6,16 +6,29 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class EmbedTextRequest(_message.Message):
-    __slots__ = ("text",)
+    __slots__ = ("id", "text", "metadata")
+    class MetadataEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    ID_FIELD_NUMBER: _ClassVar[int]
     TEXT_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    id: str
     text: str
-    def __init__(self, text: _Optional[str] = ...) -> None: ...
+    metadata: _containers.ScalarMap[str, str]
+    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class EmbedTextResponse(_message.Message):
-    __slots__ = ("vector",)
+    __slots__ = ("vector", "error")
     VECTOR_FIELD_NUMBER: _ClassVar[int]
-    vector: _containers.RepeatedScalarFieldContainer[float]
-    def __init__(self, vector: _Optional[_Iterable[float]] = ...) -> None: ...
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    vector: Vector
+    error: str
+    def __init__(self, vector: _Optional[_Union[Vector, _Mapping]] = ..., error: _Optional[str] = ...) -> None: ...
 
 class UpsertVectorRequest(_message.Message):
     __slots__ = ("namespace", "vectors")
@@ -43,12 +56,10 @@ class Vector(_message.Message):
     def __init__(self, id: _Optional[str] = ..., vector: _Optional[_Iterable[float]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpsertVectorResponse(_message.Message):
-    __slots__ = ("id", "error")
-    ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("error",)
     ERROR_FIELD_NUMBER: _ClassVar[int]
-    id: str
     error: str
-    def __init__(self, id: _Optional[str] = ..., error: _Optional[str] = ...) -> None: ...
+    def __init__(self, error: _Optional[str] = ...) -> None: ...
 
 class QueryVectorRequest(_message.Message):
     __slots__ = ("namespace", "vector", "top_k", "filter")
