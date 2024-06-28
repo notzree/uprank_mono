@@ -37,7 +37,6 @@ func (s *Server) Start() error {
 			})
 		})
 		v1_router.Post("/test", Make(s.TestRanking))
-		v1_router.Get("/test/jobs/{job_id}/upwork/{upwork_job_id}", Make(s.GetUpworkJob))
 		//private apis
 		v1_router.Group(func(private_router chi.Router) {
 			private_router.Use(func(next http.Handler) http.Handler {
@@ -54,10 +53,12 @@ func (s *Server) Start() error {
 					jobs_router.Route("/upwork", func(upwork_router chi.Router) {
 						upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
 							upwork_job_id_router.Get("/", Make(s.GetUpworkJob))
-							upwork_job_id_router.Get("/all_data", Make(s.GetUpworkJobWithAllFreelancerData))
 							upwork_job_id_router.Route("/freelancers", func(upwork_freelancers_router chi.Router) {
 								upwork_freelancers_router.Post("/", Make(s.CreateUpworkFreelancers))       //create freelancers
 								upwork_freelancers_router.Post("/update", Make(s.UpdateUpworkFreelancers)) //update freelancers
+							})
+							upwork_job_id_router.Route("/embeddings", func(upwork_job_id_embedding_router chi.Router) {
+								upwork_job_id_router.Get("/", Make(s.GetUpworkJobEmbeddingData))
 							})
 						})
 					})
