@@ -32,6 +32,7 @@ func NewClerkAuthenticator(clerk_secret_key string, ms_api_key string) *ClerkAut
 func (c *ClerkAuthenticator) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-KEY") == c.ms_api_key {
+			//todo: ensure that the user_id is in the request
 			next.ServeHTTP(w, r)
 		} else {
 			token, err := c.GetToken(r)
