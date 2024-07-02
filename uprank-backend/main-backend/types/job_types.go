@@ -1,6 +1,9 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/notzree/uprank-backend/main-backend/ent"
+)
 
 type CreateJobRequest struct {
 	Origin              string                            `json:"origin,omitempty"`
@@ -48,4 +51,9 @@ type RankJobRequest struct {
 	Short_lived_token string    `json:"short_lived_token,omitempty"`
 	Platform          string    `json:"platform,omitempty"`
 	Platform_id       string    `json:"platform_id,omitempty"`
+}
+
+type GetUpworkJobEmbeddingDataResponse struct {
+	Job_id     string         `json:"job_id,omitempty"`
+	Upwork_job *ent.UpworkJob `json:"upwork_job,omitempty"`
 }

@@ -2,36 +2,25 @@ package types
 
 import (
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type AttachUpworkJobRequest struct {
-	Job_Id           uuid.UUID `json:"job_id"`
-	Id               string    `json:"id"`
-	Title            string    `json:"title"`
-	Location         string    `json:"location"`
-	Description      string    `json:"description"`
-	Skills           []string  `json:"skills"`
-	Experience_level string    `json:"experience_level"`
-	Hourly           bool      `json:"hourly"`
-	Fixed            bool      `json:"fixed"`
-	Hourly_rate      []float32 `json:"hourly_rate"`
-	Fixed_rate       float64   `json:"fixed_rate"`
-}
-
-// Job_Id is not known from the client, is instead passed into the service from the CreateJob method.
-type CreateUpworkJobRequest struct {
-	Id               string    `json:"id"`
-	Title            string    `json:"title"`
-	Location         string    `json:"location"`
-	Description      string    `json:"description"`
-	Skills           []string  `json:"skills"`
-	Experience_level string    `json:"experience_level"`
-	Hourly           bool      `json:"hourly"`
-	Fixed            bool      `json:"fixed"`
-	Hourly_rate      []float32 `json:"hourly_rate"`
-	Fixed_rate       float64   `json:"fixed_rate"`
+	Job_Id           uuid.UUID  `json:"job_id"`
+	Id               string     `json:"id"`
+	Title            string     `json:"title"`
+	Location         string     `json:"location"`
+	Description      string     `json:"description"`
+	Skills           []string   `json:"skills"`
+	Experience_level string     `json:"experience_level"`
+	Hourly           bool       `json:"hourly"`
+	Fixed            bool       `json:"fixed"`
+	Hourly_rate      []float32  `json:"hourly_rate"`
+	Fixed_rate       float64    `json:"fixed_rate"`
+	Embedded_at      *time.Time `json:"embedded_at"`
+	Ranked_at        *time.Time `json:"ranked_at"`
 }
 
 func (req *AttachUpworkJobRequest) Validate() map[string]interface{} {
@@ -62,4 +51,29 @@ func (req *AttachUpworkJobRequest) Validate() map[string]interface{} {
 type ScrapeUpworkFreelancerData struct {
 	Id  string `json:"id"`
 	Url string `json:"url"`
+}
+
+type UpdateUpworkJobRequest struct {
+	Id               string     `json:"id,omitempty"`
+	Title            *string    `json:"title,omitempty"`
+	Location         *string    `json:"location,omitempty"`
+	Description      *string    `json:"description,omitempty"`
+	Skills           *[]string  `json:"skills,omitempty"`
+	Experience_level *string    `json:"experience_level,omitempty"`
+	Hourly           *bool      `json:"hourly,omitempty"`
+	Fixed            *bool      `json:"fixed,omitempty"`
+	Hourly_rate      *[]float32 `json:"hourly_rate,omitempty"`
+	Fixed_rate       *float64   `json:"fixed_rate,omitempty"`
+	Embedded_at      *time.Time `json:"embedded_at,omitempty"`
+	Ranked_at        *time.Time `json:"ranked_at,omitempty"`
+}
+
+func (req *UpdateUpworkJobRequest) Validate() map[string]interface{} {
+	errors := make(map[string]interface{})
+	nilArray := findNilFields(req)
+	if len(nilArray) == getNumFields(req) {
+		errors["UpdateUpworkJobRequest"] = "all fields cannot be nil"
+	}
+
+	return errors
 }
