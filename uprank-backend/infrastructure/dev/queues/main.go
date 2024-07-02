@@ -18,7 +18,7 @@ func main() {
 			FifoQueue:                 pulumi.Bool(true),
 			ContentBasedDeduplication: pulumi.Bool(true),
 			SqsManagedSseEnabled:      pulumi.Bool(true),
-			VisibilityTimeoutSeconds:  pulumi.Int(500),
+			VisibilityTimeoutSeconds:  pulumi.Int(700),
 		})
 		if err != nil {
 			return err
