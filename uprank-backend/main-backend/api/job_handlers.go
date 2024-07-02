@@ -28,5 +28,4 @@ func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, http.StatusCreated, new_job)
-
 }
