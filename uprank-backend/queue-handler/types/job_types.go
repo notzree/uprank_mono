@@ -2,8 +2,12 @@ package types
 
 import "time"
 
-type JobDataAll struct {
-	ID              string    `json:"id"`
+type JobEmbeddingData struct {
+	Job_id     string                  `json:"job_id,omitempty"`
+	Upwork_job *UpworkJobEmbeddingData `json:"upwork_job,omitempty"`
+}
+type UpworkJobEmbeddingData struct {
+	Upwork_id       string    `json:"id"`
 	Title           string    `json:"title"`
 	CreatedAt       string    `json:"created_at"`
 	Location        string    `json:"location"`
