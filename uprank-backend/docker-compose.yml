@@ -20,6 +20,8 @@ services:
       - RANKING_QUEUE_URL=${RANKING_QUEUE_URL}
       - INFERENCE_SERVER_URL=${INFERENCE_SERVER_URL}
   inference-server:
+    depends_on:
+      - server
     image: notzree/uprank/uprank-backend/inference-backend:1.0
     container_name: uprank-inference-backend
     stdin_open: true
@@ -38,6 +40,9 @@ services:
       - MAIN_BACKEND_URL=${MAIN_BACKEND_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
   queue-handler:
+    depends_on:
+    - server
+    - inference-server
     image: notzree/uprank/uprank-backend/queue-handler:1.0
     container_name: uprank-queue-handler
     stdin_open: true
