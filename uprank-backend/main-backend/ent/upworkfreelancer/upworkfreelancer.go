@@ -50,6 +50,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldEmbeddedAt holds the string denoting the embedded_at field in the database.
+	FieldEmbeddedAt = "embedded_at"
 	// FieldTotalPortfolioItems holds the string denoting the total_portfolio_items field in the database.
 	FieldTotalPortfolioItems = "total_portfolio_items"
 	// FieldTotalPortfolioV2Items holds the string denoting the total_portfolio_v2_items field in the database.
@@ -84,10 +86,10 @@ const (
 	FieldRecentEarnings = "recent_earnings"
 	// FieldTotalRevenue holds the string denoting the total_revenue field in the database.
 	FieldTotalRevenue = "total_revenue"
-	// FieldUprankScore holds the string denoting the uprank_score field in the database.
-	FieldUprankScore = "uprank_score"
-	// FieldEmbeddedAt holds the string denoting the embedded_at field in the database.
-	FieldEmbeddedAt = "embedded_at"
+	// FieldUprankSpecializationScore holds the string denoting the uprank_specialization_score field in the database.
+	FieldUprankSpecializationScore = "uprank_specialization_score"
+	// FieldUprankEstimatedCompletionTime holds the string denoting the uprank_estimated_completion_time field in the database.
+	FieldUprankEstimatedCompletionTime = "uprank_estimated_completion_time"
 	// FieldUprankReccomended holds the string denoting the uprank_reccomended field in the database.
 	FieldUprankReccomended = "uprank_reccomended"
 	// FieldUprankReccomendedReasons holds the string denoting the uprank_reccomended_reasons field in the database.
@@ -144,6 +146,7 @@ var Columns = []string{
 	FieldTotalHours,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldEmbeddedAt,
 	FieldTotalPortfolioItems,
 	FieldTotalPortfolioV2Items,
 	FieldUpworkTotalFeedback,
@@ -161,8 +164,8 @@ var Columns = []string{
 	FieldCombinedTotalRevenue,
 	FieldRecentEarnings,
 	FieldTotalRevenue,
-	FieldUprankScore,
-	FieldEmbeddedAt,
+	FieldUprankSpecializationScore,
+	FieldUprankEstimatedCompletionTime,
 	FieldUprankReccomended,
 	FieldUprankReccomendedReasons,
 	FieldUprankNotEnoughData,
@@ -191,8 +194,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultUprankScore holds the default value on creation for the "uprank_score" field.
-	DefaultUprankScore int
+	// DefaultUprankSpecializationScore holds the default value on creation for the "uprank_specialization_score" field.
+	DefaultUprankSpecializationScore float64
 	// DefaultUprankReccomended holds the default value on creation for the "uprank_reccomended" field.
 	DefaultUprankReccomended bool
 	// DefaultUprankNotEnoughData holds the default value on creation for the "uprank_not_enough_data" field.
@@ -299,6 +302,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
+// ByEmbeddedAt orders the results by the embedded_at field.
+func ByEmbeddedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmbeddedAt, opts...).ToFunc()
+}
+
 // ByTotalPortfolioItems orders the results by the total_portfolio_items field.
 func ByTotalPortfolioItems(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalPortfolioItems, opts...).ToFunc()
@@ -379,14 +387,14 @@ func ByTotalRevenue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalRevenue, opts...).ToFunc()
 }
 
-// ByUprankScore orders the results by the uprank_score field.
-func ByUprankScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankScore, opts...).ToFunc()
+// ByUprankSpecializationScore orders the results by the uprank_specialization_score field.
+func ByUprankSpecializationScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUprankSpecializationScore, opts...).ToFunc()
 }
 
-// ByEmbeddedAt orders the results by the embedded_at field.
-func ByEmbeddedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEmbeddedAt, opts...).ToFunc()
+// ByUprankEstimatedCompletionTime orders the results by the uprank_estimated_completion_time field.
+func ByUprankEstimatedCompletionTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUprankEstimatedCompletionTime, opts...).ToFunc()
 }
 
 // ByUprankReccomended orders the results by the uprank_reccomended field.

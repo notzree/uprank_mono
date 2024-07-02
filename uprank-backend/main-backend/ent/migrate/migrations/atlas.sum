@@ -1,4 +1,5 @@
-h1:m8Udz4XaM65LlAau04epHM+9kk3xzp8hM2XPH6/Q3Vk=
+h1:dHMLcjcVza64DHniOJVtXG1yxmwxXLUnrjnboX6+1uc=
 20240607200341_20240607160339_change_to_uuid.sql h1:cFP0cgxktI3KyxbW/1wrvEKzl0sTTRS5P9/Hjgydiac=
 20240609042238_20240609002236_fix_user_upwork_job_relation.sql h1:f/9HWJqWcFAkkb8WvQt9uJlVDMG/Eh3ORRq7gT6P+fU=
 20240628051041_20240627221017_add_time_fields_for_ranking.sql h1:pVPDrLZpIWqzMBgRCnHS5dMK77ZUtj5rF/FH4FLox98=
+20240701231800_20240701161756_add_ai_fields.sql h1:2yBEgt9GWZA/1TL+boEZirZi/SHEVwNujGxsrafF8Cc=

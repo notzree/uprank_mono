@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/jackc/pgtype"
 )
 
 // UpworkFreelancer represents a freelancers application to an Upwork job
@@ -37,6 +38,7 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.Float("total_hours"),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+		field.Time("embedded_at").Optional(),
 		field.Int("total_portfolio_items"),
 		field.Int("total_portfolio_v2_items"),
 		field.Float("upwork_total_feedback").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
@@ -54,8 +56,10 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.Float("combined_total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("recent_earnings").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
-		field.Int("uprank_score").Default(0).Optional(),
-		field.Time("embedded_at").Optional(),
+		field.Float("uprank_specialization_score").Default(0).Optional(),
+		field.Other("uprank_estimated_completion_time", &pgtype.Interval{}).SchemaType(map[string]string{
+			dialect.Postgres: "INTERVAL",
+		}).Optional(),
 		field.Bool("uprank_reccomended").Default(false).Optional(),
 		field.String("uprank_reccomended_reasons").Optional(),
 		field.Bool("uprank_not_enough_data").Default(false).Optional(),
