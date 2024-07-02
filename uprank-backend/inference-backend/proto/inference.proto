@@ -14,6 +14,7 @@ service Inference {
 // message EmbedRequest {
 //   string text = 1;
 // }
+//todo: remove all errors from messages
 
 message EmbedTextRequest {
   string id = 1;
@@ -58,9 +59,9 @@ message QueryVectorResponse {
 
 // Define the Match message
 message Match {
-  string id = 1;
-  float score = 2;
-  repeated float values = 3;
+  float score = 1;
+  string id = 2;
+  map<string, string> metadata = 3;
 }
 
 // Define the Usage message
