@@ -234,7 +234,7 @@ func (s *V1Servicer) CreateUpworkFreelancer(data []types.CreateUpworkFreelancerR
 	return freelancers, nil
 }
 
-func (s *V1Servicer) UpdateUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) (created_freelancer_count int, updated_freelancer_count int, deleted_freelancer_count int, err error) {
+func (s *V1Servicer) UpsertUpworkFreelancer(data []types.CreateUpworkFreelancerRequest, user_id string, upwork_job_id string, ctx context.Context) (created_freelancer_count int, updated_freelancer_count int, deleted_freelancer_count int, err error) {
 	var (
 		freelancers_to_create []types.CreateUpworkFreelancerRequest
 		freelancers_to_update []types.CreateUpworkFreelancerRequest
@@ -521,4 +521,139 @@ func (s *V1Servicer) GetUpworkJobEmbeddingData(upwork_job_id string, user_id str
 	return job, err
 }
 
-//need method for queue-handler to mark shit as embedded or ranked.
+func (s *V1Servicer) UpdateUpworkJob(data types.UpdateUpworkJobRequest, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
+	placeholder_upwork_job := s.ent.UpworkJob.UpdateOneID(data.Id)
+	if data.Title != nil {
+		placeholder_upwork_job.SetTitle(*data.Title)
+	}
+	if data.Location != nil {
+		placeholder_upwork_job.SetLocation(*data.Location)
+	}
+	if data.Description != nil {
+		placeholder_upwork_job.SetDescription(*data.Description)
+	}
+	if data.Skills != nil {
+		placeholder_upwork_job.SetSkills(*data.Skills)
+	}
+	if data.Embedded_at != nil {
+		placeholder_upwork_job.SetEmbeddedAt(*data.Embedded_at)
+	}
+	if data.Ranked_at != nil {
+		placeholder_upwork_job.SetRankedAt(*data.Ranked_at)
+	}
+	if data.Experience_level != nil {
+		placeholder_upwork_job.SetExperienceLevel(*data.Experience_level)
+	}
+	updated_upwork_job, err := placeholder_upwork_job.Save(ctx)
+
+	return updated_upwork_job, err
+}
+
+func (s *V1Servicer) UpdateUpworkFreelancer(data []types.UpdateUpworkFreelancerRequest, user_id, upwork_job_id string, ctx context.Context) ([]string, error) {
+	updated_ids := make([]string, 0)
+	for _, freelancer := range data {
+		updated_freelancer := s.ent.UpworkFreelancer.UpdateOneID(freelancer.Url)
+		if freelancer.Name != nil {
+			updated_freelancer.SetName(*freelancer.Name)
+		}
+		if freelancer.Title != nil {
+			updated_freelancer.SetTitle(*freelancer.Title)
+		}
+		if freelancer.Description != nil {
+			updated_freelancer.SetDescription(*freelancer.Description)
+		}
+		if freelancer.Location != nil {
+			updated_freelancer.SetCity(freelancer.Location.City)
+			updated_freelancer.SetCountry(freelancer.Location.Country)
+			updated_freelancer.SetTimezone(freelancer.Location.Timezone)
+		}
+		if freelancer.Cv != nil {
+			updated_freelancer.SetCv(*freelancer.Cv)
+		}
+		if freelancer.Ai_reccomended != nil {
+			updated_freelancer.SetAiReccomended(*freelancer.Ai_reccomended)
+		}
+		if freelancer.Fixed_charge_amount != nil {
+			parsed_fixed_charge_amount, _ := strconv.ParseFloat(*freelancer.Fixed_charge_amount, 64)
+			updated_freelancer.SetFixedChargeAmount(parsed_fixed_charge_amount)
+		}
+		if freelancer.Fixed_charge_currency != nil {
+			updated_freelancer.SetFixedChargeCurrency(*freelancer.Fixed_charge_currency)
+		}
+		if freelancer.Hourly_charge_amount != nil {
+			parse_hourly_charge_amount, _ := strconv.ParseFloat(*freelancer.Hourly_charge_amount, 64)
+			updated_freelancer.SetHourlyChargeAmount(parse_hourly_charge_amount)
+		}
+		if freelancer.Hourly_charge_currency != nil {
+			updated_freelancer.SetHourlyChargeCurrency(*freelancer.Hourly_charge_currency)
+		}
+		if freelancer.Invited != nil {
+			updated_freelancer.SetInvited(*freelancer.Invited)
+		}
+		if freelancer.Photo_url != nil {
+			updated_freelancer.SetPhotoURL(*freelancer.Photo_url)
+		}
+		if freelancer.Recent_hours != nil {
+			updated_freelancer.SetRecentHours(*freelancer.Recent_hours)
+		}
+		if freelancer.Total_hours != nil {
+			updated_freelancer.SetTotalHours(*freelancer.Total_hours)
+		}
+		if freelancer.Total_portfolio_items != nil {
+			updated_freelancer.SetTotalPortfolioItems(*freelancer.Total_portfolio_items)
+		}
+		if freelancer.Total_portfolio_v2_items != nil {
+			updated_freelancer.SetTotalPortfolioV2Items(*freelancer.Total_portfolio_v2_items)
+		}
+		if freelancer.Total_feedback != nil {
+			updated_freelancer.SetUpworkTotalFeedback(*freelancer.Total_feedback)
+		}
+		if freelancer.Recent_feedback != nil {
+			updated_freelancer.SetUpworkRecentFeedback(*freelancer.Recent_feedback)
+		}
+		if freelancer.Top_rated_status != nil {
+			updated_freelancer.SetUpworkTopRatedStatus(*freelancer.Top_rated_status)
+		}
+		if freelancer.Top_rated_plus_status != nil {
+			updated_freelancer.SetUpworkTopRatedPlusStatus(*freelancer.Top_rated_plus_status)
+		}
+		if freelancer.Sponsored != nil {
+			updated_freelancer.SetUpworkSponsored(*freelancer.Sponsored)
+		}
+		if freelancer.Job_success_score != nil {
+			updated_freelancer.SetUpworkJobSuccessScore(*freelancer.Job_success_score)
+		}
+		if freelancer.Reccomended != nil {
+			updated_freelancer.SetUpworkReccomended(*freelancer.Reccomended)
+		}
+		if freelancer.Skills != nil {
+			updated_freelancer.SetSkills(*freelancer.Skills)
+		}
+		if freelancer.Earnings_info != nil {
+			updated_freelancer.SetAverageRecentEarnings(freelancer.Earnings_info.Average_recent_earnings)
+
+			updated_freelancer.SetCombinedAverageRecentEarnings(freelancer.Earnings_info.Combined_average_recent_earnings)
+
+			updated_freelancer.SetCombinedRecentEarnings(freelancer.Earnings_info.Combined_recent_earnings)
+
+			updated_freelancer.SetCombinedTotalEarnings(freelancer.Earnings_info.Combined_total_earnings)
+
+			updated_freelancer.SetCombinedTotalRevenue(freelancer.Earnings_info.Combined_total_revenue)
+
+			updated_freelancer.SetRecentEarnings(freelancer.Earnings_info.Recent_earnings)
+
+			updated_freelancer.SetTotalRevenue(freelancer.Earnings_info.Total_revenue)
+
+		}
+		if freelancer.Embedded_at != nil {
+			updated_freelancer.SetEmbeddedAt(*freelancer.Embedded_at)
+		}
+		//todo impplement updated attachements
+		_, err := updated_freelancer.Save(ctx)
+		if err != nil {
+			return nil, err
+		}
+		updated_ids = append(updated_ids, freelancer.Url)
+	}
+	return updated_ids, nil
+}
