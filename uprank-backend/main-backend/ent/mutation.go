@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
@@ -998,6 +999,7 @@ type UpworkFreelancerMutation struct {
 	addtotal_hours                      *float64
 	created_at                          *time.Time
 	updated_at                          *time.Time
+	embedded_at                         *time.Time
 	total_portfolio_items               *int
 	addtotal_portfolio_items            *int
 	total_portfolio_v2_items            *int
@@ -1028,9 +1030,9 @@ type UpworkFreelancerMutation struct {
 	addrecent_earnings                  *float64
 	total_revenue                       *float64
 	addtotal_revenue                    *float64
-	uprank_score                        *int
-	adduprank_score                     *int
-	embedded_at                         *time.Time
+	uprank_specialization_score         *float64
+	adduprank_specialization_score      *float64
+	uprank_estimated_completion_time    **pgtype.Interval
 	uprank_reccomended                  *bool
 	uprank_reccomended_reasons          *string
 	uprank_not_enough_data              *bool
@@ -1909,6 +1911,55 @@ func (m *UpworkFreelancerMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetEmbeddedAt sets the "embedded_at" field.
+func (m *UpworkFreelancerMutation) SetEmbeddedAt(t time.Time) {
+	m.embedded_at = &t
+}
+
+// EmbeddedAt returns the value of the "embedded_at" field in the mutation.
+func (m *UpworkFreelancerMutation) EmbeddedAt() (r time.Time, exists bool) {
+	v := m.embedded_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmbeddedAt returns the old "embedded_at" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldEmbeddedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmbeddedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmbeddedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmbeddedAt: %w", err)
+	}
+	return oldValue.EmbeddedAt, nil
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (m *UpworkFreelancerMutation) ClearEmbeddedAt() {
+	m.embedded_at = nil
+	m.clearedFields[upworkfreelancer.FieldEmbeddedAt] = struct{}{}
+}
+
+// EmbeddedAtCleared returns if the "embedded_at" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) EmbeddedAtCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldEmbeddedAt]
+	return ok
+}
+
+// ResetEmbeddedAt resets all changes to the "embedded_at" field.
+func (m *UpworkFreelancerMutation) ResetEmbeddedAt() {
+	m.embedded_at = nil
+	delete(m.clearedFields, upworkfreelancer.FieldEmbeddedAt)
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (m *UpworkFreelancerMutation) SetTotalPortfolioItems(i int) {
 	m.total_portfolio_items = &i
@@ -2776,123 +2827,123 @@ func (m *UpworkFreelancerMutation) ResetTotalRevenue() {
 	m.addtotal_revenue = nil
 }
 
-// SetUprankScore sets the "uprank_score" field.
-func (m *UpworkFreelancerMutation) SetUprankScore(i int) {
-	m.uprank_score = &i
-	m.adduprank_score = nil
+// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
+func (m *UpworkFreelancerMutation) SetUprankSpecializationScore(f float64) {
+	m.uprank_specialization_score = &f
+	m.adduprank_specialization_score = nil
 }
 
-// UprankScore returns the value of the "uprank_score" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankScore() (r int, exists bool) {
-	v := m.uprank_score
+// UprankSpecializationScore returns the value of the "uprank_specialization_score" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankSpecializationScore() (r float64, exists bool) {
+	v := m.uprank_specialization_score
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUprankScore returns the old "uprank_score" field's value of the UpworkFreelancer entity.
+// OldUprankSpecializationScore returns the old "uprank_specialization_score" field's value of the UpworkFreelancer entity.
 // If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankScore(ctx context.Context) (v int, err error) {
+func (m *UpworkFreelancerMutation) OldUprankSpecializationScore(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankScore is only allowed on UpdateOne operations")
+		return v, errors.New("OldUprankSpecializationScore is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankScore requires an ID field in the mutation")
+		return v, errors.New("OldUprankSpecializationScore requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankScore: %w", err)
+		return v, fmt.Errorf("querying old value for OldUprankSpecializationScore: %w", err)
 	}
-	return oldValue.UprankScore, nil
+	return oldValue.UprankSpecializationScore, nil
 }
 
-// AddUprankScore adds i to the "uprank_score" field.
-func (m *UpworkFreelancerMutation) AddUprankScore(i int) {
-	if m.adduprank_score != nil {
-		*m.adduprank_score += i
+// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
+func (m *UpworkFreelancerMutation) AddUprankSpecializationScore(f float64) {
+	if m.adduprank_specialization_score != nil {
+		*m.adduprank_specialization_score += f
 	} else {
-		m.adduprank_score = &i
+		m.adduprank_specialization_score = &f
 	}
 }
 
-// AddedUprankScore returns the value that was added to the "uprank_score" field in this mutation.
-func (m *UpworkFreelancerMutation) AddedUprankScore() (r int, exists bool) {
-	v := m.adduprank_score
+// AddedUprankSpecializationScore returns the value that was added to the "uprank_specialization_score" field in this mutation.
+func (m *UpworkFreelancerMutation) AddedUprankSpecializationScore() (r float64, exists bool) {
+	v := m.adduprank_specialization_score
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearUprankScore clears the value of the "uprank_score" field.
-func (m *UpworkFreelancerMutation) ClearUprankScore() {
-	m.uprank_score = nil
-	m.adduprank_score = nil
-	m.clearedFields[upworkfreelancer.FieldUprankScore] = struct{}{}
+// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
+func (m *UpworkFreelancerMutation) ClearUprankSpecializationScore() {
+	m.uprank_specialization_score = nil
+	m.adduprank_specialization_score = nil
+	m.clearedFields[upworkfreelancer.FieldUprankSpecializationScore] = struct{}{}
 }
 
-// UprankScoreCleared returns if the "uprank_score" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankScoreCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankScore]
+// UprankSpecializationScoreCleared returns if the "uprank_specialization_score" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankSpecializationScoreCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankSpecializationScore]
 	return ok
 }
 
-// ResetUprankScore resets all changes to the "uprank_score" field.
-func (m *UpworkFreelancerMutation) ResetUprankScore() {
-	m.uprank_score = nil
-	m.adduprank_score = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankScore)
+// ResetUprankSpecializationScore resets all changes to the "uprank_specialization_score" field.
+func (m *UpworkFreelancerMutation) ResetUprankSpecializationScore() {
+	m.uprank_specialization_score = nil
+	m.adduprank_specialization_score = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankSpecializationScore)
 }
 
-// SetEmbeddedAt sets the "embedded_at" field.
-func (m *UpworkFreelancerMutation) SetEmbeddedAt(t time.Time) {
-	m.embedded_at = &t
+// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
+func (m *UpworkFreelancerMutation) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) {
+	m.uprank_estimated_completion_time = &pg
 }
 
-// EmbeddedAt returns the value of the "embedded_at" field in the mutation.
-func (m *UpworkFreelancerMutation) EmbeddedAt() (r time.Time, exists bool) {
-	v := m.embedded_at
+// UprankEstimatedCompletionTime returns the value of the "uprank_estimated_completion_time" field in the mutation.
+func (m *UpworkFreelancerMutation) UprankEstimatedCompletionTime() (r *pgtype.Interval, exists bool) {
+	v := m.uprank_estimated_completion_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEmbeddedAt returns the old "embedded_at" field's value of the UpworkFreelancer entity.
+// OldUprankEstimatedCompletionTime returns the old "uprank_estimated_completion_time" field's value of the UpworkFreelancer entity.
 // If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldEmbeddedAt(ctx context.Context) (v time.Time, err error) {
+func (m *UpworkFreelancerMutation) OldUprankEstimatedCompletionTime(ctx context.Context) (v *pgtype.Interval, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEmbeddedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldUprankEstimatedCompletionTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEmbeddedAt requires an ID field in the mutation")
+		return v, errors.New("OldUprankEstimatedCompletionTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEmbeddedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldUprankEstimatedCompletionTime: %w", err)
 	}
-	return oldValue.EmbeddedAt, nil
+	return oldValue.UprankEstimatedCompletionTime, nil
 }
 
-// ClearEmbeddedAt clears the value of the "embedded_at" field.
-func (m *UpworkFreelancerMutation) ClearEmbeddedAt() {
-	m.embedded_at = nil
-	m.clearedFields[upworkfreelancer.FieldEmbeddedAt] = struct{}{}
+// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
+func (m *UpworkFreelancerMutation) ClearUprankEstimatedCompletionTime() {
+	m.uprank_estimated_completion_time = nil
+	m.clearedFields[upworkfreelancer.FieldUprankEstimatedCompletionTime] = struct{}{}
 }
 
-// EmbeddedAtCleared returns if the "embedded_at" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) EmbeddedAtCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldEmbeddedAt]
+// UprankEstimatedCompletionTimeCleared returns if the "uprank_estimated_completion_time" field was cleared in this mutation.
+func (m *UpworkFreelancerMutation) UprankEstimatedCompletionTimeCleared() bool {
+	_, ok := m.clearedFields[upworkfreelancer.FieldUprankEstimatedCompletionTime]
 	return ok
 }
 
-// ResetEmbeddedAt resets all changes to the "embedded_at" field.
-func (m *UpworkFreelancerMutation) ResetEmbeddedAt() {
-	m.embedded_at = nil
-	delete(m.clearedFields, upworkfreelancer.FieldEmbeddedAt)
+// ResetUprankEstimatedCompletionTime resets all changes to the "uprank_estimated_completion_time" field.
+func (m *UpworkFreelancerMutation) ResetUprankEstimatedCompletionTime() {
+	m.uprank_estimated_completion_time = nil
+	delete(m.clearedFields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
 }
 
 // SetUprankReccomended sets the "uprank_reccomended" field.
@@ -3238,7 +3289,7 @@ func (m *UpworkFreelancerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UpworkFreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 40)
+	fields := make([]string, 0, 41)
 	if m.name != nil {
 		fields = append(fields, upworkfreelancer.FieldName)
 	}
@@ -3293,6 +3344,9 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, upworkfreelancer.FieldUpdatedAt)
 	}
+	if m.embedded_at != nil {
+		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
+	}
 	if m.total_portfolio_items != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalPortfolioItems)
 	}
@@ -3344,11 +3398,11 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	if m.total_revenue != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
 	}
-	if m.uprank_score != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankScore)
+	if m.uprank_specialization_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
 	}
-	if m.embedded_at != nil {
-		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
+	if m.uprank_estimated_completion_time != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
 	}
 	if m.uprank_reccomended != nil {
 		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
@@ -3403,6 +3457,8 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case upworkfreelancer.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case upworkfreelancer.FieldEmbeddedAt:
+		return m.EmbeddedAt()
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		return m.TotalPortfolioItems()
 	case upworkfreelancer.FieldTotalPortfolioV2Items:
@@ -3437,10 +3493,10 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.RecentEarnings()
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.TotalRevenue()
-	case upworkfreelancer.FieldUprankScore:
-		return m.UprankScore()
-	case upworkfreelancer.FieldEmbeddedAt:
-		return m.EmbeddedAt()
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		return m.UprankSpecializationScore()
+	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
+		return m.UprankEstimatedCompletionTime()
 	case upworkfreelancer.FieldUprankReccomended:
 		return m.UprankReccomended()
 	case upworkfreelancer.FieldUprankReccomendedReasons:
@@ -3492,6 +3548,8 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldCreatedAt(ctx)
 	case upworkfreelancer.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case upworkfreelancer.FieldEmbeddedAt:
+		return m.OldEmbeddedAt(ctx)
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		return m.OldTotalPortfolioItems(ctx)
 	case upworkfreelancer.FieldTotalPortfolioV2Items:
@@ -3526,10 +3584,10 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldRecentEarnings(ctx)
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.OldTotalRevenue(ctx)
-	case upworkfreelancer.FieldUprankScore:
-		return m.OldUprankScore(ctx)
-	case upworkfreelancer.FieldEmbeddedAt:
-		return m.OldEmbeddedAt(ctx)
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		return m.OldUprankSpecializationScore(ctx)
+	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
+		return m.OldUprankEstimatedCompletionTime(ctx)
 	case upworkfreelancer.FieldUprankReccomended:
 		return m.OldUprankReccomended(ctx)
 	case upworkfreelancer.FieldUprankReccomendedReasons:
@@ -3671,6 +3729,13 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case upworkfreelancer.FieldEmbeddedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmbeddedAt(v)
+		return nil
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		v, ok := value.(int)
 		if !ok {
@@ -3790,19 +3855,19 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetTotalRevenue(v)
 		return nil
-	case upworkfreelancer.FieldUprankScore:
-		v, ok := value.(int)
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUprankScore(v)
+		m.SetUprankSpecializationScore(v)
 		return nil
-	case upworkfreelancer.FieldEmbeddedAt:
-		v, ok := value.(time.Time)
+	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
+		v, ok := value.(*pgtype.Interval)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEmbeddedAt(v)
+		m.SetUprankEstimatedCompletionTime(v)
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		v, ok := value.(bool)
@@ -3881,8 +3946,8 @@ func (m *UpworkFreelancerMutation) AddedFields() []string {
 	if m.addtotal_revenue != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
 	}
-	if m.adduprank_score != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankScore)
+	if m.adduprank_specialization_score != nil {
+		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
 	}
 	return fields
 }
@@ -3924,8 +3989,8 @@ func (m *UpworkFreelancerMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRecentEarnings()
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.AddedTotalRevenue()
-	case upworkfreelancer.FieldUprankScore:
-		return m.AddedUprankScore()
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		return m.AddedUprankSpecializationScore()
 	}
 	return nil, false
 }
@@ -4047,12 +4112,12 @@ func (m *UpworkFreelancerMutation) AddField(name string, value ent.Value) error 
 		}
 		m.AddTotalRevenue(v)
 		return nil
-	case upworkfreelancer.FieldUprankScore:
-		v, ok := value.(int)
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddUprankScore(v)
+		m.AddUprankSpecializationScore(v)
 		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer numeric field %s", name)
@@ -4068,11 +4133,14 @@ func (m *UpworkFreelancerMutation) ClearedFields() []string {
 	if m.FieldCleared(upworkfreelancer.FieldHourlyChargeAmount) {
 		fields = append(fields, upworkfreelancer.FieldHourlyChargeAmount)
 	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankScore) {
-		fields = append(fields, upworkfreelancer.FieldUprankScore)
-	}
 	if m.FieldCleared(upworkfreelancer.FieldEmbeddedAt) {
 		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankSpecializationScore) {
+		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
+	}
+	if m.FieldCleared(upworkfreelancer.FieldUprankEstimatedCompletionTime) {
+		fields = append(fields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
 	}
 	if m.FieldCleared(upworkfreelancer.FieldUprankReccomended) {
 		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
@@ -4103,11 +4171,14 @@ func (m *UpworkFreelancerMutation) ClearField(name string) error {
 	case upworkfreelancer.FieldHourlyChargeAmount:
 		m.ClearHourlyChargeAmount()
 		return nil
-	case upworkfreelancer.FieldUprankScore:
-		m.ClearUprankScore()
-		return nil
 	case upworkfreelancer.FieldEmbeddedAt:
 		m.ClearEmbeddedAt()
+		return nil
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		m.ClearUprankSpecializationScore()
+		return nil
+	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
+		m.ClearUprankEstimatedCompletionTime()
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		m.ClearUprankReccomended()
@@ -4180,6 +4251,9 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 	case upworkfreelancer.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case upworkfreelancer.FieldEmbeddedAt:
+		m.ResetEmbeddedAt()
+		return nil
 	case upworkfreelancer.FieldTotalPortfolioItems:
 		m.ResetTotalPortfolioItems()
 		return nil
@@ -4231,11 +4305,11 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 	case upworkfreelancer.FieldTotalRevenue:
 		m.ResetTotalRevenue()
 		return nil
-	case upworkfreelancer.FieldUprankScore:
-		m.ResetUprankScore()
+	case upworkfreelancer.FieldUprankSpecializationScore:
+		m.ResetUprankSpecializationScore()
 		return nil
-	case upworkfreelancer.FieldEmbeddedAt:
-		m.ResetEmbeddedAt()
+	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
+		m.ResetUprankEstimatedCompletionTime()
 		return nil
 	case upworkfreelancer.FieldUprankReccomended:
 		m.ResetUprankReccomended()

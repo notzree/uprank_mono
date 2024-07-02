@@ -36,16 +36,16 @@ func init() {
 	upworkfreelancer.DefaultUpdatedAt = upworkfreelancerDescUpdatedAt.Default.(func() time.Time)
 	// upworkfreelancer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	upworkfreelancer.UpdateDefaultUpdatedAt = upworkfreelancerDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// upworkfreelancerDescUprankScore is the schema descriptor for uprank_score field.
-	upworkfreelancerDescUprankScore := upworkfreelancerFields[36].Descriptor()
-	// upworkfreelancer.DefaultUprankScore holds the default value on creation for the uprank_score field.
-	upworkfreelancer.DefaultUprankScore = upworkfreelancerDescUprankScore.Default.(int)
+	// upworkfreelancerDescUprankSpecializationScore is the schema descriptor for uprank_specialization_score field.
+	upworkfreelancerDescUprankSpecializationScore := upworkfreelancerFields[37].Descriptor()
+	// upworkfreelancer.DefaultUprankSpecializationScore holds the default value on creation for the uprank_specialization_score field.
+	upworkfreelancer.DefaultUprankSpecializationScore = upworkfreelancerDescUprankSpecializationScore.Default.(float64)
 	// upworkfreelancerDescUprankReccomended is the schema descriptor for uprank_reccomended field.
-	upworkfreelancerDescUprankReccomended := upworkfreelancerFields[38].Descriptor()
+	upworkfreelancerDescUprankReccomended := upworkfreelancerFields[39].Descriptor()
 	// upworkfreelancer.DefaultUprankReccomended holds the default value on creation for the uprank_reccomended field.
 	upworkfreelancer.DefaultUprankReccomended = upworkfreelancerDescUprankReccomended.Default.(bool)
 	// upworkfreelancerDescUprankNotEnoughData is the schema descriptor for uprank_not_enough_data field.
-	upworkfreelancerDescUprankNotEnoughData := upworkfreelancerFields[40].Descriptor()
+	upworkfreelancerDescUprankNotEnoughData := upworkfreelancerFields[41].Descriptor()
 	// upworkfreelancer.DefaultUprankNotEnoughData holds the default value on creation for the uprank_not_enough_data field.
 	upworkfreelancer.DefaultUprankNotEnoughData = upworkfreelancerDescUprankNotEnoughData.Default.(bool)
 	// upworkfreelancerDescID is the schema descriptor for id field.

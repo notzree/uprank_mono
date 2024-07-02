@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
@@ -299,6 +300,26 @@ func (ufu *UpworkFreelancerUpdate) AddTotalHours(f float64) *UpworkFreelancerUpd
 // SetUpdatedAt sets the "updated_at" field.
 func (ufu *UpworkFreelancerUpdate) SetUpdatedAt(t time.Time) *UpworkFreelancerUpdate {
 	ufu.mutation.SetUpdatedAt(t)
+	return ufu
+}
+
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ufu *UpworkFreelancerUpdate) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdate {
+	ufu.mutation.SetEmbeddedAt(t)
+	return ufu
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ufu *UpworkFreelancerUpdate) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdate {
+	if t != nil {
+		ufu.SetEmbeddedAt(*t)
+	}
+	return ufu
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (ufu *UpworkFreelancerUpdate) ClearEmbeddedAt() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearEmbeddedAt()
 	return ufu
 }
 
@@ -622,50 +643,42 @@ func (ufu *UpworkFreelancerUpdate) AddTotalRevenue(f float64) *UpworkFreelancerU
 	return ufu
 }
 
-// SetUprankScore sets the "uprank_score" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankScore(i int) *UpworkFreelancerUpdate {
-	ufu.mutation.ResetUprankScore()
-	ufu.mutation.SetUprankScore(i)
+// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
+func (ufu *UpworkFreelancerUpdate) SetUprankSpecializationScore(f float64) *UpworkFreelancerUpdate {
+	ufu.mutation.ResetUprankSpecializationScore()
+	ufu.mutation.SetUprankSpecializationScore(f)
 	return ufu
 }
 
-// SetNillableUprankScore sets the "uprank_score" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableUprankScore(i *int) *UpworkFreelancerUpdate {
-	if i != nil {
-		ufu.SetUprankScore(*i)
+// SetNillableUprankSpecializationScore sets the "uprank_specialization_score" field if the given value is not nil.
+func (ufu *UpworkFreelancerUpdate) SetNillableUprankSpecializationScore(f *float64) *UpworkFreelancerUpdate {
+	if f != nil {
+		ufu.SetUprankSpecializationScore(*f)
 	}
 	return ufu
 }
 
-// AddUprankScore adds i to the "uprank_score" field.
-func (ufu *UpworkFreelancerUpdate) AddUprankScore(i int) *UpworkFreelancerUpdate {
-	ufu.mutation.AddUprankScore(i)
+// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
+func (ufu *UpworkFreelancerUpdate) AddUprankSpecializationScore(f float64) *UpworkFreelancerUpdate {
+	ufu.mutation.AddUprankSpecializationScore(f)
 	return ufu
 }
 
-// ClearUprankScore clears the value of the "uprank_score" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankScore() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankScore()
+// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
+func (ufu *UpworkFreelancerUpdate) ClearUprankSpecializationScore() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearUprankSpecializationScore()
 	return ufu
 }
 
-// SetEmbeddedAt sets the "embedded_at" field.
-func (ufu *UpworkFreelancerUpdate) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdate {
-	ufu.mutation.SetEmbeddedAt(t)
+// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
+func (ufu *UpworkFreelancerUpdate) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) *UpworkFreelancerUpdate {
+	ufu.mutation.SetUprankEstimatedCompletionTime(pg)
 	return ufu
 }
 
-// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdate {
-	if t != nil {
-		ufu.SetEmbeddedAt(*t)
-	}
-	return ufu
-}
-
-// ClearEmbeddedAt clears the value of the "embedded_at" field.
-func (ufu *UpworkFreelancerUpdate) ClearEmbeddedAt() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearEmbeddedAt()
+// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
+func (ufu *UpworkFreelancerUpdate) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearUprankEstimatedCompletionTime()
 	return ufu
 }
 
@@ -956,6 +969,12 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := ufu.mutation.UpdatedAt(); ok {
 		_spec.SetField(upworkfreelancer.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := ufu.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if ufu.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
+	}
 	if value, ok := ufu.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalPortfolioItems, field.TypeInt, value)
 	}
@@ -1048,20 +1067,20 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := ufu.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 	}
-	if value, ok := ufu.mutation.UprankScore(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankScore, field.TypeInt, value)
+	if value, ok := ufu.mutation.UprankSpecializationScore(); ok {
+		_spec.SetField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
 	}
-	if value, ok := ufu.mutation.AddedUprankScore(); ok {
-		_spec.AddField(upworkfreelancer.FieldUprankScore, field.TypeInt, value)
+	if value, ok := ufu.mutation.AddedUprankSpecializationScore(); ok {
+		_spec.AddField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
 	}
-	if ufu.mutation.UprankScoreCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankScore, field.TypeInt)
+	if ufu.mutation.UprankSpecializationScoreCleared() {
+		_spec.ClearField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64)
 	}
-	if value, ok := ufu.mutation.EmbeddedAt(); ok {
-		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	if value, ok := ufu.mutation.UprankEstimatedCompletionTime(); ok {
+		_spec.SetField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther, value)
 	}
-	if ufu.mutation.EmbeddedAtCleared() {
-		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
+	if ufu.mutation.UprankEstimatedCompletionTimeCleared() {
+		_spec.ClearField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther)
 	}
 	if value, ok := ufu.mutation.UprankReccomended(); ok {
 		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
@@ -1506,6 +1525,26 @@ func (ufuo *UpworkFreelancerUpdateOne) SetUpdatedAt(t time.Time) *UpworkFreelanc
 	return ufuo
 }
 
+// SetEmbeddedAt sets the "embedded_at" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetEmbeddedAt(t)
+	return ufuo
+}
+
+// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
+func (ufuo *UpworkFreelancerUpdateOne) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdateOne {
+	if t != nil {
+		ufuo.SetEmbeddedAt(*t)
+	}
+	return ufuo
+}
+
+// ClearEmbeddedAt clears the value of the "embedded_at" field.
+func (ufuo *UpworkFreelancerUpdateOne) ClearEmbeddedAt() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearEmbeddedAt()
+	return ufuo
+}
+
 // SetTotalPortfolioItems sets the "total_portfolio_items" field.
 func (ufuo *UpworkFreelancerUpdateOne) SetTotalPortfolioItems(i int) *UpworkFreelancerUpdateOne {
 	ufuo.mutation.ResetTotalPortfolioItems()
@@ -1826,50 +1865,42 @@ func (ufuo *UpworkFreelancerUpdateOne) AddTotalRevenue(f float64) *UpworkFreelan
 	return ufuo
 }
 
-// SetUprankScore sets the "uprank_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankScore(i int) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ResetUprankScore()
-	ufuo.mutation.SetUprankScore(i)
+// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetUprankSpecializationScore(f float64) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ResetUprankSpecializationScore()
+	ufuo.mutation.SetUprankSpecializationScore(f)
 	return ufuo
 }
 
-// SetNillableUprankScore sets the "uprank_score" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankScore(i *int) *UpworkFreelancerUpdateOne {
-	if i != nil {
-		ufuo.SetUprankScore(*i)
+// SetNillableUprankSpecializationScore sets the "uprank_specialization_score" field if the given value is not nil.
+func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankSpecializationScore(f *float64) *UpworkFreelancerUpdateOne {
+	if f != nil {
+		ufuo.SetUprankSpecializationScore(*f)
 	}
 	return ufuo
 }
 
-// AddUprankScore adds i to the "uprank_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) AddUprankScore(i int) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.AddUprankScore(i)
+// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
+func (ufuo *UpworkFreelancerUpdateOne) AddUprankSpecializationScore(f float64) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.AddUprankSpecializationScore(f)
 	return ufuo
 }
 
-// ClearUprankScore clears the value of the "uprank_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankScore() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankScore()
+// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
+func (ufuo *UpworkFreelancerUpdateOne) ClearUprankSpecializationScore() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearUprankSpecializationScore()
 	return ufuo
 }
 
-// SetEmbeddedAt sets the "embedded_at" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetEmbeddedAt(t time.Time) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetEmbeddedAt(t)
+// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetUprankEstimatedCompletionTime(pg)
 	return ufuo
 }
 
-// SetNillableEmbeddedAt sets the "embedded_at" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableEmbeddedAt(t *time.Time) *UpworkFreelancerUpdateOne {
-	if t != nil {
-		ufuo.SetEmbeddedAt(*t)
-	}
-	return ufuo
-}
-
-// ClearEmbeddedAt clears the value of the "embedded_at" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearEmbeddedAt() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearEmbeddedAt()
+// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
+func (ufuo *UpworkFreelancerUpdateOne) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearUprankEstimatedCompletionTime()
 	return ufuo
 }
 
@@ -2190,6 +2221,12 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	if value, ok := ufuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(upworkfreelancer.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := ufuo.mutation.EmbeddedAt(); ok {
+		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	}
+	if ufuo.mutation.EmbeddedAtCleared() {
+		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
+	}
 	if value, ok := ufuo.mutation.TotalPortfolioItems(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalPortfolioItems, field.TypeInt, value)
 	}
@@ -2282,20 +2319,20 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	if value, ok := ufuo.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 	}
-	if value, ok := ufuo.mutation.UprankScore(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankScore, field.TypeInt, value)
+	if value, ok := ufuo.mutation.UprankSpecializationScore(); ok {
+		_spec.SetField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
 	}
-	if value, ok := ufuo.mutation.AddedUprankScore(); ok {
-		_spec.AddField(upworkfreelancer.FieldUprankScore, field.TypeInt, value)
+	if value, ok := ufuo.mutation.AddedUprankSpecializationScore(); ok {
+		_spec.AddField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
 	}
-	if ufuo.mutation.UprankScoreCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankScore, field.TypeInt)
+	if ufuo.mutation.UprankSpecializationScoreCleared() {
+		_spec.ClearField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64)
 	}
-	if value, ok := ufuo.mutation.EmbeddedAt(); ok {
-		_spec.SetField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime, value)
+	if value, ok := ufuo.mutation.UprankEstimatedCompletionTime(); ok {
+		_spec.SetField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther, value)
 	}
-	if ufuo.mutation.EmbeddedAtCleared() {
-		_spec.ClearField(upworkfreelancer.FieldEmbeddedAt, field.TypeTime)
+	if ufuo.mutation.UprankEstimatedCompletionTimeCleared() {
+		_spec.ClearField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther)
 	}
 	if value, ok := ufuo.mutation.UprankReccomended(); ok {
 		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
