@@ -3,7 +3,7 @@ from langchain_openai import OpenAIEmbeddings
 from pinecone.grpc import PineconeGRPC
 from pinecone import ServerlessSpec
 from pinecone.core.grpc.protos.vector_service_pb2 import Vector as Vector
-from google.protobuf.struct_pb2 import Struct
+from typing import List
 import grpc
 import pprint
 from logging import Logger
@@ -71,23 +71,49 @@ class InferenceService(inference_pb2_grpc.InferenceServicer):
         )
 
     def QueryVector(self, request, context):
+        matches: List[inference_pb2.Match] = []
+        demo ={
+            'job_id':'1788207506953621504',
+            'type': 'work_history_description',
+        }
+        print(type(demo), type(dict(request.filter)))
+        print(demo == dict(request.filter))
+        print(dict(request.filter))
         try:
             query_response = self.index.query(
                 namespace=request.namespace,
-                vector=request.vector,
+                vector=list(request.vector),
                 top_k=request.top_k,
-                filter=request.filter
+                include_metadata=True,
+                filter=dict(request.filter)
             )
         except Exception as e:
             context.set_code(grpc.StatusCode.UNKNOWN)
+            context.set_details(str(e))
             return inference_pb2.QueryVectorResponse(
                 matches=[],
-                error=e
+                namespace=request.namespace,
+                usage=inference_pb2.Usage(
+                    read_units=0
+                )
             )
+        for result in query_response['matches']:
+            matches.append(
+                inference_pb2.Match(
+                    id=result['id'],
+                    score=result['score'],
+                    metadata=result['metadata']
+                )
+            )
+        with open('query_response.txt', 'w') as f:
+            pprint.pprint(query_response, f)
         context.set_code(grpc.StatusCode.OK)
         return inference_pb2.QueryVectorResponse(
-            matches=query_response["matches"],
-            error=""
+            matches=matches,
+            namespace=request.namespace,
+            usage=inference_pb2.Usage(
+                read_units= query_response['usage']['read_units']
+            )
         )
 
     def DeleteVector(self, request, context):
