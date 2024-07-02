@@ -15,9 +15,21 @@ type UpsertVectorResponse struct {
 	Upserted_freelancer_ids []string      `json:"upserted_freelancer_ids"`
 }
 
-type ComputeSpecializationRequest struct {
+type ComputeRawSpecializationScoreRequest struct {
 	Job_id                 string        `json:"job_id"`
-	Work_history_count     int32         `json:"freelancer_count"`
+	Work_history_count     int32         `json:"work_history_count"`
+	Freelancer_count       int32         `json:"freelancer_count"`
 	Job_description_vector *proto.Vector `json:"job_description_vector"`
 	Job_skill_vector       *proto.Vector `json:"job_skill_vector"`
+}
+
+type ComputeRawSpecializationScoreResponse struct {
+	Job_description_specialization_scores *map[string][]float32 `json:"job_description_specialization_scores"`
+	Job_skill_specialization_scores       *map[string]float32   `json:"job_skill_specialization_scores"`
+}
+
+type ApplySpecializationScoreWeightsRequest struct {
+}
+
+type ApplySpecializationScoreWeightsResponse struct {
 }

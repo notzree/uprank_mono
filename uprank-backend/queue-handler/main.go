@@ -15,7 +15,9 @@ import (
 func main() {
 	ranking_queue_url := os.Getenv("RANKING_QUEUE_URL")
 	main_backend_url := os.Getenv("MAIN_BACKEND_URL")
-	inference_server_url := os.Getenv("INFERENCE_SERVER_URL")
+	// inference_server_url := os.Getenv("INFERENCE_SERVER_URL")
+	// log.Default().Println(fmt.Sprintf("inf server url: %v", inference_server_url))
+	inference_server_url := "uprank-inference-backend:50051"
 	ms_api_key := os.Getenv("MS_API_KEY")
 	queue := queue.NewSqsQueue(ranking_queue_url)
 	grpc_inference_client, err := client.NewGRPCInferenceClient(inference_server_url)

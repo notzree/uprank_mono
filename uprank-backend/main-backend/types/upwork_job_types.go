@@ -54,7 +54,7 @@ type ScrapeUpworkFreelancerData struct {
 }
 
 type UpdateUpworkJobRequest struct {
-	Id               string     `json:"id,omitempty"`
+	Upwork_id        string     `json:"upwork_id,omitempty"`
 	Title            *string    `json:"title,omitempty"`
 	Location         *string    `json:"location,omitempty"`
 	Description      *string    `json:"description,omitempty"`
@@ -70,10 +70,10 @@ type UpdateUpworkJobRequest struct {
 
 func (req *UpdateUpworkJobRequest) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
-	nilArray := findNilFields(req)
-	if len(nilArray) == getNumFields(req) {
-		errors["UpdateUpworkJobRequest"] = "all fields cannot be nil"
-	}
+	// nilArray := findNilFields(req)
+	// if len(nilArray) == getNumFields(req) {
+	// 	errors["UpdateUpworkJobRequest"] = "all fields cannot be nil"
+	// }
 
 	return errors
 }

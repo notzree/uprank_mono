@@ -50,16 +50,23 @@ func (s *Server) PollForRankingRequest() error {
 		log.Printf("Upsert time: %s", elapsed)
 
 		total_work_histories := s.CountTotalWorkHistories(*fetched_job_data)
-		compute_specialization_req := types.ComputeSpecializationRequest{
+		compute_specialization_req := types.ComputeRawSpecializationScoreRequest{
 			Job_id:                 req.Job_id.String(),
 			Work_history_count:     int32(total_work_histories),
+			Freelancer_count:       int32(len(fetched_job_data.Upwork_job.Edges.UpworkFreelancer)),
 			Job_description_vector: upsert_resp.Job_description_vector,
 			Job_skill_vector:       upsert_resp.Job_skill_vector,
 		}
-		_, compute_specialization_err := s.svc.ComputeSpecialization(compute_specialization_req, context.TODO())
-		if compute_specialization_err != nil {
-			return NewServiceError(compute_specialization_err)
+		raw_specialization_scores, compute_raw_specialization_err := s.svc.ComputeRawSpecializationScore(compute_specialization_req, context.TODO())
+		if compute_raw_specialization_err != nil {
+			return NewServiceError(compute_raw_specialization_err)
 		}
+
+		final_specialization_scores, apply_specialization_weights_err := s.svc.ApplySpecializationScoreWeights(*raw_specialization_scores, context.TODO())
+		if apply_specialization_weights_err != nil {
+			return NewServiceError(apply_specialization_weights_err)
+		}
+		log.Println("Final specialization scores:", final_specialization_scores)
 
 		err = s.queue.DeleteMessage(context.TODO(), req.Receipt_handle)
 		if err != nil {

@@ -26,10 +26,10 @@ type AttachPlatformSpecificJobsRequest struct {
 
 func (req *AttachPlatformSpecificJobsRequest) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
-	nil_array := findNilFields(req)
-	if len(nil_array) == getNumFields(req) {
-		errors["PlatformJobRequests"] = "At least one platform request is required"
-	}
+	// nil_array := findNilFields(req)
+	// if len(nil_array) == getNumFields(req) {
+	// 	errors["PlatformJobRequests"] = "At least one platform request is required"
+	// }
 	if req.UpworkRequest != nil {
 		upwork_errors := req.UpworkRequest.Validate()
 		if len(upwork_errors) > 0 {

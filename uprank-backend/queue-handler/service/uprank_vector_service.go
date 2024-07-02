@@ -1,14 +1,17 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	proto "github.com/notzree/uprank-backend/queue-handler/proto"
 	"github.com/notzree/uprank-backend/queue-handler/types"
@@ -18,6 +21,7 @@ const (
 	DESCRIPTION_NAMESPACE         = "description"
 	SKILL_NAMESPACE               = "skill"
 	WORK_HISTORY_DESCRIPTION_TYPE = "work_history_description"
+	FREELANCER_SKILL_TYPE         = "freelancer_skills"
 )
 
 type UprankVecService struct {
@@ -37,7 +41,7 @@ func NewUprankVecService(backend_url string, ms_api_key string, infer proto.Infe
 }
 
 func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id string) (*types.UpsertVectorResponse, error) {
-	upserted_freelancer_ids := []string{}
+	upserted_freelancer_ids := []string{} //freelancers that have been upserted or are already upserted.
 	ctx := context.Background()
 	job_description_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 		Id:       req.Upwork_job.Upwork_id,
@@ -72,6 +76,9 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 	}
 
 	for _, freelancer := range req.Upwork_job.Edges.UpworkFreelancer {
+		if freelancer.EmbeddedAt != nil && freelancer.EmbeddedAt.Before(freelancer.UpdatedAt) {
+			continue
+		}
 		description_vectors := []*proto.Vector{}
 		skill_vectors := []*proto.Vector{}
 
@@ -99,6 +106,9 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 		skill_vectors = append(skill_vectors, freelancer_skill_vector.Vector)
 
 		for _, work_history := range freelancer.Edges.WorkHistories {
+			if work_history.EmbeddedAt != nil && work_history.EmbeddedAt.After(work_history.UpdatedAt) {
+				continue
+			}
 			if work_history.Description == "" {
 				continue
 			}
@@ -113,63 +123,124 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 
 			description_vectors = append(description_vectors, work_history_description_vector.Vector)
 		}
-
-		_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
-			Namespace: DESCRIPTION_NAMESPACE,
-			Vectors:   description_vectors,
-		})
-		if upsert_vector_err != nil {
-			return nil, upsert_vector_err
+		if len(description_vectors) != 0 {
+			_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+				Namespace: DESCRIPTION_NAMESPACE,
+				Vectors:   description_vectors,
+			})
+			if upsert_vector_err != nil {
+				return nil, upsert_vector_err
+			}
 		}
-		_, upsert_vector_err = s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
-			Namespace: SKILL_NAMESPACE,
-			Vectors:   skill_vectors,
-		})
-		if upsert_vector_err != nil {
-			return nil, upsert_vector_err
+		if len(skill_vectors) != 0 {
+			_, upsert_vector_err = s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+				Namespace: SKILL_NAMESPACE,
+				Vectors:   skill_vectors,
+			})
+			if upsert_vector_err != nil {
+				return nil, upsert_vector_err
+			}
 		}
 		upserted_freelancer_ids = append(upserted_freelancer_ids, freelancer.ID)
 	}
 
-	return &types.UpsertVectorResponse{
-		Job_description_vector:  job_description_vector.Vector,
-		Job_skill_vector:        job_skill_vector.Vector,
+	//todo: Make these run concurrently!?
+	marking_job_err := s.MarkUpworkJobAsEmbedded(ctx, types.MarkUpworkJobAsEmbeddedRequest{
+		Job_id:    req.Job_id,
+		Upwork_id: req.Upwork_job.Upwork_id,
+		User_id:   user_id,
+	})
+	if marking_job_err != nil {
+		return nil, marking_job_err
+	}
+	marking_freelancer_err := s.MarkFreelancersAsEmbedded(ctx, types.MarkFreelancersAsEmbeddedRequest{
+		Job_id:                  req.Job_id,
+		Upwork_job_id:           req.Upwork_job.Upwork_id,
+		User_id:                 user_id,
 		Upserted_freelancer_ids: upserted_freelancer_ids,
+	})
+	if marking_freelancer_err != nil {
+		return nil, marking_freelancer_err
+	}
+
+	return &types.UpsertVectorResponse{
+		Job_description_vector: job_description_vector.Vector,
+		Job_skill_vector:       job_skill_vector.Vector,
 	}, nil
 }
 
-func (s *UprankVecService) ComputeSpecialization(req types.ComputeSpecializationRequest, ctx context.Context) (map[string][]float32, error) {
-	scores := make(map[string][]float32) //map of freelancer ids : scores + other data
+func (s *UprankVecService) ComputeRawSpecializationScore(req types.ComputeRawSpecializationScoreRequest, ctx context.Context) (*types.ComputeRawSpecializationScoreResponse, error) {
 	upwork_job_description_vector := req.Job_description_vector
-	// upwork_job_skill_vector := req.Job_skill_vector
-	//given the above vectors, try to find the best freelancers
-	// number_of_freelancers := len(req.Upserted_freelancer_ids)
+	description_scores := make(map[string][]float32) //map of freelancer ids: array of the similarity scores of their previously worked jobs
+	description_filter := make(map[string]string)
+	description_filter["job_id"] = req.Job_id
+	description_filter["type"] = WORK_HISTORY_DESCRIPTION_TYPE
 
-	filter := make(map[string]string)
-	filter["job_id"] = req.Job_id
-	filter["type"] = WORK_HISTORY_DESCRIPTION_TYPE
-	response, err := s.infer.QueryVector(ctx, &proto.QueryVectorRequest{
+	upwork_job_skill_vector := req.Job_skill_vector
+	skill_scores := make(map[string]float32) // map of freelancer ids: freelancer skill similarity score to job
+	skill_filter := make(map[string]string)
+	skill_filter["job_id"] = req.Job_id
+	skill_filter["type"] = FREELANCER_SKILL_TYPE
+
+	description_response, err := s.infer.QueryVector(ctx, &proto.QueryVectorRequest{
 		Namespace: DESCRIPTION_NAMESPACE,
 		Vector:    upwork_job_description_vector.Vector,
 		TopK:      req.Work_history_count,
-		Filter:    filter,
+		Filter:    description_filter,
 	})
 	if err != nil {
 		return nil, err
 	}
-	for _, vector := range response.Matches {
+	for _, vector := range description_response.Matches {
 		vector_id := vector.Metadata["freelancer_id"]
-		//todo: iterate through all the scores and collate them based off of the freelancer id
-		//then we apply weights to the scores based off of fetched data in the next step.
-		//then we have apply the same logic for the skill vectors
-		if _, exists := scores[vector_id]; !exists {
-			scores[vector_id] = []float32{vector.Score}
+		if _, exists := description_scores[vector_id]; !exists {
+			description_scores[vector_id] = []float32{vector.Score}
 		} else {
-			scores[vector_id] = append(scores[vector_id], vector.Score)
+			description_scores[vector_id] = append(description_scores[vector_id], vector.Score)
 		}
 	}
 
-	return scores, nil
+	skill_response, err := s.infer.QueryVector(ctx, &proto.QueryVectorRequest{
+		Namespace: SKILL_NAMESPACE,
+		Vector:    upwork_job_skill_vector.Vector,
+		TopK:      req.Freelancer_count,
+		Filter:    description_filter,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, vector := range skill_response.Matches {
+		vector_id := vector.Metadata["freelancer_id"]
+		if _, exists := skill_scores[vector_id]; !exists {
+			skill_scores[vector_id] = vector.Score
+		} else {
+			return nil, fmt.Errorf("Duplicate freelancer id in skill scores")
+		}
+	}
+
+	return &types.ComputeRawSpecializationScoreResponse{
+		Job_description_specialization_scores: &description_scores,
+		Job_skill_specialization_scores:       &skill_scores,
+	}, nil
+}
+
+func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ComputeRawSpecializationScoreResponse, ctx context.Context) (*types.ApplySpecializationScoreWeightsResponse, error) {
+	filePath := "score_output.json"
+	file, err := os.Create(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 func (s *UprankVecService) FetchJobData(req types.UpworkRankingMessage) (*types.JobEmbeddingData, error) {
@@ -197,6 +268,67 @@ func (s *UprankVecService) FetchJobData(req types.UpworkRankingMessage) (*types.
 		return nil, err
 	}
 	return &job_data, nil
+}
+
+func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req types.MarkFreelancersAsEmbeddedRequest) error {
+	log.Println("Marking freelancers as embedded")
+	//todo: change the date to be whenever its embedded, not when its marked as embedded
+	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/freelancers/update", s.backend_url, req.Job_id, "upwork", req.Upwork_job_id)
+
+	bodyData := []types.UpdateUpworkFreelancerRequest{}
+	for _, freelancer_id := range req.Upserted_freelancer_ids {
+		current_time := time.Now()
+		bodyData = append(bodyData, types.UpdateUpworkFreelancerRequest{
+			Url:         freelancer_id,
+			Embedded_at: &current_time,
+		})
+	}
+	body, err := json.Marshal(bodyData)
+	if err != nil {
+		return err
+	}
+	httpreq, err := http.NewRequest("POST", update_freelancer_url, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(httpreq)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req types.MarkUpworkJobAsEmbeddedRequest) error {
+	log.Println("Marking job as embedded")
+	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/update", s.backend_url, req.Job_id, "upwork", req.Upwork_id)
+	current_time := time.Now()
+	bodyData := types.UpdateUpworkJobRequest{
+		Upwork_id:   req.Upwork_id,
+		Embedded_at: &current_time,
+	}
+	body, err := json.Marshal(bodyData)
+	if err != nil {
+		return err
+	}
+	httpreq, err := http.NewRequest("POST", update_freelancer_url, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(httpreq)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
 }
 
 func (s *UprankVecService) CountTotalWorkHistories(req types.JobEmbeddingData) int {
