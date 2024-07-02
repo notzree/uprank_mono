@@ -8,8 +8,14 @@ func findNilFields(v interface{}) []string {
 
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Field(i)
-		if field.IsNil() {
-			nilArray = append(nilArray, val.Type().Field(i).Name)
+		fieldType := val.Type().Field(i)
+
+		// Check if the field is a pointer, interface, map, slice, or channel
+		switch field.Kind() {
+		case reflect.Ptr, reflect.Interface, reflect.Map, reflect.Slice, reflect.Chan:
+			if field.IsNil() {
+				nilArray = append(nilArray, fieldType.Name)
+			}
 		}
 	}
 

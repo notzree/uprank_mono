@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqs_types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -18,7 +17,6 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
 	"github.com/notzree/uprank-backend/main-backend/types"
 )
 
@@ -500,29 +498,15 @@ func (s *V1Servicer) GetUpworkJobEmbeddingData(upwork_job_id string, user_id str
 			),
 		).
 		WithUpworkfreelancer(func(query *ent.UpworkFreelancerQuery) {
-			query.Where(
-				upworkfreelancer.Or(
-					upworkfreelancer.EmbeddedAtIsNil(),
-					sql.FieldsLT(upworkfreelancer.FieldEmbeddedAt, upworkfreelancer.FieldUpdatedAt),
-				),
-			)
 			query.WithAttachments()
-			query.WithWorkHistories(
-				func(workhistory_query *ent.WorkHistoryQuery) {
-					workhistory_query.Where(
-						workhistory.Or(
-							workhistory.EmbeddedAtIsNil(),
-							sql.FieldsLT(workhistory.FieldEmbeddedAt, workhistory.FieldUpdatedAt),
-						),
-					)
-				})
+			query.WithWorkHistories()
 		}).
 		Only(ctx)
 	return job, err
 }
 
 func (s *V1Servicer) UpdateUpworkJob(data types.UpdateUpworkJobRequest, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
-	placeholder_upwork_job := s.ent.UpworkJob.UpdateOneID(data.Id)
+	placeholder_upwork_job := s.ent.UpworkJob.UpdateOneID(data.Upwork_id)
 	if data.Title != nil {
 		placeholder_upwork_job.SetTitle(*data.Title)
 	}

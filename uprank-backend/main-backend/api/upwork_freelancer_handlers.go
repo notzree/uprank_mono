@@ -2,8 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/notzree/uprank-backend/main-backend/types"
@@ -75,6 +77,7 @@ func (s *Server) UpsertUpworkFreelancer(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *Server) UpdateUpworkFreelancer(w http.ResponseWriter, r *http.Request) error {
+	//TODO: FIGURE OUT WHY THIS SHIT TAKES 14 SECONDS
 	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
@@ -93,10 +96,14 @@ func (s *Server) UpdateUpworkFreelancer(w http.ResponseWriter, r *http.Request) 
 
 	for _, freelancer := range req {
 		if errors := freelancer.Validate(); len(errors) > 0 {
+			log.Println(errors)
 			return InvalidRequestData(errors)
 		}
 	}
+	start := time.Now()
 	updated_ids, err := s.svc.UpdateUpworkFreelancer(req, user_id, upwork_job_id, r.Context())
+	elapsed := time.Since(start)
+	log.Default().Println("this shit took ", elapsed)
 	if err != nil {
 		return err
 	}

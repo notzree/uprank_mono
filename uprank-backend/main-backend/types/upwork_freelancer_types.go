@@ -231,11 +231,6 @@ func (req *UpdateUpworkFreelancerRequest) Validate() map[string]interface{} {
 		errors["job_success_score"] = "job success score must be between 0 and 100"
 	}
 
-	// Ensure that at least one of fixed or hourly charge amount is provided
-	if (req.Fixed_charge_amount == nil || strings.TrimSpace(*req.Fixed_charge_amount) == "") &&
-		(req.Hourly_charge_amount == nil || strings.TrimSpace(*req.Hourly_charge_amount) == "") {
-		errors["charge_amount"] = "either fixed or hourly charge amount must be provided"
-	}
 	if req.Fixed_charge_amount != nil && strings.TrimSpace(*req.Fixed_charge_amount) != "" {
 		_, err := strconv.ParseFloat(*req.Fixed_charge_amount, 64)
 		if err != nil {
