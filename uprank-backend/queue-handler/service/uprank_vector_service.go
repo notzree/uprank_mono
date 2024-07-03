@@ -372,18 +372,4 @@ func CreateMetadata(user_id string, job_id string, vector_type string, platform 
 	return metadata
 }
 
-// func CreateMetadata(user_id string, job_id string, vector_type string, platform string, freelancer_id *string, work_history_id *int) map[string]string {
-// 	metadata := make(map[string]string)
-// 	metadata["user_id"] = user_id
-// 	metadata["job_id"] = job_id
-// 	metadata["type"] = vector_type
-// 	metadata["platform"] = platform
-// 	if work_history_id != nil {
-// 		metadata["work_history_id"] = strconv.Itoa(*work_history_id)
 
-// 	}
-// 	if freelancer_id != nil {
-// 		metadata["freelancer_id"] = *freelancer_id
-// 	}
-// 	return metadata
-// }
