@@ -40,13 +40,14 @@ func NewUprankVecService(backend_url string, ms_api_key string, infer proto.Infe
 	}
 }
 
+
 func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id string) (*types.UpsertVectorResponse, error) {
 	upserted_freelancer_ids := []string{} //freelancers that have been upserted or are already upserted.
 	ctx := context.Background()
 	job_description_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 		Id:       req.Upwork_job.Upwork_id,
 		Text:     req.Upwork_job.Description,
-		Metadata: CreateMetadata(user_id, req.Job_id, "job_description", "upwork", nil),
+		Metadata: CreateMetadata(user_id, req.Job_id, "job_description", "upwork"),
 	})
 	if embed_err != nil {
 		return nil, embed_err
@@ -55,7 +56,7 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 	job_skill_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 		Text:     job_skills_as_string,
 		Id:       req.Upwork_job.Upwork_id,
-		Metadata: CreateMetadata(user_id, req.Job_id, "job_skills", "upwork", nil),
+		Metadata: CreateMetadata(user_id, req.Job_id, "job_skills", "upwork"),
 	})
 	if embed_err != nil {
 		return nil, embed_err
@@ -86,7 +87,7 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 		freelancer_description_vector, embed_description_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 			Id:       freelancer.ID,
 			Text:     freelancer.Description,
-			Metadata: CreateMetadata(user_id, req.Job_id, "freelancer_description", "upwork", &freelancer.ID),
+			Metadata: CreateMetadata(user_id, req.Job_id, "freelancer_description", "upwork", WithFreelancerId(freelancer.ID)),
 		})
 		if embed_description_vector_err != nil {
 			return nil, embed_description_vector_err
@@ -98,7 +99,7 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 		freelancer_skill_vector, embed_skill_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 			Id:       freelancer.ID,
 			Text:     freelancer_skills_as_string,
-			Metadata: CreateMetadata(user_id, req.Job_id, "freelancer_skills", "upwork", &freelancer.ID),
+			Metadata: CreateMetadata(user_id, req.Job_id, "freelancer_skills", "upwork", WithFreelancerId(freelancer.ID)),
 		})
 		if embed_skill_vector_err != nil {
 			return nil, embed_skill_vector_err
@@ -115,7 +116,7 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 			work_history_description_vector, embed_work_history_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 				Id:       strconv.Itoa(work_history.ID),
 				Text:     work_history.Description,
-				Metadata: CreateMetadata(user_id, req.Job_id, "work_history_description", "upwork", &freelancer.ID),
+				Metadata: CreateMetadata(user_id, req.Job_id, "work_history_description", "upwork", WithFreelancerId(freelancer.ID), WithWorkHistoryId(work_history.ID),
 			})
 			if embed_work_history_vector_err != nil {
 				return nil, embed_work_history_vector_err
@@ -171,7 +172,7 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 
 func (s *UprankVecService) ComputeRawSpecializationScore(req types.ComputeRawSpecializationScoreRequest, ctx context.Context) (*types.ComputeRawSpecializationScoreResponse, error) {
 	upwork_job_description_vector := req.Job_description_vector
-	description_scores := make(map[string][]float32) //map of freelancer ids: array of the similarity scores of their previously worked jobs
+	description_scores := make(map[string]map[string]float32) //map of freelancer ids: array of the similarity scores of their previously worked jobs
 	description_filter := make(map[string]string)
 	description_filter["job_id"] = req.Job_id
 	description_filter["type"] = WORK_HISTORY_DESCRIPTION_TYPE
@@ -193,8 +194,11 @@ func (s *UprankVecService) ComputeRawSpecializationScore(req types.ComputeRawSpe
 	}
 	for _, vector := range description_response.Matches {
 		vector_id := vector.Metadata["freelancer_id"]
+		job_id :=vector.Metadata['']
 		if _, exists := description_scores[vector_id]; !exists {
-			description_scores[vector_id] = []float32{vector.Score}
+			description_scores[vector_id] = map[string]float32{
+				"": vector.Score,
+			}
 		} else {
 			description_scores[vector_id] = append(description_scores[vector_id], vector.Score)
 		}
@@ -339,14 +343,47 @@ func (s *UprankVecService) CountTotalWorkHistories(req types.JobEmbeddingData) i
 	return total_workhistories
 }
 
-func CreateMetadata(user_id string, job_id string, vector_type string, platform string, freelancer_id *string) map[string]string {
+
+type MetadataOption func(map[string]string)
+
+func WithFreelancerId(freelancer_id string) MetadataOption {
+	return func(metadata map[string]string) {
+		metadata["freelancer_id"] = freelancer_id
+	}
+}
+
+func WithWorkHistoryId(work_history_id int) MetadataOption {
+	return func(metadata map[string]string) {
+		metadata["work_history_id"] = strconv.Itoa(work_history_id)
+	}
+}
+
+func CreateMetadata(user_id string, job_id string, vector_type string, platform string, options ...MetadataOption) map[string]string {
+
 	metadata := make(map[string]string)
 	metadata["user_id"] = user_id
 	metadata["job_id"] = job_id
 	metadata["type"] = vector_type
 	metadata["platform"] = platform
-	if freelancer_id != nil {
-		metadata["freelancer_id"] = *freelancer_id
+
+	for _, option := range options {
+		option(metadata)
 	}
 	return metadata
 }
+
+// func CreateMetadata(user_id string, job_id string, vector_type string, platform string, freelancer_id *string, work_history_id *int) map[string]string {
+// 	metadata := make(map[string]string)
+// 	metadata["user_id"] = user_id
+// 	metadata["job_id"] = job_id
+// 	metadata["type"] = vector_type
+// 	metadata["platform"] = platform
+// 	if work_history_id != nil {
+// 		metadata["work_history_id"] = strconv.Itoa(*work_history_id)
+
+// 	}
+// 	if freelancer_id != nil {
+// 		metadata["freelancer_id"] = *freelancer_id
+// 	}
+// 	return metadata
+// }
