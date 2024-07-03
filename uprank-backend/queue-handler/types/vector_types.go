@@ -1,6 +1,8 @@
 package types
 
-import proto "github.com/notzree/uprank-backend/queue-handler/proto"
+import (
+	proto "github.com/notzree/uprank-backend/queue-handler/proto"
+)
 
 type Metadata struct {
 	UserID   string `json:"user_id"`
@@ -10,9 +12,7 @@ type Metadata struct {
 }
 
 type UpsertVectorResponse struct {
-	Job_description_vector  *proto.Vector `json:"job_description_vector"`
-	Job_skill_vector        *proto.Vector `json:"job_skill_vector"`
-	Upserted_freelancer_ids []string      `json:"upserted_freelancer_ids"`
+	Job_description_vector *proto.Vector `json:"job_description_vector"`
 }
 
 type ComputeRawSpecializationScoreRequest struct {
@@ -24,12 +24,14 @@ type ComputeRawSpecializationScoreRequest struct {
 }
 
 type ComputeRawSpecializationScoreResponse struct {
-	Job_description_specialization_scores *map[string]map[string]float32 `json:"job_description_specialization_scores"`
-	Job_skill_specialization_scores       *map[string]float32            `json:"job_skill_specialization_scores"`
+	Job_description_specialization_scores *map[string]map[int]float32 `json:"job_description_specialization_scores"`
 }
 
 type ApplySpecializationScoreWeightsRequest struct {
+	Description_scores map[string]map[int]float32 `json:"description_scores"`
+	Job_data           JobEmbeddingData           `json:"job_data"`
 }
 
 type ApplySpecializationScoreWeightsResponse struct {
+	Weighted_scores (map[string]map[int]float32) `json:"weighted_scores"`
 }

@@ -29,22 +29,14 @@ func NewServiceError(err error) ServiceError {
 	return ServiceError{Msg: err.Error()}
 }
 
-type QueueListener func() error
+func HandleError(err error) {
+	if q_err, ok := err.(QError); ok {
+		slog.Error("Queue Error", "msg", q_err.Msg)
+	} else if s_err, ok := err.(ServiceError); ok {
+		slog.Error("Service Error", "msg", s_err.Msg)
+	} else {
+		slog.Error("internal server error", "err", err.Error())
 
-type SafeQueueListener func()
-
-func Make(handler QueueListener) SafeQueueListener {
-	return func() {
-		if err := handler(); err != nil {
-			if q_err, ok := err.(QError); ok {
-				slog.Error("Queue Error", "msg", q_err.Msg)
-			} else if s_err, ok := err.(ServiceError); ok {
-				slog.Error("Service Error", "msg", s_err.Msg)
-			} else {
-				slog.Error("internal server error", "err", err.Error())
-
-			}
-			slog.Error("function error", "err", err.Error())
-		}
 	}
+	slog.Error("function error", "err", err.Error())
 }
