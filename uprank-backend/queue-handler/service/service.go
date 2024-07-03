@@ -13,6 +13,6 @@ type Servicer interface {
 	UpsertVectors(req types.JobEmbeddingData, user_id string) (*types.UpsertVectorResponse, error)
 	FetchJobData(req types.UpworkRankingMessage) (*types.JobEmbeddingData, error)
 	ComputeRawSpecializationScore(req types.ComputeRawSpecializationScoreRequest, ctx context.Context) (*types.ComputeRawSpecializationScoreResponse, error)
-	ApplySpecializationScoreWeights(req types.ComputeRawSpecializationScoreResponse, ctx context.Context) (*types.ApplySpecializationScoreWeightsResponse, error)
+	ApplySpecializationScoreWeights(req types.ApplySpecializationScoreWeightsRequest, ctx context.Context, weights ...DescriptionWeight) (*types.ApplySpecializationScoreWeightsResponse, error)
 	// ComputeEstDuration(ctx context.Context) error
 }
