@@ -1,6 +1,6 @@
 import * as React from "react";
 import { GetJobResponse } from "@/client/client";
-import Navbar from "./components/navbar";
+import Navbar from "../shared/components/navbar";
 import JobCardList from "./components/JobCardList";
 import JobSearchFilter from "./components/JobSearchFilter";
 export default function Dashboard({ jobs_props }: {jobs_props: GetJobResponse}) {
