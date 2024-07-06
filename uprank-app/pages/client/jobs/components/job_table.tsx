@@ -82,29 +82,19 @@ export const columns: ColumnDef<UpworkFreelancer>[] = [
         ),
     },
     {
-        accessorKey: "Amount",
-        header: () => <div className="text-right">Amount</div>,
-        cell: ({ row }) => {
-            let amount = 0.0;
-            let currency = "";
-            const fixed_charge = row.getValue("fixed_charge_amount");
-            if (fixed_charge) {
-                amount = parseFloat(row.getValue("fixed_charge_amount"));
-                currency = row.getValue("fixed_charge_currency");
+        id: "amount",
+        accessorFn: (row) => {
+            if (row.fixed_charge_amount) {
+                return `$${row.fixed_charge_amount}`;
             } else {
-                amount = parseFloat(row.getValue("hourly_charge_amount"));
-                currency = row.getValue("hourly_charge_currency");
+                return `$${row.hourly_charge_amount} /hr`;
+                
             }
-            // Format the amount as a dollar amount
-            const formatted = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: 'USD',
-            }).format(amount);
-
-            return <div className="text-right font-medium">{formatted}</div>;
         },
-        enableSorting: false,
-        enableHiding: false,
+        cell: ({ row }) => {
+            let amount = row.getValue("amount");
+            return <div className="text-right font-medium">{amount}</div>;
+        },
     },
     {
         id: "actions",
@@ -141,8 +131,6 @@ export const columns: ColumnDef<UpworkFreelancer>[] = [
     },
 ];
 
-
-
 export function JobDataTable({
     freelancers,
 }: {
@@ -155,7 +143,7 @@ export function JobDataTable({
         React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
     const memoizedColumns = React.useMemo(() => columns, []);
-    const data = freelancers
+    const data = freelancers;
     const table = useReactTable({
         data,
         columns,
