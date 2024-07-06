@@ -13,6 +13,7 @@ type Servicer interface {
 	UpdateUser(data types.UpdateUserRequest, ctx context.Context) (*ent.User, error)
 	CreateJob(data types.CreateJobRequest, user_id string, ctx context.Context) (*ent.Job, error)
 	GetJobs(user_id string, ctx context.Context) ([]*ent.Job, error)
+	GetJobById(job_id string, user_id string, ctx context.Context) (*ent.Job, error)
 	AttachPlatformSpecificjobs(data types.AttachPlatformSpecificJobsRequest, user_id string, job_id *uuid.UUID, ctx context.Context) (*ent.Job, error)
 	GetUpworkJob(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error)
 	GetUpworkJobEmbeddingData(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error)
