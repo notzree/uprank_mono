@@ -57,3 +57,16 @@ type GetUpworkJobEmbeddingDataResponse struct {
 	Job_id     string         `json:"job_id,omitempty"`
 	Upwork_job *ent.UpworkJob `json:"upwork_job,omitempty"`
 }
+
+type AddJobRankingRequest struct {
+	Freelancer_score_map map[string]float32 `json:"freelancer_score_map,omitempty"`
+}
+
+func (req *AddJobRankingRequest) Validate() map[string]interface{} {
+	errors := make(map[string]interface{})
+
+	if req.Freelancer_score_map == nil {
+		errors["Freelancer_score_map"] = "Freelancer_score_map is required"
+	}
+	return errors
+}

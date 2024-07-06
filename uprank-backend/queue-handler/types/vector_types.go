@@ -35,3 +35,15 @@ type ApplySpecializationScoreWeightsRequest struct {
 type ApplySpecializationScoreWeightsResponse struct {
 	Weighted_scores (map[string]map[int]float32) `json:"weighted_scores"`
 }
+
+type FinalizedJobRankingData struct {
+	Job_id               string             `json:"job_id"`
+	Platform             string             `json:"platform"`
+	Platform_id          string             `json:"platform_id"`
+	User_id              string             `json:"user_id"`
+	Freelancer_score_map map[string]float32 `json:"freelancer_score_map"`
+}
+
+type AddJobRankingRequest struct {
+	Freelancer_score_map map[string]float32 `json:"freelancer_score_map,omitempty"`
+}

@@ -29,3 +29,17 @@ func (s *Server) CreateJob(w http.ResponseWriter, r *http.Request) error {
 
 	return writeJSON(w, http.StatusCreated, new_job)
 }
+
+func (s *Server) GetJobs(w http.ResponseWriter, r *http.Request) error {
+	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
+	if user_id_err != nil {
+		return user_id_err
+	}
+
+	jobs, err := s.svc.GetJobs(user_id, r.Context())
+	if err != nil {
+		return err
+	}
+
+	return writeJSON(w, http.StatusOK, jobs)
+}

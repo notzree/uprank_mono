@@ -13,24 +13,23 @@ type CardData = {
 
 const FreelancerCardData: CardData[] = [
     {
-        title: "Demand based subscription pricing",
+        title: "AI powered insights",
         content:
-            "Tired of undercutting your rate to win clients? Uprank uses demand based pricing to ensure you get paid what you're worth. No more inflated ratings. Your rate is based on demand for your services.",
+            "Make smarter hiring decisions with our AI-powered insights. Our advanced algorithms provide a job compatibility score, analyzing how well a freelancer's past experiences align with your project needs. Additionally, get AI-driven estimated completion times to better plan and manage your projects.",
     },
     {
-        title: "F.I.R.S (Fast Iteration Request System)",
+        title: "Comprehensive Freelancer Metrics",
         content:
-            "Get both feedback and requests sent to you in real-time, with a powerful annotation system allowing detailed and precise feedback. No more waiting for emails or scheduling calls.",
+            "Make informed hiring decisions with our extensive freelancer metrics. Access vital statistics like budget adherence rates, average client hire count, and more, all designed to help you assess the quality and reliability of freelancers effectively.",
     },
     {
-        title: "Short Application process",
+        title: " Custom Filtering and Data Analysis",
         content:
-            "We know your time is valuable. Our application process is short and sweet. No more long forms or waiting for approval. Get started in minutes and hear back within a week.",
+            "Our powerful spreadsheet interface allows you to apply custom filters on specific freelancer data, making it easy to narrow down your search and find the ideal candidate for your project. Leverage data analysis tools to gain deeper insights and make well-informed decisions.",
     },
 ];
 export default function Component() {
     const { user } = useUser();
-    console.log(user);
     return (
         <div key="1" className="flex flex-col min-h-screen">
             <header className="flex items-center justify-between px-8 py-6 border-b">
@@ -44,7 +43,7 @@ export default function Component() {
                     {user?.id ? (
                         <Link
                             className="text-sm font-medium hover:underline"
-                            href = "/client/dashboard"
+                            href="/client/dashboard"
                         >
                             Dashboard
                         </Link>
@@ -68,16 +67,25 @@ export default function Component() {
                 </nav>
             </header>
             <main className="flex-1">
-                <section className="py-24 px-10 text-center">
+                <section className="py-16 px-10 text-center">
                     <h1 className="text-4xl font-bold">
-                        Uprank lets freelance designers scale vertically to $1M+
-                        ARR
+                        We help business owners hire the best freelancers
                     </h1>
                     <div className="flex justify-center items-center">
-                        <p className="mt-6 text-lg text-foreground w-[40rem] text-left"></p>
+                        <p className="mt-4 text-lg text-foreground w-[40rem] text-left">
+                            Discover a smarter way to hire freelancers with our
+                            cutting-edge SaaS solution. Our Chrome extension and
+                            AI recommender algorithm streamline the hiring
+                            process, offering powerful insights and
+                            comprehensive data to help you find the perfect
+                            match for your project. Elevate your hiring strategy
+                            with custom filters, AI-powered insights, and
+                            essential metrics, all within an intuitive
+                            spreadsheet ui.
+                        </p>
                     </div>
                 </section>
-                <section className="py-24 px-10 bg-background" id="features">
+                <section className="py-2 px-10 bg-background" id="features">
                     <h2 className="text-3xl font-bold text-center">Features</h2>
                     <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                         {FreelancerCardData.map(
@@ -100,12 +108,11 @@ export default function Component() {
                 </section>
 
                 <section className="py-24 px-10 text-center">
-                    <h2 className="text-3xl font-bold">Sign up for free</h2>
+                    <h2 className="text-3xl font-bold">Sign up for the closed beta today</h2>
                     <p className="mt-6 text-lg text-gray-600">
-                        Join thousands of freelance designers growing their
-                        business with Remark
+                        Join thousands of business owners who have already enhanced their hiring strategy with Uprank.
                     </p>
-                    <Button className="mt-10">Sign Up for Free</Button>
+                    <Button className="mt-10">Register for Beta</Button>
                 </section>
             </main>
             <footer className="py-6 px-10 text-center text-sm text-gray-600">

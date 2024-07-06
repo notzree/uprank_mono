@@ -47,11 +47,13 @@ func (s *Server) Start() error {
 			private_router.Route("/private", func(private_sub_router chi.Router) {
 				private_sub_router.Route("/jobs", func(jobs_router chi.Router) {
 					jobs_router.Post("/", Make(s.CreateJob))
+					jobs_router.Get("/", Make(s.GetJobs))
 					jobs_router.Route("/{job_id}", func(job_id_router chi.Router) {
 						job_id_router.Post("/attach", Make(s.AttachPlatformSpecificJobs)) //todo: move this attach upwork job into a general attach func
 						job_id_router.Route("/upwork", func(upwork_router chi.Router) {
 							upwork_router.Route("/{upwork_job_id}", func(upwork_job_id_router chi.Router) {
 								upwork_job_id_router.Get("/", Make(s.GetUpworkJob))
+								upwork_job_id_router.Post("/rank", Make(s.AddJobRankings))
 								upwork_job_id_router.Post("/update", Make(s.UpdateUpworkJob)) //todo: make this api take in an array instead so we can batch update
 								upwork_job_id_router.Route("/freelancers", func(upwork_freelancers_router chi.Router) {
 									upwork_freelancers_router.Post("/", Make(s.UpsertUpworkFreelancer))       //create freelancers

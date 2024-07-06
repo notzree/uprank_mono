@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -79,6 +80,11 @@ func (s *V1Servicer) AttachPlatformSpecificjobs(data types.AttachPlatformSpecifi
 
 	//add more platforms here
 	return nil, nil
+}
+
+func (s *V1Servicer) GetJobs(user_id string, ctx context.Context) ([]*ent.Job, error) {
+	jobs, err := s.ent.Job.Query().Where(job.HasUserWith(user.IDEQ(user_id))).WithUpworkjob().All(ctx)
+	return jobs, err
 }
 
 // Creates an upwork job and attaches it to a job.
@@ -640,4 +646,17 @@ func (s *V1Servicer) UpdateUpworkFreelancer(data []types.UpdateUpworkFreelancerR
 		updated_ids = append(updated_ids, freelancer.Url)
 	}
 	return updated_ids, nil
+}
+
+// Adds rankings for all freelancers of a given job
+func (s *V1Servicer) AddJobRankings(data types.AddJobRankingRequest, user_id string, ctx context.Context) error {
+	bulk := make([]*ent.FreelancerInferenceDataCreate, 0, len(data.Freelancer_score_map))
+	for upwork_freelancer_id, score := range data.Freelancer_score_map {
+		bulk = append(bulk, s.ent.FreelancerInferenceData.Create().SetUpworkfreelancerID(upwork_freelancer_id).SetFinalizedRatingScore(float64(score)))
+	}
+	_, err := s.ent.FreelancerInferenceData.CreateBulk(bulk...).Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating FreelancerInferenceData: %v", err)
+	}
+	return nil
 }

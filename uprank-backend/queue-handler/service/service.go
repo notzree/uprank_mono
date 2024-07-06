@@ -14,5 +14,6 @@ type Servicer interface {
 	FetchJobData(req types.UpworkRankingMessage) (*types.JobEmbeddingData, error)
 	ComputeRawSpecializationScore(req types.ComputeRawSpecializationScoreRequest, ctx context.Context) (*types.ComputeRawSpecializationScoreResponse, error)
 	ApplySpecializationScoreWeights(req types.ApplySpecializationScoreWeightsRequest, ctx context.Context, weights ...DescriptionWeight) (*types.ApplySpecializationScoreWeightsResponse, error)
+	PostJobRankingData(req types.FinalizedJobRankingData, ctx context.Context) error
 	// ComputeEstDuration(ctx context.Context) error
 }
