@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/schema"
+	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 )
 
@@ -33,7 +34,7 @@ type JobEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Upworkjob holds the value of the upworkjob edge.
-	Upworkjob []*UpworkJob `json:"upworkjob,omitempty"`
+	Upworkjob *UpworkJob `json:"upworkjob,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -51,10 +52,12 @@ func (e JobEdges) UserOrErr() (*User, error) {
 }
 
 // UpworkjobOrErr returns the Upworkjob value or an error if the edge
-// was not loaded in eager-loading.
-func (e JobEdges) UpworkjobOrErr() ([]*UpworkJob, error) {
-	if e.loadedTypes[1] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e JobEdges) UpworkjobOrErr() (*UpworkJob, error) {
+	if e.Upworkjob != nil {
 		return e.Upworkjob, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: upworkjob.Label}
 	}
 	return nil, &NotLoadedError{edge: "upworkjob"}
 }

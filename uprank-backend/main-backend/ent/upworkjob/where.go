@@ -863,7 +863,7 @@ func HasJob() predicate.UpworkJob {
 	return predicate.UpworkJob(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, JobTable, JobColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, JobTable, JobColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

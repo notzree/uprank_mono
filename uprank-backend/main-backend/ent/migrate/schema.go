@@ -29,6 +29,31 @@ var (
 			},
 		},
 	}
+	// FreelancerInferenceDataColumns holds the columns for the "freelancer_inference_data" table.
+	FreelancerInferenceDataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "uprank_reccomended", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "uprank_reccomended_reasons", Type: field.TypeString, Nullable: true},
+		{Name: "uprank_not_enough_data", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "finalized_rating_score", Type: field.TypeFloat64},
+		{Name: "ai_estimated_duration", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "INTERVAL"}},
+		{Name: "budget_adherence_percentage", Type: field.TypeFloat64, Nullable: true},
+		{Name: "upwork_freelancer_freelancer_inference_data", Type: field.TypeString},
+	}
+	// FreelancerInferenceDataTable holds the schema information for the "freelancer_inference_data" table.
+	FreelancerInferenceDataTable = &schema.Table{
+		Name:       "freelancer_inference_data",
+		Columns:    FreelancerInferenceDataColumns,
+		PrimaryKey: []*schema.Column{FreelancerInferenceDataColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "freelancer_inference_data_upwork_freelancers_freelancer_inference_data",
+				Columns:    []*schema.Column{FreelancerInferenceDataColumns[7]},
+				RefColumns: []*schema.Column{UpworkFreelancersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// JobsColumns holds the columns for the "jobs" table.
 	JobsColumns = []*schema.Column{
 		{Name: "oid", Type: field.TypeUUID},
@@ -88,11 +113,6 @@ var (
 		{Name: "combined_total_revenue", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "recent_earnings", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "total_revenue", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
-		{Name: "uprank_specialization_score", Type: field.TypeFloat64, Nullable: true, Default: 0},
-		{Name: "uprank_estimated_completion_time", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "INTERVAL"}},
-		{Name: "uprank_reccomended", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "uprank_reccomended_reasons", Type: field.TypeString, Nullable: true},
-		{Name: "uprank_not_enough_data", Type: field.TypeBool, Nullable: true, Default: false},
 	}
 	// UpworkFreelancersTable holds the schema information for the "upwork_freelancers" table.
 	UpworkFreelancersTable = &schema.Table{
@@ -119,7 +139,7 @@ var (
 		{Name: "average_uprank_score", Type: field.TypeFloat64, Nullable: true},
 		{Name: "max_uprank_score", Type: field.TypeFloat64, Nullable: true},
 		{Name: "min_uprank_score", Type: field.TypeFloat64, Nullable: true},
-		{Name: "job_upworkjob", Type: field.TypeUUID},
+		{Name: "job_upworkjob", Type: field.TypeUUID, Unique: true},
 	}
 	// UpworkJobsTable holds the schema information for the "upwork_jobs" table.
 	UpworkJobsTable = &schema.Table{
@@ -195,6 +215,27 @@ var (
 			},
 		},
 	}
+	// WorkhistoryInferenceDataColumns holds the columns for the "workhistory_inference_data" table.
+	WorkhistoryInferenceDataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "finalized_job_rating_score", Type: field.TypeFloat64},
+		{Name: "is_within_budget", Type: field.TypeBool},
+		{Name: "work_history_work_history_inference_data", Type: field.TypeInt},
+	}
+	// WorkhistoryInferenceDataTable holds the schema information for the "workhistory_inference_data" table.
+	WorkhistoryInferenceDataTable = &schema.Table{
+		Name:       "workhistory_inference_data",
+		Columns:    WorkhistoryInferenceDataColumns,
+		PrimaryKey: []*schema.Column{WorkhistoryInferenceDataColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "workhistory_inference_data_work_histories_work_history_inference_data",
+				Columns:    []*schema.Column{WorkhistoryInferenceDataColumns[3]},
+				RefColumns: []*schema.Column{WorkHistoriesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UpworkJobUpworkfreelancerColumns holds the columns for the "upwork_job_upworkfreelancer" table.
 	UpworkJobUpworkfreelancerColumns = []*schema.Column{
 		{Name: "upwork_job_id", Type: field.TypeString},
@@ -248,11 +289,13 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AttachmentRefsTable,
+		FreelancerInferenceDataTable,
 		JobsTable,
 		UpworkFreelancersTable,
 		UpworkJobsTable,
 		UsersTable,
 		WorkHistoriesTable,
+		WorkhistoryInferenceDataTable,
 		UpworkJobUpworkfreelancerTable,
 		UserUpworkjobTable,
 	}
@@ -260,9 +303,11 @@ var (
 
 func init() {
 	AttachmentRefsTable.ForeignKeys[0].RefTable = UpworkFreelancersTable
+	FreelancerInferenceDataTable.ForeignKeys[0].RefTable = UpworkFreelancersTable
 	JobsTable.ForeignKeys[0].RefTable = UsersTable
 	UpworkJobsTable.ForeignKeys[0].RefTable = JobsTable
 	WorkHistoriesTable.ForeignKeys[0].RefTable = UpworkFreelancersTable
+	WorkhistoryInferenceDataTable.ForeignKeys[0].RefTable = WorkHistoriesTable
 	UpworkJobUpworkfreelancerTable.ForeignKeys[0].RefTable = UpworkJobsTable
 	UpworkJobUpworkfreelancerTable.ForeignKeys[1].RefTable = UpworkFreelancersTable
 	UserUpworkjobTable.ForeignKeys[0].RefTable = UsersTable

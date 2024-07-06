@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
@@ -21,13 +22,14 @@ import (
 // UpworkFreelancerQuery is the builder for querying UpworkFreelancer entities.
 type UpworkFreelancerQuery struct {
 	config
-	ctx               *QueryContext
-	order             []upworkfreelancer.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.UpworkFreelancer
-	withUpworkJob     *UpworkJobQuery
-	withAttachments   *AttachmentRefQuery
-	withWorkHistories *WorkHistoryQuery
+	ctx                         *QueryContext
+	order                       []upworkfreelancer.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.UpworkFreelancer
+	withUpworkJob               *UpworkJobQuery
+	withAttachments             *AttachmentRefQuery
+	withWorkHistories           *WorkHistoryQuery
+	withFreelancerInferenceData *FreelancerInferenceDataQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -123,6 +125,28 @@ func (ufq *UpworkFreelancerQuery) QueryWorkHistories() *WorkHistoryQuery {
 			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, selector),
 			sqlgraph.To(workhistory.Table, workhistory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, upworkfreelancer.WorkHistoriesTable, upworkfreelancer.WorkHistoriesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ufq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFreelancerInferenceData chains the current query on the "freelancer_inference_data" edge.
+func (ufq *UpworkFreelancerQuery) QueryFreelancerInferenceData() *FreelancerInferenceDataQuery {
+	query := (&FreelancerInferenceDataClient{config: ufq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ufq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ufq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, selector),
+			sqlgraph.To(freelancerinferencedata.Table, freelancerinferencedata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ufq.driver.Dialect(), step)
 		return fromU, nil
@@ -317,14 +341,15 @@ func (ufq *UpworkFreelancerQuery) Clone() *UpworkFreelancerQuery {
 		return nil
 	}
 	return &UpworkFreelancerQuery{
-		config:            ufq.config,
-		ctx:               ufq.ctx.Clone(),
-		order:             append([]upworkfreelancer.OrderOption{}, ufq.order...),
-		inters:            append([]Interceptor{}, ufq.inters...),
-		predicates:        append([]predicate.UpworkFreelancer{}, ufq.predicates...),
-		withUpworkJob:     ufq.withUpworkJob.Clone(),
-		withAttachments:   ufq.withAttachments.Clone(),
-		withWorkHistories: ufq.withWorkHistories.Clone(),
+		config:                      ufq.config,
+		ctx:                         ufq.ctx.Clone(),
+		order:                       append([]upworkfreelancer.OrderOption{}, ufq.order...),
+		inters:                      append([]Interceptor{}, ufq.inters...),
+		predicates:                  append([]predicate.UpworkFreelancer{}, ufq.predicates...),
+		withUpworkJob:               ufq.withUpworkJob.Clone(),
+		withAttachments:             ufq.withAttachments.Clone(),
+		withWorkHistories:           ufq.withWorkHistories.Clone(),
+		withFreelancerInferenceData: ufq.withFreelancerInferenceData.Clone(),
 		// clone intermediate query.
 		sql:  ufq.sql.Clone(),
 		path: ufq.path,
@@ -361,6 +386,17 @@ func (ufq *UpworkFreelancerQuery) WithWorkHistories(opts ...func(*WorkHistoryQue
 		opt(query)
 	}
 	ufq.withWorkHistories = query
+	return ufq
+}
+
+// WithFreelancerInferenceData tells the query-builder to eager-load the nodes that are connected to
+// the "freelancer_inference_data" edge. The optional arguments are used to configure the query builder of the edge.
+func (ufq *UpworkFreelancerQuery) WithFreelancerInferenceData(opts ...func(*FreelancerInferenceDataQuery)) *UpworkFreelancerQuery {
+	query := (&FreelancerInferenceDataClient{config: ufq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ufq.withFreelancerInferenceData = query
 	return ufq
 }
 
@@ -442,10 +478,11 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	var (
 		nodes       = []*UpworkFreelancer{}
 		_spec       = ufq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			ufq.withUpworkJob != nil,
 			ufq.withAttachments != nil,
 			ufq.withWorkHistories != nil,
+			ufq.withFreelancerInferenceData != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -484,6 +521,15 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 		if err := ufq.loadWorkHistories(ctx, query, nodes,
 			func(n *UpworkFreelancer) { n.Edges.WorkHistories = []*WorkHistory{} },
 			func(n *UpworkFreelancer, e *WorkHistory) { n.Edges.WorkHistories = append(n.Edges.WorkHistories, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := ufq.withFreelancerInferenceData; query != nil {
+		if err := ufq.loadFreelancerInferenceData(ctx, query, nodes,
+			func(n *UpworkFreelancer) { n.Edges.FreelancerInferenceData = []*FreelancerInferenceData{} },
+			func(n *UpworkFreelancer, e *FreelancerInferenceData) {
+				n.Edges.FreelancerInferenceData = append(n.Edges.FreelancerInferenceData, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -608,6 +654,37 @@ func (ufq *UpworkFreelancerQuery) loadWorkHistories(ctx context.Context, query *
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "upwork_freelancer_work_histories" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (ufq *UpworkFreelancerQuery) loadFreelancerInferenceData(ctx context.Context, query *FreelancerInferenceDataQuery, nodes []*UpworkFreelancer, init func(*UpworkFreelancer), assign func(*UpworkFreelancer, *FreelancerInferenceData)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*UpworkFreelancer)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.FreelancerInferenceData(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(upworkfreelancer.FreelancerInferenceDataColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.upwork_freelancer_freelancer_inference_data
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "upwork_freelancer_freelancer_inference_data" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "upwork_freelancer_freelancer_inference_data" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

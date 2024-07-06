@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/schema"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
@@ -18,6 +19,16 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	freelancerinferencedataFields := schema.FreelancerInferenceData{}.Fields()
+	_ = freelancerinferencedataFields
+	// freelancerinferencedataDescUprankReccomended is the schema descriptor for uprank_reccomended field.
+	freelancerinferencedataDescUprankReccomended := freelancerinferencedataFields[0].Descriptor()
+	// freelancerinferencedata.DefaultUprankReccomended holds the default value on creation for the uprank_reccomended field.
+	freelancerinferencedata.DefaultUprankReccomended = freelancerinferencedataDescUprankReccomended.Default.(bool)
+	// freelancerinferencedataDescUprankNotEnoughData is the schema descriptor for uprank_not_enough_data field.
+	freelancerinferencedataDescUprankNotEnoughData := freelancerinferencedataFields[2].Descriptor()
+	// freelancerinferencedata.DefaultUprankNotEnoughData holds the default value on creation for the uprank_not_enough_data field.
+	freelancerinferencedata.DefaultUprankNotEnoughData = freelancerinferencedataDescUprankNotEnoughData.Default.(bool)
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
 	// jobDescID is the schema descriptor for id field.
@@ -36,18 +47,6 @@ func init() {
 	upworkfreelancer.DefaultUpdatedAt = upworkfreelancerDescUpdatedAt.Default.(func() time.Time)
 	// upworkfreelancer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	upworkfreelancer.UpdateDefaultUpdatedAt = upworkfreelancerDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// upworkfreelancerDescUprankSpecializationScore is the schema descriptor for uprank_specialization_score field.
-	upworkfreelancerDescUprankSpecializationScore := upworkfreelancerFields[37].Descriptor()
-	// upworkfreelancer.DefaultUprankSpecializationScore holds the default value on creation for the uprank_specialization_score field.
-	upworkfreelancer.DefaultUprankSpecializationScore = upworkfreelancerDescUprankSpecializationScore.Default.(float64)
-	// upworkfreelancerDescUprankReccomended is the schema descriptor for uprank_reccomended field.
-	upworkfreelancerDescUprankReccomended := upworkfreelancerFields[39].Descriptor()
-	// upworkfreelancer.DefaultUprankReccomended holds the default value on creation for the uprank_reccomended field.
-	upworkfreelancer.DefaultUprankReccomended = upworkfreelancerDescUprankReccomended.Default.(bool)
-	// upworkfreelancerDescUprankNotEnoughData is the schema descriptor for uprank_not_enough_data field.
-	upworkfreelancerDescUprankNotEnoughData := upworkfreelancerFields[41].Descriptor()
-	// upworkfreelancer.DefaultUprankNotEnoughData holds the default value on creation for the uprank_not_enough_data field.
-	upworkfreelancer.DefaultUprankNotEnoughData = upworkfreelancerDescUprankNotEnoughData.Default.(bool)
 	// upworkfreelancerDescID is the schema descriptor for id field.
 	upworkfreelancerDescID := upworkfreelancerFields[0].Descriptor()
 	// upworkfreelancer.IDValidator is a validator for the "id" field. It is called by the builders before save.

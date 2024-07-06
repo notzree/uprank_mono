@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
@@ -643,105 +643,6 @@ func (ufu *UpworkFreelancerUpdate) AddTotalRevenue(f float64) *UpworkFreelancerU
 	return ufu
 }
 
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankSpecializationScore(f float64) *UpworkFreelancerUpdate {
-	ufu.mutation.ResetUprankSpecializationScore()
-	ufu.mutation.SetUprankSpecializationScore(f)
-	return ufu
-}
-
-// SetNillableUprankSpecializationScore sets the "uprank_specialization_score" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableUprankSpecializationScore(f *float64) *UpworkFreelancerUpdate {
-	if f != nil {
-		ufu.SetUprankSpecializationScore(*f)
-	}
-	return ufu
-}
-
-// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
-func (ufu *UpworkFreelancerUpdate) AddUprankSpecializationScore(f float64) *UpworkFreelancerUpdate {
-	ufu.mutation.AddUprankSpecializationScore(f)
-	return ufu
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankSpecializationScore() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankSpecializationScore()
-	return ufu
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) *UpworkFreelancerUpdate {
-	ufu.mutation.SetUprankEstimatedCompletionTime(pg)
-	return ufu
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankEstimatedCompletionTime()
-	return ufu
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankReccomended(b bool) *UpworkFreelancerUpdate {
-	ufu.mutation.SetUprankReccomended(b)
-	return ufu
-}
-
-// SetNillableUprankReccomended sets the "uprank_reccomended" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableUprankReccomended(b *bool) *UpworkFreelancerUpdate {
-	if b != nil {
-		ufu.SetUprankReccomended(*b)
-	}
-	return ufu
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankReccomended() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankReccomended()
-	return ufu
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankReccomendedReasons(s string) *UpworkFreelancerUpdate {
-	ufu.mutation.SetUprankReccomendedReasons(s)
-	return ufu
-}
-
-// SetNillableUprankReccomendedReasons sets the "uprank_reccomended_reasons" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableUprankReccomendedReasons(s *string) *UpworkFreelancerUpdate {
-	if s != nil {
-		ufu.SetUprankReccomendedReasons(*s)
-	}
-	return ufu
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankReccomendedReasons() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankReccomendedReasons()
-	return ufu
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (ufu *UpworkFreelancerUpdate) SetUprankNotEnoughData(b bool) *UpworkFreelancerUpdate {
-	ufu.mutation.SetUprankNotEnoughData(b)
-	return ufu
-}
-
-// SetNillableUprankNotEnoughData sets the "uprank_not_enough_data" field if the given value is not nil.
-func (ufu *UpworkFreelancerUpdate) SetNillableUprankNotEnoughData(b *bool) *UpworkFreelancerUpdate {
-	if b != nil {
-		ufu.SetUprankNotEnoughData(*b)
-	}
-	return ufu
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (ufu *UpworkFreelancerUpdate) ClearUprankNotEnoughData() *UpworkFreelancerUpdate {
-	ufu.mutation.ClearUprankNotEnoughData()
-	return ufu
-}
-
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
 func (ufu *UpworkFreelancerUpdate) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdate {
 	ufu.mutation.AddUpworkJobIDs(ids...)
@@ -785,6 +686,21 @@ func (ufu *UpworkFreelancerUpdate) AddWorkHistories(w ...*WorkHistory) *UpworkFr
 		ids[i] = w[i].ID
 	}
 	return ufu.AddWorkHistoryIDs(ids...)
+}
+
+// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
+func (ufu *UpworkFreelancerUpdate) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdate {
+	ufu.mutation.AddFreelancerInferenceDatumIDs(ids...)
+	return ufu
+}
+
+// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+func (ufu *UpworkFreelancerUpdate) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ufu.AddFreelancerInferenceDatumIDs(ids...)
 }
 
 // Mutation returns the UpworkFreelancerMutation object of the builder.
@@ -853,6 +769,27 @@ func (ufu *UpworkFreelancerUpdate) RemoveWorkHistories(w ...*WorkHistory) *Upwor
 		ids[i] = w[i].ID
 	}
 	return ufu.RemoveWorkHistoryIDs(ids...)
+}
+
+// ClearFreelancerInferenceData clears all "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+func (ufu *UpworkFreelancerUpdate) ClearFreelancerInferenceData() *UpworkFreelancerUpdate {
+	ufu.mutation.ClearFreelancerInferenceData()
+	return ufu
+}
+
+// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to FreelancerInferenceData entities by IDs.
+func (ufu *UpworkFreelancerUpdate) RemoveFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdate {
+	ufu.mutation.RemoveFreelancerInferenceDatumIDs(ids...)
+	return ufu
+}
+
+// RemoveFreelancerInferenceData removes "freelancer_inference_data" edges to FreelancerInferenceData entities.
+func (ufu *UpworkFreelancerUpdate) RemoveFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ufu.RemoveFreelancerInferenceDatumIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1067,39 +1004,6 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := ufu.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 	}
-	if value, ok := ufu.mutation.UprankSpecializationScore(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
-	}
-	if value, ok := ufu.mutation.AddedUprankSpecializationScore(); ok {
-		_spec.AddField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
-	}
-	if ufu.mutation.UprankSpecializationScoreCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64)
-	}
-	if value, ok := ufu.mutation.UprankEstimatedCompletionTime(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther, value)
-	}
-	if ufu.mutation.UprankEstimatedCompletionTimeCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther)
-	}
-	if value, ok := ufu.mutation.UprankReccomended(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
-	}
-	if ufu.mutation.UprankReccomendedCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankReccomended, field.TypeBool)
-	}
-	if value, ok := ufu.mutation.UprankReccomendedReasons(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomendedReasons, field.TypeString, value)
-	}
-	if ufu.mutation.UprankReccomendedReasonsCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankReccomendedReasons, field.TypeString)
-	}
-	if value, ok := ufu.mutation.UprankNotEnoughData(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool, value)
-	}
-	if ufu.mutation.UprankNotEnoughDataCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool)
-	}
 	if ufu.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1228,6 +1132,51 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(workhistory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ufu.mutation.FreelancerInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ufu.mutation.RemovedFreelancerInferenceDataIDs(); len(nodes) > 0 && !ufu.mutation.FreelancerInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ufu.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1865,105 +1814,6 @@ func (ufuo *UpworkFreelancerUpdateOne) AddTotalRevenue(f float64) *UpworkFreelan
 	return ufuo
 }
 
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankSpecializationScore(f float64) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ResetUprankSpecializationScore()
-	ufuo.mutation.SetUprankSpecializationScore(f)
-	return ufuo
-}
-
-// SetNillableUprankSpecializationScore sets the "uprank_specialization_score" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankSpecializationScore(f *float64) *UpworkFreelancerUpdateOne {
-	if f != nil {
-		ufuo.SetUprankSpecializationScore(*f)
-	}
-	return ufuo
-}
-
-// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) AddUprankSpecializationScore(f float64) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.AddUprankSpecializationScore(f)
-	return ufuo
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankSpecializationScore() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankSpecializationScore()
-	return ufuo
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetUprankEstimatedCompletionTime(pg)
-	return ufuo
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankEstimatedCompletionTime()
-	return ufuo
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankReccomended(b bool) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetUprankReccomended(b)
-	return ufuo
-}
-
-// SetNillableUprankReccomended sets the "uprank_reccomended" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankReccomended(b *bool) *UpworkFreelancerUpdateOne {
-	if b != nil {
-		ufuo.SetUprankReccomended(*b)
-	}
-	return ufuo
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankReccomended() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankReccomended()
-	return ufuo
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankReccomendedReasons(s string) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetUprankReccomendedReasons(s)
-	return ufuo
-}
-
-// SetNillableUprankReccomendedReasons sets the "uprank_reccomended_reasons" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankReccomendedReasons(s *string) *UpworkFreelancerUpdateOne {
-	if s != nil {
-		ufuo.SetUprankReccomendedReasons(*s)
-	}
-	return ufuo
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankReccomendedReasons() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankReccomendedReasons()
-	return ufuo
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (ufuo *UpworkFreelancerUpdateOne) SetUprankNotEnoughData(b bool) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.SetUprankNotEnoughData(b)
-	return ufuo
-}
-
-// SetNillableUprankNotEnoughData sets the "uprank_not_enough_data" field if the given value is not nil.
-func (ufuo *UpworkFreelancerUpdateOne) SetNillableUprankNotEnoughData(b *bool) *UpworkFreelancerUpdateOne {
-	if b != nil {
-		ufuo.SetUprankNotEnoughData(*b)
-	}
-	return ufuo
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (ufuo *UpworkFreelancerUpdateOne) ClearUprankNotEnoughData() *UpworkFreelancerUpdateOne {
-	ufuo.mutation.ClearUprankNotEnoughData()
-	return ufuo
-}
-
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
 func (ufuo *UpworkFreelancerUpdateOne) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
 	ufuo.mutation.AddUpworkJobIDs(ids...)
@@ -2007,6 +1857,21 @@ func (ufuo *UpworkFreelancerUpdateOne) AddWorkHistories(w ...*WorkHistory) *Upwo
 		ids[i] = w[i].ID
 	}
 	return ufuo.AddWorkHistoryIDs(ids...)
+}
+
+// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
+func (ufuo *UpworkFreelancerUpdateOne) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.AddFreelancerInferenceDatumIDs(ids...)
+	return ufuo
+}
+
+// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+func (ufuo *UpworkFreelancerUpdateOne) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ufuo.AddFreelancerInferenceDatumIDs(ids...)
 }
 
 // Mutation returns the UpworkFreelancerMutation object of the builder.
@@ -2075,6 +1940,27 @@ func (ufuo *UpworkFreelancerUpdateOne) RemoveWorkHistories(w ...*WorkHistory) *U
 		ids[i] = w[i].ID
 	}
 	return ufuo.RemoveWorkHistoryIDs(ids...)
+}
+
+// ClearFreelancerInferenceData clears all "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+func (ufuo *UpworkFreelancerUpdateOne) ClearFreelancerInferenceData() *UpworkFreelancerUpdateOne {
+	ufuo.mutation.ClearFreelancerInferenceData()
+	return ufuo
+}
+
+// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to FreelancerInferenceData entities by IDs.
+func (ufuo *UpworkFreelancerUpdateOne) RemoveFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.RemoveFreelancerInferenceDatumIDs(ids...)
+	return ufuo
+}
+
+// RemoveFreelancerInferenceData removes "freelancer_inference_data" edges to FreelancerInferenceData entities.
+func (ufuo *UpworkFreelancerUpdateOne) RemoveFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ufuo.RemoveFreelancerInferenceDatumIDs(ids...)
 }
 
 // Where appends a list predicates to the UpworkFreelancerUpdate builder.
@@ -2319,39 +2205,6 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	if value, ok := ufuo.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 	}
-	if value, ok := ufuo.mutation.UprankSpecializationScore(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
-	}
-	if value, ok := ufuo.mutation.AddedUprankSpecializationScore(); ok {
-		_spec.AddField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
-	}
-	if ufuo.mutation.UprankSpecializationScoreCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64)
-	}
-	if value, ok := ufuo.mutation.UprankEstimatedCompletionTime(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther, value)
-	}
-	if ufuo.mutation.UprankEstimatedCompletionTimeCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther)
-	}
-	if value, ok := ufuo.mutation.UprankReccomended(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
-	}
-	if ufuo.mutation.UprankReccomendedCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankReccomended, field.TypeBool)
-	}
-	if value, ok := ufuo.mutation.UprankReccomendedReasons(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomendedReasons, field.TypeString, value)
-	}
-	if ufuo.mutation.UprankReccomendedReasonsCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankReccomendedReasons, field.TypeString)
-	}
-	if value, ok := ufuo.mutation.UprankNotEnoughData(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool, value)
-	}
-	if ufuo.mutation.UprankNotEnoughDataCleared() {
-		_spec.ClearField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool)
-	}
 	if ufuo.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -2480,6 +2333,51 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(workhistory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ufuo.mutation.FreelancerInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ufuo.mutation.RemovedFreelancerInferenceDataIDs(); len(nodes) > 0 && !ufuo.mutation.FreelancerInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ufuo.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

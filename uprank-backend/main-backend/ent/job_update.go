@@ -40,19 +40,23 @@ func (ju *JobUpdate) SetUser(u *User) *JobUpdate {
 	return ju.SetUserID(u.ID)
 }
 
-// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
-func (ju *JobUpdate) AddUpworkjobIDs(ids ...string) *JobUpdate {
-	ju.mutation.AddUpworkjobIDs(ids...)
+// SetUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID.
+func (ju *JobUpdate) SetUpworkjobID(id string) *JobUpdate {
+	ju.mutation.SetUpworkjobID(id)
 	return ju
 }
 
-// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
-func (ju *JobUpdate) AddUpworkjob(u ...*UpworkJob) *JobUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID if the given value is not nil.
+func (ju *JobUpdate) SetNillableUpworkjobID(id *string) *JobUpdate {
+	if id != nil {
+		ju = ju.SetUpworkjobID(*id)
 	}
-	return ju.AddUpworkjobIDs(ids...)
+	return ju
+}
+
+// SetUpworkjob sets the "upworkjob" edge to the UpworkJob entity.
+func (ju *JobUpdate) SetUpworkjob(u *UpworkJob) *JobUpdate {
+	return ju.SetUpworkjobID(u.ID)
 }
 
 // Mutation returns the JobMutation object of the builder.
@@ -66,25 +70,10 @@ func (ju *JobUpdate) ClearUser() *JobUpdate {
 	return ju
 }
 
-// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+// ClearUpworkjob clears the "upworkjob" edge to the UpworkJob entity.
 func (ju *JobUpdate) ClearUpworkjob() *JobUpdate {
 	ju.mutation.ClearUpworkjob()
 	return ju
-}
-
-// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
-func (ju *JobUpdate) RemoveUpworkjobIDs(ids ...string) *JobUpdate {
-	ju.mutation.RemoveUpworkjobIDs(ids...)
-	return ju
-}
-
-// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
-func (ju *JobUpdate) RemoveUpworkjob(u ...*UpworkJob) *JobUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ju.RemoveUpworkjobIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -165,7 +154,7 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ju.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   job.UpworkjobTable,
 			Columns: []string{job.UpworkjobColumn},
@@ -173,28 +162,12 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ju.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !ju.mutation.UpworkjobCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   job.UpworkjobTable,
-			Columns: []string{job.UpworkjobColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ju.mutation.UpworkjobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   job.UpworkjobTable,
 			Columns: []string{job.UpworkjobColumn},
@@ -239,19 +212,23 @@ func (juo *JobUpdateOne) SetUser(u *User) *JobUpdateOne {
 	return juo.SetUserID(u.ID)
 }
 
-// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
-func (juo *JobUpdateOne) AddUpworkjobIDs(ids ...string) *JobUpdateOne {
-	juo.mutation.AddUpworkjobIDs(ids...)
+// SetUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID.
+func (juo *JobUpdateOne) SetUpworkjobID(id string) *JobUpdateOne {
+	juo.mutation.SetUpworkjobID(id)
 	return juo
 }
 
-// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
-func (juo *JobUpdateOne) AddUpworkjob(u ...*UpworkJob) *JobUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID if the given value is not nil.
+func (juo *JobUpdateOne) SetNillableUpworkjobID(id *string) *JobUpdateOne {
+	if id != nil {
+		juo = juo.SetUpworkjobID(*id)
 	}
-	return juo.AddUpworkjobIDs(ids...)
+	return juo
+}
+
+// SetUpworkjob sets the "upworkjob" edge to the UpworkJob entity.
+func (juo *JobUpdateOne) SetUpworkjob(u *UpworkJob) *JobUpdateOne {
+	return juo.SetUpworkjobID(u.ID)
 }
 
 // Mutation returns the JobMutation object of the builder.
@@ -265,25 +242,10 @@ func (juo *JobUpdateOne) ClearUser() *JobUpdateOne {
 	return juo
 }
 
-// ClearUpworkjob clears all "upworkjob" edges to the UpworkJob entity.
+// ClearUpworkjob clears the "upworkjob" edge to the UpworkJob entity.
 func (juo *JobUpdateOne) ClearUpworkjob() *JobUpdateOne {
 	juo.mutation.ClearUpworkjob()
 	return juo
-}
-
-// RemoveUpworkjobIDs removes the "upworkjob" edge to UpworkJob entities by IDs.
-func (juo *JobUpdateOne) RemoveUpworkjobIDs(ids ...string) *JobUpdateOne {
-	juo.mutation.RemoveUpworkjobIDs(ids...)
-	return juo
-}
-
-// RemoveUpworkjob removes "upworkjob" edges to UpworkJob entities.
-func (juo *JobUpdateOne) RemoveUpworkjob(u ...*UpworkJob) *JobUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return juo.RemoveUpworkjobIDs(ids...)
 }
 
 // Where appends a list predicates to the JobUpdate builder.
@@ -394,7 +356,7 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	}
 	if juo.mutation.UpworkjobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   job.UpworkjobTable,
 			Columns: []string{job.UpworkjobColumn},
@@ -402,28 +364,12 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := juo.mutation.RemovedUpworkjobIDs(); len(nodes) > 0 && !juo.mutation.UpworkjobCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   job.UpworkjobTable,
-			Columns: []string{job.UpworkjobColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(upworkjob.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := juo.mutation.UpworkjobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   job.UpworkjobTable,
 			Columns: []string{job.UpworkjobColumn},

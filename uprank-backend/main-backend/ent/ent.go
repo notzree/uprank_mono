@@ -13,11 +13,13 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -78,12 +80,14 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			attachmentref.Table:    attachmentref.ValidColumn,
-			job.Table:              job.ValidColumn,
-			upworkfreelancer.Table: upworkfreelancer.ValidColumn,
-			upworkjob.Table:        upworkjob.ValidColumn,
-			user.Table:             user.ValidColumn,
-			workhistory.Table:      workhistory.ValidColumn,
+			attachmentref.Table:            attachmentref.ValidColumn,
+			freelancerinferencedata.Table:  freelancerinferencedata.ValidColumn,
+			job.Table:                      job.ValidColumn,
+			upworkfreelancer.Table:         upworkfreelancer.ValidColumn,
+			upworkjob.Table:                upworkjob.ValidColumn,
+			user.Table:                     user.ValidColumn,
+			workhistory.Table:              workhistory.ValidColumn,
+			workhistoryinferencedata.Table: workhistoryinferencedata.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

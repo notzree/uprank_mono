@@ -66,6 +66,8 @@ const (
 	FieldSkills = "skills"
 	// EdgeFreelancer holds the string denoting the freelancer edge name in mutations.
 	EdgeFreelancer = "freelancer"
+	// EdgeWorkHistoryInferenceData holds the string denoting the work_history_inference_data edge name in mutations.
+	EdgeWorkHistoryInferenceData = "work_history_inference_data"
 	// Table holds the table name of the workhistory in the database.
 	Table = "work_histories"
 	// FreelancerTable is the table that holds the freelancer relation/edge.
@@ -75,6 +77,13 @@ const (
 	FreelancerInverseTable = "upwork_freelancers"
 	// FreelancerColumn is the table column denoting the freelancer relation/edge.
 	FreelancerColumn = "upwork_freelancer_work_histories"
+	// WorkHistoryInferenceDataTable is the table that holds the work_history_inference_data relation/edge.
+	WorkHistoryInferenceDataTable = "workhistory_inference_data"
+	// WorkHistoryInferenceDataInverseTable is the table name for the WorkhistoryInferenceData entity.
+	// It exists in this package in order to avoid circular dependency with the "workhistoryinferencedata" package.
+	WorkHistoryInferenceDataInverseTable = "workhistory_inference_data"
+	// WorkHistoryInferenceDataColumn is the table column denoting the work_history_inference_data relation/edge.
+	WorkHistoryInferenceDataColumn = "work_history_work_history_inference_data"
 )
 
 // Columns holds all SQL columns for workhistory fields.
@@ -271,10 +280,31 @@ func ByFreelancerField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFreelancerStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByWorkHistoryInferenceDataCount orders the results by work_history_inference_data count.
+func ByWorkHistoryInferenceDataCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWorkHistoryInferenceDataStep(), opts...)
+	}
+}
+
+// ByWorkHistoryInferenceData orders the results by work_history_inference_data terms.
+func ByWorkHistoryInferenceData(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWorkHistoryInferenceDataStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newFreelancerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FreelancerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, FreelancerTable, FreelancerColumn),
+	)
+}
+func newWorkHistoryInferenceDataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WorkHistoryInferenceDataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, WorkHistoryInferenceDataTable, WorkHistoryInferenceDataColumn),
 	)
 }

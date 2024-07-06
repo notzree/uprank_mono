@@ -9,6 +9,9 @@ import (
 // AttachmentRef is the predicate function for attachmentref builders.
 type AttachmentRef func(*sql.Selector)
 
+// FreelancerInferenceData is the predicate function for freelancerinferencedata builders.
+type FreelancerInferenceData func(*sql.Selector)
+
 // Job is the predicate function for job builders.
 type Job func(*sql.Selector)
 
@@ -23,3 +26,6 @@ type User func(*sql.Selector)
 
 // WorkHistory is the predicate function for workhistory builders.
 type WorkHistory func(*sql.Selector)
+
+// WorkhistoryInferenceData is the predicate function for workhistoryinferencedata builders.
+type WorkhistoryInferenceData func(*sql.Selector)

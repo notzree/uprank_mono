@@ -100,7 +100,7 @@ func (jq *JobQuery) QueryUpworkjob() *UpworkJobQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(job.Table, job.FieldID, selector),
 			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, job.UpworkjobTable, job.UpworkjobColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, job.UpworkjobTable, job.UpworkjobColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(jq.driver.Dialect(), step)
 		return fromU, nil
@@ -445,9 +445,8 @@ func (jq *JobQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Job, err
 		}
 	}
 	if query := jq.withUpworkjob; query != nil {
-		if err := jq.loadUpworkjob(ctx, query, nodes,
-			func(n *Job) { n.Edges.Upworkjob = []*UpworkJob{} },
-			func(n *Job, e *UpworkJob) { n.Edges.Upworkjob = append(n.Edges.Upworkjob, e) }); err != nil {
+		if err := jq.loadUpworkjob(ctx, query, nodes, nil,
+			func(n *Job, e *UpworkJob) { n.Edges.Upworkjob = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -492,9 +491,6 @@ func (jq *JobQuery) loadUpworkjob(ctx context.Context, query *UpworkJobQuery, no
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.UpworkJob(func(s *sql.Selector) {

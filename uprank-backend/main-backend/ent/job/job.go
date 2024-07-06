@@ -106,17 +106,10 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByUpworkjobCount orders the results by upworkjob count.
-func ByUpworkjobCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUpworkjobField orders the results by upworkjob field.
+func ByUpworkjobField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUpworkjobStep(), opts...)
-	}
-}
-
-// ByUpworkjob orders the results by upworkjob terms.
-func ByUpworkjob(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpworkjobStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUpworkjobStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newUserStep() *sqlgraph.Step {
@@ -130,6 +123,6 @@ func newUpworkjobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UpworkjobInverseTable, UpworkJobFieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UpworkjobTable, UpworkjobColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, UpworkjobTable, UpworkjobColumn),
 	)
 }

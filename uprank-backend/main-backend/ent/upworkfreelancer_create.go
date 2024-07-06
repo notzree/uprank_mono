@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
@@ -283,68 +283,6 @@ func (ufc *UpworkFreelancerCreate) SetTotalRevenue(f float64) *UpworkFreelancerC
 	return ufc
 }
 
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (ufc *UpworkFreelancerCreate) SetUprankSpecializationScore(f float64) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankSpecializationScore(f)
-	return ufc
-}
-
-// SetNillableUprankSpecializationScore sets the "uprank_specialization_score" field if the given value is not nil.
-func (ufc *UpworkFreelancerCreate) SetNillableUprankSpecializationScore(f *float64) *UpworkFreelancerCreate {
-	if f != nil {
-		ufc.SetUprankSpecializationScore(*f)
-	}
-	return ufc
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (ufc *UpworkFreelancerCreate) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankEstimatedCompletionTime(pg)
-	return ufc
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (ufc *UpworkFreelancerCreate) SetUprankReccomended(b bool) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankReccomended(b)
-	return ufc
-}
-
-// SetNillableUprankReccomended sets the "uprank_reccomended" field if the given value is not nil.
-func (ufc *UpworkFreelancerCreate) SetNillableUprankReccomended(b *bool) *UpworkFreelancerCreate {
-	if b != nil {
-		ufc.SetUprankReccomended(*b)
-	}
-	return ufc
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (ufc *UpworkFreelancerCreate) SetUprankReccomendedReasons(s string) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankReccomendedReasons(s)
-	return ufc
-}
-
-// SetNillableUprankReccomendedReasons sets the "uprank_reccomended_reasons" field if the given value is not nil.
-func (ufc *UpworkFreelancerCreate) SetNillableUprankReccomendedReasons(s *string) *UpworkFreelancerCreate {
-	if s != nil {
-		ufc.SetUprankReccomendedReasons(*s)
-	}
-	return ufc
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (ufc *UpworkFreelancerCreate) SetUprankNotEnoughData(b bool) *UpworkFreelancerCreate {
-	ufc.mutation.SetUprankNotEnoughData(b)
-	return ufc
-}
-
-// SetNillableUprankNotEnoughData sets the "uprank_not_enough_data" field if the given value is not nil.
-func (ufc *UpworkFreelancerCreate) SetNillableUprankNotEnoughData(b *bool) *UpworkFreelancerCreate {
-	if b != nil {
-		ufc.SetUprankNotEnoughData(*b)
-	}
-	return ufc
-}
-
 // SetID sets the "id" field.
 func (ufc *UpworkFreelancerCreate) SetID(s string) *UpworkFreelancerCreate {
 	ufc.mutation.SetID(s)
@@ -396,6 +334,21 @@ func (ufc *UpworkFreelancerCreate) AddWorkHistories(w ...*WorkHistory) *UpworkFr
 	return ufc.AddWorkHistoryIDs(ids...)
 }
 
+// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
+func (ufc *UpworkFreelancerCreate) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerCreate {
+	ufc.mutation.AddFreelancerInferenceDatumIDs(ids...)
+	return ufc
+}
+
+// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+func (ufc *UpworkFreelancerCreate) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerCreate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ufc.AddFreelancerInferenceDatumIDs(ids...)
+}
+
 // Mutation returns the UpworkFreelancerMutation object of the builder.
 func (ufc *UpworkFreelancerCreate) Mutation() *UpworkFreelancerMutation {
 	return ufc.mutation
@@ -438,18 +391,6 @@ func (ufc *UpworkFreelancerCreate) defaults() {
 	if _, ok := ufc.mutation.UpdatedAt(); !ok {
 		v := upworkfreelancer.DefaultUpdatedAt()
 		ufc.mutation.SetUpdatedAt(v)
-	}
-	if _, ok := ufc.mutation.UprankSpecializationScore(); !ok {
-		v := upworkfreelancer.DefaultUprankSpecializationScore
-		ufc.mutation.SetUprankSpecializationScore(v)
-	}
-	if _, ok := ufc.mutation.UprankReccomended(); !ok {
-		v := upworkfreelancer.DefaultUprankReccomended
-		ufc.mutation.SetUprankReccomended(v)
-	}
-	if _, ok := ufc.mutation.UprankNotEnoughData(); !ok {
-		v := upworkfreelancer.DefaultUprankNotEnoughData
-		ufc.mutation.SetUprankNotEnoughData(v)
 	}
 }
 
@@ -739,26 +680,6 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 		_spec.SetField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 		_node.TotalRevenue = value
 	}
-	if value, ok := ufc.mutation.UprankSpecializationScore(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankSpecializationScore, field.TypeFloat64, value)
-		_node.UprankSpecializationScore = value
-	}
-	if value, ok := ufc.mutation.UprankEstimatedCompletionTime(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankEstimatedCompletionTime, field.TypeOther, value)
-		_node.UprankEstimatedCompletionTime = value
-	}
-	if value, ok := ufc.mutation.UprankReccomended(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomended, field.TypeBool, value)
-		_node.UprankReccomended = value
-	}
-	if value, ok := ufc.mutation.UprankReccomendedReasons(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankReccomendedReasons, field.TypeString, value)
-		_node.UprankReccomendedReasons = value
-	}
-	if value, ok := ufc.mutation.UprankNotEnoughData(); ok {
-		_spec.SetField(upworkfreelancer.FieldUprankNotEnoughData, field.TypeBool, value)
-		_node.UprankNotEnoughData = value
-	}
 	if nodes := ufc.mutation.UpworkJobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -800,6 +721,22 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(workhistory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ufc.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   upworkfreelancer.FreelancerInferenceDataTable,
+			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1390,102 +1327,6 @@ func (u *UpworkFreelancerUpsert) UpdateTotalRevenue() *UpworkFreelancerUpsert {
 // AddTotalRevenue adds v to the "total_revenue" field.
 func (u *UpworkFreelancerUpsert) AddTotalRevenue(v float64) *UpworkFreelancerUpsert {
 	u.Add(upworkfreelancer.FieldTotalRevenue, v)
-	return u
-}
-
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsert) SetUprankSpecializationScore(v float64) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankSpecializationScore, v)
-	return u
-}
-
-// UpdateUprankSpecializationScore sets the "uprank_specialization_score" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankSpecializationScore() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankSpecializationScore)
-	return u
-}
-
-// AddUprankSpecializationScore adds v to the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsert) AddUprankSpecializationScore(v float64) *UpworkFreelancerUpsert {
-	u.Add(upworkfreelancer.FieldUprankSpecializationScore, v)
-	return u
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsert) ClearUprankSpecializationScore() *UpworkFreelancerUpsert {
-	u.SetNull(upworkfreelancer.FieldUprankSpecializationScore)
-	return u
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsert) SetUprankEstimatedCompletionTime(v *pgtype.Interval) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankEstimatedCompletionTime, v)
-	return u
-}
-
-// UpdateUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankEstimatedCompletionTime() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankEstimatedCompletionTime)
-	return u
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsert) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpsert {
-	u.SetNull(upworkfreelancer.FieldUprankEstimatedCompletionTime)
-	return u
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsert) SetUprankReccomended(v bool) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankReccomended, v)
-	return u
-}
-
-// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankReccomended() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankReccomended)
-	return u
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsert) ClearUprankReccomended() *UpworkFreelancerUpsert {
-	u.SetNull(upworkfreelancer.FieldUprankReccomended)
-	return u
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsert) SetUprankReccomendedReasons(v string) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankReccomendedReasons, v)
-	return u
-}
-
-// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankReccomendedReasons() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankReccomendedReasons)
-	return u
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsert) ClearUprankReccomendedReasons() *UpworkFreelancerUpsert {
-	u.SetNull(upworkfreelancer.FieldUprankReccomendedReasons)
-	return u
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsert) SetUprankNotEnoughData(v bool) *UpworkFreelancerUpsert {
-	u.Set(upworkfreelancer.FieldUprankNotEnoughData, v)
-	return u
-}
-
-// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsert) UpdateUprankNotEnoughData() *UpworkFreelancerUpsert {
-	u.SetExcluded(upworkfreelancer.FieldUprankNotEnoughData)
-	return u
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsert) ClearUprankNotEnoughData() *UpworkFreelancerUpsert {
-	u.SetNull(upworkfreelancer.FieldUprankNotEnoughData)
 	return u
 }
 
@@ -2160,118 +2001,6 @@ func (u *UpworkFreelancerUpsertOne) AddTotalRevenue(v float64) *UpworkFreelancer
 func (u *UpworkFreelancerUpsertOne) UpdateTotalRevenue() *UpworkFreelancerUpsertOne {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalRevenue()
-	})
-}
-
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankSpecializationScore(v float64) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankSpecializationScore(v)
-	})
-}
-
-// AddUprankSpecializationScore adds v to the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertOne) AddUprankSpecializationScore(v float64) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.AddUprankSpecializationScore(v)
-	})
-}
-
-// UpdateUprankSpecializationScore sets the "uprank_specialization_score" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankSpecializationScore() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankSpecializationScore()
-	})
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertOne) ClearUprankSpecializationScore() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankSpecializationScore()
-	})
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankEstimatedCompletionTime(v *pgtype.Interval) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankEstimatedCompletionTime(v)
-	})
-}
-
-// UpdateUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankEstimatedCompletionTime() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankEstimatedCompletionTime()
-	})
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsertOne) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankEstimatedCompletionTime()
-	})
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankReccomended(v bool) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankReccomended(v)
-	})
-}
-
-// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankReccomended() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankReccomended()
-	})
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsertOne) ClearUprankReccomended() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankReccomended()
-	})
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankReccomendedReasons(v string) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankReccomendedReasons(v)
-	})
-}
-
-// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankReccomendedReasons() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankReccomendedReasons()
-	})
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsertOne) ClearUprankReccomendedReasons() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankReccomendedReasons()
-	})
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsertOne) SetUprankNotEnoughData(v bool) *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankNotEnoughData(v)
-	})
-}
-
-// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertOne) UpdateUprankNotEnoughData() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankNotEnoughData()
-	})
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsertOne) ClearUprankNotEnoughData() *UpworkFreelancerUpsertOne {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankNotEnoughData()
 	})
 }
 
@@ -3113,118 +2842,6 @@ func (u *UpworkFreelancerUpsertBulk) AddTotalRevenue(v float64) *UpworkFreelance
 func (u *UpworkFreelancerUpsertBulk) UpdateTotalRevenue() *UpworkFreelancerUpsertBulk {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalRevenue()
-	})
-}
-
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankSpecializationScore(v float64) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankSpecializationScore(v)
-	})
-}
-
-// AddUprankSpecializationScore adds v to the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertBulk) AddUprankSpecializationScore(v float64) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.AddUprankSpecializationScore(v)
-	})
-}
-
-// UpdateUprankSpecializationScore sets the "uprank_specialization_score" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankSpecializationScore() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankSpecializationScore()
-	})
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (u *UpworkFreelancerUpsertBulk) ClearUprankSpecializationScore() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankSpecializationScore()
-	})
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankEstimatedCompletionTime(v *pgtype.Interval) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankEstimatedCompletionTime(v)
-	})
-}
-
-// UpdateUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankEstimatedCompletionTime() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankEstimatedCompletionTime()
-	})
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (u *UpworkFreelancerUpsertBulk) ClearUprankEstimatedCompletionTime() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankEstimatedCompletionTime()
-	})
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankReccomended(v bool) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankReccomended(v)
-	})
-}
-
-// UpdateUprankReccomended sets the "uprank_reccomended" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankReccomended() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankReccomended()
-	})
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (u *UpworkFreelancerUpsertBulk) ClearUprankReccomended() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankReccomended()
-	})
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankReccomendedReasons(v string) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankReccomendedReasons(v)
-	})
-}
-
-// UpdateUprankReccomendedReasons sets the "uprank_reccomended_reasons" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankReccomendedReasons() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankReccomendedReasons()
-	})
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (u *UpworkFreelancerUpsertBulk) ClearUprankReccomendedReasons() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankReccomendedReasons()
-	})
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsertBulk) SetUprankNotEnoughData(v bool) *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.SetUprankNotEnoughData(v)
-	})
-}
-
-// UpdateUprankNotEnoughData sets the "uprank_not_enough_data" field to the value that was provided on create.
-func (u *UpworkFreelancerUpsertBulk) UpdateUprankNotEnoughData() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.UpdateUprankNotEnoughData()
-	})
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (u *UpworkFreelancerUpsertBulk) ClearUprankNotEnoughData() *UpworkFreelancerUpsertBulk {
-	return u.Update(func(s *UpworkFreelancerUpsert) {
-		s.ClearUprankNotEnoughData()
 	})
 }
 

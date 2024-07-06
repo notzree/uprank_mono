@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// AttachmentRef is the client for interacting with the AttachmentRef builders.
 	AttachmentRef *AttachmentRefClient
+	// FreelancerInferenceData is the client for interacting with the FreelancerInferenceData builders.
+	FreelancerInferenceData *FreelancerInferenceDataClient
 	// Job is the client for interacting with the Job builders.
 	Job *JobClient
 	// UpworkFreelancer is the client for interacting with the UpworkFreelancer builders.
@@ -24,6 +26,8 @@ type Tx struct {
 	User *UserClient
 	// WorkHistory is the client for interacting with the WorkHistory builders.
 	WorkHistory *WorkHistoryClient
+	// WorkhistoryInferenceData is the client for interacting with the WorkhistoryInferenceData builders.
+	WorkhistoryInferenceData *WorkhistoryInferenceDataClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,11 +160,13 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AttachmentRef = NewAttachmentRefClient(tx.config)
+	tx.FreelancerInferenceData = NewFreelancerInferenceDataClient(tx.config)
 	tx.Job = NewJobClient(tx.config)
 	tx.UpworkFreelancer = NewUpworkFreelancerClient(tx.config)
 	tx.UpworkJob = NewUpworkJobClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.WorkHistory = NewWorkHistoryClient(tx.config)
+	tx.WorkhistoryInferenceData = NewWorkhistoryInferenceDataClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

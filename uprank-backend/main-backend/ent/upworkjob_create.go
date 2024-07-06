@@ -451,7 +451,7 @@ func (ujc *UpworkJobCreate) createSpec() (*UpworkJob, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ujc.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   upworkjob.JobTable,
 			Columns: []string{upworkjob.JobColumn},

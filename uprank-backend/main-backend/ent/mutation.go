@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/schema"
@@ -21,6 +22,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 const (
@@ -32,12 +34,14 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAttachmentRef    = "AttachmentRef"
-	TypeJob              = "Job"
-	TypeUpworkFreelancer = "UpworkFreelancer"
-	TypeUpworkJob        = "UpworkJob"
-	TypeUser             = "User"
-	TypeWorkHistory      = "WorkHistory"
+	TypeAttachmentRef            = "AttachmentRef"
+	TypeFreelancerInferenceData  = "FreelancerInferenceData"
+	TypeJob                      = "Job"
+	TypeUpworkFreelancer         = "UpworkFreelancer"
+	TypeUpworkJob                = "UpworkJob"
+	TypeUser                     = "User"
+	TypeWorkHistory              = "WorkHistory"
+	TypeWorkhistoryInferenceData = "WorkhistoryInferenceData"
 )
 
 // AttachmentRefMutation represents an operation that mutates the AttachmentRef nodes in the graph.
@@ -487,6 +491,837 @@ func (m *AttachmentRefMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AttachmentRef edge %s", name)
 }
 
+// FreelancerInferenceDataMutation represents an operation that mutates the FreelancerInferenceData nodes in the graph.
+type FreelancerInferenceDataMutation struct {
+	config
+	op                             Op
+	typ                            string
+	id                             *int
+	uprank_reccomended             *bool
+	uprank_reccomended_reasons     *string
+	uprank_not_enough_data         *bool
+	finalized_rating_score         *float64
+	addfinalized_rating_score      *float64
+	ai_estimated_duration          **pgtype.Interval
+	budget_adherence_percentage    *float64
+	addbudget_adherence_percentage *float64
+	clearedFields                  map[string]struct{}
+	upworkfreelancer               *string
+	clearedupworkfreelancer        bool
+	done                           bool
+	oldValue                       func(context.Context) (*FreelancerInferenceData, error)
+	predicates                     []predicate.FreelancerInferenceData
+}
+
+var _ ent.Mutation = (*FreelancerInferenceDataMutation)(nil)
+
+// freelancerinferencedataOption allows management of the mutation configuration using functional options.
+type freelancerinferencedataOption func(*FreelancerInferenceDataMutation)
+
+// newFreelancerInferenceDataMutation creates new mutation for the FreelancerInferenceData entity.
+func newFreelancerInferenceDataMutation(c config, op Op, opts ...freelancerinferencedataOption) *FreelancerInferenceDataMutation {
+	m := &FreelancerInferenceDataMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeFreelancerInferenceData,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withFreelancerInferenceDataID sets the ID field of the mutation.
+func withFreelancerInferenceDataID(id int) freelancerinferencedataOption {
+	return func(m *FreelancerInferenceDataMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *FreelancerInferenceData
+		)
+		m.oldValue = func(ctx context.Context) (*FreelancerInferenceData, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().FreelancerInferenceData.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withFreelancerInferenceData sets the old FreelancerInferenceData of the mutation.
+func withFreelancerInferenceData(node *FreelancerInferenceData) freelancerinferencedataOption {
+	return func(m *FreelancerInferenceDataMutation) {
+		m.oldValue = func(context.Context) (*FreelancerInferenceData, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m FreelancerInferenceDataMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m FreelancerInferenceDataMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *FreelancerInferenceDataMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *FreelancerInferenceDataMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().FreelancerInferenceData.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUprankReccomended sets the "uprank_reccomended" field.
+func (m *FreelancerInferenceDataMutation) SetUprankReccomended(b bool) {
+	m.uprank_reccomended = &b
+}
+
+// UprankReccomended returns the value of the "uprank_reccomended" field in the mutation.
+func (m *FreelancerInferenceDataMutation) UprankReccomended() (r bool, exists bool) {
+	v := m.uprank_reccomended
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankReccomended returns the old "uprank_reccomended" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldUprankReccomended(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankReccomended is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankReccomended requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankReccomended: %w", err)
+	}
+	return oldValue.UprankReccomended, nil
+}
+
+// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
+func (m *FreelancerInferenceDataMutation) ClearUprankReccomended() {
+	m.uprank_reccomended = nil
+	m.clearedFields[freelancerinferencedata.FieldUprankReccomended] = struct{}{}
+}
+
+// UprankReccomendedCleared returns if the "uprank_reccomended" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) UprankReccomendedCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldUprankReccomended]
+	return ok
+}
+
+// ResetUprankReccomended resets all changes to the "uprank_reccomended" field.
+func (m *FreelancerInferenceDataMutation) ResetUprankReccomended() {
+	m.uprank_reccomended = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldUprankReccomended)
+}
+
+// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
+func (m *FreelancerInferenceDataMutation) SetUprankReccomendedReasons(s string) {
+	m.uprank_reccomended_reasons = &s
+}
+
+// UprankReccomendedReasons returns the value of the "uprank_reccomended_reasons" field in the mutation.
+func (m *FreelancerInferenceDataMutation) UprankReccomendedReasons() (r string, exists bool) {
+	v := m.uprank_reccomended_reasons
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankReccomendedReasons returns the old "uprank_reccomended_reasons" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldUprankReccomendedReasons(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankReccomendedReasons is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankReccomendedReasons requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankReccomendedReasons: %w", err)
+	}
+	return oldValue.UprankReccomendedReasons, nil
+}
+
+// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
+func (m *FreelancerInferenceDataMutation) ClearUprankReccomendedReasons() {
+	m.uprank_reccomended_reasons = nil
+	m.clearedFields[freelancerinferencedata.FieldUprankReccomendedReasons] = struct{}{}
+}
+
+// UprankReccomendedReasonsCleared returns if the "uprank_reccomended_reasons" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) UprankReccomendedReasonsCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldUprankReccomendedReasons]
+	return ok
+}
+
+// ResetUprankReccomendedReasons resets all changes to the "uprank_reccomended_reasons" field.
+func (m *FreelancerInferenceDataMutation) ResetUprankReccomendedReasons() {
+	m.uprank_reccomended_reasons = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldUprankReccomendedReasons)
+}
+
+// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
+func (m *FreelancerInferenceDataMutation) SetUprankNotEnoughData(b bool) {
+	m.uprank_not_enough_data = &b
+}
+
+// UprankNotEnoughData returns the value of the "uprank_not_enough_data" field in the mutation.
+func (m *FreelancerInferenceDataMutation) UprankNotEnoughData() (r bool, exists bool) {
+	v := m.uprank_not_enough_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUprankNotEnoughData returns the old "uprank_not_enough_data" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldUprankNotEnoughData(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUprankNotEnoughData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUprankNotEnoughData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUprankNotEnoughData: %w", err)
+	}
+	return oldValue.UprankNotEnoughData, nil
+}
+
+// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
+func (m *FreelancerInferenceDataMutation) ClearUprankNotEnoughData() {
+	m.uprank_not_enough_data = nil
+	m.clearedFields[freelancerinferencedata.FieldUprankNotEnoughData] = struct{}{}
+}
+
+// UprankNotEnoughDataCleared returns if the "uprank_not_enough_data" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) UprankNotEnoughDataCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldUprankNotEnoughData]
+	return ok
+}
+
+// ResetUprankNotEnoughData resets all changes to the "uprank_not_enough_data" field.
+func (m *FreelancerInferenceDataMutation) ResetUprankNotEnoughData() {
+	m.uprank_not_enough_data = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldUprankNotEnoughData)
+}
+
+// SetFinalizedRatingScore sets the "finalized_rating_score" field.
+func (m *FreelancerInferenceDataMutation) SetFinalizedRatingScore(f float64) {
+	m.finalized_rating_score = &f
+	m.addfinalized_rating_score = nil
+}
+
+// FinalizedRatingScore returns the value of the "finalized_rating_score" field in the mutation.
+func (m *FreelancerInferenceDataMutation) FinalizedRatingScore() (r float64, exists bool) {
+	v := m.finalized_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFinalizedRatingScore returns the old "finalized_rating_score" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldFinalizedRatingScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFinalizedRatingScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFinalizedRatingScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFinalizedRatingScore: %w", err)
+	}
+	return oldValue.FinalizedRatingScore, nil
+}
+
+// AddFinalizedRatingScore adds f to the "finalized_rating_score" field.
+func (m *FreelancerInferenceDataMutation) AddFinalizedRatingScore(f float64) {
+	if m.addfinalized_rating_score != nil {
+		*m.addfinalized_rating_score += f
+	} else {
+		m.addfinalized_rating_score = &f
+	}
+}
+
+// AddedFinalizedRatingScore returns the value that was added to the "finalized_rating_score" field in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedFinalizedRatingScore() (r float64, exists bool) {
+	v := m.addfinalized_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetFinalizedRatingScore resets all changes to the "finalized_rating_score" field.
+func (m *FreelancerInferenceDataMutation) ResetFinalizedRatingScore() {
+	m.finalized_rating_score = nil
+	m.addfinalized_rating_score = nil
+}
+
+// SetAiEstimatedDuration sets the "ai_estimated_duration" field.
+func (m *FreelancerInferenceDataMutation) SetAiEstimatedDuration(pg *pgtype.Interval) {
+	m.ai_estimated_duration = &pg
+}
+
+// AiEstimatedDuration returns the value of the "ai_estimated_duration" field in the mutation.
+func (m *FreelancerInferenceDataMutation) AiEstimatedDuration() (r *pgtype.Interval, exists bool) {
+	v := m.ai_estimated_duration
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAiEstimatedDuration returns the old "ai_estimated_duration" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldAiEstimatedDuration(ctx context.Context) (v *pgtype.Interval, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAiEstimatedDuration is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAiEstimatedDuration requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAiEstimatedDuration: %w", err)
+	}
+	return oldValue.AiEstimatedDuration, nil
+}
+
+// ClearAiEstimatedDuration clears the value of the "ai_estimated_duration" field.
+func (m *FreelancerInferenceDataMutation) ClearAiEstimatedDuration() {
+	m.ai_estimated_duration = nil
+	m.clearedFields[freelancerinferencedata.FieldAiEstimatedDuration] = struct{}{}
+}
+
+// AiEstimatedDurationCleared returns if the "ai_estimated_duration" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) AiEstimatedDurationCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldAiEstimatedDuration]
+	return ok
+}
+
+// ResetAiEstimatedDuration resets all changes to the "ai_estimated_duration" field.
+func (m *FreelancerInferenceDataMutation) ResetAiEstimatedDuration() {
+	m.ai_estimated_duration = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldAiEstimatedDuration)
+}
+
+// SetBudgetAdherencePercentage sets the "budget_adherence_percentage" field.
+func (m *FreelancerInferenceDataMutation) SetBudgetAdherencePercentage(f float64) {
+	m.budget_adherence_percentage = &f
+	m.addbudget_adherence_percentage = nil
+}
+
+// BudgetAdherencePercentage returns the value of the "budget_adherence_percentage" field in the mutation.
+func (m *FreelancerInferenceDataMutation) BudgetAdherencePercentage() (r float64, exists bool) {
+	v := m.budget_adherence_percentage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBudgetAdherencePercentage returns the old "budget_adherence_percentage" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldBudgetAdherencePercentage(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBudgetAdherencePercentage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBudgetAdherencePercentage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBudgetAdherencePercentage: %w", err)
+	}
+	return oldValue.BudgetAdherencePercentage, nil
+}
+
+// AddBudgetAdherencePercentage adds f to the "budget_adherence_percentage" field.
+func (m *FreelancerInferenceDataMutation) AddBudgetAdherencePercentage(f float64) {
+	if m.addbudget_adherence_percentage != nil {
+		*m.addbudget_adherence_percentage += f
+	} else {
+		m.addbudget_adherence_percentage = &f
+	}
+}
+
+// AddedBudgetAdherencePercentage returns the value that was added to the "budget_adherence_percentage" field in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedBudgetAdherencePercentage() (r float64, exists bool) {
+	v := m.addbudget_adherence_percentage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearBudgetAdherencePercentage clears the value of the "budget_adherence_percentage" field.
+func (m *FreelancerInferenceDataMutation) ClearBudgetAdherencePercentage() {
+	m.budget_adherence_percentage = nil
+	m.addbudget_adherence_percentage = nil
+	m.clearedFields[freelancerinferencedata.FieldBudgetAdherencePercentage] = struct{}{}
+}
+
+// BudgetAdherencePercentageCleared returns if the "budget_adherence_percentage" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) BudgetAdherencePercentageCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldBudgetAdherencePercentage]
+	return ok
+}
+
+// ResetBudgetAdherencePercentage resets all changes to the "budget_adherence_percentage" field.
+func (m *FreelancerInferenceDataMutation) ResetBudgetAdherencePercentage() {
+	m.budget_adherence_percentage = nil
+	m.addbudget_adherence_percentage = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+}
+
+// SetUpworkfreelancerID sets the "upworkfreelancer" edge to the UpworkFreelancer entity by id.
+func (m *FreelancerInferenceDataMutation) SetUpworkfreelancerID(id string) {
+	m.upworkfreelancer = &id
+}
+
+// ClearUpworkfreelancer clears the "upworkfreelancer" edge to the UpworkFreelancer entity.
+func (m *FreelancerInferenceDataMutation) ClearUpworkfreelancer() {
+	m.clearedupworkfreelancer = true
+}
+
+// UpworkfreelancerCleared reports if the "upworkfreelancer" edge to the UpworkFreelancer entity was cleared.
+func (m *FreelancerInferenceDataMutation) UpworkfreelancerCleared() bool {
+	return m.clearedupworkfreelancer
+}
+
+// UpworkfreelancerID returns the "upworkfreelancer" edge ID in the mutation.
+func (m *FreelancerInferenceDataMutation) UpworkfreelancerID() (id string, exists bool) {
+	if m.upworkfreelancer != nil {
+		return *m.upworkfreelancer, true
+	}
+	return
+}
+
+// UpworkfreelancerIDs returns the "upworkfreelancer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpworkfreelancerID instead. It exists only for internal usage by the builders.
+func (m *FreelancerInferenceDataMutation) UpworkfreelancerIDs() (ids []string) {
+	if id := m.upworkfreelancer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpworkfreelancer resets all changes to the "upworkfreelancer" edge.
+func (m *FreelancerInferenceDataMutation) ResetUpworkfreelancer() {
+	m.upworkfreelancer = nil
+	m.clearedupworkfreelancer = false
+}
+
+// Where appends a list predicates to the FreelancerInferenceDataMutation builder.
+func (m *FreelancerInferenceDataMutation) Where(ps ...predicate.FreelancerInferenceData) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the FreelancerInferenceDataMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *FreelancerInferenceDataMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.FreelancerInferenceData, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *FreelancerInferenceDataMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *FreelancerInferenceDataMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (FreelancerInferenceData).
+func (m *FreelancerInferenceDataMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *FreelancerInferenceDataMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.uprank_reccomended != nil {
+		fields = append(fields, freelancerinferencedata.FieldUprankReccomended)
+	}
+	if m.uprank_reccomended_reasons != nil {
+		fields = append(fields, freelancerinferencedata.FieldUprankReccomendedReasons)
+	}
+	if m.uprank_not_enough_data != nil {
+		fields = append(fields, freelancerinferencedata.FieldUprankNotEnoughData)
+	}
+	if m.finalized_rating_score != nil {
+		fields = append(fields, freelancerinferencedata.FieldFinalizedRatingScore)
+	}
+	if m.ai_estimated_duration != nil {
+		fields = append(fields, freelancerinferencedata.FieldAiEstimatedDuration)
+	}
+	if m.budget_adherence_percentage != nil {
+		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *FreelancerInferenceDataMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case freelancerinferencedata.FieldUprankReccomended:
+		return m.UprankReccomended()
+	case freelancerinferencedata.FieldUprankReccomendedReasons:
+		return m.UprankReccomendedReasons()
+	case freelancerinferencedata.FieldUprankNotEnoughData:
+		return m.UprankNotEnoughData()
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		return m.FinalizedRatingScore()
+	case freelancerinferencedata.FieldAiEstimatedDuration:
+		return m.AiEstimatedDuration()
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		return m.BudgetAdherencePercentage()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *FreelancerInferenceDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case freelancerinferencedata.FieldUprankReccomended:
+		return m.OldUprankReccomended(ctx)
+	case freelancerinferencedata.FieldUprankReccomendedReasons:
+		return m.OldUprankReccomendedReasons(ctx)
+	case freelancerinferencedata.FieldUprankNotEnoughData:
+		return m.OldUprankNotEnoughData(ctx)
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		return m.OldFinalizedRatingScore(ctx)
+	case freelancerinferencedata.FieldAiEstimatedDuration:
+		return m.OldAiEstimatedDuration(ctx)
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		return m.OldBudgetAdherencePercentage(ctx)
+	}
+	return nil, fmt.Errorf("unknown FreelancerInferenceData field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *FreelancerInferenceDataMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case freelancerinferencedata.FieldUprankReccomended:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankReccomended(v)
+		return nil
+	case freelancerinferencedata.FieldUprankReccomendedReasons:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankReccomendedReasons(v)
+		return nil
+	case freelancerinferencedata.FieldUprankNotEnoughData:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUprankNotEnoughData(v)
+		return nil
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFinalizedRatingScore(v)
+		return nil
+	case freelancerinferencedata.FieldAiEstimatedDuration:
+		v, ok := value.(*pgtype.Interval)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAiEstimatedDuration(v)
+		return nil
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBudgetAdherencePercentage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *FreelancerInferenceDataMutation) AddedFields() []string {
+	var fields []string
+	if m.addfinalized_rating_score != nil {
+		fields = append(fields, freelancerinferencedata.FieldFinalizedRatingScore)
+	}
+	if m.addbudget_adherence_percentage != nil {
+		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *FreelancerInferenceDataMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		return m.AddedFinalizedRatingScore()
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		return m.AddedBudgetAdherencePercentage()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *FreelancerInferenceDataMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFinalizedRatingScore(v)
+		return nil
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBudgetAdherencePercentage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *FreelancerInferenceDataMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(freelancerinferencedata.FieldUprankReccomended) {
+		fields = append(fields, freelancerinferencedata.FieldUprankReccomended)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldUprankReccomendedReasons) {
+		fields = append(fields, freelancerinferencedata.FieldUprankReccomendedReasons)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldUprankNotEnoughData) {
+		fields = append(fields, freelancerinferencedata.FieldUprankNotEnoughData)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldAiEstimatedDuration) {
+		fields = append(fields, freelancerinferencedata.FieldAiEstimatedDuration)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldBudgetAdherencePercentage) {
+		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *FreelancerInferenceDataMutation) ClearField(name string) error {
+	switch name {
+	case freelancerinferencedata.FieldUprankReccomended:
+		m.ClearUprankReccomended()
+		return nil
+	case freelancerinferencedata.FieldUprankReccomendedReasons:
+		m.ClearUprankReccomendedReasons()
+		return nil
+	case freelancerinferencedata.FieldUprankNotEnoughData:
+		m.ClearUprankNotEnoughData()
+		return nil
+	case freelancerinferencedata.FieldAiEstimatedDuration:
+		m.ClearAiEstimatedDuration()
+		return nil
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		m.ClearBudgetAdherencePercentage()
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *FreelancerInferenceDataMutation) ResetField(name string) error {
+	switch name {
+	case freelancerinferencedata.FieldUprankReccomended:
+		m.ResetUprankReccomended()
+		return nil
+	case freelancerinferencedata.FieldUprankReccomendedReasons:
+		m.ResetUprankReccomendedReasons()
+		return nil
+	case freelancerinferencedata.FieldUprankNotEnoughData:
+		m.ResetUprankNotEnoughData()
+		return nil
+	case freelancerinferencedata.FieldFinalizedRatingScore:
+		m.ResetFinalizedRatingScore()
+		return nil
+	case freelancerinferencedata.FieldAiEstimatedDuration:
+		m.ResetAiEstimatedDuration()
+		return nil
+	case freelancerinferencedata.FieldBudgetAdherencePercentage:
+		m.ResetBudgetAdherencePercentage()
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.upworkfreelancer != nil {
+		edges = append(edges, freelancerinferencedata.EdgeUpworkfreelancer)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case freelancerinferencedata.EdgeUpworkfreelancer:
+		if id := m.upworkfreelancer; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *FreelancerInferenceDataMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *FreelancerInferenceDataMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedupworkfreelancer {
+		edges = append(edges, freelancerinferencedata.EdgeUpworkfreelancer)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case freelancerinferencedata.EdgeUpworkfreelancer:
+		return m.clearedupworkfreelancer
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *FreelancerInferenceDataMutation) ClearEdge(name string) error {
+	switch name {
+	case freelancerinferencedata.EdgeUpworkfreelancer:
+		m.ClearUpworkfreelancer()
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *FreelancerInferenceDataMutation) ResetEdge(name string) error {
+	switch name {
+	case freelancerinferencedata.EdgeUpworkfreelancer:
+		m.ResetUpworkfreelancer()
+		return nil
+	}
+	return fmt.Errorf("unknown FreelancerInferenceData edge %s", name)
+}
+
 // JobMutation represents an operation that mutates the Job nodes in the graph.
 type JobMutation struct {
 	config
@@ -497,8 +1332,7 @@ type JobMutation struct {
 	clearedFields    map[string]struct{}
 	user             *string
 	cleareduser      bool
-	upworkjob        map[string]struct{}
-	removedupworkjob map[string]struct{}
+	upworkjob        *string
 	clearedupworkjob bool
 	done             bool
 	oldValue         func(context.Context) (*Job, error)
@@ -684,14 +1518,9 @@ func (m *JobMutation) ResetUser() {
 	m.cleareduser = false
 }
 
-// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by ids.
-func (m *JobMutation) AddUpworkjobIDs(ids ...string) {
-	if m.upworkjob == nil {
-		m.upworkjob = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.upworkjob[ids[i]] = struct{}{}
-	}
+// SetUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by id.
+func (m *JobMutation) SetUpworkjobID(id string) {
+	m.upworkjob = &id
 }
 
 // ClearUpworkjob clears the "upworkjob" edge to the UpworkJob entity.
@@ -704,29 +1533,20 @@ func (m *JobMutation) UpworkjobCleared() bool {
 	return m.clearedupworkjob
 }
 
-// RemoveUpworkjobIDs removes the "upworkjob" edge to the UpworkJob entity by IDs.
-func (m *JobMutation) RemoveUpworkjobIDs(ids ...string) {
-	if m.removedupworkjob == nil {
-		m.removedupworkjob = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.upworkjob, ids[i])
-		m.removedupworkjob[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUpworkjob returns the removed IDs of the "upworkjob" edge to the UpworkJob entity.
-func (m *JobMutation) RemovedUpworkjobIDs() (ids []string) {
-	for id := range m.removedupworkjob {
-		ids = append(ids, id)
+// UpworkjobID returns the "upworkjob" edge ID in the mutation.
+func (m *JobMutation) UpworkjobID() (id string, exists bool) {
+	if m.upworkjob != nil {
+		return *m.upworkjob, true
 	}
 	return
 }
 
 // UpworkjobIDs returns the "upworkjob" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpworkjobID instead. It exists only for internal usage by the builders.
 func (m *JobMutation) UpworkjobIDs() (ids []string) {
-	for id := range m.upworkjob {
-		ids = append(ids, id)
+	if id := m.upworkjob; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -735,7 +1555,6 @@ func (m *JobMutation) UpworkjobIDs() (ids []string) {
 func (m *JobMutation) ResetUpworkjob() {
 	m.upworkjob = nil
 	m.clearedupworkjob = false
-	m.removedupworkjob = nil
 }
 
 // Where appends a list predicates to the JobMutation builder.
@@ -890,11 +1709,9 @@ func (m *JobMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case job.EdgeUpworkjob:
-		ids := make([]ent.Value, 0, len(m.upworkjob))
-		for id := range m.upworkjob {
-			ids = append(ids, id)
+		if id := m.upworkjob; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -902,23 +1719,12 @@ func (m *JobMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *JobMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedupworkjob != nil {
-		edges = append(edges, job.EdgeUpworkjob)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *JobMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case job.EdgeUpworkjob:
-		ids := make([]ent.Value, 0, len(m.removedupworkjob))
-		for id := range m.removedupworkjob {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -952,6 +1758,9 @@ func (m *JobMutation) ClearEdge(name string) error {
 	switch name {
 	case job.EdgeUser:
 		m.ClearUser()
+		return nil
+	case job.EdgeUpworkjob:
+		m.ClearUpworkjob()
 		return nil
 	}
 	return fmt.Errorf("unknown Job unique edge %s", name)
@@ -1030,12 +1839,6 @@ type UpworkFreelancerMutation struct {
 	addrecent_earnings                  *float64
 	total_revenue                       *float64
 	addtotal_revenue                    *float64
-	uprank_specialization_score         *float64
-	adduprank_specialization_score      *float64
-	uprank_estimated_completion_time    **pgtype.Interval
-	uprank_reccomended                  *bool
-	uprank_reccomended_reasons          *string
-	uprank_not_enough_data              *bool
 	clearedFields                       map[string]struct{}
 	upwork_job                          map[string]struct{}
 	removedupwork_job                   map[string]struct{}
@@ -1046,6 +1849,9 @@ type UpworkFreelancerMutation struct {
 	work_histories                      map[int]struct{}
 	removedwork_histories               map[int]struct{}
 	clearedwork_histories               bool
+	freelancer_inference_data           map[int]struct{}
+	removedfreelancer_inference_data    map[int]struct{}
+	clearedfreelancer_inference_data    bool
 	done                                bool
 	oldValue                            func(context.Context) (*UpworkFreelancer, error)
 	predicates                          []predicate.UpworkFreelancer
@@ -2827,272 +3633,6 @@ func (m *UpworkFreelancerMutation) ResetTotalRevenue() {
 	m.addtotal_revenue = nil
 }
 
-// SetUprankSpecializationScore sets the "uprank_specialization_score" field.
-func (m *UpworkFreelancerMutation) SetUprankSpecializationScore(f float64) {
-	m.uprank_specialization_score = &f
-	m.adduprank_specialization_score = nil
-}
-
-// UprankSpecializationScore returns the value of the "uprank_specialization_score" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankSpecializationScore() (r float64, exists bool) {
-	v := m.uprank_specialization_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankSpecializationScore returns the old "uprank_specialization_score" field's value of the UpworkFreelancer entity.
-// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankSpecializationScore(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankSpecializationScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankSpecializationScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankSpecializationScore: %w", err)
-	}
-	return oldValue.UprankSpecializationScore, nil
-}
-
-// AddUprankSpecializationScore adds f to the "uprank_specialization_score" field.
-func (m *UpworkFreelancerMutation) AddUprankSpecializationScore(f float64) {
-	if m.adduprank_specialization_score != nil {
-		*m.adduprank_specialization_score += f
-	} else {
-		m.adduprank_specialization_score = &f
-	}
-}
-
-// AddedUprankSpecializationScore returns the value that was added to the "uprank_specialization_score" field in this mutation.
-func (m *UpworkFreelancerMutation) AddedUprankSpecializationScore() (r float64, exists bool) {
-	v := m.adduprank_specialization_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearUprankSpecializationScore clears the value of the "uprank_specialization_score" field.
-func (m *UpworkFreelancerMutation) ClearUprankSpecializationScore() {
-	m.uprank_specialization_score = nil
-	m.adduprank_specialization_score = nil
-	m.clearedFields[upworkfreelancer.FieldUprankSpecializationScore] = struct{}{}
-}
-
-// UprankSpecializationScoreCleared returns if the "uprank_specialization_score" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankSpecializationScoreCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankSpecializationScore]
-	return ok
-}
-
-// ResetUprankSpecializationScore resets all changes to the "uprank_specialization_score" field.
-func (m *UpworkFreelancerMutation) ResetUprankSpecializationScore() {
-	m.uprank_specialization_score = nil
-	m.adduprank_specialization_score = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankSpecializationScore)
-}
-
-// SetUprankEstimatedCompletionTime sets the "uprank_estimated_completion_time" field.
-func (m *UpworkFreelancerMutation) SetUprankEstimatedCompletionTime(pg *pgtype.Interval) {
-	m.uprank_estimated_completion_time = &pg
-}
-
-// UprankEstimatedCompletionTime returns the value of the "uprank_estimated_completion_time" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankEstimatedCompletionTime() (r *pgtype.Interval, exists bool) {
-	v := m.uprank_estimated_completion_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankEstimatedCompletionTime returns the old "uprank_estimated_completion_time" field's value of the UpworkFreelancer entity.
-// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankEstimatedCompletionTime(ctx context.Context) (v *pgtype.Interval, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankEstimatedCompletionTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankEstimatedCompletionTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankEstimatedCompletionTime: %w", err)
-	}
-	return oldValue.UprankEstimatedCompletionTime, nil
-}
-
-// ClearUprankEstimatedCompletionTime clears the value of the "uprank_estimated_completion_time" field.
-func (m *UpworkFreelancerMutation) ClearUprankEstimatedCompletionTime() {
-	m.uprank_estimated_completion_time = nil
-	m.clearedFields[upworkfreelancer.FieldUprankEstimatedCompletionTime] = struct{}{}
-}
-
-// UprankEstimatedCompletionTimeCleared returns if the "uprank_estimated_completion_time" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankEstimatedCompletionTimeCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankEstimatedCompletionTime]
-	return ok
-}
-
-// ResetUprankEstimatedCompletionTime resets all changes to the "uprank_estimated_completion_time" field.
-func (m *UpworkFreelancerMutation) ResetUprankEstimatedCompletionTime() {
-	m.uprank_estimated_completion_time = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
-}
-
-// SetUprankReccomended sets the "uprank_reccomended" field.
-func (m *UpworkFreelancerMutation) SetUprankReccomended(b bool) {
-	m.uprank_reccomended = &b
-}
-
-// UprankReccomended returns the value of the "uprank_reccomended" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankReccomended() (r bool, exists bool) {
-	v := m.uprank_reccomended
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankReccomended returns the old "uprank_reccomended" field's value of the UpworkFreelancer entity.
-// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankReccomended(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankReccomended is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankReccomended requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankReccomended: %w", err)
-	}
-	return oldValue.UprankReccomended, nil
-}
-
-// ClearUprankReccomended clears the value of the "uprank_reccomended" field.
-func (m *UpworkFreelancerMutation) ClearUprankReccomended() {
-	m.uprank_reccomended = nil
-	m.clearedFields[upworkfreelancer.FieldUprankReccomended] = struct{}{}
-}
-
-// UprankReccomendedCleared returns if the "uprank_reccomended" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankReccomendedCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankReccomended]
-	return ok
-}
-
-// ResetUprankReccomended resets all changes to the "uprank_reccomended" field.
-func (m *UpworkFreelancerMutation) ResetUprankReccomended() {
-	m.uprank_reccomended = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankReccomended)
-}
-
-// SetUprankReccomendedReasons sets the "uprank_reccomended_reasons" field.
-func (m *UpworkFreelancerMutation) SetUprankReccomendedReasons(s string) {
-	m.uprank_reccomended_reasons = &s
-}
-
-// UprankReccomendedReasons returns the value of the "uprank_reccomended_reasons" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankReccomendedReasons() (r string, exists bool) {
-	v := m.uprank_reccomended_reasons
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankReccomendedReasons returns the old "uprank_reccomended_reasons" field's value of the UpworkFreelancer entity.
-// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankReccomendedReasons(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankReccomendedReasons is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankReccomendedReasons requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankReccomendedReasons: %w", err)
-	}
-	return oldValue.UprankReccomendedReasons, nil
-}
-
-// ClearUprankReccomendedReasons clears the value of the "uprank_reccomended_reasons" field.
-func (m *UpworkFreelancerMutation) ClearUprankReccomendedReasons() {
-	m.uprank_reccomended_reasons = nil
-	m.clearedFields[upworkfreelancer.FieldUprankReccomendedReasons] = struct{}{}
-}
-
-// UprankReccomendedReasonsCleared returns if the "uprank_reccomended_reasons" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankReccomendedReasonsCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankReccomendedReasons]
-	return ok
-}
-
-// ResetUprankReccomendedReasons resets all changes to the "uprank_reccomended_reasons" field.
-func (m *UpworkFreelancerMutation) ResetUprankReccomendedReasons() {
-	m.uprank_reccomended_reasons = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankReccomendedReasons)
-}
-
-// SetUprankNotEnoughData sets the "uprank_not_enough_data" field.
-func (m *UpworkFreelancerMutation) SetUprankNotEnoughData(b bool) {
-	m.uprank_not_enough_data = &b
-}
-
-// UprankNotEnoughData returns the value of the "uprank_not_enough_data" field in the mutation.
-func (m *UpworkFreelancerMutation) UprankNotEnoughData() (r bool, exists bool) {
-	v := m.uprank_not_enough_data
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUprankNotEnoughData returns the old "uprank_not_enough_data" field's value of the UpworkFreelancer entity.
-// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UpworkFreelancerMutation) OldUprankNotEnoughData(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUprankNotEnoughData is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUprankNotEnoughData requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUprankNotEnoughData: %w", err)
-	}
-	return oldValue.UprankNotEnoughData, nil
-}
-
-// ClearUprankNotEnoughData clears the value of the "uprank_not_enough_data" field.
-func (m *UpworkFreelancerMutation) ClearUprankNotEnoughData() {
-	m.uprank_not_enough_data = nil
-	m.clearedFields[upworkfreelancer.FieldUprankNotEnoughData] = struct{}{}
-}
-
-// UprankNotEnoughDataCleared returns if the "uprank_not_enough_data" field was cleared in this mutation.
-func (m *UpworkFreelancerMutation) UprankNotEnoughDataCleared() bool {
-	_, ok := m.clearedFields[upworkfreelancer.FieldUprankNotEnoughData]
-	return ok
-}
-
-// ResetUprankNotEnoughData resets all changes to the "uprank_not_enough_data" field.
-func (m *UpworkFreelancerMutation) ResetUprankNotEnoughData() {
-	m.uprank_not_enough_data = nil
-	delete(m.clearedFields, upworkfreelancer.FieldUprankNotEnoughData)
-}
-
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by ids.
 func (m *UpworkFreelancerMutation) AddUpworkJobIDs(ids ...string) {
 	if m.upwork_job == nil {
@@ -3255,6 +3795,60 @@ func (m *UpworkFreelancerMutation) ResetWorkHistories() {
 	m.removedwork_histories = nil
 }
 
+// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ids.
+func (m *UpworkFreelancerMutation) AddFreelancerInferenceDatumIDs(ids ...int) {
+	if m.freelancer_inference_data == nil {
+		m.freelancer_inference_data = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.freelancer_inference_data[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFreelancerInferenceData clears the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
+func (m *UpworkFreelancerMutation) ClearFreelancerInferenceData() {
+	m.clearedfreelancer_inference_data = true
+}
+
+// FreelancerInferenceDataCleared reports if the "freelancer_inference_data" edge to the FreelancerInferenceData entity was cleared.
+func (m *UpworkFreelancerMutation) FreelancerInferenceDataCleared() bool {
+	return m.clearedfreelancer_inference_data
+}
+
+// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
+func (m *UpworkFreelancerMutation) RemoveFreelancerInferenceDatumIDs(ids ...int) {
+	if m.removedfreelancer_inference_data == nil {
+		m.removedfreelancer_inference_data = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.freelancer_inference_data, ids[i])
+		m.removedfreelancer_inference_data[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFreelancerInferenceData returns the removed IDs of the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
+func (m *UpworkFreelancerMutation) RemovedFreelancerInferenceDataIDs() (ids []int) {
+	for id := range m.removedfreelancer_inference_data {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FreelancerInferenceDataIDs returns the "freelancer_inference_data" edge IDs in the mutation.
+func (m *UpworkFreelancerMutation) FreelancerInferenceDataIDs() (ids []int) {
+	for id := range m.freelancer_inference_data {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFreelancerInferenceData resets all changes to the "freelancer_inference_data" edge.
+func (m *UpworkFreelancerMutation) ResetFreelancerInferenceData() {
+	m.freelancer_inference_data = nil
+	m.clearedfreelancer_inference_data = false
+	m.removedfreelancer_inference_data = nil
+}
+
 // Where appends a list predicates to the UpworkFreelancerMutation builder.
 func (m *UpworkFreelancerMutation) Where(ps ...predicate.UpworkFreelancer) {
 	m.predicates = append(m.predicates, ps...)
@@ -3289,7 +3883,7 @@ func (m *UpworkFreelancerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UpworkFreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 41)
+	fields := make([]string, 0, 36)
 	if m.name != nil {
 		fields = append(fields, upworkfreelancer.FieldName)
 	}
@@ -3398,21 +3992,6 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	if m.total_revenue != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
 	}
-	if m.uprank_specialization_score != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
-	}
-	if m.uprank_estimated_completion_time != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
-	}
-	if m.uprank_reccomended != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
-	}
-	if m.uprank_reccomended_reasons != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankReccomendedReasons)
-	}
-	if m.uprank_not_enough_data != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankNotEnoughData)
-	}
 	return fields
 }
 
@@ -3493,16 +4072,6 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.RecentEarnings()
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.TotalRevenue()
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		return m.UprankSpecializationScore()
-	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-		return m.UprankEstimatedCompletionTime()
-	case upworkfreelancer.FieldUprankReccomended:
-		return m.UprankReccomended()
-	case upworkfreelancer.FieldUprankReccomendedReasons:
-		return m.UprankReccomendedReasons()
-	case upworkfreelancer.FieldUprankNotEnoughData:
-		return m.UprankNotEnoughData()
 	}
 	return nil, false
 }
@@ -3584,16 +4153,6 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldRecentEarnings(ctx)
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.OldTotalRevenue(ctx)
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		return m.OldUprankSpecializationScore(ctx)
-	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-		return m.OldUprankEstimatedCompletionTime(ctx)
-	case upworkfreelancer.FieldUprankReccomended:
-		return m.OldUprankReccomended(ctx)
-	case upworkfreelancer.FieldUprankReccomendedReasons:
-		return m.OldUprankReccomendedReasons(ctx)
-	case upworkfreelancer.FieldUprankNotEnoughData:
-		return m.OldUprankNotEnoughData(ctx)
 	}
 	return nil, fmt.Errorf("unknown UpworkFreelancer field %s", name)
 }
@@ -3855,41 +4414,6 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetTotalRevenue(v)
 		return nil
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankSpecializationScore(v)
-		return nil
-	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-		v, ok := value.(*pgtype.Interval)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankEstimatedCompletionTime(v)
-		return nil
-	case upworkfreelancer.FieldUprankReccomended:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankReccomended(v)
-		return nil
-	case upworkfreelancer.FieldUprankReccomendedReasons:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankReccomendedReasons(v)
-		return nil
-	case upworkfreelancer.FieldUprankNotEnoughData:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUprankNotEnoughData(v)
-		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer field %s", name)
 }
@@ -3946,9 +4470,6 @@ func (m *UpworkFreelancerMutation) AddedFields() []string {
 	if m.addtotal_revenue != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
 	}
-	if m.adduprank_specialization_score != nil {
-		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
-	}
 	return fields
 }
 
@@ -3989,8 +4510,6 @@ func (m *UpworkFreelancerMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRecentEarnings()
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.AddedTotalRevenue()
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		return m.AddedUprankSpecializationScore()
 	}
 	return nil, false
 }
@@ -4112,13 +4631,6 @@ func (m *UpworkFreelancerMutation) AddField(name string, value ent.Value) error 
 		}
 		m.AddTotalRevenue(v)
 		return nil
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUprankSpecializationScore(v)
-		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer numeric field %s", name)
 }
@@ -4135,21 +4647,6 @@ func (m *UpworkFreelancerMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(upworkfreelancer.FieldEmbeddedAt) {
 		fields = append(fields, upworkfreelancer.FieldEmbeddedAt)
-	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankSpecializationScore) {
-		fields = append(fields, upworkfreelancer.FieldUprankSpecializationScore)
-	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankEstimatedCompletionTime) {
-		fields = append(fields, upworkfreelancer.FieldUprankEstimatedCompletionTime)
-	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankReccomended) {
-		fields = append(fields, upworkfreelancer.FieldUprankReccomended)
-	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankReccomendedReasons) {
-		fields = append(fields, upworkfreelancer.FieldUprankReccomendedReasons)
-	}
-	if m.FieldCleared(upworkfreelancer.FieldUprankNotEnoughData) {
-		fields = append(fields, upworkfreelancer.FieldUprankNotEnoughData)
 	}
 	return fields
 }
@@ -4173,21 +4670,6 @@ func (m *UpworkFreelancerMutation) ClearField(name string) error {
 		return nil
 	case upworkfreelancer.FieldEmbeddedAt:
 		m.ClearEmbeddedAt()
-		return nil
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		m.ClearUprankSpecializationScore()
-		return nil
-	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-		m.ClearUprankEstimatedCompletionTime()
-		return nil
-	case upworkfreelancer.FieldUprankReccomended:
-		m.ClearUprankReccomended()
-		return nil
-	case upworkfreelancer.FieldUprankReccomendedReasons:
-		m.ClearUprankReccomendedReasons()
-		return nil
-	case upworkfreelancer.FieldUprankNotEnoughData:
-		m.ClearUprankNotEnoughData()
 		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer nullable field %s", name)
@@ -4305,28 +4787,13 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 	case upworkfreelancer.FieldTotalRevenue:
 		m.ResetTotalRevenue()
 		return nil
-	case upworkfreelancer.FieldUprankSpecializationScore:
-		m.ResetUprankSpecializationScore()
-		return nil
-	case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-		m.ResetUprankEstimatedCompletionTime()
-		return nil
-	case upworkfreelancer.FieldUprankReccomended:
-		m.ResetUprankReccomended()
-		return nil
-	case upworkfreelancer.FieldUprankReccomendedReasons:
-		m.ResetUprankReccomendedReasons()
-		return nil
-	case upworkfreelancer.FieldUprankNotEnoughData:
-		m.ResetUprankNotEnoughData()
-		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UpworkFreelancerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.upwork_job != nil {
 		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
@@ -4335,6 +4802,9 @@ func (m *UpworkFreelancerMutation) AddedEdges() []string {
 	}
 	if m.work_histories != nil {
 		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	if m.freelancer_inference_data != nil {
+		edges = append(edges, upworkfreelancer.EdgeFreelancerInferenceData)
 	}
 	return edges
 }
@@ -4361,13 +4831,19 @@ func (m *UpworkFreelancerMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case upworkfreelancer.EdgeFreelancerInferenceData:
+		ids := make([]ent.Value, 0, len(m.freelancer_inference_data))
+		for id := range m.freelancer_inference_data {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UpworkFreelancerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedupwork_job != nil {
 		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
@@ -4376,6 +4852,9 @@ func (m *UpworkFreelancerMutation) RemovedEdges() []string {
 	}
 	if m.removedwork_histories != nil {
 		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	if m.removedfreelancer_inference_data != nil {
+		edges = append(edges, upworkfreelancer.EdgeFreelancerInferenceData)
 	}
 	return edges
 }
@@ -4402,13 +4881,19 @@ func (m *UpworkFreelancerMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case upworkfreelancer.EdgeFreelancerInferenceData:
+		ids := make([]ent.Value, 0, len(m.removedfreelancer_inference_data))
+		for id := range m.removedfreelancer_inference_data {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UpworkFreelancerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedupwork_job {
 		edges = append(edges, upworkfreelancer.EdgeUpworkJob)
 	}
@@ -4417,6 +4902,9 @@ func (m *UpworkFreelancerMutation) ClearedEdges() []string {
 	}
 	if m.clearedwork_histories {
 		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
+	}
+	if m.clearedfreelancer_inference_data {
+		edges = append(edges, upworkfreelancer.EdgeFreelancerInferenceData)
 	}
 	return edges
 }
@@ -4431,6 +4919,8 @@ func (m *UpworkFreelancerMutation) EdgeCleared(name string) bool {
 		return m.clearedattachments
 	case upworkfreelancer.EdgeWorkHistories:
 		return m.clearedwork_histories
+	case upworkfreelancer.EdgeFreelancerInferenceData:
+		return m.clearedfreelancer_inference_data
 	}
 	return false
 }
@@ -4455,6 +4945,9 @@ func (m *UpworkFreelancerMutation) ResetEdge(name string) error {
 		return nil
 	case upworkfreelancer.EdgeWorkHistories:
 		m.ResetWorkHistories()
+		return nil
+	case upworkfreelancer.EdgeFreelancerInferenceData:
+		m.ResetFreelancerInferenceData()
 		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer edge %s", name)
@@ -7029,6 +7522,9 @@ type WorkHistoryMutation struct {
 	clearedFields                      map[string]struct{}
 	freelancer                         *string
 	clearedfreelancer                  bool
+	work_history_inference_data        map[int]struct{}
+	removedwork_history_inference_data map[int]struct{}
+	clearedwork_history_inference_data bool
 	done                               bool
 	oldValue                           func(context.Context) (*WorkHistory, error)
 	predicates                         []predicate.WorkHistory
@@ -8646,6 +9142,60 @@ func (m *WorkHistoryMutation) ResetFreelancer() {
 	m.clearedfreelancer = false
 }
 
+// AddWorkHistoryInferenceDatumIDs adds the "work_history_inference_data" edge to the WorkhistoryInferenceData entity by ids.
+func (m *WorkHistoryMutation) AddWorkHistoryInferenceDatumIDs(ids ...int) {
+	if m.work_history_inference_data == nil {
+		m.work_history_inference_data = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.work_history_inference_data[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWorkHistoryInferenceData clears the "work_history_inference_data" edge to the WorkhistoryInferenceData entity.
+func (m *WorkHistoryMutation) ClearWorkHistoryInferenceData() {
+	m.clearedwork_history_inference_data = true
+}
+
+// WorkHistoryInferenceDataCleared reports if the "work_history_inference_data" edge to the WorkhistoryInferenceData entity was cleared.
+func (m *WorkHistoryMutation) WorkHistoryInferenceDataCleared() bool {
+	return m.clearedwork_history_inference_data
+}
+
+// RemoveWorkHistoryInferenceDatumIDs removes the "work_history_inference_data" edge to the WorkhistoryInferenceData entity by IDs.
+func (m *WorkHistoryMutation) RemoveWorkHistoryInferenceDatumIDs(ids ...int) {
+	if m.removedwork_history_inference_data == nil {
+		m.removedwork_history_inference_data = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.work_history_inference_data, ids[i])
+		m.removedwork_history_inference_data[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWorkHistoryInferenceData returns the removed IDs of the "work_history_inference_data" edge to the WorkhistoryInferenceData entity.
+func (m *WorkHistoryMutation) RemovedWorkHistoryInferenceDataIDs() (ids []int) {
+	for id := range m.removedwork_history_inference_data {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WorkHistoryInferenceDataIDs returns the "work_history_inference_data" edge IDs in the mutation.
+func (m *WorkHistoryMutation) WorkHistoryInferenceDataIDs() (ids []int) {
+	for id := range m.work_history_inference_data {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWorkHistoryInferenceData resets all changes to the "work_history_inference_data" edge.
+func (m *WorkHistoryMutation) ResetWorkHistoryInferenceData() {
+	m.work_history_inference_data = nil
+	m.clearedwork_history_inference_data = false
+	m.removedwork_history_inference_data = nil
+}
+
 // Where appends a list predicates to the WorkHistoryMutation builder.
 func (m *WorkHistoryMutation) Where(ps ...predicate.WorkHistory) {
 	m.predicates = append(m.predicates, ps...)
@@ -9481,9 +10031,12 @@ func (m *WorkHistoryMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkHistoryMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.freelancer != nil {
 		edges = append(edges, workhistory.EdgeFreelancer)
+	}
+	if m.work_history_inference_data != nil {
+		edges = append(edges, workhistory.EdgeWorkHistoryInferenceData)
 	}
 	return edges
 }
@@ -9496,27 +10049,47 @@ func (m *WorkHistoryMutation) AddedIDs(name string) []ent.Value {
 		if id := m.freelancer; id != nil {
 			return []ent.Value{*id}
 		}
+	case workhistory.EdgeWorkHistoryInferenceData:
+		ids := make([]ent.Value, 0, len(m.work_history_inference_data))
+		for id := range m.work_history_inference_data {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkHistoryMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedwork_history_inference_data != nil {
+		edges = append(edges, workhistory.EdgeWorkHistoryInferenceData)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *WorkHistoryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case workhistory.EdgeWorkHistoryInferenceData:
+		ids := make([]ent.Value, 0, len(m.removedwork_history_inference_data))
+		for id := range m.removedwork_history_inference_data {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkHistoryMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedfreelancer {
 		edges = append(edges, workhistory.EdgeFreelancer)
+	}
+	if m.clearedwork_history_inference_data {
+		edges = append(edges, workhistory.EdgeWorkHistoryInferenceData)
 	}
 	return edges
 }
@@ -9527,6 +10100,8 @@ func (m *WorkHistoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case workhistory.EdgeFreelancer:
 		return m.clearedfreelancer
+	case workhistory.EdgeWorkHistoryInferenceData:
+		return m.clearedwork_history_inference_data
 	}
 	return false
 }
@@ -9549,6 +10124,492 @@ func (m *WorkHistoryMutation) ResetEdge(name string) error {
 	case workhistory.EdgeFreelancer:
 		m.ResetFreelancer()
 		return nil
+	case workhistory.EdgeWorkHistoryInferenceData:
+		m.ResetWorkHistoryInferenceData()
+		return nil
 	}
 	return fmt.Errorf("unknown WorkHistory edge %s", name)
+}
+
+// WorkhistoryInferenceDataMutation represents an operation that mutates the WorkhistoryInferenceData nodes in the graph.
+type WorkhistoryInferenceDataMutation struct {
+	config
+	op                            Op
+	typ                           string
+	id                            *int
+	finalized_job_rating_score    *float64
+	addfinalized_job_rating_score *float64
+	is_within_budget              *bool
+	clearedFields                 map[string]struct{}
+	work_histories                *int
+	clearedwork_histories         bool
+	done                          bool
+	oldValue                      func(context.Context) (*WorkhistoryInferenceData, error)
+	predicates                    []predicate.WorkhistoryInferenceData
+}
+
+var _ ent.Mutation = (*WorkhistoryInferenceDataMutation)(nil)
+
+// workhistoryinferencedataOption allows management of the mutation configuration using functional options.
+type workhistoryinferencedataOption func(*WorkhistoryInferenceDataMutation)
+
+// newWorkhistoryInferenceDataMutation creates new mutation for the WorkhistoryInferenceData entity.
+func newWorkhistoryInferenceDataMutation(c config, op Op, opts ...workhistoryinferencedataOption) *WorkhistoryInferenceDataMutation {
+	m := &WorkhistoryInferenceDataMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeWorkhistoryInferenceData,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withWorkhistoryInferenceDataID sets the ID field of the mutation.
+func withWorkhistoryInferenceDataID(id int) workhistoryinferencedataOption {
+	return func(m *WorkhistoryInferenceDataMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *WorkhistoryInferenceData
+		)
+		m.oldValue = func(ctx context.Context) (*WorkhistoryInferenceData, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().WorkhistoryInferenceData.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWorkhistoryInferenceData sets the old WorkhistoryInferenceData of the mutation.
+func withWorkhistoryInferenceData(node *WorkhistoryInferenceData) workhistoryinferencedataOption {
+	return func(m *WorkhistoryInferenceDataMutation) {
+		m.oldValue = func(context.Context) (*WorkhistoryInferenceData, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m WorkhistoryInferenceDataMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m WorkhistoryInferenceDataMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WorkhistoryInferenceDataMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *WorkhistoryInferenceDataMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().WorkhistoryInferenceData.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetFinalizedJobRatingScore sets the "finalized_job_rating_score" field.
+func (m *WorkhistoryInferenceDataMutation) SetFinalizedJobRatingScore(f float64) {
+	m.finalized_job_rating_score = &f
+	m.addfinalized_job_rating_score = nil
+}
+
+// FinalizedJobRatingScore returns the value of the "finalized_job_rating_score" field in the mutation.
+func (m *WorkhistoryInferenceDataMutation) FinalizedJobRatingScore() (r float64, exists bool) {
+	v := m.finalized_job_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFinalizedJobRatingScore returns the old "finalized_job_rating_score" field's value of the WorkhistoryInferenceData entity.
+// If the WorkhistoryInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkhistoryInferenceDataMutation) OldFinalizedJobRatingScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFinalizedJobRatingScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFinalizedJobRatingScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFinalizedJobRatingScore: %w", err)
+	}
+	return oldValue.FinalizedJobRatingScore, nil
+}
+
+// AddFinalizedJobRatingScore adds f to the "finalized_job_rating_score" field.
+func (m *WorkhistoryInferenceDataMutation) AddFinalizedJobRatingScore(f float64) {
+	if m.addfinalized_job_rating_score != nil {
+		*m.addfinalized_job_rating_score += f
+	} else {
+		m.addfinalized_job_rating_score = &f
+	}
+}
+
+// AddedFinalizedJobRatingScore returns the value that was added to the "finalized_job_rating_score" field in this mutation.
+func (m *WorkhistoryInferenceDataMutation) AddedFinalizedJobRatingScore() (r float64, exists bool) {
+	v := m.addfinalized_job_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetFinalizedJobRatingScore resets all changes to the "finalized_job_rating_score" field.
+func (m *WorkhistoryInferenceDataMutation) ResetFinalizedJobRatingScore() {
+	m.finalized_job_rating_score = nil
+	m.addfinalized_job_rating_score = nil
+}
+
+// SetIsWithinBudget sets the "is_within_budget" field.
+func (m *WorkhistoryInferenceDataMutation) SetIsWithinBudget(b bool) {
+	m.is_within_budget = &b
+}
+
+// IsWithinBudget returns the value of the "is_within_budget" field in the mutation.
+func (m *WorkhistoryInferenceDataMutation) IsWithinBudget() (r bool, exists bool) {
+	v := m.is_within_budget
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsWithinBudget returns the old "is_within_budget" field's value of the WorkhistoryInferenceData entity.
+// If the WorkhistoryInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkhistoryInferenceDataMutation) OldIsWithinBudget(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsWithinBudget is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsWithinBudget requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsWithinBudget: %w", err)
+	}
+	return oldValue.IsWithinBudget, nil
+}
+
+// ResetIsWithinBudget resets all changes to the "is_within_budget" field.
+func (m *WorkhistoryInferenceDataMutation) ResetIsWithinBudget() {
+	m.is_within_budget = nil
+}
+
+// SetWorkHistoriesID sets the "work_histories" edge to the WorkHistory entity by id.
+func (m *WorkhistoryInferenceDataMutation) SetWorkHistoriesID(id int) {
+	m.work_histories = &id
+}
+
+// ClearWorkHistories clears the "work_histories" edge to the WorkHistory entity.
+func (m *WorkhistoryInferenceDataMutation) ClearWorkHistories() {
+	m.clearedwork_histories = true
+}
+
+// WorkHistoriesCleared reports if the "work_histories" edge to the WorkHistory entity was cleared.
+func (m *WorkhistoryInferenceDataMutation) WorkHistoriesCleared() bool {
+	return m.clearedwork_histories
+}
+
+// WorkHistoriesID returns the "work_histories" edge ID in the mutation.
+func (m *WorkhistoryInferenceDataMutation) WorkHistoriesID() (id int, exists bool) {
+	if m.work_histories != nil {
+		return *m.work_histories, true
+	}
+	return
+}
+
+// WorkHistoriesIDs returns the "work_histories" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkHistoriesID instead. It exists only for internal usage by the builders.
+func (m *WorkhistoryInferenceDataMutation) WorkHistoriesIDs() (ids []int) {
+	if id := m.work_histories; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkHistories resets all changes to the "work_histories" edge.
+func (m *WorkhistoryInferenceDataMutation) ResetWorkHistories() {
+	m.work_histories = nil
+	m.clearedwork_histories = false
+}
+
+// Where appends a list predicates to the WorkhistoryInferenceDataMutation builder.
+func (m *WorkhistoryInferenceDataMutation) Where(ps ...predicate.WorkhistoryInferenceData) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the WorkhistoryInferenceDataMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WorkhistoryInferenceDataMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.WorkhistoryInferenceData, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *WorkhistoryInferenceDataMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WorkhistoryInferenceDataMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (WorkhistoryInferenceData).
+func (m *WorkhistoryInferenceDataMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *WorkhistoryInferenceDataMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.finalized_job_rating_score != nil {
+		fields = append(fields, workhistoryinferencedata.FieldFinalizedJobRatingScore)
+	}
+	if m.is_within_budget != nil {
+		fields = append(fields, workhistoryinferencedata.FieldIsWithinBudget)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *WorkhistoryInferenceDataMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		return m.FinalizedJobRatingScore()
+	case workhistoryinferencedata.FieldIsWithinBudget:
+		return m.IsWithinBudget()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *WorkhistoryInferenceDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		return m.OldFinalizedJobRatingScore(ctx)
+	case workhistoryinferencedata.FieldIsWithinBudget:
+		return m.OldIsWithinBudget(ctx)
+	}
+	return nil, fmt.Errorf("unknown WorkhistoryInferenceData field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WorkhistoryInferenceDataMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFinalizedJobRatingScore(v)
+		return nil
+	case workhistoryinferencedata.FieldIsWithinBudget:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsWithinBudget(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WorkhistoryInferenceData field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *WorkhistoryInferenceDataMutation) AddedFields() []string {
+	var fields []string
+	if m.addfinalized_job_rating_score != nil {
+		fields = append(fields, workhistoryinferencedata.FieldFinalizedJobRatingScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *WorkhistoryInferenceDataMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		return m.AddedFinalizedJobRatingScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WorkhistoryInferenceDataMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFinalizedJobRatingScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WorkhistoryInferenceData numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *WorkhistoryInferenceDataMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *WorkhistoryInferenceDataMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *WorkhistoryInferenceDataMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown WorkhistoryInferenceData nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *WorkhistoryInferenceDataMutation) ResetField(name string) error {
+	switch name {
+	case workhistoryinferencedata.FieldFinalizedJobRatingScore:
+		m.ResetFinalizedJobRatingScore()
+		return nil
+	case workhistoryinferencedata.FieldIsWithinBudget:
+		m.ResetIsWithinBudget()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkhistoryInferenceData field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *WorkhistoryInferenceDataMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.work_histories != nil {
+		edges = append(edges, workhistoryinferencedata.EdgeWorkHistories)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *WorkhistoryInferenceDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case workhistoryinferencedata.EdgeWorkHistories:
+		if id := m.work_histories; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *WorkhistoryInferenceDataMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *WorkhistoryInferenceDataMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *WorkhistoryInferenceDataMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedwork_histories {
+		edges = append(edges, workhistoryinferencedata.EdgeWorkHistories)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *WorkhistoryInferenceDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case workhistoryinferencedata.EdgeWorkHistories:
+		return m.clearedwork_histories
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *WorkhistoryInferenceDataMutation) ClearEdge(name string) error {
+	switch name {
+	case workhistoryinferencedata.EdgeWorkHistories:
+		m.ClearWorkHistories()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkhistoryInferenceData unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *WorkhistoryInferenceDataMutation) ResetEdge(name string) error {
+	switch name {
+	case workhistoryinferencedata.EdgeWorkHistories:
+		m.ResetWorkHistories()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkhistoryInferenceData edge %s", name)
 }

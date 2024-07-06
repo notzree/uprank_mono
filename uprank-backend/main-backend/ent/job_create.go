@@ -57,19 +57,23 @@ func (jc *JobCreate) SetUser(u *User) *JobCreate {
 	return jc.SetUserID(u.ID)
 }
 
-// AddUpworkjobIDs adds the "upworkjob" edge to the UpworkJob entity by IDs.
-func (jc *JobCreate) AddUpworkjobIDs(ids ...string) *JobCreate {
-	jc.mutation.AddUpworkjobIDs(ids...)
+// SetUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID.
+func (jc *JobCreate) SetUpworkjobID(id string) *JobCreate {
+	jc.mutation.SetUpworkjobID(id)
 	return jc
 }
 
-// AddUpworkjob adds the "upworkjob" edges to the UpworkJob entity.
-func (jc *JobCreate) AddUpworkjob(u ...*UpworkJob) *JobCreate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUpworkjobID sets the "upworkjob" edge to the UpworkJob entity by ID if the given value is not nil.
+func (jc *JobCreate) SetNillableUpworkjobID(id *string) *JobCreate {
+	if id != nil {
+		jc = jc.SetUpworkjobID(*id)
 	}
-	return jc.AddUpworkjobIDs(ids...)
+	return jc
+}
+
+// SetUpworkjob sets the "upworkjob" edge to the UpworkJob entity.
+func (jc *JobCreate) SetUpworkjob(u *UpworkJob) *JobCreate {
+	return jc.SetUpworkjobID(u.ID)
 }
 
 // Mutation returns the JobMutation object of the builder.
@@ -185,7 +189,7 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	}
 	if nodes := jc.mutation.UpworkjobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   job.UpworkjobTable,
 			Columns: []string{job.UpworkjobColumn},

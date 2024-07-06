@@ -264,7 +264,7 @@ func newJobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(JobInverseTable, JobFieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, JobTable, JobColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, JobTable, JobColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {
