@@ -283,6 +283,20 @@ func (ufc *UpworkFreelancerCreate) SetTotalRevenue(f float64) *UpworkFreelancerC
 	return ufc
 }
 
+// SetMissingFields sets the "missing_fields" field.
+func (ufc *UpworkFreelancerCreate) SetMissingFields(b bool) *UpworkFreelancerCreate {
+	ufc.mutation.SetMissingFields(b)
+	return ufc
+}
+
+// SetNillableMissingFields sets the "missing_fields" field if the given value is not nil.
+func (ufc *UpworkFreelancerCreate) SetNillableMissingFields(b *bool) *UpworkFreelancerCreate {
+	if b != nil {
+		ufc.SetMissingFields(*b)
+	}
+	return ufc
+}
+
 // SetID sets the "id" field.
 func (ufc *UpworkFreelancerCreate) SetID(s string) *UpworkFreelancerCreate {
 	ufc.mutation.SetID(s)
@@ -392,6 +406,10 @@ func (ufc *UpworkFreelancerCreate) defaults() {
 		v := upworkfreelancer.DefaultUpdatedAt()
 		ufc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ufc.mutation.MissingFields(); !ok {
+		v := upworkfreelancer.DefaultMissingFields
+		ufc.mutation.SetMissingFields(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -494,6 +512,9 @@ func (ufc *UpworkFreelancerCreate) check() error {
 	}
 	if _, ok := ufc.mutation.TotalRevenue(); !ok {
 		return &ValidationError{Name: "total_revenue", err: errors.New(`ent: missing required field "UpworkFreelancer.total_revenue"`)}
+	}
+	if _, ok := ufc.mutation.MissingFields(); !ok {
+		return &ValidationError{Name: "missing_fields", err: errors.New(`ent: missing required field "UpworkFreelancer.missing_fields"`)}
 	}
 	if v, ok := ufc.mutation.ID(); ok {
 		if err := upworkfreelancer.IDValidator(v); err != nil {
@@ -679,6 +700,10 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 	if value, ok := ufc.mutation.TotalRevenue(); ok {
 		_spec.SetField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
 		_node.TotalRevenue = value
+	}
+	if value, ok := ufc.mutation.MissingFields(); ok {
+		_spec.SetField(upworkfreelancer.FieldMissingFields, field.TypeBool, value)
+		_node.MissingFields = value
 	}
 	if nodes := ufc.mutation.UpworkJobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -1327,6 +1352,18 @@ func (u *UpworkFreelancerUpsert) UpdateTotalRevenue() *UpworkFreelancerUpsert {
 // AddTotalRevenue adds v to the "total_revenue" field.
 func (u *UpworkFreelancerUpsert) AddTotalRevenue(v float64) *UpworkFreelancerUpsert {
 	u.Add(upworkfreelancer.FieldTotalRevenue, v)
+	return u
+}
+
+// SetMissingFields sets the "missing_fields" field.
+func (u *UpworkFreelancerUpsert) SetMissingFields(v bool) *UpworkFreelancerUpsert {
+	u.Set(upworkfreelancer.FieldMissingFields, v)
+	return u
+}
+
+// UpdateMissingFields sets the "missing_fields" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsert) UpdateMissingFields() *UpworkFreelancerUpsert {
+	u.SetExcluded(upworkfreelancer.FieldMissingFields)
 	return u
 }
 
@@ -2001,6 +2038,20 @@ func (u *UpworkFreelancerUpsertOne) AddTotalRevenue(v float64) *UpworkFreelancer
 func (u *UpworkFreelancerUpsertOne) UpdateTotalRevenue() *UpworkFreelancerUpsertOne {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalRevenue()
+	})
+}
+
+// SetMissingFields sets the "missing_fields" field.
+func (u *UpworkFreelancerUpsertOne) SetMissingFields(v bool) *UpworkFreelancerUpsertOne {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.SetMissingFields(v)
+	})
+}
+
+// UpdateMissingFields sets the "missing_fields" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertOne) UpdateMissingFields() *UpworkFreelancerUpsertOne {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.UpdateMissingFields()
 	})
 }
 
@@ -2842,6 +2893,20 @@ func (u *UpworkFreelancerUpsertBulk) AddTotalRevenue(v float64) *UpworkFreelance
 func (u *UpworkFreelancerUpsertBulk) UpdateTotalRevenue() *UpworkFreelancerUpsertBulk {
 	return u.Update(func(s *UpworkFreelancerUpsert) {
 		s.UpdateTotalRevenue()
+	})
+}
+
+// SetMissingFields sets the "missing_fields" field.
+func (u *UpworkFreelancerUpsertBulk) SetMissingFields(v bool) *UpworkFreelancerUpsertBulk {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.SetMissingFields(v)
+	})
+}
+
+// UpdateMissingFields sets the "missing_fields" field to the value that was provided on create.
+func (u *UpworkFreelancerUpsertBulk) UpdateMissingFields() *UpworkFreelancerUpsertBulk {
+	return u.Update(func(s *UpworkFreelancerUpsert) {
+		s.UpdateMissingFields()
 	})
 }
 

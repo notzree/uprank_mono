@@ -47,6 +47,10 @@ func init() {
 	upworkfreelancer.DefaultUpdatedAt = upworkfreelancerDescUpdatedAt.Default.(func() time.Time)
 	// upworkfreelancer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	upworkfreelancer.UpdateDefaultUpdatedAt = upworkfreelancerDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// upworkfreelancerDescMissingFields is the schema descriptor for missing_fields field.
+	upworkfreelancerDescMissingFields := upworkfreelancerFields[37].Descriptor()
+	// upworkfreelancer.DefaultMissingFields holds the default value on creation for the missing_fields field.
+	upworkfreelancer.DefaultMissingFields = upworkfreelancerDescMissingFields.Default.(bool)
 	// upworkfreelancerDescID is the schema descriptor for id field.
 	upworkfreelancerDescID := upworkfreelancerFields[0].Descriptor()
 	// upworkfreelancer.IDValidator is a validator for the "id" field. It is called by the builders before save.

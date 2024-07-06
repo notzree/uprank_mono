@@ -240,6 +240,11 @@ func TotalRevenue(v float64) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldEQ(FieldTotalRevenue, v))
 }
 
+// MissingFields applies equality check predicate on the "missing_fields" field. It's identical to MissingFieldsEQ.
+func MissingFields(v bool) predicate.UpworkFreelancer {
+	return predicate.UpworkFreelancer(sql.FieldEQ(FieldMissingFields, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldEQ(FieldName, v))
@@ -1738,6 +1743,16 @@ func TotalRevenueLT(v float64) predicate.UpworkFreelancer {
 // TotalRevenueLTE applies the LTE predicate on the "total_revenue" field.
 func TotalRevenueLTE(v float64) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldLTE(FieldTotalRevenue, v))
+}
+
+// MissingFieldsEQ applies the EQ predicate on the "missing_fields" field.
+func MissingFieldsEQ(v bool) predicate.UpworkFreelancer {
+	return predicate.UpworkFreelancer(sql.FieldEQ(FieldMissingFields, v))
+}
+
+// MissingFieldsNEQ applies the NEQ predicate on the "missing_fields" field.
+func MissingFieldsNEQ(v bool) predicate.UpworkFreelancer {
+	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldMissingFields, v))
 }
 
 // HasUpworkJob applies the HasEdge predicate on the "upwork_job" edge.
