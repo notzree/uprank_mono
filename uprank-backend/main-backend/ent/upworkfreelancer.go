@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
@@ -91,16 +90,6 @@ type UpworkFreelancer struct {
 	RecentEarnings float64 `json:"recent_earnings,omitempty"`
 	// TotalRevenue holds the value of the "total_revenue" field.
 	TotalRevenue float64 `json:"total_revenue,omitempty"`
-	// UprankSpecializationScore holds the value of the "uprank_specialization_score" field.
-	UprankSpecializationScore float64 `json:"uprank_specialization_score,omitempty"`
-	// UprankEstimatedCompletionTime holds the value of the "uprank_estimated_completion_time" field.
-	UprankEstimatedCompletionTime *pgtype.Interval `json:"uprank_estimated_completion_time,omitempty"`
-	// UprankReccomended holds the value of the "uprank_reccomended" field.
-	UprankReccomended bool `json:"uprank_reccomended,omitempty"`
-	// UprankReccomendedReasons holds the value of the "uprank_reccomended_reasons" field.
-	UprankReccomendedReasons string `json:"uprank_reccomended_reasons,omitempty"`
-	// UprankNotEnoughData holds the value of the "uprank_not_enough_data" field.
-	UprankNotEnoughData bool `json:"uprank_not_enough_data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UpworkFreelancerQuery when eager-loading is set.
 	Edges        UpworkFreelancerEdges `json:"edges"`
@@ -115,9 +104,11 @@ type UpworkFreelancerEdges struct {
 	Attachments []*AttachmentRef `json:"attachments,omitempty"`
 	// WorkHistories holds the value of the work_histories edge.
 	WorkHistories []*WorkHistory `json:"work_histories,omitempty"`
+	// FreelancerInferenceData holds the value of the freelancer_inference_data edge.
+	FreelancerInferenceData []*FreelancerInferenceData `json:"freelancer_inference_data,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // UpworkJobOrErr returns the UpworkJob value or an error if the edge
@@ -147,6 +138,15 @@ func (e UpworkFreelancerEdges) WorkHistoriesOrErr() ([]*WorkHistory, error) {
 	return nil, &NotLoadedError{edge: "work_histories"}
 }
 
+// FreelancerInferenceDataOrErr returns the FreelancerInferenceData value or an error if the edge
+// was not loaded in eager-loading.
+func (e UpworkFreelancerEdges) FreelancerInferenceDataOrErr() ([]*FreelancerInferenceData, error) {
+	if e.loadedTypes[3] {
+		return e.FreelancerInferenceData, nil
+	}
+	return nil, &NotLoadedError{edge: "freelancer_inference_data"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*UpworkFreelancer) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -154,15 +154,13 @@ func (*UpworkFreelancer) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case upworkfreelancer.FieldSkills:
 			values[i] = new([]byte)
-		case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-			values[i] = new(pgtype.Interval)
-		case upworkfreelancer.FieldAiReccomended, upworkfreelancer.FieldInvited, upworkfreelancer.FieldUpworkTopRatedStatus, upworkfreelancer.FieldUpworkTopRatedPlusStatus, upworkfreelancer.FieldUpworkSponsored, upworkfreelancer.FieldUpworkReccomended, upworkfreelancer.FieldUprankReccomended, upworkfreelancer.FieldUprankNotEnoughData:
+		case upworkfreelancer.FieldAiReccomended, upworkfreelancer.FieldInvited, upworkfreelancer.FieldUpworkTopRatedStatus, upworkfreelancer.FieldUpworkTopRatedPlusStatus, upworkfreelancer.FieldUpworkSponsored, upworkfreelancer.FieldUpworkReccomended:
 			values[i] = new(sql.NullBool)
-		case upworkfreelancer.FieldFixedChargeAmount, upworkfreelancer.FieldHourlyChargeAmount, upworkfreelancer.FieldRecentHours, upworkfreelancer.FieldTotalHours, upworkfreelancer.FieldUpworkTotalFeedback, upworkfreelancer.FieldUpworkRecentFeedback, upworkfreelancer.FieldUpworkJobSuccessScore, upworkfreelancer.FieldAverageRecentEarnings, upworkfreelancer.FieldCombinedAverageRecentEarnings, upworkfreelancer.FieldCombinedRecentEarnings, upworkfreelancer.FieldCombinedTotalEarnings, upworkfreelancer.FieldCombinedTotalRevenue, upworkfreelancer.FieldRecentEarnings, upworkfreelancer.FieldTotalRevenue, upworkfreelancer.FieldUprankSpecializationScore:
+		case upworkfreelancer.FieldFixedChargeAmount, upworkfreelancer.FieldHourlyChargeAmount, upworkfreelancer.FieldRecentHours, upworkfreelancer.FieldTotalHours, upworkfreelancer.FieldUpworkTotalFeedback, upworkfreelancer.FieldUpworkRecentFeedback, upworkfreelancer.FieldUpworkJobSuccessScore, upworkfreelancer.FieldAverageRecentEarnings, upworkfreelancer.FieldCombinedAverageRecentEarnings, upworkfreelancer.FieldCombinedRecentEarnings, upworkfreelancer.FieldCombinedTotalEarnings, upworkfreelancer.FieldCombinedTotalRevenue, upworkfreelancer.FieldRecentEarnings, upworkfreelancer.FieldTotalRevenue:
 			values[i] = new(sql.NullFloat64)
 		case upworkfreelancer.FieldTotalPortfolioItems, upworkfreelancer.FieldTotalPortfolioV2Items:
 			values[i] = new(sql.NullInt64)
-		case upworkfreelancer.FieldID, upworkfreelancer.FieldName, upworkfreelancer.FieldTitle, upworkfreelancer.FieldDescription, upworkfreelancer.FieldCity, upworkfreelancer.FieldCountry, upworkfreelancer.FieldTimezone, upworkfreelancer.FieldCv, upworkfreelancer.FieldFixedChargeCurrency, upworkfreelancer.FieldHourlyChargeCurrency, upworkfreelancer.FieldPhotoURL, upworkfreelancer.FieldUprankReccomendedReasons:
+		case upworkfreelancer.FieldID, upworkfreelancer.FieldName, upworkfreelancer.FieldTitle, upworkfreelancer.FieldDescription, upworkfreelancer.FieldCity, upworkfreelancer.FieldCountry, upworkfreelancer.FieldTimezone, upworkfreelancer.FieldCv, upworkfreelancer.FieldFixedChargeCurrency, upworkfreelancer.FieldHourlyChargeCurrency, upworkfreelancer.FieldPhotoURL:
 			values[i] = new(sql.NullString)
 		case upworkfreelancer.FieldCreatedAt, upworkfreelancer.FieldUpdatedAt, upworkfreelancer.FieldEmbeddedAt:
 			values[i] = new(sql.NullTime)
@@ -405,36 +403,6 @@ func (uf *UpworkFreelancer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				uf.TotalRevenue = value.Float64
 			}
-		case upworkfreelancer.FieldUprankSpecializationScore:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_specialization_score", values[i])
-			} else if value.Valid {
-				uf.UprankSpecializationScore = value.Float64
-			}
-		case upworkfreelancer.FieldUprankEstimatedCompletionTime:
-			if value, ok := values[i].(*pgtype.Interval); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_estimated_completion_time", values[i])
-			} else if value != nil {
-				uf.UprankEstimatedCompletionTime = value
-			}
-		case upworkfreelancer.FieldUprankReccomended:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_reccomended", values[i])
-			} else if value.Valid {
-				uf.UprankReccomended = value.Bool
-			}
-		case upworkfreelancer.FieldUprankReccomendedReasons:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_reccomended_reasons", values[i])
-			} else if value.Valid {
-				uf.UprankReccomendedReasons = value.String
-			}
-		case upworkfreelancer.FieldUprankNotEnoughData:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field uprank_not_enough_data", values[i])
-			} else if value.Valid {
-				uf.UprankNotEnoughData = value.Bool
-			}
 		default:
 			uf.selectValues.Set(columns[i], values[i])
 		}
@@ -461,6 +429,11 @@ func (uf *UpworkFreelancer) QueryAttachments() *AttachmentRefQuery {
 // QueryWorkHistories queries the "work_histories" edge of the UpworkFreelancer entity.
 func (uf *UpworkFreelancer) QueryWorkHistories() *WorkHistoryQuery {
 	return NewUpworkFreelancerClient(uf.config).QueryWorkHistories(uf)
+}
+
+// QueryFreelancerInferenceData queries the "freelancer_inference_data" edge of the UpworkFreelancer entity.
+func (uf *UpworkFreelancer) QueryFreelancerInferenceData() *FreelancerInferenceDataQuery {
+	return NewUpworkFreelancerClient(uf.config).QueryFreelancerInferenceData(uf)
 }
 
 // Update returns a builder for updating this UpworkFreelancer.
@@ -593,21 +566,6 @@ func (uf *UpworkFreelancer) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("total_revenue=")
 	builder.WriteString(fmt.Sprintf("%v", uf.TotalRevenue))
-	builder.WriteString(", ")
-	builder.WriteString("uprank_specialization_score=")
-	builder.WriteString(fmt.Sprintf("%v", uf.UprankSpecializationScore))
-	builder.WriteString(", ")
-	builder.WriteString("uprank_estimated_completion_time=")
-	builder.WriteString(fmt.Sprintf("%v", uf.UprankEstimatedCompletionTime))
-	builder.WriteString(", ")
-	builder.WriteString("uprank_reccomended=")
-	builder.WriteString(fmt.Sprintf("%v", uf.UprankReccomended))
-	builder.WriteString(", ")
-	builder.WriteString("uprank_reccomended_reasons=")
-	builder.WriteString(uf.UprankReccomendedReasons)
-	builder.WriteString(", ")
-	builder.WriteString("uprank_not_enough_data=")
-	builder.WriteString(fmt.Sprintf("%v", uf.UprankNotEnoughData))
 	builder.WriteByte(')')
 	return builder.String()
 }

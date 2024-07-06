@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/jackc/pgtype"
 )
 
 // UpworkFreelancer represents a freelancers application to an Upwork job
@@ -56,13 +55,6 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.Float("combined_total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("recent_earnings").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
-		field.Float("uprank_specialization_score").Default(0).Optional(),
-		field.Other("uprank_estimated_completion_time", &pgtype.Interval{}).SchemaType(map[string]string{
-			dialect.Postgres: "INTERVAL",
-		}).Optional(),
-		field.Bool("uprank_reccomended").Default(false).Optional(),
-		field.String("uprank_reccomended_reasons").Optional(),
-		field.Bool("uprank_not_enough_data").Default(false).Optional(),
 	}
 }
 
@@ -73,5 +65,6 @@ func (UpworkFreelancer) Edges() []ent.Edge {
 			Ref("upworkfreelancer"),
 		edge.To("attachments", AttachmentRef.Type),
 		edge.To("work_histories", WorkHistory.Type),
+		edge.To("freelancer_inference_data", FreelancerInferenceData.Type),
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // WorkHistoryCreate is the builder for creating a WorkHistory entity.
@@ -368,6 +369,21 @@ func (whc *WorkHistoryCreate) SetFreelancer(u *UpworkFreelancer) *WorkHistoryCre
 	return whc.SetFreelancerID(u.ID)
 }
 
+// AddWorkHistoryInferenceDatumIDs adds the "work_history_inference_data" edge to the WorkhistoryInferenceData entity by IDs.
+func (whc *WorkHistoryCreate) AddWorkHistoryInferenceDatumIDs(ids ...int) *WorkHistoryCreate {
+	whc.mutation.AddWorkHistoryInferenceDatumIDs(ids...)
+	return whc
+}
+
+// AddWorkHistoryInferenceData adds the "work_history_inference_data" edges to the WorkhistoryInferenceData entity.
+func (whc *WorkHistoryCreate) AddWorkHistoryInferenceData(w ...*WorkhistoryInferenceData) *WorkHistoryCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return whc.AddWorkHistoryInferenceDatumIDs(ids...)
+}
+
 // Mutation returns the WorkHistoryMutation object of the builder.
 func (whc *WorkHistoryCreate) Mutation() *WorkHistoryMutation {
 	return whc.mutation
@@ -569,6 +585,22 @@ func (whc *WorkHistoryCreate) createSpec() (*WorkHistory, *sqlgraph.CreateSpec) 
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.upwork_freelancer_work_histories = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := whc.mutation.WorkHistoryInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

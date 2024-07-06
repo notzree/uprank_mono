@@ -640,7 +640,7 @@ func (uju *UpworkJobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uju.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   upworkjob.JobTable,
 			Columns: []string{upworkjob.JobColumn},
@@ -653,7 +653,7 @@ func (uju *UpworkJobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := uju.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   upworkjob.JobTable,
 			Columns: []string{upworkjob.JobColumn},
@@ -1369,7 +1369,7 @@ func (ujuo *UpworkJobUpdateOne) sqlSave(ctx context.Context) (_node *UpworkJob, 
 	}
 	if ujuo.mutation.JobCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   upworkjob.JobTable,
 			Columns: []string{upworkjob.JobColumn},
@@ -1382,7 +1382,7 @@ func (ujuo *UpworkJobUpdateOne) sqlSave(ctx context.Context) (_node *UpworkJob, 
 	}
 	if nodes := ujuo.mutation.JobIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   upworkjob.JobTable,
 			Columns: []string{upworkjob.JobColumn},

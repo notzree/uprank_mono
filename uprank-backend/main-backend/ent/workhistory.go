@@ -80,9 +80,11 @@ type WorkHistory struct {
 type WorkHistoryEdges struct {
 	// Freelancer holds the value of the freelancer edge.
 	Freelancer *UpworkFreelancer `json:"freelancer,omitempty"`
+	// WorkHistoryInferenceData holds the value of the work_history_inference_data edge.
+	WorkHistoryInferenceData []*WorkhistoryInferenceData `json:"work_history_inference_data,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // FreelancerOrErr returns the Freelancer value or an error if the edge
@@ -94,6 +96,15 @@ func (e WorkHistoryEdges) FreelancerOrErr() (*UpworkFreelancer, error) {
 		return nil, &NotFoundError{label: upworkfreelancer.Label}
 	}
 	return nil, &NotLoadedError{edge: "freelancer"}
+}
+
+// WorkHistoryInferenceDataOrErr returns the WorkHistoryInferenceData value or an error if the edge
+// was not loaded in eager-loading.
+func (e WorkHistoryEdges) WorkHistoryInferenceDataOrErr() ([]*WorkhistoryInferenceData, error) {
+	if e.loadedTypes[1] {
+		return e.WorkHistoryInferenceData, nil
+	}
+	return nil, &NotLoadedError{edge: "work_history_inference_data"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -309,6 +320,11 @@ func (wh *WorkHistory) Value(name string) (ent.Value, error) {
 // QueryFreelancer queries the "freelancer" edge of the WorkHistory entity.
 func (wh *WorkHistory) QueryFreelancer() *UpworkFreelancerQuery {
 	return NewWorkHistoryClient(wh.config).QueryFreelancer(wh)
+}
+
+// QueryWorkHistoryInferenceData queries the "work_history_inference_data" edge of the WorkHistory entity.
+func (wh *WorkHistory) QueryWorkHistoryInferenceData() *WorkhistoryInferenceDataQuery {
+	return NewWorkHistoryClient(wh.config).QueryWorkHistoryInferenceData(wh)
 }
 
 // Update returns a builder for updating this WorkHistory.

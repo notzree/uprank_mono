@@ -1528,6 +1528,29 @@ func HasFreelancerWith(preds ...predicate.UpworkFreelancer) predicate.WorkHistor
 	})
 }
 
+// HasWorkHistoryInferenceData applies the HasEdge predicate on the "work_history_inference_data" edge.
+func HasWorkHistoryInferenceData() predicate.WorkHistory {
+	return predicate.WorkHistory(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WorkHistoryInferenceDataTable, WorkHistoryInferenceDataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWorkHistoryInferenceDataWith applies the HasEdge predicate on the "work_history_inference_data" edge with a given conditions (other predicates).
+func HasWorkHistoryInferenceDataWith(preds ...predicate.WorkhistoryInferenceData) predicate.WorkHistory {
+	return predicate.WorkHistory(func(s *sql.Selector) {
+		step := newWorkHistoryInferenceDataStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.WorkHistory) predicate.WorkHistory {
 	return predicate.WorkHistory(sql.AndPredicates(predicates...))

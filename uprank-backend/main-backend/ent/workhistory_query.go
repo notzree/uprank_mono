@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -13,17 +14,19 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // WorkHistoryQuery is the builder for querying WorkHistory entities.
 type WorkHistoryQuery struct {
 	config
-	ctx            *QueryContext
-	order          []workhistory.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.WorkHistory
-	withFreelancer *UpworkFreelancerQuery
-	withFKs        bool
+	ctx                          *QueryContext
+	order                        []workhistory.OrderOption
+	inters                       []Interceptor
+	predicates                   []predicate.WorkHistory
+	withFreelancer               *UpworkFreelancerQuery
+	withWorkHistoryInferenceData *WorkhistoryInferenceDataQuery
+	withFKs                      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +78,28 @@ func (whq *WorkHistoryQuery) QueryFreelancer() *UpworkFreelancerQuery {
 			sqlgraph.From(workhistory.Table, workhistory.FieldID, selector),
 			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, workhistory.FreelancerTable, workhistory.FreelancerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(whq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryWorkHistoryInferenceData chains the current query on the "work_history_inference_data" edge.
+func (whq *WorkHistoryQuery) QueryWorkHistoryInferenceData() *WorkhistoryInferenceDataQuery {
+	query := (&WorkhistoryInferenceDataClient{config: whq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := whq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := whq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workhistory.Table, workhistory.FieldID, selector),
+			sqlgraph.To(workhistoryinferencedata.Table, workhistoryinferencedata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workhistory.WorkHistoryInferenceDataTable, workhistory.WorkHistoryInferenceDataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(whq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,12 +294,13 @@ func (whq *WorkHistoryQuery) Clone() *WorkHistoryQuery {
 		return nil
 	}
 	return &WorkHistoryQuery{
-		config:         whq.config,
-		ctx:            whq.ctx.Clone(),
-		order:          append([]workhistory.OrderOption{}, whq.order...),
-		inters:         append([]Interceptor{}, whq.inters...),
-		predicates:     append([]predicate.WorkHistory{}, whq.predicates...),
-		withFreelancer: whq.withFreelancer.Clone(),
+		config:                       whq.config,
+		ctx:                          whq.ctx.Clone(),
+		order:                        append([]workhistory.OrderOption{}, whq.order...),
+		inters:                       append([]Interceptor{}, whq.inters...),
+		predicates:                   append([]predicate.WorkHistory{}, whq.predicates...),
+		withFreelancer:               whq.withFreelancer.Clone(),
+		withWorkHistoryInferenceData: whq.withWorkHistoryInferenceData.Clone(),
 		// clone intermediate query.
 		sql:  whq.sql.Clone(),
 		path: whq.path,
@@ -289,6 +315,17 @@ func (whq *WorkHistoryQuery) WithFreelancer(opts ...func(*UpworkFreelancerQuery)
 		opt(query)
 	}
 	whq.withFreelancer = query
+	return whq
+}
+
+// WithWorkHistoryInferenceData tells the query-builder to eager-load the nodes that are connected to
+// the "work_history_inference_data" edge. The optional arguments are used to configure the query builder of the edge.
+func (whq *WorkHistoryQuery) WithWorkHistoryInferenceData(opts ...func(*WorkhistoryInferenceDataQuery)) *WorkHistoryQuery {
+	query := (&WorkhistoryInferenceDataClient{config: whq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	whq.withWorkHistoryInferenceData = query
 	return whq
 }
 
@@ -371,8 +408,9 @@ func (whq *WorkHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes       = []*WorkHistory{}
 		withFKs     = whq.withFKs
 		_spec       = whq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			whq.withFreelancer != nil,
+			whq.withWorkHistoryInferenceData != nil,
 		}
 	)
 	if whq.withFreelancer != nil {
@@ -402,6 +440,15 @@ func (whq *WorkHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if query := whq.withFreelancer; query != nil {
 		if err := whq.loadFreelancer(ctx, query, nodes, nil,
 			func(n *WorkHistory, e *UpworkFreelancer) { n.Edges.Freelancer = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := whq.withWorkHistoryInferenceData; query != nil {
+		if err := whq.loadWorkHistoryInferenceData(ctx, query, nodes,
+			func(n *WorkHistory) { n.Edges.WorkHistoryInferenceData = []*WorkhistoryInferenceData{} },
+			func(n *WorkHistory, e *WorkhistoryInferenceData) {
+				n.Edges.WorkHistoryInferenceData = append(n.Edges.WorkHistoryInferenceData, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -437,6 +484,37 @@ func (whq *WorkHistoryQuery) loadFreelancer(ctx context.Context, query *UpworkFr
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (whq *WorkHistoryQuery) loadWorkHistoryInferenceData(ctx context.Context, query *WorkhistoryInferenceDataQuery, nodes []*WorkHistory, init func(*WorkHistory), assign func(*WorkHistory, *WorkhistoryInferenceData)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*WorkHistory)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.WorkhistoryInferenceData(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(workhistory.WorkHistoryInferenceDataColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.work_history_work_history_inference_data
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "work_history_work_history_inference_data" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "work_history_work_history_inference_data" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -51,5 +51,6 @@ func (WorkHistory) Edges() []ent.Edge {
 		edge.From("freelancer", UpworkFreelancer.Type).
 			Ref("work_histories").
 			Unique().Required(),
+		edge.To("work_history_inference_data", WorkhistoryInferenceData.Type),
 	}
 }

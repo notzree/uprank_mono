@@ -21,6 +21,18 @@ func (f AttachmentRefFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AttachmentRefMutation", m)
 }
 
+// The FreelancerInferenceDataFunc type is an adapter to allow the use of ordinary
+// function as FreelancerInferenceData mutator.
+type FreelancerInferenceDataFunc func(context.Context, *ent.FreelancerInferenceDataMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FreelancerInferenceDataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FreelancerInferenceDataMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FreelancerInferenceDataMutation", m)
+}
+
 // The JobFunc type is an adapter to allow the use of ordinary
 // function as Job mutator.
 type JobFunc func(context.Context, *ent.JobMutation) (ent.Value, error)
@@ -79,6 +91,18 @@ func (f WorkHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WorkHistoryMutation", m)
+}
+
+// The WorkhistoryInferenceDataFunc type is an adapter to allow the use of ordinary
+// function as WorkhistoryInferenceData mutator.
+type WorkhistoryInferenceDataFunc func(context.Context, *ent.WorkhistoryInferenceDataMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WorkhistoryInferenceDataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WorkhistoryInferenceDataMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WorkhistoryInferenceDataMutation", m)
 }
 
 // Condition is a hook condition function.

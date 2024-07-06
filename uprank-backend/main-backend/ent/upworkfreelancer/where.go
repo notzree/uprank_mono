@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/jackc/pgtype"
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 )
 
@@ -239,31 +238,6 @@ func RecentEarnings(v float64) predicate.UpworkFreelancer {
 // TotalRevenue applies equality check predicate on the "total_revenue" field. It's identical to TotalRevenueEQ.
 func TotalRevenue(v float64) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldEQ(FieldTotalRevenue, v))
-}
-
-// UprankSpecializationScore applies equality check predicate on the "uprank_specialization_score" field. It's identical to UprankSpecializationScoreEQ.
-func UprankSpecializationScore(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankSpecializationScore, v))
-}
-
-// UprankEstimatedCompletionTime applies equality check predicate on the "uprank_estimated_completion_time" field. It's identical to UprankEstimatedCompletionTimeEQ.
-func UprankEstimatedCompletionTime(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankReccomended applies equality check predicate on the "uprank_reccomended" field. It's identical to UprankReccomendedEQ.
-func UprankReccomended(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankReccomended, v))
-}
-
-// UprankReccomendedReasons applies equality check predicate on the "uprank_reccomended_reasons" field. It's identical to UprankReccomendedReasonsEQ.
-func UprankReccomendedReasons(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankReccomendedReasons, v))
-}
-
-// UprankNotEnoughData applies equality check predicate on the "uprank_not_enough_data" field. It's identical to UprankNotEnoughDataEQ.
-func UprankNotEnoughData(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankNotEnoughData, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -1766,221 +1740,6 @@ func TotalRevenueLTE(v float64) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(sql.FieldLTE(FieldTotalRevenue, v))
 }
 
-// UprankSpecializationScoreEQ applies the EQ predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreEQ(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreNEQ applies the NEQ predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreNEQ(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreIn applies the In predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreIn(vs ...float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIn(FieldUprankSpecializationScore, vs...))
-}
-
-// UprankSpecializationScoreNotIn applies the NotIn predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreNotIn(vs ...float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotIn(FieldUprankSpecializationScore, vs...))
-}
-
-// UprankSpecializationScoreGT applies the GT predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreGT(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGT(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreGTE applies the GTE predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreGTE(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGTE(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreLT applies the LT predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreLT(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLT(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreLTE applies the LTE predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreLTE(v float64) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLTE(FieldUprankSpecializationScore, v))
-}
-
-// UprankSpecializationScoreIsNil applies the IsNil predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreIsNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIsNull(FieldUprankSpecializationScore))
-}
-
-// UprankSpecializationScoreNotNil applies the NotNil predicate on the "uprank_specialization_score" field.
-func UprankSpecializationScoreNotNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankSpecializationScore))
-}
-
-// UprankEstimatedCompletionTimeEQ applies the EQ predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeEQ(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeNEQ applies the NEQ predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeNEQ(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeIn applies the In predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeIn(vs ...*pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIn(FieldUprankEstimatedCompletionTime, vs...))
-}
-
-// UprankEstimatedCompletionTimeNotIn applies the NotIn predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeNotIn(vs ...*pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotIn(FieldUprankEstimatedCompletionTime, vs...))
-}
-
-// UprankEstimatedCompletionTimeGT applies the GT predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeGT(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGT(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeGTE applies the GTE predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeGTE(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGTE(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeLT applies the LT predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeLT(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLT(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeLTE applies the LTE predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeLTE(v *pgtype.Interval) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLTE(FieldUprankEstimatedCompletionTime, v))
-}
-
-// UprankEstimatedCompletionTimeIsNil applies the IsNil predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeIsNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIsNull(FieldUprankEstimatedCompletionTime))
-}
-
-// UprankEstimatedCompletionTimeNotNil applies the NotNil predicate on the "uprank_estimated_completion_time" field.
-func UprankEstimatedCompletionTimeNotNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankEstimatedCompletionTime))
-}
-
-// UprankReccomendedEQ applies the EQ predicate on the "uprank_reccomended" field.
-func UprankReccomendedEQ(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankReccomended, v))
-}
-
-// UprankReccomendedNEQ applies the NEQ predicate on the "uprank_reccomended" field.
-func UprankReccomendedNEQ(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldUprankReccomended, v))
-}
-
-// UprankReccomendedIsNil applies the IsNil predicate on the "uprank_reccomended" field.
-func UprankReccomendedIsNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIsNull(FieldUprankReccomended))
-}
-
-// UprankReccomendedNotNil applies the NotNil predicate on the "uprank_reccomended" field.
-func UprankReccomendedNotNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankReccomended))
-}
-
-// UprankReccomendedReasonsEQ applies the EQ predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsEQ(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsNEQ applies the NEQ predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsNEQ(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsIn applies the In predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsIn(vs ...string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIn(FieldUprankReccomendedReasons, vs...))
-}
-
-// UprankReccomendedReasonsNotIn applies the NotIn predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsNotIn(vs ...string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotIn(FieldUprankReccomendedReasons, vs...))
-}
-
-// UprankReccomendedReasonsGT applies the GT predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsGT(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGT(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsGTE applies the GTE predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsGTE(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldGTE(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsLT applies the LT predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsLT(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLT(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsLTE applies the LTE predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsLTE(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldLTE(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsContains applies the Contains predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsContains(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldContains(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsHasPrefix applies the HasPrefix predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsHasPrefix(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldHasPrefix(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsHasSuffix applies the HasSuffix predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsHasSuffix(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldHasSuffix(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsIsNil applies the IsNil predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsIsNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIsNull(FieldUprankReccomendedReasons))
-}
-
-// UprankReccomendedReasonsNotNil applies the NotNil predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsNotNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankReccomendedReasons))
-}
-
-// UprankReccomendedReasonsEqualFold applies the EqualFold predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsEqualFold(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEqualFold(FieldUprankReccomendedReasons, v))
-}
-
-// UprankReccomendedReasonsContainsFold applies the ContainsFold predicate on the "uprank_reccomended_reasons" field.
-func UprankReccomendedReasonsContainsFold(v string) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldContainsFold(FieldUprankReccomendedReasons, v))
-}
-
-// UprankNotEnoughDataEQ applies the EQ predicate on the "uprank_not_enough_data" field.
-func UprankNotEnoughDataEQ(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldEQ(FieldUprankNotEnoughData, v))
-}
-
-// UprankNotEnoughDataNEQ applies the NEQ predicate on the "uprank_not_enough_data" field.
-func UprankNotEnoughDataNEQ(v bool) predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNEQ(FieldUprankNotEnoughData, v))
-}
-
-// UprankNotEnoughDataIsNil applies the IsNil predicate on the "uprank_not_enough_data" field.
-func UprankNotEnoughDataIsNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldIsNull(FieldUprankNotEnoughData))
-}
-
-// UprankNotEnoughDataNotNil applies the NotNil predicate on the "uprank_not_enough_data" field.
-func UprankNotEnoughDataNotNil() predicate.UpworkFreelancer {
-	return predicate.UpworkFreelancer(sql.FieldNotNull(FieldUprankNotEnoughData))
-}
-
 // HasUpworkJob applies the HasEdge predicate on the "upwork_job" edge.
 func HasUpworkJob() predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(func(s *sql.Selector) {
@@ -2042,6 +1801,29 @@ func HasWorkHistories() predicate.UpworkFreelancer {
 func HasWorkHistoriesWith(preds ...predicate.WorkHistory) predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(func(s *sql.Selector) {
 		step := newWorkHistoriesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFreelancerInferenceData applies the HasEdge predicate on the "freelancer_inference_data" edge.
+func HasFreelancerInferenceData() predicate.UpworkFreelancer {
+	return predicate.UpworkFreelancer(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFreelancerInferenceDataWith applies the HasEdge predicate on the "freelancer_inference_data" edge with a given conditions (other predicates).
+func HasFreelancerInferenceDataWith(preds ...predicate.FreelancerInferenceData) predicate.UpworkFreelancer {
+	return predicate.UpworkFreelancer(func(s *sql.Selector) {
+		step := newFreelancerInferenceDataStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

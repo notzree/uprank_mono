@@ -86,22 +86,14 @@ const (
 	FieldRecentEarnings = "recent_earnings"
 	// FieldTotalRevenue holds the string denoting the total_revenue field in the database.
 	FieldTotalRevenue = "total_revenue"
-	// FieldUprankSpecializationScore holds the string denoting the uprank_specialization_score field in the database.
-	FieldUprankSpecializationScore = "uprank_specialization_score"
-	// FieldUprankEstimatedCompletionTime holds the string denoting the uprank_estimated_completion_time field in the database.
-	FieldUprankEstimatedCompletionTime = "uprank_estimated_completion_time"
-	// FieldUprankReccomended holds the string denoting the uprank_reccomended field in the database.
-	FieldUprankReccomended = "uprank_reccomended"
-	// FieldUprankReccomendedReasons holds the string denoting the uprank_reccomended_reasons field in the database.
-	FieldUprankReccomendedReasons = "uprank_reccomended_reasons"
-	// FieldUprankNotEnoughData holds the string denoting the uprank_not_enough_data field in the database.
-	FieldUprankNotEnoughData = "uprank_not_enough_data"
 	// EdgeUpworkJob holds the string denoting the upwork_job edge name in mutations.
 	EdgeUpworkJob = "upwork_job"
 	// EdgeAttachments holds the string denoting the attachments edge name in mutations.
 	EdgeAttachments = "attachments"
 	// EdgeWorkHistories holds the string denoting the work_histories edge name in mutations.
 	EdgeWorkHistories = "work_histories"
+	// EdgeFreelancerInferenceData holds the string denoting the freelancer_inference_data edge name in mutations.
+	EdgeFreelancerInferenceData = "freelancer_inference_data"
 	// Table holds the table name of the upworkfreelancer in the database.
 	Table = "upwork_freelancers"
 	// UpworkJobTable is the table that holds the upwork_job relation/edge. The primary key declared below.
@@ -123,6 +115,13 @@ const (
 	WorkHistoriesInverseTable = "work_histories"
 	// WorkHistoriesColumn is the table column denoting the work_histories relation/edge.
 	WorkHistoriesColumn = "upwork_freelancer_work_histories"
+	// FreelancerInferenceDataTable is the table that holds the freelancer_inference_data relation/edge.
+	FreelancerInferenceDataTable = "freelancer_inference_data"
+	// FreelancerInferenceDataInverseTable is the table name for the FreelancerInferenceData entity.
+	// It exists in this package in order to avoid circular dependency with the "freelancerinferencedata" package.
+	FreelancerInferenceDataInverseTable = "freelancer_inference_data"
+	// FreelancerInferenceDataColumn is the table column denoting the freelancer_inference_data relation/edge.
+	FreelancerInferenceDataColumn = "upwork_freelancer_freelancer_inference_data"
 )
 
 // Columns holds all SQL columns for upworkfreelancer fields.
@@ -164,11 +163,6 @@ var Columns = []string{
 	FieldCombinedTotalRevenue,
 	FieldRecentEarnings,
 	FieldTotalRevenue,
-	FieldUprankSpecializationScore,
-	FieldUprankEstimatedCompletionTime,
-	FieldUprankReccomended,
-	FieldUprankReccomendedReasons,
-	FieldUprankNotEnoughData,
 }
 
 var (
@@ -194,12 +188,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultUprankSpecializationScore holds the default value on creation for the "uprank_specialization_score" field.
-	DefaultUprankSpecializationScore float64
-	// DefaultUprankReccomended holds the default value on creation for the "uprank_reccomended" field.
-	DefaultUprankReccomended bool
-	// DefaultUprankNotEnoughData holds the default value on creation for the "uprank_not_enough_data" field.
-	DefaultUprankNotEnoughData bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -387,31 +375,6 @@ func ByTotalRevenue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalRevenue, opts...).ToFunc()
 }
 
-// ByUprankSpecializationScore orders the results by the uprank_specialization_score field.
-func ByUprankSpecializationScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankSpecializationScore, opts...).ToFunc()
-}
-
-// ByUprankEstimatedCompletionTime orders the results by the uprank_estimated_completion_time field.
-func ByUprankEstimatedCompletionTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankEstimatedCompletionTime, opts...).ToFunc()
-}
-
-// ByUprankReccomended orders the results by the uprank_reccomended field.
-func ByUprankReccomended(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankReccomended, opts...).ToFunc()
-}
-
-// ByUprankReccomendedReasons orders the results by the uprank_reccomended_reasons field.
-func ByUprankReccomendedReasons(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankReccomendedReasons, opts...).ToFunc()
-}
-
-// ByUprankNotEnoughData orders the results by the uprank_not_enough_data field.
-func ByUprankNotEnoughData(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUprankNotEnoughData, opts...).ToFunc()
-}
-
 // ByUpworkJobCount orders the results by upwork_job count.
 func ByUpworkJobCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -453,6 +416,20 @@ func ByWorkHistories(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newWorkHistoriesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByFreelancerInferenceDataCount orders the results by freelancer_inference_data count.
+func ByFreelancerInferenceDataCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFreelancerInferenceDataStep(), opts...)
+	}
+}
+
+// ByFreelancerInferenceData orders the results by freelancer_inference_data terms.
+func ByFreelancerInferenceData(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFreelancerInferenceDataStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUpworkJobStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -472,5 +449,12 @@ func newWorkHistoriesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(WorkHistoriesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, WorkHistoriesTable, WorkHistoriesColumn),
+	)
+}
+func newFreelancerInferenceDataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FreelancerInferenceDataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
 	)
 }

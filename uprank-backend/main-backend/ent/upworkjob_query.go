@@ -102,7 +102,7 @@ func (ujq *UpworkJobQuery) QueryJob() *JobQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkjob.Table, upworkjob.FieldID, selector),
 			sqlgraph.To(job.Table, job.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, upworkjob.JobTable, upworkjob.JobColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, upworkjob.JobTable, upworkjob.JobColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ujq.driver.Dialect(), step)
 		return fromU, nil

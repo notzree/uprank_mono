@@ -17,11 +17,13 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/job"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
 	"github.com/notzree/uprank-backend/main-backend/ent/user"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // Client is the client that holds all ent builders.
@@ -31,6 +33,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// AttachmentRef is the client for interacting with the AttachmentRef builders.
 	AttachmentRef *AttachmentRefClient
+	// FreelancerInferenceData is the client for interacting with the FreelancerInferenceData builders.
+	FreelancerInferenceData *FreelancerInferenceDataClient
 	// Job is the client for interacting with the Job builders.
 	Job *JobClient
 	// UpworkFreelancer is the client for interacting with the UpworkFreelancer builders.
@@ -41,6 +45,8 @@ type Client struct {
 	User *UserClient
 	// WorkHistory is the client for interacting with the WorkHistory builders.
 	WorkHistory *WorkHistoryClient
+	// WorkhistoryInferenceData is the client for interacting with the WorkhistoryInferenceData builders.
+	WorkhistoryInferenceData *WorkhistoryInferenceDataClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -53,11 +59,13 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AttachmentRef = NewAttachmentRefClient(c.config)
+	c.FreelancerInferenceData = NewFreelancerInferenceDataClient(c.config)
 	c.Job = NewJobClient(c.config)
 	c.UpworkFreelancer = NewUpworkFreelancerClient(c.config)
 	c.UpworkJob = NewUpworkJobClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.WorkHistory = NewWorkHistoryClient(c.config)
+	c.WorkhistoryInferenceData = NewWorkhistoryInferenceDataClient(c.config)
 }
 
 type (
@@ -148,14 +156,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		AttachmentRef:    NewAttachmentRefClient(cfg),
-		Job:              NewJobClient(cfg),
-		UpworkFreelancer: NewUpworkFreelancerClient(cfg),
-		UpworkJob:        NewUpworkJobClient(cfg),
-		User:             NewUserClient(cfg),
-		WorkHistory:      NewWorkHistoryClient(cfg),
+		ctx:                      ctx,
+		config:                   cfg,
+		AttachmentRef:            NewAttachmentRefClient(cfg),
+		FreelancerInferenceData:  NewFreelancerInferenceDataClient(cfg),
+		Job:                      NewJobClient(cfg),
+		UpworkFreelancer:         NewUpworkFreelancerClient(cfg),
+		UpworkJob:                NewUpworkJobClient(cfg),
+		User:                     NewUserClient(cfg),
+		WorkHistory:              NewWorkHistoryClient(cfg),
+		WorkhistoryInferenceData: NewWorkhistoryInferenceDataClient(cfg),
 	}, nil
 }
 
@@ -173,14 +183,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		AttachmentRef:    NewAttachmentRefClient(cfg),
-		Job:              NewJobClient(cfg),
-		UpworkFreelancer: NewUpworkFreelancerClient(cfg),
-		UpworkJob:        NewUpworkJobClient(cfg),
-		User:             NewUserClient(cfg),
-		WorkHistory:      NewWorkHistoryClient(cfg),
+		ctx:                      ctx,
+		config:                   cfg,
+		AttachmentRef:            NewAttachmentRefClient(cfg),
+		FreelancerInferenceData:  NewFreelancerInferenceDataClient(cfg),
+		Job:                      NewJobClient(cfg),
+		UpworkFreelancer:         NewUpworkFreelancerClient(cfg),
+		UpworkJob:                NewUpworkJobClient(cfg),
+		User:                     NewUserClient(cfg),
+		WorkHistory:              NewWorkHistoryClient(cfg),
+		WorkhistoryInferenceData: NewWorkhistoryInferenceDataClient(cfg),
 	}, nil
 }
 
@@ -210,7 +222,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AttachmentRef, c.Job, c.UpworkFreelancer, c.UpworkJob, c.User, c.WorkHistory,
+		c.AttachmentRef, c.FreelancerInferenceData, c.Job, c.UpworkFreelancer,
+		c.UpworkJob, c.User, c.WorkHistory, c.WorkhistoryInferenceData,
 	} {
 		n.Use(hooks...)
 	}
@@ -220,7 +233,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AttachmentRef, c.Job, c.UpworkFreelancer, c.UpworkJob, c.User, c.WorkHistory,
+		c.AttachmentRef, c.FreelancerInferenceData, c.Job, c.UpworkFreelancer,
+		c.UpworkJob, c.User, c.WorkHistory, c.WorkhistoryInferenceData,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -231,6 +245,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AttachmentRefMutation:
 		return c.AttachmentRef.mutate(ctx, m)
+	case *FreelancerInferenceDataMutation:
+		return c.FreelancerInferenceData.mutate(ctx, m)
 	case *JobMutation:
 		return c.Job.mutate(ctx, m)
 	case *UpworkFreelancerMutation:
@@ -241,6 +257,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	case *WorkHistoryMutation:
 		return c.WorkHistory.mutate(ctx, m)
+	case *WorkhistoryInferenceDataMutation:
+		return c.WorkhistoryInferenceData.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -395,6 +413,155 @@ func (c *AttachmentRefClient) mutate(ctx context.Context, m *AttachmentRefMutati
 	}
 }
 
+// FreelancerInferenceDataClient is a client for the FreelancerInferenceData schema.
+type FreelancerInferenceDataClient struct {
+	config
+}
+
+// NewFreelancerInferenceDataClient returns a client for the FreelancerInferenceData from the given config.
+func NewFreelancerInferenceDataClient(c config) *FreelancerInferenceDataClient {
+	return &FreelancerInferenceDataClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `freelancerinferencedata.Hooks(f(g(h())))`.
+func (c *FreelancerInferenceDataClient) Use(hooks ...Hook) {
+	c.hooks.FreelancerInferenceData = append(c.hooks.FreelancerInferenceData, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `freelancerinferencedata.Intercept(f(g(h())))`.
+func (c *FreelancerInferenceDataClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FreelancerInferenceData = append(c.inters.FreelancerInferenceData, interceptors...)
+}
+
+// Create returns a builder for creating a FreelancerInferenceData entity.
+func (c *FreelancerInferenceDataClient) Create() *FreelancerInferenceDataCreate {
+	mutation := newFreelancerInferenceDataMutation(c.config, OpCreate)
+	return &FreelancerInferenceDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FreelancerInferenceData entities.
+func (c *FreelancerInferenceDataClient) CreateBulk(builders ...*FreelancerInferenceDataCreate) *FreelancerInferenceDataCreateBulk {
+	return &FreelancerInferenceDataCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FreelancerInferenceDataClient) MapCreateBulk(slice any, setFunc func(*FreelancerInferenceDataCreate, int)) *FreelancerInferenceDataCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FreelancerInferenceDataCreateBulk{err: fmt.Errorf("calling to FreelancerInferenceDataClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FreelancerInferenceDataCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FreelancerInferenceDataCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FreelancerInferenceData.
+func (c *FreelancerInferenceDataClient) Update() *FreelancerInferenceDataUpdate {
+	mutation := newFreelancerInferenceDataMutation(c.config, OpUpdate)
+	return &FreelancerInferenceDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FreelancerInferenceDataClient) UpdateOne(fid *FreelancerInferenceData) *FreelancerInferenceDataUpdateOne {
+	mutation := newFreelancerInferenceDataMutation(c.config, OpUpdateOne, withFreelancerInferenceData(fid))
+	return &FreelancerInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FreelancerInferenceDataClient) UpdateOneID(id int) *FreelancerInferenceDataUpdateOne {
+	mutation := newFreelancerInferenceDataMutation(c.config, OpUpdateOne, withFreelancerInferenceDataID(id))
+	return &FreelancerInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FreelancerInferenceData.
+func (c *FreelancerInferenceDataClient) Delete() *FreelancerInferenceDataDelete {
+	mutation := newFreelancerInferenceDataMutation(c.config, OpDelete)
+	return &FreelancerInferenceDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FreelancerInferenceDataClient) DeleteOne(fid *FreelancerInferenceData) *FreelancerInferenceDataDeleteOne {
+	return c.DeleteOneID(fid.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FreelancerInferenceDataClient) DeleteOneID(id int) *FreelancerInferenceDataDeleteOne {
+	builder := c.Delete().Where(freelancerinferencedata.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FreelancerInferenceDataDeleteOne{builder}
+}
+
+// Query returns a query builder for FreelancerInferenceData.
+func (c *FreelancerInferenceDataClient) Query() *FreelancerInferenceDataQuery {
+	return &FreelancerInferenceDataQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFreelancerInferenceData},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FreelancerInferenceData entity by its id.
+func (c *FreelancerInferenceDataClient) Get(ctx context.Context, id int) (*FreelancerInferenceData, error) {
+	return c.Query().Where(freelancerinferencedata.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FreelancerInferenceDataClient) GetX(ctx context.Context, id int) *FreelancerInferenceData {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUpworkfreelancer queries the upworkfreelancer edge of a FreelancerInferenceData.
+func (c *FreelancerInferenceDataClient) QueryUpworkfreelancer(fid *FreelancerInferenceData) *UpworkFreelancerQuery {
+	query := (&UpworkFreelancerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := fid.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(freelancerinferencedata.Table, freelancerinferencedata.FieldID, id),
+			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, freelancerinferencedata.UpworkfreelancerTable, freelancerinferencedata.UpworkfreelancerColumn),
+		)
+		fromV = sqlgraph.Neighbors(fid.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *FreelancerInferenceDataClient) Hooks() []Hook {
+	return c.hooks.FreelancerInferenceData
+}
+
+// Interceptors returns the client interceptors.
+func (c *FreelancerInferenceDataClient) Interceptors() []Interceptor {
+	return c.inters.FreelancerInferenceData
+}
+
+func (c *FreelancerInferenceDataClient) mutate(ctx context.Context, m *FreelancerInferenceDataMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FreelancerInferenceDataCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FreelancerInferenceDataUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FreelancerInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FreelancerInferenceDataDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FreelancerInferenceData mutation op: %q", m.Op())
+	}
+}
+
 // JobClient is a client for the Job schema.
 type JobClient struct {
 	config
@@ -527,7 +694,7 @@ func (c *JobClient) QueryUpworkjob(j *Job) *UpworkJobQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(job.Table, job.FieldID, id),
 			sqlgraph.To(upworkjob.Table, upworkjob.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, job.UpworkjobTable, job.UpworkjobColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, job.UpworkjobTable, job.UpworkjobColumn),
 		)
 		fromV = sqlgraph.Neighbors(j.driver.Dialect(), step)
 		return fromV, nil
@@ -716,6 +883,22 @@ func (c *UpworkFreelancerClient) QueryWorkHistories(uf *UpworkFreelancer) *WorkH
 	return query
 }
 
+// QueryFreelancerInferenceData queries the freelancer_inference_data edge of a UpworkFreelancer.
+func (c *UpworkFreelancerClient) QueryFreelancerInferenceData(uf *UpworkFreelancer) *FreelancerInferenceDataQuery {
+	query := (&FreelancerInferenceDataClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := uf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, id),
+			sqlgraph.To(freelancerinferencedata.Table, freelancerinferencedata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
+		)
+		fromV = sqlgraph.Neighbors(uf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UpworkFreelancerClient) Hooks() []Hook {
 	return c.hooks.UpworkFreelancer
@@ -873,7 +1056,7 @@ func (c *UpworkJobClient) QueryJob(uj *UpworkJob) *JobQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkjob.Table, upworkjob.FieldID, id),
 			sqlgraph.To(job.Table, job.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, upworkjob.JobTable, upworkjob.JobColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, upworkjob.JobTable, upworkjob.JobColumn),
 		)
 		fromV = sqlgraph.Neighbors(uj.driver.Dialect(), step)
 		return fromV, nil
@@ -1211,6 +1394,22 @@ func (c *WorkHistoryClient) QueryFreelancer(wh *WorkHistory) *UpworkFreelancerQu
 	return query
 }
 
+// QueryWorkHistoryInferenceData queries the work_history_inference_data edge of a WorkHistory.
+func (c *WorkHistoryClient) QueryWorkHistoryInferenceData(wh *WorkHistory) *WorkhistoryInferenceDataQuery {
+	query := (&WorkhistoryInferenceDataClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wh.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workhistory.Table, workhistory.FieldID, id),
+			sqlgraph.To(workhistoryinferencedata.Table, workhistoryinferencedata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, workhistory.WorkHistoryInferenceDataTable, workhistory.WorkHistoryInferenceDataColumn),
+		)
+		fromV = sqlgraph.Neighbors(wh.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *WorkHistoryClient) Hooks() []Hook {
 	return c.hooks.WorkHistory
@@ -1236,13 +1435,163 @@ func (c *WorkHistoryClient) mutate(ctx context.Context, m *WorkHistoryMutation) 
 	}
 }
 
+// WorkhistoryInferenceDataClient is a client for the WorkhistoryInferenceData schema.
+type WorkhistoryInferenceDataClient struct {
+	config
+}
+
+// NewWorkhistoryInferenceDataClient returns a client for the WorkhistoryInferenceData from the given config.
+func NewWorkhistoryInferenceDataClient(c config) *WorkhistoryInferenceDataClient {
+	return &WorkhistoryInferenceDataClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `workhistoryinferencedata.Hooks(f(g(h())))`.
+func (c *WorkhistoryInferenceDataClient) Use(hooks ...Hook) {
+	c.hooks.WorkhistoryInferenceData = append(c.hooks.WorkhistoryInferenceData, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `workhistoryinferencedata.Intercept(f(g(h())))`.
+func (c *WorkhistoryInferenceDataClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WorkhistoryInferenceData = append(c.inters.WorkhistoryInferenceData, interceptors...)
+}
+
+// Create returns a builder for creating a WorkhistoryInferenceData entity.
+func (c *WorkhistoryInferenceDataClient) Create() *WorkhistoryInferenceDataCreate {
+	mutation := newWorkhistoryInferenceDataMutation(c.config, OpCreate)
+	return &WorkhistoryInferenceDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WorkhistoryInferenceData entities.
+func (c *WorkhistoryInferenceDataClient) CreateBulk(builders ...*WorkhistoryInferenceDataCreate) *WorkhistoryInferenceDataCreateBulk {
+	return &WorkhistoryInferenceDataCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WorkhistoryInferenceDataClient) MapCreateBulk(slice any, setFunc func(*WorkhistoryInferenceDataCreate, int)) *WorkhistoryInferenceDataCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WorkhistoryInferenceDataCreateBulk{err: fmt.Errorf("calling to WorkhistoryInferenceDataClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WorkhistoryInferenceDataCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WorkhistoryInferenceDataCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WorkhistoryInferenceData.
+func (c *WorkhistoryInferenceDataClient) Update() *WorkhistoryInferenceDataUpdate {
+	mutation := newWorkhistoryInferenceDataMutation(c.config, OpUpdate)
+	return &WorkhistoryInferenceDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WorkhistoryInferenceDataClient) UpdateOne(wid *WorkhistoryInferenceData) *WorkhistoryInferenceDataUpdateOne {
+	mutation := newWorkhistoryInferenceDataMutation(c.config, OpUpdateOne, withWorkhistoryInferenceData(wid))
+	return &WorkhistoryInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WorkhistoryInferenceDataClient) UpdateOneID(id int) *WorkhistoryInferenceDataUpdateOne {
+	mutation := newWorkhistoryInferenceDataMutation(c.config, OpUpdateOne, withWorkhistoryInferenceDataID(id))
+	return &WorkhistoryInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WorkhistoryInferenceData.
+func (c *WorkhistoryInferenceDataClient) Delete() *WorkhistoryInferenceDataDelete {
+	mutation := newWorkhistoryInferenceDataMutation(c.config, OpDelete)
+	return &WorkhistoryInferenceDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WorkhistoryInferenceDataClient) DeleteOne(wid *WorkhistoryInferenceData) *WorkhistoryInferenceDataDeleteOne {
+	return c.DeleteOneID(wid.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WorkhistoryInferenceDataClient) DeleteOneID(id int) *WorkhistoryInferenceDataDeleteOne {
+	builder := c.Delete().Where(workhistoryinferencedata.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WorkhistoryInferenceDataDeleteOne{builder}
+}
+
+// Query returns a query builder for WorkhistoryInferenceData.
+func (c *WorkhistoryInferenceDataClient) Query() *WorkhistoryInferenceDataQuery {
+	return &WorkhistoryInferenceDataQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWorkhistoryInferenceData},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a WorkhistoryInferenceData entity by its id.
+func (c *WorkhistoryInferenceDataClient) Get(ctx context.Context, id int) (*WorkhistoryInferenceData, error) {
+	return c.Query().Where(workhistoryinferencedata.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WorkhistoryInferenceDataClient) GetX(ctx context.Context, id int) *WorkhistoryInferenceData {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWorkHistories queries the work_histories edge of a WorkhistoryInferenceData.
+func (c *WorkhistoryInferenceDataClient) QueryWorkHistories(wid *WorkhistoryInferenceData) *WorkHistoryQuery {
+	query := (&WorkHistoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wid.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(workhistoryinferencedata.Table, workhistoryinferencedata.FieldID, id),
+			sqlgraph.To(workhistory.Table, workhistory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, workhistoryinferencedata.WorkHistoriesTable, workhistoryinferencedata.WorkHistoriesColumn),
+		)
+		fromV = sqlgraph.Neighbors(wid.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WorkhistoryInferenceDataClient) Hooks() []Hook {
+	return c.hooks.WorkhistoryInferenceData
+}
+
+// Interceptors returns the client interceptors.
+func (c *WorkhistoryInferenceDataClient) Interceptors() []Interceptor {
+	return c.inters.WorkhistoryInferenceData
+}
+
+func (c *WorkhistoryInferenceDataClient) mutate(ctx context.Context, m *WorkhistoryInferenceDataMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WorkhistoryInferenceDataCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WorkhistoryInferenceDataUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WorkhistoryInferenceDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WorkhistoryInferenceDataDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WorkhistoryInferenceData mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AttachmentRef, Job, UpworkFreelancer, UpworkJob, User, WorkHistory []ent.Hook
+		AttachmentRef, FreelancerInferenceData, Job, UpworkFreelancer, UpworkJob, User,
+		WorkHistory, WorkhistoryInferenceData []ent.Hook
 	}
 	inters struct {
-		AttachmentRef, Job, UpworkFreelancer, UpworkJob, User,
-		WorkHistory []ent.Interceptor
+		AttachmentRef, FreelancerInferenceData, Job, UpworkFreelancer, UpworkJob, User,
+		WorkHistory, WorkhistoryInferenceData []ent.Interceptor
 	}
 )

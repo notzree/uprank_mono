@@ -15,6 +15,7 @@ import (
 	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // WorkHistoryUpdate is the builder for updating WorkHistory entities.
@@ -590,6 +591,21 @@ func (whu *WorkHistoryUpdate) SetFreelancer(u *UpworkFreelancer) *WorkHistoryUpd
 	return whu.SetFreelancerID(u.ID)
 }
 
+// AddWorkHistoryInferenceDatumIDs adds the "work_history_inference_data" edge to the WorkhistoryInferenceData entity by IDs.
+func (whu *WorkHistoryUpdate) AddWorkHistoryInferenceDatumIDs(ids ...int) *WorkHistoryUpdate {
+	whu.mutation.AddWorkHistoryInferenceDatumIDs(ids...)
+	return whu
+}
+
+// AddWorkHistoryInferenceData adds the "work_history_inference_data" edges to the WorkhistoryInferenceData entity.
+func (whu *WorkHistoryUpdate) AddWorkHistoryInferenceData(w ...*WorkhistoryInferenceData) *WorkHistoryUpdate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return whu.AddWorkHistoryInferenceDatumIDs(ids...)
+}
+
 // Mutation returns the WorkHistoryMutation object of the builder.
 func (whu *WorkHistoryUpdate) Mutation() *WorkHistoryMutation {
 	return whu.mutation
@@ -599,6 +615,27 @@ func (whu *WorkHistoryUpdate) Mutation() *WorkHistoryMutation {
 func (whu *WorkHistoryUpdate) ClearFreelancer() *WorkHistoryUpdate {
 	whu.mutation.ClearFreelancer()
 	return whu
+}
+
+// ClearWorkHistoryInferenceData clears all "work_history_inference_data" edges to the WorkhistoryInferenceData entity.
+func (whu *WorkHistoryUpdate) ClearWorkHistoryInferenceData() *WorkHistoryUpdate {
+	whu.mutation.ClearWorkHistoryInferenceData()
+	return whu
+}
+
+// RemoveWorkHistoryInferenceDatumIDs removes the "work_history_inference_data" edge to WorkhistoryInferenceData entities by IDs.
+func (whu *WorkHistoryUpdate) RemoveWorkHistoryInferenceDatumIDs(ids ...int) *WorkHistoryUpdate {
+	whu.mutation.RemoveWorkHistoryInferenceDatumIDs(ids...)
+	return whu
+}
+
+// RemoveWorkHistoryInferenceData removes "work_history_inference_data" edges to WorkhistoryInferenceData entities.
+func (whu *WorkHistoryUpdate) RemoveWorkHistoryInferenceData(w ...*WorkhistoryInferenceData) *WorkHistoryUpdate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return whu.RemoveWorkHistoryInferenceDatumIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -861,6 +898,51 @@ func (whu *WorkHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if whu.mutation.WorkHistoryInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := whu.mutation.RemovedWorkHistoryInferenceDataIDs(); len(nodes) > 0 && !whu.mutation.WorkHistoryInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := whu.mutation.WorkHistoryInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1448,6 +1530,21 @@ func (whuo *WorkHistoryUpdateOne) SetFreelancer(u *UpworkFreelancer) *WorkHistor
 	return whuo.SetFreelancerID(u.ID)
 }
 
+// AddWorkHistoryInferenceDatumIDs adds the "work_history_inference_data" edge to the WorkhistoryInferenceData entity by IDs.
+func (whuo *WorkHistoryUpdateOne) AddWorkHistoryInferenceDatumIDs(ids ...int) *WorkHistoryUpdateOne {
+	whuo.mutation.AddWorkHistoryInferenceDatumIDs(ids...)
+	return whuo
+}
+
+// AddWorkHistoryInferenceData adds the "work_history_inference_data" edges to the WorkhistoryInferenceData entity.
+func (whuo *WorkHistoryUpdateOne) AddWorkHistoryInferenceData(w ...*WorkhistoryInferenceData) *WorkHistoryUpdateOne {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return whuo.AddWorkHistoryInferenceDatumIDs(ids...)
+}
+
 // Mutation returns the WorkHistoryMutation object of the builder.
 func (whuo *WorkHistoryUpdateOne) Mutation() *WorkHistoryMutation {
 	return whuo.mutation
@@ -1457,6 +1554,27 @@ func (whuo *WorkHistoryUpdateOne) Mutation() *WorkHistoryMutation {
 func (whuo *WorkHistoryUpdateOne) ClearFreelancer() *WorkHistoryUpdateOne {
 	whuo.mutation.ClearFreelancer()
 	return whuo
+}
+
+// ClearWorkHistoryInferenceData clears all "work_history_inference_data" edges to the WorkhistoryInferenceData entity.
+func (whuo *WorkHistoryUpdateOne) ClearWorkHistoryInferenceData() *WorkHistoryUpdateOne {
+	whuo.mutation.ClearWorkHistoryInferenceData()
+	return whuo
+}
+
+// RemoveWorkHistoryInferenceDatumIDs removes the "work_history_inference_data" edge to WorkhistoryInferenceData entities by IDs.
+func (whuo *WorkHistoryUpdateOne) RemoveWorkHistoryInferenceDatumIDs(ids ...int) *WorkHistoryUpdateOne {
+	whuo.mutation.RemoveWorkHistoryInferenceDatumIDs(ids...)
+	return whuo
+}
+
+// RemoveWorkHistoryInferenceData removes "work_history_inference_data" edges to WorkhistoryInferenceData entities.
+func (whuo *WorkHistoryUpdateOne) RemoveWorkHistoryInferenceData(w ...*WorkhistoryInferenceData) *WorkHistoryUpdateOne {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return whuo.RemoveWorkHistoryInferenceDatumIDs(ids...)
 }
 
 // Where appends a list predicates to the WorkHistoryUpdate builder.
@@ -1749,6 +1867,51 @@ func (whuo *WorkHistoryUpdateOne) sqlSave(ctx context.Context) (_node *WorkHisto
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(upworkfreelancer.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if whuo.mutation.WorkHistoryInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := whuo.mutation.RemovedWorkHistoryInferenceDataIDs(); len(nodes) > 0 && !whuo.mutation.WorkHistoryInferenceDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := whuo.mutation.WorkHistoryInferenceDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workhistory.WorkHistoryInferenceDataTable,
+			Columns: []string{workhistory.WorkHistoryInferenceDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workhistoryinferencedata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
