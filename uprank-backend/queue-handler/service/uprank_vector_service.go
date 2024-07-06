@@ -193,6 +193,10 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 						budget_adherence_score = 0.5
 					}
 					new_weight := 0.95*job_similarity_score + 0.05*budget_adherence_score
+					if new_weights[freelancer.ID] == nil {
+						new_weights[freelancer.ID] = make(map[int]float32)
+						new_weights[freelancer.ID][work_history.ID] = new_weight
+					}
 					new_weights[freelancer.ID][work_history.ID] = new_weight
 				}
 			}
@@ -207,6 +211,32 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 func ExponentialScaling(score float32) float32 {
 	base := float32(2.0)
 	return float32(math.Exp(float64(score*base)) / math.Exp(float64(base)))
+}
+
+func (s *UprankVecService) PostJobRankingData(req types.FinalizedJobRankingData, ctx context.Context) error {
+	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/rank", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
+	bodyData := types.AddJobRankingRequest{
+		Freelancer_score_map: req.Freelancer_score_map,
+	}
+	body, err := json.Marshal(bodyData)
+	if err != nil {
+		return err
+	}
+
+	httpreq, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("Content-Type", "application/json")
+	resp, err := s.httpClient.Do(httpreq)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+
 }
 
 func (s *UprankVecService) FetchJobData(req types.UpworkRankingMessage) (*types.JobEmbeddingData, error) {

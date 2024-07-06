@@ -89,6 +89,25 @@ func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRanki
 	if apply_specialization_weights_err != nil {
 		return NewServiceError(apply_specialization_weights_err)
 	}
+	summed_scores := make(map[string]float32)
+	for freelancer_id, scores := range final_specialization_scores.Weighted_scores {
+		sum := float32(0)
+		for _, score := range scores {
+			sum += score
+		}
+		summed_scores[freelancer_id] = sum / float32(len(scores))
+	}
+	svc_err := s.svc.PostJobRankingData(types.FinalizedJobRankingData{
+		Freelancer_score_map: summed_scores,
+		Job_id:               req.Job_id.String(),
+		Platform:             req.Platform,
+		Platform_id:          req.Platform_id,
+		User_id:              req.User_id,
+	}, ctx)
+	if svc_err != nil {
+		return NewServiceError(svc_err)
+	}
+
 	// Write final_specialization_scores to a file as JSON
 	file, err := os.Create("final_specialization_scores.json")
 	if err != nil {
@@ -97,7 +116,7 @@ func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRanki
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	err = encoder.Encode(final_specialization_scores)
+	err = encoder.Encode(summed_scores)
 	if err != nil {
 		return NewServiceError(err)
 	}

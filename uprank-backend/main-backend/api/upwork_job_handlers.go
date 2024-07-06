@@ -86,3 +86,26 @@ func (s *Server) UpdateUpworkJob(w http.ResponseWriter, r *http.Request) error {
 
 	return writeJSON(w, http.StatusOK, upwork_job)
 }
+
+func (s *Server) AddJobRankings(w http.ResponseWriter, r *http.Request) error {
+	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
+	if user_id_err != nil {
+		return user_id_err
+	}
+	var req types.AddJobRankingRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return InvalidJSON()
+	}
+
+	defer r.Body.Close()
+	if errors := req.Validate(); len(errors) > 0 {
+		return InvalidRequestData(errors)
+	}
+
+	err := s.svc.AddJobRankings(req, user_id, r.Context())
+	if err != nil {
+		return err
+	}
+	return writeJSON(w, http.StatusCreated, nil)
+
+}
