@@ -1839,6 +1839,7 @@ type UpworkFreelancerMutation struct {
 	addrecent_earnings                  *float64
 	total_revenue                       *float64
 	addtotal_revenue                    *float64
+	missing_fields                      *bool
 	clearedFields                       map[string]struct{}
 	upwork_job                          map[string]struct{}
 	removedupwork_job                   map[string]struct{}
@@ -3633,6 +3634,42 @@ func (m *UpworkFreelancerMutation) ResetTotalRevenue() {
 	m.addtotal_revenue = nil
 }
 
+// SetMissingFields sets the "missing_fields" field.
+func (m *UpworkFreelancerMutation) SetMissingFields(b bool) {
+	m.missing_fields = &b
+}
+
+// MissingFields returns the value of the "missing_fields" field in the mutation.
+func (m *UpworkFreelancerMutation) MissingFields() (r bool, exists bool) {
+	v := m.missing_fields
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMissingFields returns the old "missing_fields" field's value of the UpworkFreelancer entity.
+// If the UpworkFreelancer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UpworkFreelancerMutation) OldMissingFields(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMissingFields is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMissingFields requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMissingFields: %w", err)
+	}
+	return oldValue.MissingFields, nil
+}
+
+// ResetMissingFields resets all changes to the "missing_fields" field.
+func (m *UpworkFreelancerMutation) ResetMissingFields() {
+	m.missing_fields = nil
+}
+
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by ids.
 func (m *UpworkFreelancerMutation) AddUpworkJobIDs(ids ...string) {
 	if m.upwork_job == nil {
@@ -3883,7 +3920,7 @@ func (m *UpworkFreelancerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UpworkFreelancerMutation) Fields() []string {
-	fields := make([]string, 0, 36)
+	fields := make([]string, 0, 37)
 	if m.name != nil {
 		fields = append(fields, upworkfreelancer.FieldName)
 	}
@@ -3992,6 +4029,9 @@ func (m *UpworkFreelancerMutation) Fields() []string {
 	if m.total_revenue != nil {
 		fields = append(fields, upworkfreelancer.FieldTotalRevenue)
 	}
+	if m.missing_fields != nil {
+		fields = append(fields, upworkfreelancer.FieldMissingFields)
+	}
 	return fields
 }
 
@@ -4072,6 +4112,8 @@ func (m *UpworkFreelancerMutation) Field(name string) (ent.Value, bool) {
 		return m.RecentEarnings()
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.TotalRevenue()
+	case upworkfreelancer.FieldMissingFields:
+		return m.MissingFields()
 	}
 	return nil, false
 }
@@ -4153,6 +4195,8 @@ func (m *UpworkFreelancerMutation) OldField(ctx context.Context, name string) (e
 		return m.OldRecentEarnings(ctx)
 	case upworkfreelancer.FieldTotalRevenue:
 		return m.OldTotalRevenue(ctx)
+	case upworkfreelancer.FieldMissingFields:
+		return m.OldMissingFields(ctx)
 	}
 	return nil, fmt.Errorf("unknown UpworkFreelancer field %s", name)
 }
@@ -4413,6 +4457,13 @@ func (m *UpworkFreelancerMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotalRevenue(v)
+		return nil
+	case upworkfreelancer.FieldMissingFields:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMissingFields(v)
 		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer field %s", name)
@@ -4786,6 +4837,9 @@ func (m *UpworkFreelancerMutation) ResetField(name string) error {
 		return nil
 	case upworkfreelancer.FieldTotalRevenue:
 		m.ResetTotalRevenue()
+		return nil
+	case upworkfreelancer.FieldMissingFields:
+		m.ResetMissingFields()
 		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer field %s", name)

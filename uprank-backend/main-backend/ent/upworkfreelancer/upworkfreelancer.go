@@ -86,6 +86,8 @@ const (
 	FieldRecentEarnings = "recent_earnings"
 	// FieldTotalRevenue holds the string denoting the total_revenue field in the database.
 	FieldTotalRevenue = "total_revenue"
+	// FieldMissingFields holds the string denoting the missing_fields field in the database.
+	FieldMissingFields = "missing_fields"
 	// EdgeUpworkJob holds the string denoting the upwork_job edge name in mutations.
 	EdgeUpworkJob = "upwork_job"
 	// EdgeAttachments holds the string denoting the attachments edge name in mutations.
@@ -163,6 +165,7 @@ var Columns = []string{
 	FieldCombinedTotalRevenue,
 	FieldRecentEarnings,
 	FieldTotalRevenue,
+	FieldMissingFields,
 }
 
 var (
@@ -188,6 +191,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultMissingFields holds the default value on creation for the "missing_fields" field.
+	DefaultMissingFields bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -373,6 +378,11 @@ func ByRecentEarnings(opts ...sql.OrderTermOption) OrderOption {
 // ByTotalRevenue orders the results by the total_revenue field.
 func ByTotalRevenue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotalRevenue, opts...).ToFunc()
+}
+
+// ByMissingFields orders the results by the missing_fields field.
+func ByMissingFields(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMissingFields, opts...).ToFunc()
 }
 
 // ByUpworkJobCount orders the results by upwork_job count.

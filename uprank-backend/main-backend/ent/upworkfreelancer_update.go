@@ -643,6 +643,20 @@ func (ufu *UpworkFreelancerUpdate) AddTotalRevenue(f float64) *UpworkFreelancerU
 	return ufu
 }
 
+// SetMissingFields sets the "missing_fields" field.
+func (ufu *UpworkFreelancerUpdate) SetMissingFields(b bool) *UpworkFreelancerUpdate {
+	ufu.mutation.SetMissingFields(b)
+	return ufu
+}
+
+// SetNillableMissingFields sets the "missing_fields" field if the given value is not nil.
+func (ufu *UpworkFreelancerUpdate) SetNillableMissingFields(b *bool) *UpworkFreelancerUpdate {
+	if b != nil {
+		ufu.SetMissingFields(*b)
+	}
+	return ufu
+}
+
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
 func (ufu *UpworkFreelancerUpdate) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdate {
 	ufu.mutation.AddUpworkJobIDs(ids...)
@@ -1003,6 +1017,9 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if value, ok := ufu.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
+	}
+	if value, ok := ufu.mutation.MissingFields(); ok {
+		_spec.SetField(upworkfreelancer.FieldMissingFields, field.TypeBool, value)
 	}
 	if ufu.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1814,6 +1831,20 @@ func (ufuo *UpworkFreelancerUpdateOne) AddTotalRevenue(f float64) *UpworkFreelan
 	return ufuo
 }
 
+// SetMissingFields sets the "missing_fields" field.
+func (ufuo *UpworkFreelancerUpdateOne) SetMissingFields(b bool) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetMissingFields(b)
+	return ufuo
+}
+
+// SetNillableMissingFields sets the "missing_fields" field if the given value is not nil.
+func (ufuo *UpworkFreelancerUpdateOne) SetNillableMissingFields(b *bool) *UpworkFreelancerUpdateOne {
+	if b != nil {
+		ufuo.SetMissingFields(*b)
+	}
+	return ufuo
+}
+
 // AddUpworkJobIDs adds the "upwork_job" edge to the UpworkJob entity by IDs.
 func (ufuo *UpworkFreelancerUpdateOne) AddUpworkJobIDs(ids ...string) *UpworkFreelancerUpdateOne {
 	ufuo.mutation.AddUpworkJobIDs(ids...)
@@ -2204,6 +2235,9 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	}
 	if value, ok := ufuo.mutation.AddedTotalRevenue(); ok {
 		_spec.AddField(upworkfreelancer.FieldTotalRevenue, field.TypeFloat64, value)
+	}
+	if value, ok := ufuo.mutation.MissingFields(); ok {
+		_spec.SetField(upworkfreelancer.FieldMissingFields, field.TypeBool, value)
 	}
 	if ufuo.mutation.UpworkJobCleared() {
 		edge := &sqlgraph.EdgeSpec{

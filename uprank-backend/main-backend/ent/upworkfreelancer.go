@@ -90,6 +90,8 @@ type UpworkFreelancer struct {
 	RecentEarnings float64 `json:"recent_earnings,omitempty"`
 	// TotalRevenue holds the value of the "total_revenue" field.
 	TotalRevenue float64 `json:"total_revenue,omitempty"`
+	// MissingFields holds the value of the "missing_fields" field.
+	MissingFields bool `json:"missing_fields,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UpworkFreelancerQuery when eager-loading is set.
 	Edges        UpworkFreelancerEdges `json:"edges"`
@@ -154,7 +156,7 @@ func (*UpworkFreelancer) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case upworkfreelancer.FieldSkills:
 			values[i] = new([]byte)
-		case upworkfreelancer.FieldAiReccomended, upworkfreelancer.FieldInvited, upworkfreelancer.FieldUpworkTopRatedStatus, upworkfreelancer.FieldUpworkTopRatedPlusStatus, upworkfreelancer.FieldUpworkSponsored, upworkfreelancer.FieldUpworkReccomended:
+		case upworkfreelancer.FieldAiReccomended, upworkfreelancer.FieldInvited, upworkfreelancer.FieldUpworkTopRatedStatus, upworkfreelancer.FieldUpworkTopRatedPlusStatus, upworkfreelancer.FieldUpworkSponsored, upworkfreelancer.FieldUpworkReccomended, upworkfreelancer.FieldMissingFields:
 			values[i] = new(sql.NullBool)
 		case upworkfreelancer.FieldFixedChargeAmount, upworkfreelancer.FieldHourlyChargeAmount, upworkfreelancer.FieldRecentHours, upworkfreelancer.FieldTotalHours, upworkfreelancer.FieldUpworkTotalFeedback, upworkfreelancer.FieldUpworkRecentFeedback, upworkfreelancer.FieldUpworkJobSuccessScore, upworkfreelancer.FieldAverageRecentEarnings, upworkfreelancer.FieldCombinedAverageRecentEarnings, upworkfreelancer.FieldCombinedRecentEarnings, upworkfreelancer.FieldCombinedTotalEarnings, upworkfreelancer.FieldCombinedTotalRevenue, upworkfreelancer.FieldRecentEarnings, upworkfreelancer.FieldTotalRevenue:
 			values[i] = new(sql.NullFloat64)
@@ -403,6 +405,12 @@ func (uf *UpworkFreelancer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				uf.TotalRevenue = value.Float64
 			}
+		case upworkfreelancer.FieldMissingFields:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field missing_fields", values[i])
+			} else if value.Valid {
+				uf.MissingFields = value.Bool
+			}
 		default:
 			uf.selectValues.Set(columns[i], values[i])
 		}
@@ -566,6 +574,9 @@ func (uf *UpworkFreelancer) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("total_revenue=")
 	builder.WriteString(fmt.Sprintf("%v", uf.TotalRevenue))
+	builder.WriteString(", ")
+	builder.WriteString("missing_fields=")
+	builder.WriteString(fmt.Sprintf("%v", uf.MissingFields))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -113,6 +113,7 @@ var (
 		{Name: "combined_total_revenue", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "recent_earnings", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
 		{Name: "total_revenue", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "DECIMAL"}},
+		{Name: "missing_fields", Type: field.TypeBool, Default: false},
 	}
 	// UpworkFreelancersTable holds the schema information for the "upwork_freelancers" table.
 	UpworkFreelancersTable = &schema.Table{

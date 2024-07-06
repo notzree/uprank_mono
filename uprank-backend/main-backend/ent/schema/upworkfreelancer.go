@@ -55,6 +55,7 @@ func (UpworkFreelancer) Fields() []ent.Field {
 		field.Float("combined_total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("recent_earnings").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
 		field.Float("total_revenue").SchemaType(map[string]string{dialect.Postgres: "DECIMAL"}),
+		field.Bool("missing_fields").Default(false),
 	}
 }
 
