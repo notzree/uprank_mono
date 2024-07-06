@@ -1,3 +1,5 @@
+import { UpworkFreelancer } from "./freelancer";
+
 // UUID type definition for simplicity
 type UUID = string;
 
@@ -36,7 +38,7 @@ export interface UpworkJob {
 
 // UpworkJobEdges type definition
 interface UpworkJobEdges {
-    // Define any necessary fields here
+    upworkfreelancer: UpworkFreelancer[];
 }
 
 // Job type definition

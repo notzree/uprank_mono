@@ -85,9 +85,6 @@ func (s *V1Servicer) AttachPlatformSpecificjobs(data types.AttachPlatformSpecifi
 func (s *V1Servicer) GetJobs(user_id string, ctx context.Context) ([]*ent.Job, error) {
 	jobs, err := s.ent.Job.Query().Where(job.HasUserWith(user.IDEQ(user_id))).WithUpworkjob().All(ctx)
 	return jobs, err
-	// func(query *ent.UpworkJobQuery) {
-	// 	query.WithUpworkfreelancer()
-	// }
 }
 
 // Creates an upwork job and attaches it to a job.
@@ -127,8 +124,13 @@ func (s *V1Servicer) GetJob(ctx context.Context) (*ent.Job, error) {
 }
 
 func (s *V1Servicer) GetJobById(job_id string, user_id string, ctx context.Context) (*ent.Job, error) {
-	job, err := s.ent.Job.Query().Where(job.IDEQ(uuid.MustParse(job_id))).Where(job.HasUserWith(user.IDEQ(user_id))).WithUpworkjob().Only(ctx)
+	job, err := s.ent.Job.Query().Where(job.IDEQ(uuid.MustParse(job_id))).Where(job.HasUserWith(user.IDEQ(user_id))).WithUpworkjob(func(query *ent.UpworkJobQuery) {
+		query.WithUpworkfreelancer(func(query *ent.UpworkFreelancerQuery) {
+			query.WithFreelancerInferenceData()
+		})
+	}).Only(ctx)
 	return job, err
+
 }
 
 func (s *V1Servicer) GetUpworkJob(upwork_job_id string, user_id string, ctx context.Context) (*ent.UpworkJob, error) {
