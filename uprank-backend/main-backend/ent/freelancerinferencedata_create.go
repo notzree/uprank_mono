@@ -208,7 +208,7 @@ func (fidc *FreelancerInferenceDataCreate) createSpec() (*FreelancerInferenceDat
 	}
 	if nodes := fidc.mutation.UpworkfreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   freelancerinferencedata.UpworkfreelancerTable,
 			Columns: []string{freelancerinferencedata.UpworkfreelancerColumn},

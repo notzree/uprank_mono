@@ -1829,7 +1829,7 @@ func HasFreelancerInferenceData() predicate.UpworkFreelancer {
 	return predicate.UpworkFreelancer(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

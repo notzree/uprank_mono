@@ -146,7 +146,7 @@ func (ufq *UpworkFreelancerQuery) QueryFreelancerInferenceData() *FreelancerInfe
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, selector),
 			sqlgraph.To(freelancerinferencedata.Table, freelancerinferencedata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ufq.driver.Dialect(), step)
 		return fromU, nil
@@ -525,11 +525,8 @@ func (ufq *UpworkFreelancerQuery) sqlAll(ctx context.Context, hooks ...queryHook
 		}
 	}
 	if query := ufq.withFreelancerInferenceData; query != nil {
-		if err := ufq.loadFreelancerInferenceData(ctx, query, nodes,
-			func(n *UpworkFreelancer) { n.Edges.FreelancerInferenceData = []*FreelancerInferenceData{} },
-			func(n *UpworkFreelancer, e *FreelancerInferenceData) {
-				n.Edges.FreelancerInferenceData = append(n.Edges.FreelancerInferenceData, e)
-			}); err != nil {
+		if err := ufq.loadFreelancerInferenceData(ctx, query, nodes, nil,
+			func(n *UpworkFreelancer, e *FreelancerInferenceData) { n.Edges.FreelancerInferenceData = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -665,9 +662,6 @@ func (ufq *UpworkFreelancerQuery) loadFreelancerInferenceData(ctx context.Contex
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.FreelancerInferenceData(func(s *sql.Selector) {

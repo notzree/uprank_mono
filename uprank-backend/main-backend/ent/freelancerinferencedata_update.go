@@ -259,7 +259,7 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if fidu.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   freelancerinferencedata.UpworkfreelancerTable,
 			Columns: []string{freelancerinferencedata.UpworkfreelancerColumn},
@@ -272,7 +272,7 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if nodes := fidu.mutation.UpworkfreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   freelancerinferencedata.UpworkfreelancerTable,
 			Columns: []string{freelancerinferencedata.UpworkfreelancerColumn},
@@ -566,7 +566,7 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if fiduo.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   freelancerinferencedata.UpworkfreelancerTable,
 			Columns: []string{freelancerinferencedata.UpworkfreelancerColumn},
@@ -579,7 +579,7 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if nodes := fiduo.mutation.UpworkfreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   freelancerinferencedata.UpworkfreelancerTable,
 			Columns: []string{freelancerinferencedata.UpworkfreelancerColumn},

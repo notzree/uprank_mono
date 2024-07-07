@@ -427,17 +427,10 @@ func ByWorkHistories(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByFreelancerInferenceDataCount orders the results by freelancer_inference_data count.
-func ByFreelancerInferenceDataCount(opts ...sql.OrderTermOption) OrderOption {
+// ByFreelancerInferenceDataField orders the results by freelancer_inference_data field.
+func ByFreelancerInferenceDataField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newFreelancerInferenceDataStep(), opts...)
-	}
-}
-
-// ByFreelancerInferenceData orders the results by freelancer_inference_data terms.
-func ByFreelancerInferenceData(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newFreelancerInferenceDataStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newFreelancerInferenceDataStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newUpworkJobStep() *sqlgraph.Step {
@@ -465,6 +458,6 @@ func newFreelancerInferenceDataStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FreelancerInferenceDataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, FreelancerInferenceDataTable, FreelancerInferenceDataColumn),
 	)
 }
