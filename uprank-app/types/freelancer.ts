@@ -37,9 +37,16 @@ export type UpworkFreelancer = {
   recent_earnings: number;
   total_revenue: number;
   portfolio_items?: PortfolioItem[];
-  edges: any;
+  edges: UpworkFreelancerEdges;
 };
 
-// export type UpworkFreelancerEdges = {
+export type UpworkFreelancerEdges = {
+  freelancer_inference_data: FreelancerInferenceData
+}
 
-// }
+export type FreelancerInferenceData = {
+  ai_estimated_duration: any;
+  finalized_rating_score: number;
+  id: number;
+  edges: any;
+}

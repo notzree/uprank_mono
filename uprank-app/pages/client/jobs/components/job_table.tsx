@@ -13,6 +13,17 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -63,37 +74,108 @@ export const columns: ColumnDef<UpworkFreelancer>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "photo_url",
-        header: "Avatar",
-        cell: ({ row }) => (
-            <Avatar>
-                <AvatarImage src={row.getValue("photo_url")} />
-                <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-        ),
+        id: "identity",
+        header: "Freelancer",
+        cell: ({ row }) => {
+            const name = row.original.name; 
+            const photo_url = row.original.photo_url;
+            return (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <Avatar>
+                        <AvatarImage src={photo_url} />
+                        <AvatarFallback>:d</AvatarFallback>
+                    </Avatar>
+                    <span style={{ marginLeft: "8px" }}>{name}</span>
+                </div>
+            );
+        },
         enableSorting: false,
         enableHiding: false,
     },
     {
-        accessorKey: "name",
-        header: "Name",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("name")}</div>
-        ),
+        id: "Location",
+        header: "Region Details",
+        cell: ({ row }) => {
+            return <div className="text-right">{row.original.city} | {row.original.country}</div>;
+        },
     },
     {
-        id: "amount",
-        accessorFn: (row) => {
-            if (row.fixed_charge_amount) {
-                return `$${row.fixed_charge_amount}`;
-            } else {
-                return `$${row.hourly_charge_amount} /hr`;
-                
-            }
-        },
+        id: "description",
+        header: "Description",
         cell: ({ row }) => {
-            let amount = row.getValue("amount");
-            return <div className="text-right font-medium">{amount}</div>;
+            return (
+                <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">Show</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                  <AlertDialogTitle>{row.original.name}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {row.original.description}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogAction>Close</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>)
+        },
+    },
+    {
+        id: "Proposed Rate",
+        header: "Proposed Rate",
+        cell: ({ row }) => {
+            let currency = row.original.hourly_charge_currency || row.original.fixed_charge_currency;
+            let amount = row.original.fixed_charge_amount || row.original.hourly_charge_amount;
+            let formatted_string = `${currency} ${amount}`;
+            if (row.original.fixed_charge_amount){
+                formatted_string += "/hr";
+            }
+
+            return <div className="text-right font-medium">{formatted_string}</div>;
+        },
+    },
+    {
+        id: "recent_hours",
+        header: "Recent Hours",
+        cell: ({ row }) => {
+            let hours = "0";
+            if (row.original.recent_hours){
+                hours = row.original.recent_hours.toFixed(0)
+            }
+            return <div className="text-right">{hours}</div>;
+        },
+        enableHiding: true,
+        enableSorting: true,
+    },
+    {
+        "id":"skills",
+        "header": "Percent of Skills Matched",
+        "cell": ({ row }) => {
+            // let skills = row.original.skills;
+            // let matched_skills = 0;
+            // if (row.original.edges.freelancer_inference_data){
+            //     let freelancer_inference_data = row.original.edges.freelancer_inference_data;
+            //     let skills = freelancer_inference_data.edges.skills;
+            //     matched_skills = skills.length;
+            // }
+            return <div className="text-right">{0}</div>;
+        },
+    },
+
+    {
+        id: "specialization_score",
+        header: "Specialization Score",
+        cell: ({ row }) => {
+            let score = 0;
+            if (row.original.edges.freelancer_inference_data){
+                score = row.original.edges.freelancer_inference_data.finalized_rating_score;
+            }
+            else {
+                score = -1
+            }
+            return <div className="text-right">{score}</div>;
         },
     },
     {
@@ -167,7 +249,7 @@ export function JobDataTable({
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter freelancers..."
                     value={
                         (table.getColumn("name")?.getFilterValue() as string) ??
                         ""
