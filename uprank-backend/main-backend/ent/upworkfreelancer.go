@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
 	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
@@ -107,7 +108,7 @@ type UpworkFreelancerEdges struct {
 	// WorkHistories holds the value of the work_histories edge.
 	WorkHistories []*WorkHistory `json:"work_histories,omitempty"`
 	// FreelancerInferenceData holds the value of the freelancer_inference_data edge.
-	FreelancerInferenceData []*FreelancerInferenceData `json:"freelancer_inference_data,omitempty"`
+	FreelancerInferenceData *FreelancerInferenceData `json:"freelancer_inference_data,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
@@ -141,10 +142,12 @@ func (e UpworkFreelancerEdges) WorkHistoriesOrErr() ([]*WorkHistory, error) {
 }
 
 // FreelancerInferenceDataOrErr returns the FreelancerInferenceData value or an error if the edge
-// was not loaded in eager-loading.
-func (e UpworkFreelancerEdges) FreelancerInferenceDataOrErr() ([]*FreelancerInferenceData, error) {
-	if e.loadedTypes[3] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UpworkFreelancerEdges) FreelancerInferenceDataOrErr() (*FreelancerInferenceData, error) {
+	if e.FreelancerInferenceData != nil {
 		return e.FreelancerInferenceData, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: freelancerinferencedata.Label}
 	}
 	return nil, &NotLoadedError{edge: "freelancer_inference_data"}
 }

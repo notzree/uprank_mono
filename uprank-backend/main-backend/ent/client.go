@@ -529,7 +529,7 @@ func (c *FreelancerInferenceDataClient) QueryUpworkfreelancer(fid *FreelancerInf
 		step := sqlgraph.NewStep(
 			sqlgraph.From(freelancerinferencedata.Table, freelancerinferencedata.FieldID, id),
 			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, freelancerinferencedata.UpworkfreelancerTable, freelancerinferencedata.UpworkfreelancerColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, freelancerinferencedata.UpworkfreelancerTable, freelancerinferencedata.UpworkfreelancerColumn),
 		)
 		fromV = sqlgraph.Neighbors(fid.driver.Dialect(), step)
 		return fromV, nil
@@ -891,7 +891,7 @@ func (c *UpworkFreelancerClient) QueryFreelancerInferenceData(uf *UpworkFreelanc
 		step := sqlgraph.NewStep(
 			sqlgraph.From(upworkfreelancer.Table, upworkfreelancer.FieldID, id),
 			sqlgraph.To(freelancerinferencedata.Table, freelancerinferencedata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, upworkfreelancer.FreelancerInferenceDataTable, upworkfreelancer.FreelancerInferenceDataColumn),
 		)
 		fromV = sqlgraph.Neighbors(uf.driver.Dialect(), step)
 		return fromV, nil

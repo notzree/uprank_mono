@@ -38,7 +38,7 @@ var (
 		{Name: "finalized_rating_score", Type: field.TypeFloat64},
 		{Name: "ai_estimated_duration", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "INTERVAL"}},
 		{Name: "budget_adherence_percentage", Type: field.TypeFloat64, Nullable: true},
-		{Name: "upwork_freelancer_freelancer_inference_data", Type: field.TypeString},
+		{Name: "upwork_freelancer_freelancer_inference_data", Type: field.TypeString, Unique: true},
 	}
 	// FreelancerInferenceDataTable holds the schema information for the "freelancer_inference_data" table.
 	FreelancerInferenceDataTable = &schema.Table{

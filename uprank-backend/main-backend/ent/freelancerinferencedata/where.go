@@ -344,7 +344,7 @@ func HasUpworkfreelancer() predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpworkfreelancerTable, UpworkfreelancerColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, UpworkfreelancerTable, UpworkfreelancerColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

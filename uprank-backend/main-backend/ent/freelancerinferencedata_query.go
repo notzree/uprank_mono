@@ -74,7 +74,7 @@ func (fidq *FreelancerInferenceDataQuery) QueryUpworkfreelancer() *UpworkFreelan
 		step := sqlgraph.NewStep(
 			sqlgraph.From(freelancerinferencedata.Table, freelancerinferencedata.FieldID, selector),
 			sqlgraph.To(upworkfreelancer.Table, upworkfreelancer.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, freelancerinferencedata.UpworkfreelancerTable, freelancerinferencedata.UpworkfreelancerColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, freelancerinferencedata.UpworkfreelancerTable, freelancerinferencedata.UpworkfreelancerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(fidq.driver.Dialect(), step)
 		return fromU, nil

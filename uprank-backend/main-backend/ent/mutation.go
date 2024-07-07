@@ -1850,8 +1850,7 @@ type UpworkFreelancerMutation struct {
 	work_histories                      map[int]struct{}
 	removedwork_histories               map[int]struct{}
 	clearedwork_histories               bool
-	freelancer_inference_data           map[int]struct{}
-	removedfreelancer_inference_data    map[int]struct{}
+	freelancer_inference_data           *int
 	clearedfreelancer_inference_data    bool
 	done                                bool
 	oldValue                            func(context.Context) (*UpworkFreelancer, error)
@@ -3832,14 +3831,9 @@ func (m *UpworkFreelancerMutation) ResetWorkHistories() {
 	m.removedwork_histories = nil
 }
 
-// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ids.
-func (m *UpworkFreelancerMutation) AddFreelancerInferenceDatumIDs(ids ...int) {
-	if m.freelancer_inference_data == nil {
-		m.freelancer_inference_data = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.freelancer_inference_data[ids[i]] = struct{}{}
-	}
+// SetFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by id.
+func (m *UpworkFreelancerMutation) SetFreelancerInferenceDataID(id int) {
+	m.freelancer_inference_data = &id
 }
 
 // ClearFreelancerInferenceData clears the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
@@ -3852,29 +3846,20 @@ func (m *UpworkFreelancerMutation) FreelancerInferenceDataCleared() bool {
 	return m.clearedfreelancer_inference_data
 }
 
-// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
-func (m *UpworkFreelancerMutation) RemoveFreelancerInferenceDatumIDs(ids ...int) {
-	if m.removedfreelancer_inference_data == nil {
-		m.removedfreelancer_inference_data = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.freelancer_inference_data, ids[i])
-		m.removedfreelancer_inference_data[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedFreelancerInferenceData returns the removed IDs of the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
-func (m *UpworkFreelancerMutation) RemovedFreelancerInferenceDataIDs() (ids []int) {
-	for id := range m.removedfreelancer_inference_data {
-		ids = append(ids, id)
+// FreelancerInferenceDataID returns the "freelancer_inference_data" edge ID in the mutation.
+func (m *UpworkFreelancerMutation) FreelancerInferenceDataID() (id int, exists bool) {
+	if m.freelancer_inference_data != nil {
+		return *m.freelancer_inference_data, true
 	}
 	return
 }
 
 // FreelancerInferenceDataIDs returns the "freelancer_inference_data" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FreelancerInferenceDataID instead. It exists only for internal usage by the builders.
 func (m *UpworkFreelancerMutation) FreelancerInferenceDataIDs() (ids []int) {
-	for id := range m.freelancer_inference_data {
-		ids = append(ids, id)
+	if id := m.freelancer_inference_data; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -3883,7 +3868,6 @@ func (m *UpworkFreelancerMutation) FreelancerInferenceDataIDs() (ids []int) {
 func (m *UpworkFreelancerMutation) ResetFreelancerInferenceData() {
 	m.freelancer_inference_data = nil
 	m.clearedfreelancer_inference_data = false
-	m.removedfreelancer_inference_data = nil
 }
 
 // Where appends a list predicates to the UpworkFreelancerMutation builder.
@@ -4886,11 +4870,9 @@ func (m *UpworkFreelancerMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case upworkfreelancer.EdgeFreelancerInferenceData:
-		ids := make([]ent.Value, 0, len(m.freelancer_inference_data))
-		for id := range m.freelancer_inference_data {
-			ids = append(ids, id)
+		if id := m.freelancer_inference_data; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -4906,9 +4888,6 @@ func (m *UpworkFreelancerMutation) RemovedEdges() []string {
 	}
 	if m.removedwork_histories != nil {
 		edges = append(edges, upworkfreelancer.EdgeWorkHistories)
-	}
-	if m.removedfreelancer_inference_data != nil {
-		edges = append(edges, upworkfreelancer.EdgeFreelancerInferenceData)
 	}
 	return edges
 }
@@ -4932,12 +4911,6 @@ func (m *UpworkFreelancerMutation) RemovedIDs(name string) []ent.Value {
 	case upworkfreelancer.EdgeWorkHistories:
 		ids := make([]ent.Value, 0, len(m.removedwork_histories))
 		for id := range m.removedwork_histories {
-			ids = append(ids, id)
-		}
-		return ids
-	case upworkfreelancer.EdgeFreelancerInferenceData:
-		ids := make([]ent.Value, 0, len(m.removedfreelancer_inference_data))
-		for id := range m.removedfreelancer_inference_data {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4983,6 +4956,9 @@ func (m *UpworkFreelancerMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *UpworkFreelancerMutation) ClearEdge(name string) error {
 	switch name {
+	case upworkfreelancer.EdgeFreelancerInferenceData:
+		m.ClearFreelancerInferenceData()
+		return nil
 	}
 	return fmt.Errorf("unknown UpworkFreelancer unique edge %s", name)
 }

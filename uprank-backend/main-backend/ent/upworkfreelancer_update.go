@@ -702,19 +702,23 @@ func (ufu *UpworkFreelancerUpdate) AddWorkHistories(w ...*WorkHistory) *UpworkFr
 	return ufu.AddWorkHistoryIDs(ids...)
 }
 
-// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
-func (ufu *UpworkFreelancerUpdate) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdate {
-	ufu.mutation.AddFreelancerInferenceDatumIDs(ids...)
+// SetFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID.
+func (ufu *UpworkFreelancerUpdate) SetFreelancerInferenceDataID(id int) *UpworkFreelancerUpdate {
+	ufu.mutation.SetFreelancerInferenceDataID(id)
 	return ufu
 }
 
-// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
-func (ufu *UpworkFreelancerUpdate) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// SetNillableFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID if the given value is not nil.
+func (ufu *UpworkFreelancerUpdate) SetNillableFreelancerInferenceDataID(id *int) *UpworkFreelancerUpdate {
+	if id != nil {
+		ufu = ufu.SetFreelancerInferenceDataID(*id)
 	}
-	return ufu.AddFreelancerInferenceDatumIDs(ids...)
+	return ufu
+}
+
+// SetFreelancerInferenceData sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
+func (ufu *UpworkFreelancerUpdate) SetFreelancerInferenceData(f *FreelancerInferenceData) *UpworkFreelancerUpdate {
+	return ufu.SetFreelancerInferenceDataID(f.ID)
 }
 
 // Mutation returns the UpworkFreelancerMutation object of the builder.
@@ -785,25 +789,10 @@ func (ufu *UpworkFreelancerUpdate) RemoveWorkHistories(w ...*WorkHistory) *Upwor
 	return ufu.RemoveWorkHistoryIDs(ids...)
 }
 
-// ClearFreelancerInferenceData clears all "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+// ClearFreelancerInferenceData clears the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
 func (ufu *UpworkFreelancerUpdate) ClearFreelancerInferenceData() *UpworkFreelancerUpdate {
 	ufu.mutation.ClearFreelancerInferenceData()
 	return ufu
-}
-
-// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to FreelancerInferenceData entities by IDs.
-func (ufu *UpworkFreelancerUpdate) RemoveFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdate {
-	ufu.mutation.RemoveFreelancerInferenceDatumIDs(ids...)
-	return ufu
-}
-
-// RemoveFreelancerInferenceData removes "freelancer_inference_data" edges to FreelancerInferenceData entities.
-func (ufu *UpworkFreelancerUpdate) RemoveFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return ufu.RemoveFreelancerInferenceDatumIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1158,7 +1147,7 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if ufu.mutation.FreelancerInferenceDataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   upworkfreelancer.FreelancerInferenceDataTable,
 			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
@@ -1166,28 +1155,12 @@ func (ufu *UpworkFreelancerUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ufu.mutation.RemovedFreelancerInferenceDataIDs(); len(nodes) > 0 && !ufu.mutation.FreelancerInferenceDataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   upworkfreelancer.FreelancerInferenceDataTable,
-			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ufu.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   upworkfreelancer.FreelancerInferenceDataTable,
 			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
@@ -1890,19 +1863,23 @@ func (ufuo *UpworkFreelancerUpdateOne) AddWorkHistories(w ...*WorkHistory) *Upwo
 	return ufuo.AddWorkHistoryIDs(ids...)
 }
 
-// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
-func (ufuo *UpworkFreelancerUpdateOne) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.AddFreelancerInferenceDatumIDs(ids...)
+// SetFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID.
+func (ufuo *UpworkFreelancerUpdateOne) SetFreelancerInferenceDataID(id int) *UpworkFreelancerUpdateOne {
+	ufuo.mutation.SetFreelancerInferenceDataID(id)
 	return ufuo
 }
 
-// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
-func (ufuo *UpworkFreelancerUpdateOne) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// SetNillableFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID if the given value is not nil.
+func (ufuo *UpworkFreelancerUpdateOne) SetNillableFreelancerInferenceDataID(id *int) *UpworkFreelancerUpdateOne {
+	if id != nil {
+		ufuo = ufuo.SetFreelancerInferenceDataID(*id)
 	}
-	return ufuo.AddFreelancerInferenceDatumIDs(ids...)
+	return ufuo
+}
+
+// SetFreelancerInferenceData sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
+func (ufuo *UpworkFreelancerUpdateOne) SetFreelancerInferenceData(f *FreelancerInferenceData) *UpworkFreelancerUpdateOne {
+	return ufuo.SetFreelancerInferenceDataID(f.ID)
 }
 
 // Mutation returns the UpworkFreelancerMutation object of the builder.
@@ -1973,25 +1950,10 @@ func (ufuo *UpworkFreelancerUpdateOne) RemoveWorkHistories(w ...*WorkHistory) *U
 	return ufuo.RemoveWorkHistoryIDs(ids...)
 }
 
-// ClearFreelancerInferenceData clears all "freelancer_inference_data" edges to the FreelancerInferenceData entity.
+// ClearFreelancerInferenceData clears the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
 func (ufuo *UpworkFreelancerUpdateOne) ClearFreelancerInferenceData() *UpworkFreelancerUpdateOne {
 	ufuo.mutation.ClearFreelancerInferenceData()
 	return ufuo
-}
-
-// RemoveFreelancerInferenceDatumIDs removes the "freelancer_inference_data" edge to FreelancerInferenceData entities by IDs.
-func (ufuo *UpworkFreelancerUpdateOne) RemoveFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerUpdateOne {
-	ufuo.mutation.RemoveFreelancerInferenceDatumIDs(ids...)
-	return ufuo
-}
-
-// RemoveFreelancerInferenceData removes "freelancer_inference_data" edges to FreelancerInferenceData entities.
-func (ufuo *UpworkFreelancerUpdateOne) RemoveFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return ufuo.RemoveFreelancerInferenceDatumIDs(ids...)
 }
 
 // Where appends a list predicates to the UpworkFreelancerUpdate builder.
@@ -2376,7 +2338,7 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 	}
 	if ufuo.mutation.FreelancerInferenceDataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   upworkfreelancer.FreelancerInferenceDataTable,
 			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
@@ -2384,28 +2346,12 @@ func (ufuo *UpworkFreelancerUpdateOne) sqlSave(ctx context.Context) (_node *Upwo
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ufuo.mutation.RemovedFreelancerInferenceDataIDs(); len(nodes) > 0 && !ufuo.mutation.FreelancerInferenceDataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   upworkfreelancer.FreelancerInferenceDataTable,
-			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(freelancerinferencedata.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ufuo.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   upworkfreelancer.FreelancerInferenceDataTable,
 			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},

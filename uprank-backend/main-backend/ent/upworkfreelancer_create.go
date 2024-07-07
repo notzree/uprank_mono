@@ -348,19 +348,23 @@ func (ufc *UpworkFreelancerCreate) AddWorkHistories(w ...*WorkHistory) *UpworkFr
 	return ufc.AddWorkHistoryIDs(ids...)
 }
 
-// AddFreelancerInferenceDatumIDs adds the "freelancer_inference_data" edge to the FreelancerInferenceData entity by IDs.
-func (ufc *UpworkFreelancerCreate) AddFreelancerInferenceDatumIDs(ids ...int) *UpworkFreelancerCreate {
-	ufc.mutation.AddFreelancerInferenceDatumIDs(ids...)
+// SetFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID.
+func (ufc *UpworkFreelancerCreate) SetFreelancerInferenceDataID(id int) *UpworkFreelancerCreate {
+	ufc.mutation.SetFreelancerInferenceDataID(id)
 	return ufc
 }
 
-// AddFreelancerInferenceData adds the "freelancer_inference_data" edges to the FreelancerInferenceData entity.
-func (ufc *UpworkFreelancerCreate) AddFreelancerInferenceData(f ...*FreelancerInferenceData) *UpworkFreelancerCreate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// SetNillableFreelancerInferenceDataID sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity by ID if the given value is not nil.
+func (ufc *UpworkFreelancerCreate) SetNillableFreelancerInferenceDataID(id *int) *UpworkFreelancerCreate {
+	if id != nil {
+		ufc = ufc.SetFreelancerInferenceDataID(*id)
 	}
-	return ufc.AddFreelancerInferenceDatumIDs(ids...)
+	return ufc
+}
+
+// SetFreelancerInferenceData sets the "freelancer_inference_data" edge to the FreelancerInferenceData entity.
+func (ufc *UpworkFreelancerCreate) SetFreelancerInferenceData(f *FreelancerInferenceData) *UpworkFreelancerCreate {
+	return ufc.SetFreelancerInferenceDataID(f.ID)
 }
 
 // Mutation returns the UpworkFreelancerMutation object of the builder.
@@ -755,7 +759,7 @@ func (ufc *UpworkFreelancerCreate) createSpec() (*UpworkFreelancer, *sqlgraph.Cr
 	}
 	if nodes := ufc.mutation.FreelancerInferenceDataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   upworkfreelancer.FreelancerInferenceDataTable,
 			Columns: []string{upworkfreelancer.FreelancerInferenceDataColumn},

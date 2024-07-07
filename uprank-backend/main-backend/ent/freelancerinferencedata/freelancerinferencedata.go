@@ -124,6 +124,6 @@ func newUpworkfreelancerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UpworkfreelancerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpworkfreelancerTable, UpworkfreelancerColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, UpworkfreelancerTable, UpworkfreelancerColumn),
 	)
 }

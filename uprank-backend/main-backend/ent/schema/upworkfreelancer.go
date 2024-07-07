@@ -66,6 +66,6 @@ func (UpworkFreelancer) Edges() []ent.Edge {
 			Ref("upworkfreelancer"),
 		edge.To("attachments", AttachmentRef.Type),
 		edge.To("work_histories", WorkHistory.Type),
-		edge.To("freelancer_inference_data", FreelancerInferenceData.Type),
+		edge.To("freelancer_inference_data", FreelancerInferenceData.Type).Unique(),
 	}
 }
