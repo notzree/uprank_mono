@@ -1,28 +1,35 @@
 import Navbar from "../shared/components/navbar";
 import { JobDataTable } from "./components/job_table";
 
-export default function Jobs({job_prop}:{job_prop: Job}){
-
-    console.log(job_prop)
+export default function Jobs({ job_prop }: { job_prop: Job }) {
+    const job = job_prop.edges.upworkjob;
+    if (!job) {
+        return <div>Job not found</div>;
+    }
     return (
         <div className="grid min-h-screen w-full">
             <div className="flex flex-col">
                 <Navbar />
                 <main className="flex flex-1 flex-col pt-16">
                     <div className="flex flex-row w-full  px-6">
-                    <JobDataTable freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []} />
+                        <JobDataTable
+                            freelancers={
+                                job_prop.edges.upworkjob?.edges
+                                    .upworkfreelancer || []
+                            }
+                            job={job}
+                        />
                     </div>
                 </main>
             </div>
         </div>
-    )
+    );
 }
 
 import { getAuth } from "@clerk/nextjs/server";
 import { GetServerSideProps } from "next";
 import { v1Client } from "@/client/v1_client";
 import { Job } from "@/types/job";
-
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const base_url = process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL;
@@ -53,4 +60,4 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             job_prop: job,
         },
     };
-}
+};
