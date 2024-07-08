@@ -201,7 +201,6 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 				}
 			}
 		}
-
 	}
 	return &types.ApplySpecializationScoreWeightsResponse{
 		Weighted_scores: new_weights,
