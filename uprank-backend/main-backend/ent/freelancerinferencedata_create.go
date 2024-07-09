@@ -71,6 +71,20 @@ func (fidc *FreelancerInferenceDataCreate) SetFinalizedRatingScore(f float64) *F
 	return fidc
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fidc *FreelancerInferenceDataCreate) SetRawRatingScore(f float64) *FreelancerInferenceDataCreate {
+	fidc.mutation.SetRawRatingScore(f)
+	return fidc
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fidc *FreelancerInferenceDataCreate) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataCreate {
+	if f != nil {
+		fidc.SetRawRatingScore(*f)
+	}
+	return fidc
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (fidc *FreelancerInferenceDataCreate) SetAiEstimatedDuration(pg *pgtype.Interval) *FreelancerInferenceDataCreate {
 	fidc.mutation.SetAiEstimatedDuration(pg)
@@ -197,6 +211,10 @@ func (fidc *FreelancerInferenceDataCreate) createSpec() (*FreelancerInferenceDat
 	if value, ok := fidc.mutation.FinalizedRatingScore(); ok {
 		_spec.SetField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
 		_node.FinalizedRatingScore = value
+	}
+	if value, ok := fidc.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+		_node.RawRatingScore = value
 	}
 	if value, ok := fidc.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)
@@ -344,6 +362,30 @@ func (u *FreelancerInferenceDataUpsert) UpdateFinalizedRatingScore() *Freelancer
 // AddFinalizedRatingScore adds v to the "finalized_rating_score" field.
 func (u *FreelancerInferenceDataUpsert) AddFinalizedRatingScore(v float64) *FreelancerInferenceDataUpsert {
 	u.Add(freelancerinferencedata.FieldFinalizedRatingScore, v)
+	return u
+}
+
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsert {
+	u.Set(freelancerinferencedata.FieldRawRatingScore, v)
+	return u
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsert) UpdateRawRatingScore() *FreelancerInferenceDataUpsert {
+	u.SetExcluded(freelancerinferencedata.FieldRawRatingScore)
+	return u
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsert {
+	u.Add(freelancerinferencedata.FieldRawRatingScore, v)
+	return u
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) ClearRawRatingScore() *FreelancerInferenceDataUpsert {
+	u.SetNull(freelancerinferencedata.FieldRawRatingScore)
 	return u
 }
 
@@ -510,6 +552,34 @@ func (u *FreelancerInferenceDataUpsertOne) AddFinalizedRatingScore(v float64) *F
 func (u *FreelancerInferenceDataUpsertOne) UpdateFinalizedRatingScore() *FreelancerInferenceDataUpsertOne {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.UpdateFinalizedRatingScore()
+	})
+}
+
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetRawRatingScore(v)
+	})
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddRawRatingScore(v)
+	})
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertOne) UpdateRawRatingScore() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateRawRatingScore()
+	})
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) ClearRawRatingScore() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearRawRatingScore()
 	})
 }
 
@@ -847,6 +917,34 @@ func (u *FreelancerInferenceDataUpsertBulk) AddFinalizedRatingScore(v float64) *
 func (u *FreelancerInferenceDataUpsertBulk) UpdateFinalizedRatingScore() *FreelancerInferenceDataUpsertBulk {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.UpdateFinalizedRatingScore()
+	})
+}
+
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetRawRatingScore(v)
+	})
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddRawRatingScore(v)
+	})
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertBulk) UpdateRawRatingScore() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateRawRatingScore()
+	})
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) ClearRawRatingScore() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearRawRatingScore()
 	})
 }
 

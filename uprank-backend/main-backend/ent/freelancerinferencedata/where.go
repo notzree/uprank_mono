@@ -74,6 +74,11 @@ func FinalizedRatingScore(v float64) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldFinalizedRatingScore, v))
 }
 
+// RawRatingScore applies equality check predicate on the "raw_rating_score" field. It's identical to RawRatingScoreEQ.
+func RawRatingScore(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldRawRatingScore, v))
+}
+
 // AiEstimatedDuration applies equality check predicate on the "ai_estimated_duration" field. It's identical to AiEstimatedDurationEQ.
 func AiEstimatedDuration(v *pgtype.Interval) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldAiEstimatedDuration, v))
@@ -237,6 +242,56 @@ func FinalizedRatingScoreLT(v float64) predicate.FreelancerInferenceData {
 // FinalizedRatingScoreLTE applies the LTE predicate on the "finalized_rating_score" field.
 func FinalizedRatingScoreLTE(v float64) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldLTE(FieldFinalizedRatingScore, v))
+}
+
+// RawRatingScoreEQ applies the EQ predicate on the "raw_rating_score" field.
+func RawRatingScoreEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreNEQ applies the NEQ predicate on the "raw_rating_score" field.
+func RawRatingScoreNEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNEQ(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreIn applies the In predicate on the "raw_rating_score" field.
+func RawRatingScoreIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIn(FieldRawRatingScore, vs...))
+}
+
+// RawRatingScoreNotIn applies the NotIn predicate on the "raw_rating_score" field.
+func RawRatingScoreNotIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotIn(FieldRawRatingScore, vs...))
+}
+
+// RawRatingScoreGT applies the GT predicate on the "raw_rating_score" field.
+func RawRatingScoreGT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGT(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreGTE applies the GTE predicate on the "raw_rating_score" field.
+func RawRatingScoreGTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGTE(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreLT applies the LT predicate on the "raw_rating_score" field.
+func RawRatingScoreLT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLT(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreLTE applies the LTE predicate on the "raw_rating_score" field.
+func RawRatingScoreLTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLTE(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreIsNil applies the IsNil predicate on the "raw_rating_score" field.
+func RawRatingScoreIsNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIsNull(FieldRawRatingScore))
+}
+
+// RawRatingScoreNotNil applies the NotNil predicate on the "raw_rating_score" field.
+func RawRatingScoreNotNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotNull(FieldRawRatingScore))
 }
 
 // AiEstimatedDurationEQ applies the EQ predicate on the "ai_estimated_duration" field.

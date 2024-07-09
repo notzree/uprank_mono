@@ -110,6 +110,33 @@ func (fidu *FreelancerInferenceDataUpdate) AddFinalizedRatingScore(f float64) *F
 	return fidu
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) SetRawRatingScore(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.ResetRawRatingScore()
+	fidu.mutation.SetRawRatingScore(f)
+	return fidu
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fidu *FreelancerInferenceDataUpdate) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataUpdate {
+	if f != nil {
+		fidu.SetRawRatingScore(*f)
+	}
+	return fidu
+}
+
+// AddRawRatingScore adds f to the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) AddRawRatingScore(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.AddRawRatingScore(f)
+	return fidu
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) ClearRawRatingScore() *FreelancerInferenceDataUpdate {
+	fidu.mutation.ClearRawRatingScore()
+	return fidu
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (fidu *FreelancerInferenceDataUpdate) SetAiEstimatedDuration(pg *pgtype.Interval) *FreelancerInferenceDataUpdate {
 	fidu.mutation.SetAiEstimatedDuration(pg)
@@ -241,6 +268,15 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if value, ok := fidu.mutation.AddedFinalizedRatingScore(); ok {
 		_spec.AddField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fidu.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fidu.mutation.AddedRawRatingScore(); ok {
+		_spec.AddField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if fidu.mutation.RawRatingScoreCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64)
 	}
 	if value, ok := fidu.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)
@@ -384,6 +420,33 @@ func (fiduo *FreelancerInferenceDataUpdateOne) SetNillableFinalizedRatingScore(f
 // AddFinalizedRatingScore adds f to the "finalized_rating_score" field.
 func (fiduo *FreelancerInferenceDataUpdateOne) AddFinalizedRatingScore(f float64) *FreelancerInferenceDataUpdateOne {
 	fiduo.mutation.AddFinalizedRatingScore(f)
+	return fiduo
+}
+
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetRawRatingScore(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ResetRawRatingScore()
+	fiduo.mutation.SetRawRatingScore(f)
+	return fiduo
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataUpdateOne {
+	if f != nil {
+		fiduo.SetRawRatingScore(*f)
+	}
+	return fiduo
+}
+
+// AddRawRatingScore adds f to the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) AddRawRatingScore(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.AddRawRatingScore(f)
+	return fiduo
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) ClearRawRatingScore() *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ClearRawRatingScore()
 	return fiduo
 }
 
@@ -548,6 +611,15 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if value, ok := fiduo.mutation.AddedFinalizedRatingScore(); ok {
 		_spec.AddField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fiduo.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fiduo.mutation.AddedRawRatingScore(); ok {
+		_spec.AddField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if fiduo.mutation.RawRatingScoreCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64)
 	}
 	if value, ok := fiduo.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)

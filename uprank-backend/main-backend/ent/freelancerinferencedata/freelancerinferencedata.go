@@ -20,6 +20,8 @@ const (
 	FieldUprankNotEnoughData = "uprank_not_enough_data"
 	// FieldFinalizedRatingScore holds the string denoting the finalized_rating_score field in the database.
 	FieldFinalizedRatingScore = "finalized_rating_score"
+	// FieldRawRatingScore holds the string denoting the raw_rating_score field in the database.
+	FieldRawRatingScore = "raw_rating_score"
 	// FieldAiEstimatedDuration holds the string denoting the ai_estimated_duration field in the database.
 	FieldAiEstimatedDuration = "ai_estimated_duration"
 	// FieldBudgetAdherencePercentage holds the string denoting the budget_adherence_percentage field in the database.
@@ -44,6 +46,7 @@ var Columns = []string{
 	FieldUprankReccomendedReasons,
 	FieldUprankNotEnoughData,
 	FieldFinalizedRatingScore,
+	FieldRawRatingScore,
 	FieldAiEstimatedDuration,
 	FieldBudgetAdherencePercentage,
 }
@@ -102,6 +105,11 @@ func ByUprankNotEnoughData(opts ...sql.OrderTermOption) OrderOption {
 // ByFinalizedRatingScore orders the results by the finalized_rating_score field.
 func ByFinalizedRatingScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFinalizedRatingScore, opts...).ToFunc()
+}
+
+// ByRawRatingScore orders the results by the raw_rating_score field.
+func ByRawRatingScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRawRatingScore, opts...).ToFunc()
 }
 
 // ByAiEstimatedDuration orders the results by the ai_estimated_duration field.

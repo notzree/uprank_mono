@@ -26,6 +26,8 @@ type FreelancerInferenceData struct {
 	UprankNotEnoughData bool `json:"uprank_not_enough_data,omitempty"`
 	// FinalizedRatingScore holds the value of the "finalized_rating_score" field.
 	FinalizedRatingScore float64 `json:"finalized_rating_score,omitempty"`
+	// RawRatingScore holds the value of the "raw_rating_score" field.
+	RawRatingScore float64 `json:"raw_rating_score,omitempty"`
 	// AiEstimatedDuration holds the value of the "ai_estimated_duration" field.
 	AiEstimatedDuration *pgtype.Interval `json:"ai_estimated_duration,omitempty"`
 	// BudgetAdherencePercentage holds the value of the "budget_adherence_percentage" field.
@@ -66,7 +68,7 @@ func (*FreelancerInferenceData) scanValues(columns []string) ([]any, error) {
 			values[i] = new(pgtype.Interval)
 		case freelancerinferencedata.FieldUprankReccomended, freelancerinferencedata.FieldUprankNotEnoughData:
 			values[i] = new(sql.NullBool)
-		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage:
+		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldRawRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage:
 			values[i] = new(sql.NullFloat64)
 		case freelancerinferencedata.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -118,6 +120,12 @@ func (fid *FreelancerInferenceData) assignValues(columns []string, values []any)
 				return fmt.Errorf("unexpected type %T for field finalized_rating_score", values[i])
 			} else if value.Valid {
 				fid.FinalizedRatingScore = value.Float64
+			}
+		case freelancerinferencedata.FieldRawRatingScore:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field raw_rating_score", values[i])
+			} else if value.Valid {
+				fid.RawRatingScore = value.Float64
 			}
 		case freelancerinferencedata.FieldAiEstimatedDuration:
 			if value, ok := values[i].(*pgtype.Interval); !ok {
@@ -190,6 +198,9 @@ func (fid *FreelancerInferenceData) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("finalized_rating_score=")
 	builder.WriteString(fmt.Sprintf("%v", fid.FinalizedRatingScore))
+	builder.WriteString(", ")
+	builder.WriteString("raw_rating_score=")
+	builder.WriteString(fmt.Sprintf("%v", fid.RawRatingScore))
 	builder.WriteString(", ")
 	builder.WriteString("ai_estimated_duration=")
 	builder.WriteString(fmt.Sprintf("%v", fid.AiEstimatedDuration))
