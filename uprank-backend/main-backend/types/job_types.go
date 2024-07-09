@@ -59,7 +59,17 @@ type GetUpworkJobEmbeddingDataResponse struct {
 }
 
 type AddJobRankingRequest struct {
-	Freelancer_score_map map[string]float32 `json:"freelancer_score_map,omitempty"`
+	Freelancer_ranking_data []FreelancerRankingData `json:"freelancer_ranking_data,omitempty"`
+}
+
+type FreelancerRankingData struct {
+	Freelancer_id               string  `json:"freelancer_id,omitempty"`
+	Finalized_rating_score      float32 `json:"finalized_rating_score,omitempty"`
+	Raw_rating_score            float32 `json:"raw_rating_score,omitempty"`
+	Uprank_reccomended          bool    `json:"uprank_reccomended,omitempty"`
+	Uprank_reccomended_reasons  string  `json:"uprank_reccomended_reasons,omitempty"`
+	Uprank_not_enough_data      bool    `json:"uprank_not_enough_data,omitempty"`
+	Budget_adherence_percentage float32 `json:"budget_adherence_percentage,omitempty"`
 }
 
 func (req *AddJobRankingRequest) Validate() map[string]interface{} {
