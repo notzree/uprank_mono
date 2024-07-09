@@ -18,6 +18,7 @@ func (FreelancerInferenceData) Fields() []ent.Field {
 		field.String("uprank_reccomended_reasons").Optional(),
 		field.Bool("uprank_not_enough_data").Default(false).Optional(),
 		field.Float("finalized_rating_score"),
+		field.Float("raw_rating_score").Optional(),
 		field.Other("ai_estimated_duration", &pgtype.Interval{}).SchemaType(map[string]string{
 			dialect.Postgres: "INTERVAL",
 		}).Optional(),

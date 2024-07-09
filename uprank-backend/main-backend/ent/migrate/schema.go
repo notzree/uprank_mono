@@ -36,6 +36,7 @@ var (
 		{Name: "uprank_reccomended_reasons", Type: field.TypeString, Nullable: true},
 		{Name: "uprank_not_enough_data", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "finalized_rating_score", Type: field.TypeFloat64},
+		{Name: "raw_rating_score", Type: field.TypeFloat64, Nullable: true},
 		{Name: "ai_estimated_duration", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "INTERVAL"}},
 		{Name: "budget_adherence_percentage", Type: field.TypeFloat64, Nullable: true},
 		{Name: "upwork_freelancer_freelancer_inference_data", Type: field.TypeString, Unique: true},
@@ -48,7 +49,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "freelancer_inference_data_upwork_freelancers_freelancer_inference_data",
-				Columns:    []*schema.Column{FreelancerInferenceDataColumns[7]},
+				Columns:    []*schema.Column{FreelancerInferenceDataColumns[8]},
 				RefColumns: []*schema.Column{UpworkFreelancersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

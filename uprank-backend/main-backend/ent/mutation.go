@@ -502,6 +502,8 @@ type FreelancerInferenceDataMutation struct {
 	uprank_not_enough_data         *bool
 	finalized_rating_score         *float64
 	addfinalized_rating_score      *float64
+	raw_rating_score               *float64
+	addraw_rating_score            *float64
 	ai_estimated_duration          **pgtype.Interval
 	budget_adherence_percentage    *float64
 	addbudget_adherence_percentage *float64
@@ -814,6 +816,76 @@ func (m *FreelancerInferenceDataMutation) ResetFinalizedRatingScore() {
 	m.addfinalized_rating_score = nil
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (m *FreelancerInferenceDataMutation) SetRawRatingScore(f float64) {
+	m.raw_rating_score = &f
+	m.addraw_rating_score = nil
+}
+
+// RawRatingScore returns the value of the "raw_rating_score" field in the mutation.
+func (m *FreelancerInferenceDataMutation) RawRatingScore() (r float64, exists bool) {
+	v := m.raw_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRawRatingScore returns the old "raw_rating_score" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldRawRatingScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRawRatingScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRawRatingScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRawRatingScore: %w", err)
+	}
+	return oldValue.RawRatingScore, nil
+}
+
+// AddRawRatingScore adds f to the "raw_rating_score" field.
+func (m *FreelancerInferenceDataMutation) AddRawRatingScore(f float64) {
+	if m.addraw_rating_score != nil {
+		*m.addraw_rating_score += f
+	} else {
+		m.addraw_rating_score = &f
+	}
+}
+
+// AddedRawRatingScore returns the value that was added to the "raw_rating_score" field in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedRawRatingScore() (r float64, exists bool) {
+	v := m.addraw_rating_score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (m *FreelancerInferenceDataMutation) ClearRawRatingScore() {
+	m.raw_rating_score = nil
+	m.addraw_rating_score = nil
+	m.clearedFields[freelancerinferencedata.FieldRawRatingScore] = struct{}{}
+}
+
+// RawRatingScoreCleared returns if the "raw_rating_score" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) RawRatingScoreCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldRawRatingScore]
+	return ok
+}
+
+// ResetRawRatingScore resets all changes to the "raw_rating_score" field.
+func (m *FreelancerInferenceDataMutation) ResetRawRatingScore() {
+	m.raw_rating_score = nil
+	m.addraw_rating_score = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldRawRatingScore)
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (m *FreelancerInferenceDataMutation) SetAiEstimatedDuration(pg *pgtype.Interval) {
 	m.ai_estimated_duration = &pg
@@ -1006,7 +1078,7 @@ func (m *FreelancerInferenceDataMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FreelancerInferenceDataMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.uprank_reccomended != nil {
 		fields = append(fields, freelancerinferencedata.FieldUprankReccomended)
 	}
@@ -1018,6 +1090,9 @@ func (m *FreelancerInferenceDataMutation) Fields() []string {
 	}
 	if m.finalized_rating_score != nil {
 		fields = append(fields, freelancerinferencedata.FieldFinalizedRatingScore)
+	}
+	if m.raw_rating_score != nil {
+		fields = append(fields, freelancerinferencedata.FieldRawRatingScore)
 	}
 	if m.ai_estimated_duration != nil {
 		fields = append(fields, freelancerinferencedata.FieldAiEstimatedDuration)
@@ -1041,6 +1116,8 @@ func (m *FreelancerInferenceDataMutation) Field(name string) (ent.Value, bool) {
 		return m.UprankNotEnoughData()
 	case freelancerinferencedata.FieldFinalizedRatingScore:
 		return m.FinalizedRatingScore()
+	case freelancerinferencedata.FieldRawRatingScore:
+		return m.RawRatingScore()
 	case freelancerinferencedata.FieldAiEstimatedDuration:
 		return m.AiEstimatedDuration()
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
@@ -1062,6 +1139,8 @@ func (m *FreelancerInferenceDataMutation) OldField(ctx context.Context, name str
 		return m.OldUprankNotEnoughData(ctx)
 	case freelancerinferencedata.FieldFinalizedRatingScore:
 		return m.OldFinalizedRatingScore(ctx)
+	case freelancerinferencedata.FieldRawRatingScore:
+		return m.OldRawRatingScore(ctx)
 	case freelancerinferencedata.FieldAiEstimatedDuration:
 		return m.OldAiEstimatedDuration(ctx)
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
@@ -1103,6 +1182,13 @@ func (m *FreelancerInferenceDataMutation) SetField(name string, value ent.Value)
 		}
 		m.SetFinalizedRatingScore(v)
 		return nil
+	case freelancerinferencedata.FieldRawRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRawRatingScore(v)
+		return nil
 	case freelancerinferencedata.FieldAiEstimatedDuration:
 		v, ok := value.(*pgtype.Interval)
 		if !ok {
@@ -1128,6 +1214,9 @@ func (m *FreelancerInferenceDataMutation) AddedFields() []string {
 	if m.addfinalized_rating_score != nil {
 		fields = append(fields, freelancerinferencedata.FieldFinalizedRatingScore)
 	}
+	if m.addraw_rating_score != nil {
+		fields = append(fields, freelancerinferencedata.FieldRawRatingScore)
+	}
 	if m.addbudget_adherence_percentage != nil {
 		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
 	}
@@ -1141,6 +1230,8 @@ func (m *FreelancerInferenceDataMutation) AddedField(name string) (ent.Value, bo
 	switch name {
 	case freelancerinferencedata.FieldFinalizedRatingScore:
 		return m.AddedFinalizedRatingScore()
+	case freelancerinferencedata.FieldRawRatingScore:
+		return m.AddedRawRatingScore()
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		return m.AddedBudgetAdherencePercentage()
 	}
@@ -1158,6 +1249,13 @@ func (m *FreelancerInferenceDataMutation) AddField(name string, value ent.Value)
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFinalizedRatingScore(v)
+		return nil
+	case freelancerinferencedata.FieldRawRatingScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRawRatingScore(v)
 		return nil
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		v, ok := value.(float64)
@@ -1182,6 +1280,9 @@ func (m *FreelancerInferenceDataMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(freelancerinferencedata.FieldUprankNotEnoughData) {
 		fields = append(fields, freelancerinferencedata.FieldUprankNotEnoughData)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldRawRatingScore) {
+		fields = append(fields, freelancerinferencedata.FieldRawRatingScore)
 	}
 	if m.FieldCleared(freelancerinferencedata.FieldAiEstimatedDuration) {
 		fields = append(fields, freelancerinferencedata.FieldAiEstimatedDuration)
@@ -1212,6 +1313,9 @@ func (m *FreelancerInferenceDataMutation) ClearField(name string) error {
 	case freelancerinferencedata.FieldUprankNotEnoughData:
 		m.ClearUprankNotEnoughData()
 		return nil
+	case freelancerinferencedata.FieldRawRatingScore:
+		m.ClearRawRatingScore()
+		return nil
 	case freelancerinferencedata.FieldAiEstimatedDuration:
 		m.ClearAiEstimatedDuration()
 		return nil
@@ -1237,6 +1341,9 @@ func (m *FreelancerInferenceDataMutation) ResetField(name string) error {
 		return nil
 	case freelancerinferencedata.FieldFinalizedRatingScore:
 		m.ResetFinalizedRatingScore()
+		return nil
+	case freelancerinferencedata.FieldRawRatingScore:
+		m.ResetRawRatingScore()
 		return nil
 	case freelancerinferencedata.FieldAiEstimatedDuration:
 		m.ResetAiEstimatedDuration()
