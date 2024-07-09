@@ -7,11 +7,11 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
         return <div>Job not found</div>;
     }
     return (
-        <div className="grid min-h-screen w-full">
+        <div className="grid min-h-screen w-screen">
             <div className="flex flex-col">
                 <Navbar />
                 <main className="flex flex-1 flex-col pt-16">
-                    <div className="flex flex-row w-full  px-6">
+                    <div className="flex flex-row w-screen px-6">
                         <JobDataTable
                             freelancers={
                                 job_prop.edges.upworkjob?.edges

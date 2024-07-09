@@ -51,7 +51,7 @@ import { UpworkJob } from "@/types/job";
 
 export function JobDataTable({
     freelancers,
-    job
+    job,
 }: {
     freelancers: UpworkFreelancer[];
     job: UpworkJob;
@@ -88,7 +88,9 @@ export function JobDataTable({
                 return (
                     <Button
                         variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
                     >
                         Name
                         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -106,9 +108,11 @@ export function JobDataTable({
                             <AvatarFallback>:d</AvatarFallback>
                         </Avatar>
                         <span style={{ marginLeft: "8px" }}>
-                            <a href={freelancer_link} target = "_blank"
+                            <a
+                                href={freelancer_link}
+                                target="_blank"
                                 className=" underline"
-                                >
+                            >
                                 {name}
                             </a>
                         </span>
@@ -116,7 +120,7 @@ export function JobDataTable({
                 );
             },
             enableSorting: true,
-            enableHiding: false,    
+            enableHiding: false,
         },
         {
             id: "Location",
@@ -134,7 +138,7 @@ export function JobDataTable({
             cell: ({ row }) => (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="outline">Show</Button>
+                        <Button variant="outline">View</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -154,67 +158,14 @@ export function JobDataTable({
             enableSorting: false,
         },
         {
-            id: "proposed_rate",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Proposed Rate
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => {
-                return (
-                    <div className="text-right font-medium">
-                        {row.getValue("proposed_rate")}
-                    </div>
-                );
-            },
-            accessorFn: (row) => {
-                let currency = row.hourly_charge_currency || row.fixed_charge_currency;
-                let amount = row.fixed_charge_amount || row.hourly_charge_amount;
-                let formatted_string = `${currency} ${amount}`;
-                if (row.fixed_charge_amount) {
-                    formatted_string += "/hr";
-                }
-                return formatted_string;
-            },
-            enableSorting: true,
-        },
-        {
-            id: "recent_hours",
-            accessorKey: "recent_hours",
-            header: ({ column }) => {
-                return (
-                  <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                  >
-                    Recent hours
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                )
-              },
-            cell: ({ row }) => {
-                let hours = "0";
-                if (row.original.recent_hours) {
-                    hours = row.original.recent_hours.toFixed(0);
-                }
-                return <div className="text-right">{hours}</div>;
-            },
-            enableSorting: true,
-            enableHiding: true,
-        },
-        {
             id: "skills",
             header: ({ column }) => {
                 return (
                     <Button
                         variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
                     >
                         Percent skills matched
                         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -223,8 +174,36 @@ export function JobDataTable({
             },
             cell: ({ row }) => {
                 return (
-                    <div className="text-right">
-                        {row.getValue("skills") + "%"|| "No skills indicated"}
+                    <div className="text-right flex justify-end items-center gap-x-4">
+                        {row.getValue("skills") + "%" || "No skills indicated"}
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline">View</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        {row.original.name}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className=" overflow-y-scroll max-h-96">
+                                        {
+                                            row.original.skills.map(
+                                                (skill, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            {skill}
+                                                        </div>
+                                                    );
+                                                }
+                                            )
+                                        }
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogAction>Close</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 );
             },
@@ -241,10 +220,180 @@ export function JobDataTable({
                         matched_skills += 1;
                     }
                 }
-                const percent_matched = Math.round(matched_skills / required_skills.length * 100);
+                const percent_matched = Math.round(
+                    (matched_skills / required_skills.length) * 100
+                );
                 return percent_matched;
             },
             enableSorting: true,
+        },
+        {
+            id: "proposed_rate",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Proposed Rate
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-right font-medium">
+                        {row.getValue("proposed_rate")}
+                    </div>
+                );
+            },
+            accessorFn: (row) => {
+                let currency =
+                    row.hourly_charge_currency || row.fixed_charge_currency;
+                let amount =
+                    row.fixed_charge_amount || row.hourly_charge_amount;
+                let formatted_string = `${currency} ${amount}`;
+                if (row.fixed_charge_amount) {
+                    formatted_string += "/hr";
+                }
+                return formatted_string;
+            },
+            enableSorting: true,
+        },
+        {
+            id: "recent_hours",
+            accessorKey: "recent_hours",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Recent hours
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                let hours = "0";
+                if (row.original.recent_hours) {
+                    hours = row.original.recent_hours.toFixed(0);
+                }
+                return <div className="text-right">{hours}</div>;
+            },
+            enableSorting: true,
+            enableHiding: true,
+        },
+        {
+            id: "total_hours",
+            accessorKey: "total_hours",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Total hours
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                let hours = "0";
+                if (row.original.total_hours) {
+                    hours = row.original.total_hours.toFixed(0);
+                }
+                return <div className="text-right">{hours}</div>;
+            },
+            enableSorting: true,
+            enableHiding: true,
+        },
+        {
+            id: "average_recent_earnings",
+            accessorKey: "average_recent_earnings",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Average Recent Earnings
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                let earnings = "0";
+                if (row.original.average_recent_earnings) {
+                    earnings = row.original.average_recent_earnings.toFixed(0);
+                }
+                return <div className="text-right">${earnings}</div>;
+            },
+            accessorFn: (row) => row.average_recent_earnings || 0,
+            enableSorting: true,
+            enableHiding: true,
+        },
+        {
+            id: "recent_earnings",
+            accessorKey: "recent_earnings",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Recent Earnings
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                let earnings = "0";
+                if (row.original.recent_earnings) {
+                    earnings = row.original.recent_earnings.toFixed(0);
+                }
+                return <div className="text-right">${earnings}</div>;
+            },
+            accessorFn: (row) => row.recent_earnings || 0,
+            enableSorting: true,
+            enableHiding: true,
+        },
+        {
+            id: "combined_total_earnings",
+            accessorKey: "combined_total_earnings",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Total Earnings
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                let earnings = "0";
+                if (row.original.combined_total_earnings) {
+                    earnings = row.original.combined_total_earnings.toFixed(0);
+                }
+                return <div className="text-right">${earnings}</div>;
+            },
+            accessorFn: (row) => row.combined_total_earnings || 0,
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             id: "specialization_score",
@@ -252,7 +401,9 @@ export function JobDataTable({
                 return (
                     <Button
                         variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
                     >
                         Specialization score
                         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -269,9 +420,11 @@ export function JobDataTable({
             accessorKey: "specialization_score",
             accessorFn: (row) => {
                 if (row.edges && row.edges.freelancer_inference_data) {
-                    return row.edges.freelancer_inference_data.finalized_rating_score.toFixed(2)
+                    return row.edges.freelancer_inference_data.finalized_rating_score.toFixed(
+                        2
+                    );
                 } else {
-                    return "Not enough data"
+                    return "Not enough data";
                 }
             },
             enableSorting: true,
@@ -281,7 +434,7 @@ export function JobDataTable({
             enableHiding: false,
             cell: ({ row }) => {
                 const payment = row.original;
-    
+
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -311,7 +464,6 @@ export function JobDataTable({
             enableSorting: false,
         },
     ];
-    
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -340,7 +492,7 @@ export function JobDataTable({
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full overflow-auto">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter freelancers..."
