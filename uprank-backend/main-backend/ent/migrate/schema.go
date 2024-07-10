@@ -39,6 +39,7 @@ var (
 		{Name: "raw_rating_score", Type: field.TypeFloat64, Nullable: true},
 		{Name: "ai_estimated_duration", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "INTERVAL"}},
 		{Name: "budget_adherence_percentage", Type: field.TypeFloat64, Nullable: true},
+		{Name: "budget_overrun_percentage", Type: field.TypeFloat64, Nullable: true},
 		{Name: "upwork_freelancer_freelancer_inference_data", Type: field.TypeString, Unique: true},
 	}
 	// FreelancerInferenceDataTable holds the schema information for the "freelancer_inference_data" table.
@@ -49,7 +50,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "freelancer_inference_data_upwork_freelancers_freelancer_inference_data",
-				Columns:    []*schema.Column{FreelancerInferenceDataColumns[8]},
+				Columns:    []*schema.Column{FreelancerInferenceDataColumns[9]},
 				RefColumns: []*schema.Column{UpworkFreelancersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

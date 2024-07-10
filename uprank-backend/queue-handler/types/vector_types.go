@@ -16,9 +16,7 @@ type UpsertVectorResponse struct {
 }
 
 type ComputeRawSpecializationScoreRequest struct {
-	Job_id                 string        `json:"job_id"`
-	Work_history_count     int32         `json:"work_history_count"`
-	Freelancer_count       int32         `json:"freelancer_count"`
+	Job_data               JobData       `json:"job_data"`
 	Job_description_vector *proto.Vector `json:"job_description_vector"`
 	Job_skill_vector       *proto.Vector `json:"job_skill_vector"`
 }
@@ -29,21 +27,31 @@ type ComputeRawSpecializationScoreResponse struct {
 
 type ApplySpecializationScoreWeightsRequest struct {
 	Description_scores map[string]map[int]float32 `json:"description_scores"`
-	Job_data           JobEmbeddingData           `json:"job_data"`
+	Job_data           JobData                    `json:"job_data"`
 }
 
 type ApplySpecializationScoreWeightsResponse struct {
 	Weighted_scores (map[string]map[int]float32) `json:"weighted_scores"`
 }
 
-type FinalizedJobRankingData struct {
-	Job_id               string             `json:"job_id"`
-	Platform             string             `json:"platform"`
-	Platform_id          string             `json:"platform_id"`
-	User_id              string             `json:"user_id"`
-	Freelancer_score_map map[string]float32 `json:"freelancer_score_map"`
+type PostJobRankingDataRequest struct {
+	Job_id                  string                  `json:"job_id"`
+	Platform                string                  `json:"platform"`
+	Platform_id             string                  `json:"platform_id"`
+	User_id                 string                  `json:"user_id"`
+	Freelancer_ranking_data []FreelancerRankingData `json:"freelancer_ranking_data"`
 }
 
 type AddJobRankingRequest struct {
-	Freelancer_score_map map[string]float32 `json:"freelancer_score_map,omitempty"`
+	Freelancer_ranking_data []FreelancerRankingData `json:"freelancer_ranking_data,omitempty"`
+}
+
+type FreelancerRankingData struct {
+	Freelancer_id               string  `json:"freelancer_id,omitempty"`
+	Finalized_rating_score      float32 `json:"finalized_rating_score,omitempty"`
+	Raw_rating_score            float32 `json:"raw_rating_score,omitempty"`
+	Uprank_reccomended          bool    `json:"uprank_reccomended,omitempty"`
+	Uprank_reccomended_reasons  string  `json:"uprank_reccomended_reasons,omitempty"`
+	Uprank_not_enough_data      bool    `json:"uprank_not_enough_data,omitempty"`
+	Budget_adherence_percentage float32 `json:"budget_adherence_percentage,omitempty"`
 }

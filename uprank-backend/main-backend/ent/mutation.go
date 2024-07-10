@@ -507,6 +507,8 @@ type FreelancerInferenceDataMutation struct {
 	ai_estimated_duration          **pgtype.Interval
 	budget_adherence_percentage    *float64
 	addbudget_adherence_percentage *float64
+	budget_overrun_percentage      *float64
+	addbudget_overrun_percentage   *float64
 	clearedFields                  map[string]struct{}
 	upworkfreelancer               *string
 	clearedupworkfreelancer        bool
@@ -1005,6 +1007,76 @@ func (m *FreelancerInferenceDataMutation) ResetBudgetAdherencePercentage() {
 	delete(m.clearedFields, freelancerinferencedata.FieldBudgetAdherencePercentage)
 }
 
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (m *FreelancerInferenceDataMutation) SetBudgetOverrunPercentage(f float64) {
+	m.budget_overrun_percentage = &f
+	m.addbudget_overrun_percentage = nil
+}
+
+// BudgetOverrunPercentage returns the value of the "budget_overrun_percentage" field in the mutation.
+func (m *FreelancerInferenceDataMutation) BudgetOverrunPercentage() (r float64, exists bool) {
+	v := m.budget_overrun_percentage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBudgetOverrunPercentage returns the old "budget_overrun_percentage" field's value of the FreelancerInferenceData entity.
+// If the FreelancerInferenceData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FreelancerInferenceDataMutation) OldBudgetOverrunPercentage(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBudgetOverrunPercentage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBudgetOverrunPercentage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBudgetOverrunPercentage: %w", err)
+	}
+	return oldValue.BudgetOverrunPercentage, nil
+}
+
+// AddBudgetOverrunPercentage adds f to the "budget_overrun_percentage" field.
+func (m *FreelancerInferenceDataMutation) AddBudgetOverrunPercentage(f float64) {
+	if m.addbudget_overrun_percentage != nil {
+		*m.addbudget_overrun_percentage += f
+	} else {
+		m.addbudget_overrun_percentage = &f
+	}
+}
+
+// AddedBudgetOverrunPercentage returns the value that was added to the "budget_overrun_percentage" field in this mutation.
+func (m *FreelancerInferenceDataMutation) AddedBudgetOverrunPercentage() (r float64, exists bool) {
+	v := m.addbudget_overrun_percentage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (m *FreelancerInferenceDataMutation) ClearBudgetOverrunPercentage() {
+	m.budget_overrun_percentage = nil
+	m.addbudget_overrun_percentage = nil
+	m.clearedFields[freelancerinferencedata.FieldBudgetOverrunPercentage] = struct{}{}
+}
+
+// BudgetOverrunPercentageCleared returns if the "budget_overrun_percentage" field was cleared in this mutation.
+func (m *FreelancerInferenceDataMutation) BudgetOverrunPercentageCleared() bool {
+	_, ok := m.clearedFields[freelancerinferencedata.FieldBudgetOverrunPercentage]
+	return ok
+}
+
+// ResetBudgetOverrunPercentage resets all changes to the "budget_overrun_percentage" field.
+func (m *FreelancerInferenceDataMutation) ResetBudgetOverrunPercentage() {
+	m.budget_overrun_percentage = nil
+	m.addbudget_overrun_percentage = nil
+	delete(m.clearedFields, freelancerinferencedata.FieldBudgetOverrunPercentage)
+}
+
 // SetUpworkfreelancerID sets the "upworkfreelancer" edge to the UpworkFreelancer entity by id.
 func (m *FreelancerInferenceDataMutation) SetUpworkfreelancerID(id string) {
 	m.upworkfreelancer = &id
@@ -1078,7 +1150,7 @@ func (m *FreelancerInferenceDataMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FreelancerInferenceDataMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.uprank_reccomended != nil {
 		fields = append(fields, freelancerinferencedata.FieldUprankReccomended)
 	}
@@ -1099,6 +1171,9 @@ func (m *FreelancerInferenceDataMutation) Fields() []string {
 	}
 	if m.budget_adherence_percentage != nil {
 		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+	}
+	if m.budget_overrun_percentage != nil {
+		fields = append(fields, freelancerinferencedata.FieldBudgetOverrunPercentage)
 	}
 	return fields
 }
@@ -1122,6 +1197,8 @@ func (m *FreelancerInferenceDataMutation) Field(name string) (ent.Value, bool) {
 		return m.AiEstimatedDuration()
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		return m.BudgetAdherencePercentage()
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		return m.BudgetOverrunPercentage()
 	}
 	return nil, false
 }
@@ -1145,6 +1222,8 @@ func (m *FreelancerInferenceDataMutation) OldField(ctx context.Context, name str
 		return m.OldAiEstimatedDuration(ctx)
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		return m.OldBudgetAdherencePercentage(ctx)
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		return m.OldBudgetOverrunPercentage(ctx)
 	}
 	return nil, fmt.Errorf("unknown FreelancerInferenceData field %s", name)
 }
@@ -1203,6 +1282,13 @@ func (m *FreelancerInferenceDataMutation) SetField(name string, value ent.Value)
 		}
 		m.SetBudgetAdherencePercentage(v)
 		return nil
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBudgetOverrunPercentage(v)
+		return nil
 	}
 	return fmt.Errorf("unknown FreelancerInferenceData field %s", name)
 }
@@ -1220,6 +1306,9 @@ func (m *FreelancerInferenceDataMutation) AddedFields() []string {
 	if m.addbudget_adherence_percentage != nil {
 		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
 	}
+	if m.addbudget_overrun_percentage != nil {
+		fields = append(fields, freelancerinferencedata.FieldBudgetOverrunPercentage)
+	}
 	return fields
 }
 
@@ -1234,6 +1323,8 @@ func (m *FreelancerInferenceDataMutation) AddedField(name string) (ent.Value, bo
 		return m.AddedRawRatingScore()
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		return m.AddedBudgetAdherencePercentage()
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		return m.AddedBudgetOverrunPercentage()
 	}
 	return nil, false
 }
@@ -1264,6 +1355,13 @@ func (m *FreelancerInferenceDataMutation) AddField(name string, value ent.Value)
 		}
 		m.AddBudgetAdherencePercentage(v)
 		return nil
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBudgetOverrunPercentage(v)
+		return nil
 	}
 	return fmt.Errorf("unknown FreelancerInferenceData numeric field %s", name)
 }
@@ -1289,6 +1387,9 @@ func (m *FreelancerInferenceDataMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(freelancerinferencedata.FieldBudgetAdherencePercentage) {
 		fields = append(fields, freelancerinferencedata.FieldBudgetAdherencePercentage)
+	}
+	if m.FieldCleared(freelancerinferencedata.FieldBudgetOverrunPercentage) {
+		fields = append(fields, freelancerinferencedata.FieldBudgetOverrunPercentage)
 	}
 	return fields
 }
@@ -1322,6 +1423,9 @@ func (m *FreelancerInferenceDataMutation) ClearField(name string) error {
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		m.ClearBudgetAdherencePercentage()
 		return nil
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		m.ClearBudgetOverrunPercentage()
+		return nil
 	}
 	return fmt.Errorf("unknown FreelancerInferenceData nullable field %s", name)
 }
@@ -1350,6 +1454,9 @@ func (m *FreelancerInferenceDataMutation) ResetField(name string) error {
 		return nil
 	case freelancerinferencedata.FieldBudgetAdherencePercentage:
 		m.ResetBudgetAdherencePercentage()
+		return nil
+	case freelancerinferencedata.FieldBudgetOverrunPercentage:
+		m.ResetBudgetOverrunPercentage()
 		return nil
 	}
 	return fmt.Errorf("unknown FreelancerInferenceData field %s", name)

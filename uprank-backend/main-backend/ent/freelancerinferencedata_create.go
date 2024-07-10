@@ -105,6 +105,20 @@ func (fidc *FreelancerInferenceDataCreate) SetNillableBudgetAdherencePercentage(
 	return fidc
 }
 
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fidc *FreelancerInferenceDataCreate) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataCreate {
+	fidc.mutation.SetBudgetOverrunPercentage(f)
+	return fidc
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fidc *FreelancerInferenceDataCreate) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataCreate {
+	if f != nil {
+		fidc.SetBudgetOverrunPercentage(*f)
+	}
+	return fidc
+}
+
 // SetUpworkfreelancerID sets the "upworkfreelancer" edge to the UpworkFreelancer entity by ID.
 func (fidc *FreelancerInferenceDataCreate) SetUpworkfreelancerID(id string) *FreelancerInferenceDataCreate {
 	fidc.mutation.SetUpworkfreelancerID(id)
@@ -223,6 +237,10 @@ func (fidc *FreelancerInferenceDataCreate) createSpec() (*FreelancerInferenceDat
 	if value, ok := fidc.mutation.BudgetAdherencePercentage(); ok {
 		_spec.SetField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64, value)
 		_node.BudgetAdherencePercentage = value
+	}
+	if value, ok := fidc.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+		_node.BudgetOverrunPercentage = value
 	}
 	if nodes := fidc.mutation.UpworkfreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -431,6 +449,30 @@ func (u *FreelancerInferenceDataUpsert) ClearBudgetAdherencePercentage() *Freela
 	return u
 }
 
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsert {
+	u.Set(freelancerinferencedata.FieldBudgetOverrunPercentage, v)
+	return u
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsert) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsert {
+	u.SetExcluded(freelancerinferencedata.FieldBudgetOverrunPercentage)
+	return u
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsert {
+	u.Add(freelancerinferencedata.FieldBudgetOverrunPercentage, v)
+	return u
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsert {
+	u.SetNull(freelancerinferencedata.FieldBudgetOverrunPercentage)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -629,6 +671,34 @@ func (u *FreelancerInferenceDataUpsertOne) UpdateBudgetAdherencePercentage() *Fr
 func (u *FreelancerInferenceDataUpsertOne) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpsertOne {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.ClearBudgetAdherencePercentage()
+	})
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetBudgetOverrunPercentage(v)
+	})
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddBudgetOverrunPercentage(v)
+	})
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertOne) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateBudgetOverrunPercentage()
+	})
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearBudgetOverrunPercentage()
 	})
 }
 
@@ -994,6 +1064,34 @@ func (u *FreelancerInferenceDataUpsertBulk) UpdateBudgetAdherencePercentage() *F
 func (u *FreelancerInferenceDataUpsertBulk) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpsertBulk {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.ClearBudgetAdherencePercentage()
+	})
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetBudgetOverrunPercentage(v)
+	})
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddBudgetOverrunPercentage(v)
+	})
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertBulk) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateBudgetOverrunPercentage()
+	})
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearBudgetOverrunPercentage()
 	})
 }
 

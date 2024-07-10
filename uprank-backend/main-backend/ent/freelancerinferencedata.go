@@ -32,6 +32,8 @@ type FreelancerInferenceData struct {
 	AiEstimatedDuration *pgtype.Interval `json:"ai_estimated_duration,omitempty"`
 	// BudgetAdherencePercentage holds the value of the "budget_adherence_percentage" field.
 	BudgetAdherencePercentage float64 `json:"budget_adherence_percentage,omitempty"`
+	// BudgetOverrunPercentage holds the value of the "budget_overrun_percentage" field.
+	BudgetOverrunPercentage float64 `json:"budget_overrun_percentage,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FreelancerInferenceDataQuery when eager-loading is set.
 	Edges                                       FreelancerInferenceDataEdges `json:"edges"`
@@ -68,7 +70,7 @@ func (*FreelancerInferenceData) scanValues(columns []string) ([]any, error) {
 			values[i] = new(pgtype.Interval)
 		case freelancerinferencedata.FieldUprankReccomended, freelancerinferencedata.FieldUprankNotEnoughData:
 			values[i] = new(sql.NullBool)
-		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldRawRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage:
+		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldRawRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage, freelancerinferencedata.FieldBudgetOverrunPercentage:
 			values[i] = new(sql.NullFloat64)
 		case freelancerinferencedata.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -139,6 +141,12 @@ func (fid *FreelancerInferenceData) assignValues(columns []string, values []any)
 			} else if value.Valid {
 				fid.BudgetAdherencePercentage = value.Float64
 			}
+		case freelancerinferencedata.FieldBudgetOverrunPercentage:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field budget_overrun_percentage", values[i])
+			} else if value.Valid {
+				fid.BudgetOverrunPercentage = value.Float64
+			}
 		case freelancerinferencedata.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field upwork_freelancer_freelancer_inference_data", values[i])
@@ -207,6 +215,9 @@ func (fid *FreelancerInferenceData) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("budget_adherence_percentage=")
 	builder.WriteString(fmt.Sprintf("%v", fid.BudgetAdherencePercentage))
+	builder.WriteString(", ")
+	builder.WriteString("budget_overrun_percentage=")
+	builder.WriteString(fmt.Sprintf("%v", fid.BudgetOverrunPercentage))
 	builder.WriteByte(')')
 	return builder.String()
 }

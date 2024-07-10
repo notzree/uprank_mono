@@ -72,11 +72,32 @@ type FreelancerRankingData struct {
 	Budget_adherence_percentage float32 `json:"budget_adherence_percentage,omitempty"`
 }
 
+func (req *FreelancerRankingData) Validate() map[string]interface{} {
+	errors := make(map[string]interface{})
+	if req.Finalized_rating_score < 0 {
+		errors["Finalized_rating_score"] = "Finalized_rating_score must be greater than or equal to 0"
+	}
+	if req.Raw_rating_score < 0 {
+		errors["Raw_rating_score"] = "Raw_rating_score must be greater than or equal to 0"
+	}
+	if req.Budget_adherence_percentage < 0 {
+		errors["Budget_adherence_percentage"] = "Budget_adherence_percentage must be greater than or equal to 0"
+	}
+
+	return errors
+}
+
 func (req *AddJobRankingRequest) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 
-	if req.Freelancer_score_map == nil {
+	if req.Freelancer_ranking_data == nil {
 		errors["Freelancer_score_map"] = "Freelancer_score_map is required"
+	}
+	for _, data := range req.Freelancer_ranking_data {
+		data_errors := data.Validate()
+		if len(data_errors) > 0 {
+			errors["Freelancer_score_map"] = append(errors["Freelancer_score_map"].([]map[string]interface{}), data_errors)
+		}
 	}
 	return errors
 }

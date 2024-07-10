@@ -176,6 +176,33 @@ func (fidu *FreelancerInferenceDataUpdate) ClearBudgetAdherencePercentage() *Fre
 	return fidu
 }
 
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.ResetBudgetOverrunPercentage()
+	fidu.mutation.SetBudgetOverrunPercentage(f)
+	return fidu
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fidu *FreelancerInferenceDataUpdate) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataUpdate {
+	if f != nil {
+		fidu.SetBudgetOverrunPercentage(*f)
+	}
+	return fidu
+}
+
+// AddBudgetOverrunPercentage adds f to the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) AddBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.AddBudgetOverrunPercentage(f)
+	return fidu
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpdate {
+	fidu.mutation.ClearBudgetOverrunPercentage()
+	return fidu
+}
+
 // SetUpworkfreelancerID sets the "upworkfreelancer" edge to the UpworkFreelancer entity by ID.
 func (fidu *FreelancerInferenceDataUpdate) SetUpworkfreelancerID(id string) *FreelancerInferenceDataUpdate {
 	fidu.mutation.SetUpworkfreelancerID(id)
@@ -292,6 +319,15 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if fidu.mutation.BudgetAdherencePercentageCleared() {
 		_spec.ClearField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64)
+	}
+	if value, ok := fidu.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if value, ok := fidu.mutation.AddedBudgetOverrunPercentage(); ok {
+		_spec.AddField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if fidu.mutation.BudgetOverrunPercentageCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64)
 	}
 	if fidu.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -489,6 +525,33 @@ func (fiduo *FreelancerInferenceDataUpdateOne) ClearBudgetAdherencePercentage() 
 	return fiduo
 }
 
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ResetBudgetOverrunPercentage()
+	fiduo.mutation.SetBudgetOverrunPercentage(f)
+	return fiduo
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataUpdateOne {
+	if f != nil {
+		fiduo.SetBudgetOverrunPercentage(*f)
+	}
+	return fiduo
+}
+
+// AddBudgetOverrunPercentage adds f to the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) AddBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.AddBudgetOverrunPercentage(f)
+	return fiduo
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ClearBudgetOverrunPercentage()
+	return fiduo
+}
+
 // SetUpworkfreelancerID sets the "upworkfreelancer" edge to the UpworkFreelancer entity by ID.
 func (fiduo *FreelancerInferenceDataUpdateOne) SetUpworkfreelancerID(id string) *FreelancerInferenceDataUpdateOne {
 	fiduo.mutation.SetUpworkfreelancerID(id)
@@ -635,6 +698,15 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if fiduo.mutation.BudgetAdherencePercentageCleared() {
 		_spec.ClearField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64)
+	}
+	if value, ok := fiduo.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if value, ok := fiduo.mutation.AddedBudgetOverrunPercentage(); ok {
+		_spec.AddField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if fiduo.mutation.BudgetOverrunPercentageCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64)
 	}
 	if fiduo.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
