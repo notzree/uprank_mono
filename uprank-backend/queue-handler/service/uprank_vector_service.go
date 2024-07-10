@@ -39,9 +39,8 @@ func NewUprankVecService(backend_url string, ms_api_key string, infer proto.Infe
 	}
 }
 
-func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id string) (*types.UpsertVectorResponse, error) {
+func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData, user_id string) (*types.UpsertVectorResponse, error) {
 	upserted_freelancer_ids := []string{} //freelancers that have been upserted or are already upserted.
-	ctx := context.Background()
 
 	job_description_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
 		Id:       req.Upwork_job.Upwork_id,
@@ -131,17 +130,17 @@ func (s *UprankVecService) UpsertVectors(req types.JobEmbeddingData, user_id str
 	}, nil
 }
 
-func (s *UprankVecService) ComputeRawSpecializationScore(req types.ComputeRawSpecializationScoreRequest, ctx context.Context) (*types.ComputeRawSpecializationScoreResponse, error) {
+func (s *UprankVecService) ComputeRawSpecializationScore(ctx context.Context, req types.ComputeRawSpecializationScoreRequest) (*types.ComputeRawSpecializationScoreResponse, error) {
 	upwork_job_description_vector := req.Job_description_vector
 	description_scores := make(map[string]map[int]float32) //map of freelancer ids: array of the similarity scores of their previously worked jobs
 	description_filter := make(map[string]string)
-	description_filter["job_id"] = req.Job_id
+	description_filter["job_id"] = req.Job_data.Job_id
 	description_filter["type"] = WORK_HISTORY_DESCRIPTION_TYPE
-
+	work_history_count := int32(s.CountTotalWorkHistories(req.Job_data))
 	description_response, err := s.infer.QueryVector(ctx, &proto.QueryVectorRequest{
 		Namespace: DESCRIPTION_NAMESPACE,
 		Vector:    upwork_job_description_vector.Vector,
-		TopK:      req.Work_history_count,
+		TopK:      work_history_count,
 		Filter:    description_filter,
 	})
 	if err != nil {
@@ -170,7 +169,7 @@ func (s *UprankVecService) ComputeRawSpecializationScore(req types.ComputeRawSpe
 
 // Weight is a function that takes in some job data, as well as the existing scores, and returns the scores with some weighting applied.
 // The job_data is used in the case that the weight is dependent on the job data, such as the job duration. budget, etc.
-type DescriptionWeight func(job_data types.JobEmbeddingData, score_data map[string]map[int]float32) map[string]map[int]float32
+type DescriptionWeight func(job_data types.JobData, score_data map[string]map[int]float32) map[string]map[int]float32
 
 func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecializationScoreWeightsRequest, ctx context.Context, weights ...DescriptionWeight) (*types.ApplySpecializationScoreWeightsResponse, error) {
 	new_weights := make(map[string]map[int]float32)
@@ -207,15 +206,51 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 	}, nil
 }
 
+func (s *UprankVecService) SaveRawSpecializationScoreWeights(ctx context.Context, req *types.ComputeRawSpecializationScoreResponse, data []types.FreelancerRankingData) error {
+	summed_scores := make(map[string]float32)
+	for freelancer_id, scores := range *req.Job_description_specialization_scores {
+		sum := float32(0)
+		for _, score := range scores {
+			sum += score
+		}
+		average_score := sum / float32(len(scores))
+		summed_scores[freelancer_id] = average_score
+	}
+	for _, freelancer := range data {
+		if score, exists := summed_scores[freelancer.Freelancer_id]; exists {
+			freelancer.Raw_rating_score = score
+		}
+	}
+	return nil
+}
+
+func (s *UprankVecService) SaveWeightedSpecializationScoreWeights(ctx context.Context, req *types.ApplySpecializationScoreWeightsResponse, data []types.FreelancerRankingData) error {
+	summed_scores := make(map[string]float32)
+	for freelancer_id, scores := range req.Weighted_scores {
+		sum := float32(0)
+		for _, score := range scores {
+			sum += score
+		}
+		average_score := sum / float32(len(scores))
+		summed_scores[freelancer_id] = average_score
+	}
+	for _, freelancer := range data {
+		if score, exists := summed_scores[freelancer.Freelancer_id]; exists {
+			freelancer.Finalized_rating_score = score
+		}
+	}
+	return nil
+}
+
 func ExponentialScaling(score float32) float32 {
 	base := float32(2.0)
 	return float32(math.Exp(float64(score*base)) / math.Exp(float64(base)))
 }
 
-func (s *UprankVecService) PostJobRankingData(req types.FinalizedJobRankingData, ctx context.Context) error {
+func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataRequest, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/rank", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
 	bodyData := types.AddJobRankingRequest{
-		Freelancer_score_map: req.Freelancer_score_map,
+		Freelancer_ranking_data: req.Freelancer_ranking_data,
 	}
 	body, err := json.Marshal(bodyData)
 	if err != nil {
@@ -238,31 +273,43 @@ func (s *UprankVecService) PostJobRankingData(req types.FinalizedJobRankingData,
 
 }
 
-func (s *UprankVecService) FetchJobData(req types.UpworkRankingMessage) (*types.JobEmbeddingData, error) {
+func (s *UprankVecService) FetchJobData(ctx context.Context, req types.UpworkRankingMessage) (*types.JobData, []types.FreelancerRankingData, error) {
 	fetch_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/embeddings/job_data", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
 	log.Println("Fetching data from:", fetch_url)
 	httpreq, err := http.NewRequest("GET", fetch_url, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
 	httpreq.Header.Set("User_id", req.User_id)
 	resp, err := s.httpClient.Do(httpreq)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var job_data types.JobEmbeddingData
+	var job_data types.JobData
 	err = json.Unmarshal((body), &job_data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &job_data, nil
+	result := make([]types.FreelancerRankingData, 0)
+	for _, freelancer := range job_data.Upwork_job.Edges.UpworkFreelancer {
+		result = append(result, types.FreelancerRankingData{
+			Freelancer_id:               freelancer.ID,
+			Finalized_rating_score:      0.0,
+			Raw_rating_score:            0.0,
+			Uprank_reccomended:          false,
+			Uprank_reccomended_reasons:  "",
+			Uprank_not_enough_data:      false,
+			Budget_adherence_percentage: 0.0,
+		})
+	}
+	return &job_data, result, nil
 }
 
 func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req types.MarkFreelancersAsEmbeddedRequest) error {
@@ -326,12 +373,12 @@ func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req type
 	return nil
 }
 
-func (s *UprankVecService) CountTotalWorkHistories(req types.JobEmbeddingData) int {
+func (s *UprankVecService) CountTotalWorkHistories(req types.JobData) int32 {
 	total_workhistories := 0
 	for _, freelancer := range req.Upwork_job.Edges.UpworkFreelancer {
 		total_workhistories += len(freelancer.Edges.WorkHistories)
 	}
-	return total_workhistories
+	return int32(total_workhistories)
 }
 
 func CreateMetadata(user_id string, job_id string, vector_type string, platform string, options ...MetadataOption) map[string]string {

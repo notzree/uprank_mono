@@ -22,7 +22,8 @@ func (FreelancerInferenceData) Fields() []ent.Field {
 		field.Other("ai_estimated_duration", &pgtype.Interval{}).SchemaType(map[string]string{
 			dialect.Postgres: "INTERVAL",
 		}).Optional(),
-		field.Float("budget_adherence_percentage").Optional(), //TODO: MAKE THIS REQUIRED IN THE FUTURE
+		field.Float("budget_adherence_percentage").Optional(),
+		field.Float("budget_overrun_percentage").Optional(),
 	}
 }
 
