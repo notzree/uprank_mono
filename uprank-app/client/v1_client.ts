@@ -1,5 +1,7 @@
+import { CreateUserBody } from "@/types/user";
 import { Client, GetJobResponse, RankRequest } from "./client";
 import { Job } from "@/types/job";
+import { stringify } from "querystring";
 export class v1Client implements Client {
     private base_url: string;
     
@@ -42,6 +44,12 @@ export class v1Client implements Client {
         if (!response.ok) {
             throw new Error("Failed to rank jobs");
         }
+    }
+
+    async SyncUser(req: CreateUserBody): Promise<Response> {
+        const url = this.base_url + "/v1/public/users";
+        const response = await fetch(url, this._build_request("", "POST", JSON.stringify(req)));
+        return response;
     }
 }
 

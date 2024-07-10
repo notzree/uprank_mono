@@ -5,7 +5,6 @@ export default authMiddleware({
     apiRoutes: ["/api/private/(.*)"],
     afterAuth(auth, req, evt) {
         const res = NextResponse.next();
-        console.log("path" + req.nextUrl.pathname);
         if (auth.isApiRoute) {
             //todo: Change this so that it only allows access to the api if the user is authenticated
             return res;

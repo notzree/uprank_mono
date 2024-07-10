@@ -6,7 +6,6 @@ export function return_origin_job(job: Job): UpworkJob {
         if (job.edges.upworkjob == null) {
             throw new Error("Upwork job not found");
         }
-        console.log(job.origin_platform)
         return job.edges.upworkjob;
     }
 

@@ -49,13 +49,13 @@ export default function Component() {
                         </Link>
                     ) : (
                         <>
-                            <Link
+                            {/* <Link
                                 className="text-sm font-medium hover:underline"
                                 href="/sign-up"
                             >
                                 Sign up
                             </Link>
-                            <p>or</p>
+                            <p>or</p> */}
                             <Link
                                 className="text-sm font-medium hover:underline"
                                 href="/sign-in"

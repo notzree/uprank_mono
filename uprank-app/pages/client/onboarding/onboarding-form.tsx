@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import craft_api_url from "@/utils/api_utils/craft_api_url";
 import {
     Form,
     FormControl,
@@ -17,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
-import { CreateUserBody } from "@/types/user_types";
+import { CreateUserBody } from "@/types/user";
+import { v1Client } from "@/client/v1_client";
 
 const formSchema = z.object({
     first_name: z.string().trim().min(1, {
@@ -32,6 +32,7 @@ const formSchema = z.object({
 });
 
 export default function Home() {
+    const client = new v1Client(process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL);
     const { isLoaded, user } = useUser();
     const { toast } = useToast();
     const router = useRouter();
@@ -69,13 +70,7 @@ export default function Home() {
             completed_onboarding: user.unsafeMetadata
                 .completed_onboarding as boolean,
         };
-        const sync_user = await fetch(craft_api_url("/v1/public/users"), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request_body),
-        });
+        const sync_user = await client.SyncUser(request_body);
         if (!sync_user.ok) {
             console.log(sync_user);
             alert("Failed to sync user data, please try again.");
