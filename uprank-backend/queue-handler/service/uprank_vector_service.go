@@ -206,7 +206,7 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 	}, nil
 }
 
-func (s *UprankVecService) SaveRawSpecializationScoreWeights(ctx context.Context, req *types.ComputeRawSpecializationScoreResponse, data []types.FreelancerRankingData) error {
+func (s *UprankVecService) SaveRawSpecializationScoreWeights(ctx context.Context, req *types.ComputeRawSpecializationScoreResponse, data *[]types.FreelancerRankingData) error {
 	summed_scores := make(map[string]float32)
 	for freelancer_id, scores := range *req.Job_description_specialization_scores {
 		sum := float32(0)
@@ -216,15 +216,16 @@ func (s *UprankVecService) SaveRawSpecializationScoreWeights(ctx context.Context
 		average_score := sum / float32(len(scores))
 		summed_scores[freelancer_id] = average_score
 	}
-	for _, freelancer := range data {
+	for i, freelancer := range *data {
 		if score, exists := summed_scores[freelancer.Freelancer_id]; exists {
-			freelancer.Raw_rating_score = score
+			// Access the original slice by index to update its value
+			(*data)[i].Raw_rating_score = score
 		}
 	}
 	return nil
 }
 
-func (s *UprankVecService) SaveWeightedSpecializationScoreWeights(ctx context.Context, req *types.ApplySpecializationScoreWeightsResponse, data []types.FreelancerRankingData) error {
+func (s *UprankVecService) SaveWeightedSpecializationScoreWeights(ctx context.Context, req *types.ApplySpecializationScoreWeightsResponse, data *[]types.FreelancerRankingData) error {
 	summed_scores := make(map[string]float32)
 	for freelancer_id, scores := range req.Weighted_scores {
 		sum := float32(0)
@@ -234,9 +235,10 @@ func (s *UprankVecService) SaveWeightedSpecializationScoreWeights(ctx context.Co
 		average_score := sum / float32(len(scores))
 		summed_scores[freelancer_id] = average_score
 	}
-	for _, freelancer := range data {
+	for i, freelancer := range *data {
 		if score, exists := summed_scores[freelancer.Freelancer_id]; exists {
-			freelancer.Finalized_rating_score = score
+			// Access the original slice by index to update its value
+			(*data)[i].Finalized_rating_score = score
 		}
 	}
 	return nil
@@ -245,6 +247,55 @@ func (s *UprankVecService) SaveWeightedSpecializationScoreWeights(ctx context.Co
 func ExponentialScaling(score float32) float32 {
 	base := float32(2.0)
 	return float32(math.Exp(float64(score*base)) / math.Exp(float64(base)))
+}
+
+func (s *UprankVecService) ApplyBudgetScores(ctx context.Context, req types.JobData, data *[]types.FreelancerRankingData) error {
+	//Adds the Budget Adherence and Budget overrun percentage to the data
+	scores := make(map[string]float32)
+	overrunPercentages := make(map[string]float32)
+	freelancers := req.Upwork_job.Edges.UpworkFreelancer
+	for _, freelancer := range freelancers {
+		work_histories := freelancer.Edges.WorkHistories
+		work_histories_with_budget := float32(0)
+		work_histories_within_budget := float32(0)
+		totalOverrunPercentage := float32(0)
+		overrunCount := float32(0)
+		for _, work_history := range work_histories {
+			if work_history.Budget == 0 {
+				continue
+			}
+			work_histories_with_budget++
+			if work_history.FreelancerEarnings <= work_history.Budget {
+				work_histories_within_budget++
+			} else {
+				overrunCount++
+				overrunPercentage := float32(work_history.FreelancerEarnings-work_history.Budget) / float32(work_history.Budget) * 100
+				totalOverrunPercentage += overrunPercentage
+			}
+		}
+		if work_histories_with_budget > 0 {
+			budget_adherence_percentage := float32(work_histories_within_budget) / float32(work_histories_with_budget) * 100
+			scores[freelancer.ID] = budget_adherence_percentage
+
+			if overrunCount > 0 {
+				averageOverrunPercentage := totalOverrunPercentage / float32(overrunCount)
+				overrunPercentages[freelancer.ID] = averageOverrunPercentage
+			} else {
+				overrunPercentages[freelancer.ID] = 0
+			}
+		}
+	}
+
+	for i, freelancer := range *data {
+		if score, exists := scores[freelancer.Freelancer_id]; exists {
+			// Access the original slice by index to update its value
+			(*data)[i].Budget_adherence_percentage = score
+		}
+		if overrunPercentage, exists := overrunPercentages[freelancer.Freelancer_id]; exists {
+			(*data)[i].Budget_overrun_percentage = overrunPercentage
+		}
+	}
+	return nil
 }
 
 func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataRequest, ctx context.Context) error {

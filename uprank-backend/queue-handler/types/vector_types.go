@@ -54,4 +54,5 @@ type FreelancerRankingData struct {
 	Uprank_reccomended_reasons  string  `json:"uprank_reccomended_reasons,omitempty"`
 	Uprank_not_enough_data      bool    `json:"uprank_not_enough_data,omitempty"`
 	Budget_adherence_percentage float32 `json:"budget_adherence_percentage,omitempty"`
+	Budget_overrun_percentage   float32 `json:"budget_overrun_percentage,omitempty"`
 }
