@@ -110,6 +110,33 @@ func (fidu *FreelancerInferenceDataUpdate) AddFinalizedRatingScore(f float64) *F
 	return fidu
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) SetRawRatingScore(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.ResetRawRatingScore()
+	fidu.mutation.SetRawRatingScore(f)
+	return fidu
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fidu *FreelancerInferenceDataUpdate) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataUpdate {
+	if f != nil {
+		fidu.SetRawRatingScore(*f)
+	}
+	return fidu
+}
+
+// AddRawRatingScore adds f to the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) AddRawRatingScore(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.AddRawRatingScore(f)
+	return fidu
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (fidu *FreelancerInferenceDataUpdate) ClearRawRatingScore() *FreelancerInferenceDataUpdate {
+	fidu.mutation.ClearRawRatingScore()
+	return fidu
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (fidu *FreelancerInferenceDataUpdate) SetAiEstimatedDuration(pg *pgtype.Interval) *FreelancerInferenceDataUpdate {
 	fidu.mutation.SetAiEstimatedDuration(pg)
@@ -146,6 +173,33 @@ func (fidu *FreelancerInferenceDataUpdate) AddBudgetAdherencePercentage(f float6
 // ClearBudgetAdherencePercentage clears the value of the "budget_adherence_percentage" field.
 func (fidu *FreelancerInferenceDataUpdate) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpdate {
 	fidu.mutation.ClearBudgetAdherencePercentage()
+	return fidu
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.ResetBudgetOverrunPercentage()
+	fidu.mutation.SetBudgetOverrunPercentage(f)
+	return fidu
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fidu *FreelancerInferenceDataUpdate) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataUpdate {
+	if f != nil {
+		fidu.SetBudgetOverrunPercentage(*f)
+	}
+	return fidu
+}
+
+// AddBudgetOverrunPercentage adds f to the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) AddBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdate {
+	fidu.mutation.AddBudgetOverrunPercentage(f)
+	return fidu
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (fidu *FreelancerInferenceDataUpdate) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpdate {
+	fidu.mutation.ClearBudgetOverrunPercentage()
 	return fidu
 }
 
@@ -242,6 +296,15 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	if value, ok := fidu.mutation.AddedFinalizedRatingScore(); ok {
 		_spec.AddField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
 	}
+	if value, ok := fidu.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fidu.mutation.AddedRawRatingScore(); ok {
+		_spec.AddField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if fidu.mutation.RawRatingScoreCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64)
+	}
 	if value, ok := fidu.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)
 	}
@@ -256,6 +319,15 @@ func (fidu *FreelancerInferenceDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if fidu.mutation.BudgetAdherencePercentageCleared() {
 		_spec.ClearField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64)
+	}
+	if value, ok := fidu.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if value, ok := fidu.mutation.AddedBudgetOverrunPercentage(); ok {
+		_spec.AddField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if fidu.mutation.BudgetOverrunPercentageCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64)
 	}
 	if fidu.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -387,6 +459,33 @@ func (fiduo *FreelancerInferenceDataUpdateOne) AddFinalizedRatingScore(f float64
 	return fiduo
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetRawRatingScore(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ResetRawRatingScore()
+	fiduo.mutation.SetRawRatingScore(f)
+	return fiduo
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataUpdateOne {
+	if f != nil {
+		fiduo.SetRawRatingScore(*f)
+	}
+	return fiduo
+}
+
+// AddRawRatingScore adds f to the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) AddRawRatingScore(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.AddRawRatingScore(f)
+	return fiduo
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) ClearRawRatingScore() *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ClearRawRatingScore()
+	return fiduo
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (fiduo *FreelancerInferenceDataUpdateOne) SetAiEstimatedDuration(pg *pgtype.Interval) *FreelancerInferenceDataUpdateOne {
 	fiduo.mutation.SetAiEstimatedDuration(pg)
@@ -423,6 +522,33 @@ func (fiduo *FreelancerInferenceDataUpdateOne) AddBudgetAdherencePercentage(f fl
 // ClearBudgetAdherencePercentage clears the value of the "budget_adherence_percentage" field.
 func (fiduo *FreelancerInferenceDataUpdateOne) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpdateOne {
 	fiduo.mutation.ClearBudgetAdherencePercentage()
+	return fiduo
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ResetBudgetOverrunPercentage()
+	fiduo.mutation.SetBudgetOverrunPercentage(f)
+	return fiduo
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fiduo *FreelancerInferenceDataUpdateOne) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataUpdateOne {
+	if f != nil {
+		fiduo.SetBudgetOverrunPercentage(*f)
+	}
+	return fiduo
+}
+
+// AddBudgetOverrunPercentage adds f to the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) AddBudgetOverrunPercentage(f float64) *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.AddBudgetOverrunPercentage(f)
+	return fiduo
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (fiduo *FreelancerInferenceDataUpdateOne) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpdateOne {
+	fiduo.mutation.ClearBudgetOverrunPercentage()
 	return fiduo
 }
 
@@ -549,6 +675,15 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	if value, ok := fiduo.mutation.AddedFinalizedRatingScore(); ok {
 		_spec.AddField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
 	}
+	if value, ok := fiduo.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if value, ok := fiduo.mutation.AddedRawRatingScore(); ok {
+		_spec.AddField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+	}
+	if fiduo.mutation.RawRatingScoreCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64)
+	}
 	if value, ok := fiduo.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)
 	}
@@ -563,6 +698,15 @@ func (fiduo *FreelancerInferenceDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if fiduo.mutation.BudgetAdherencePercentageCleared() {
 		_spec.ClearField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64)
+	}
+	if value, ok := fiduo.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if value, ok := fiduo.mutation.AddedBudgetOverrunPercentage(); ok {
+		_spec.AddField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+	}
+	if fiduo.mutation.BudgetOverrunPercentageCleared() {
+		_spec.ClearField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64)
 	}
 	if fiduo.mutation.UpworkfreelancerCleared() {
 		edge := &sqlgraph.EdgeSpec{

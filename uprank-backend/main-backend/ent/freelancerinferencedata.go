@@ -26,10 +26,14 @@ type FreelancerInferenceData struct {
 	UprankNotEnoughData bool `json:"uprank_not_enough_data,omitempty"`
 	// FinalizedRatingScore holds the value of the "finalized_rating_score" field.
 	FinalizedRatingScore float64 `json:"finalized_rating_score,omitempty"`
+	// RawRatingScore holds the value of the "raw_rating_score" field.
+	RawRatingScore float64 `json:"raw_rating_score,omitempty"`
 	// AiEstimatedDuration holds the value of the "ai_estimated_duration" field.
 	AiEstimatedDuration *pgtype.Interval `json:"ai_estimated_duration,omitempty"`
 	// BudgetAdherencePercentage holds the value of the "budget_adherence_percentage" field.
 	BudgetAdherencePercentage float64 `json:"budget_adherence_percentage,omitempty"`
+	// BudgetOverrunPercentage holds the value of the "budget_overrun_percentage" field.
+	BudgetOverrunPercentage float64 `json:"budget_overrun_percentage,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FreelancerInferenceDataQuery when eager-loading is set.
 	Edges                                       FreelancerInferenceDataEdges `json:"edges"`
@@ -66,7 +70,7 @@ func (*FreelancerInferenceData) scanValues(columns []string) ([]any, error) {
 			values[i] = new(pgtype.Interval)
 		case freelancerinferencedata.FieldUprankReccomended, freelancerinferencedata.FieldUprankNotEnoughData:
 			values[i] = new(sql.NullBool)
-		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage:
+		case freelancerinferencedata.FieldFinalizedRatingScore, freelancerinferencedata.FieldRawRatingScore, freelancerinferencedata.FieldBudgetAdherencePercentage, freelancerinferencedata.FieldBudgetOverrunPercentage:
 			values[i] = new(sql.NullFloat64)
 		case freelancerinferencedata.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -119,6 +123,12 @@ func (fid *FreelancerInferenceData) assignValues(columns []string, values []any)
 			} else if value.Valid {
 				fid.FinalizedRatingScore = value.Float64
 			}
+		case freelancerinferencedata.FieldRawRatingScore:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field raw_rating_score", values[i])
+			} else if value.Valid {
+				fid.RawRatingScore = value.Float64
+			}
 		case freelancerinferencedata.FieldAiEstimatedDuration:
 			if value, ok := values[i].(*pgtype.Interval); !ok {
 				return fmt.Errorf("unexpected type %T for field ai_estimated_duration", values[i])
@@ -130,6 +140,12 @@ func (fid *FreelancerInferenceData) assignValues(columns []string, values []any)
 				return fmt.Errorf("unexpected type %T for field budget_adherence_percentage", values[i])
 			} else if value.Valid {
 				fid.BudgetAdherencePercentage = value.Float64
+			}
+		case freelancerinferencedata.FieldBudgetOverrunPercentage:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field budget_overrun_percentage", values[i])
+			} else if value.Valid {
+				fid.BudgetOverrunPercentage = value.Float64
 			}
 		case freelancerinferencedata.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -191,11 +207,17 @@ func (fid *FreelancerInferenceData) String() string {
 	builder.WriteString("finalized_rating_score=")
 	builder.WriteString(fmt.Sprintf("%v", fid.FinalizedRatingScore))
 	builder.WriteString(", ")
+	builder.WriteString("raw_rating_score=")
+	builder.WriteString(fmt.Sprintf("%v", fid.RawRatingScore))
+	builder.WriteString(", ")
 	builder.WriteString("ai_estimated_duration=")
 	builder.WriteString(fmt.Sprintf("%v", fid.AiEstimatedDuration))
 	builder.WriteString(", ")
 	builder.WriteString("budget_adherence_percentage=")
 	builder.WriteString(fmt.Sprintf("%v", fid.BudgetAdherencePercentage))
+	builder.WriteString(", ")
+	builder.WriteString("budget_overrun_percentage=")
+	builder.WriteString(fmt.Sprintf("%v", fid.BudgetOverrunPercentage))
 	builder.WriteByte(')')
 	return builder.String()
 }

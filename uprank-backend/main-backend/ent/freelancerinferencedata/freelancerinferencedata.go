@@ -20,10 +20,14 @@ const (
 	FieldUprankNotEnoughData = "uprank_not_enough_data"
 	// FieldFinalizedRatingScore holds the string denoting the finalized_rating_score field in the database.
 	FieldFinalizedRatingScore = "finalized_rating_score"
+	// FieldRawRatingScore holds the string denoting the raw_rating_score field in the database.
+	FieldRawRatingScore = "raw_rating_score"
 	// FieldAiEstimatedDuration holds the string denoting the ai_estimated_duration field in the database.
 	FieldAiEstimatedDuration = "ai_estimated_duration"
 	// FieldBudgetAdherencePercentage holds the string denoting the budget_adherence_percentage field in the database.
 	FieldBudgetAdherencePercentage = "budget_adherence_percentage"
+	// FieldBudgetOverrunPercentage holds the string denoting the budget_overrun_percentage field in the database.
+	FieldBudgetOverrunPercentage = "budget_overrun_percentage"
 	// EdgeUpworkfreelancer holds the string denoting the upworkfreelancer edge name in mutations.
 	EdgeUpworkfreelancer = "upworkfreelancer"
 	// Table holds the table name of the freelancerinferencedata in the database.
@@ -44,8 +48,10 @@ var Columns = []string{
 	FieldUprankReccomendedReasons,
 	FieldUprankNotEnoughData,
 	FieldFinalizedRatingScore,
+	FieldRawRatingScore,
 	FieldAiEstimatedDuration,
 	FieldBudgetAdherencePercentage,
+	FieldBudgetOverrunPercentage,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "freelancer_inference_data"
@@ -104,6 +110,11 @@ func ByFinalizedRatingScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFinalizedRatingScore, opts...).ToFunc()
 }
 
+// ByRawRatingScore orders the results by the raw_rating_score field.
+func ByRawRatingScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRawRatingScore, opts...).ToFunc()
+}
+
 // ByAiEstimatedDuration orders the results by the ai_estimated_duration field.
 func ByAiEstimatedDuration(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAiEstimatedDuration, opts...).ToFunc()
@@ -112,6 +123,11 @@ func ByAiEstimatedDuration(opts ...sql.OrderTermOption) OrderOption {
 // ByBudgetAdherencePercentage orders the results by the budget_adherence_percentage field.
 func ByBudgetAdherencePercentage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBudgetAdherencePercentage, opts...).ToFunc()
+}
+
+// ByBudgetOverrunPercentage orders the results by the budget_overrun_percentage field.
+func ByBudgetOverrunPercentage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBudgetOverrunPercentage, opts...).ToFunc()
 }
 
 // ByUpworkfreelancerField orders the results by upworkfreelancer field.

@@ -71,6 +71,20 @@ func (fidc *FreelancerInferenceDataCreate) SetFinalizedRatingScore(f float64) *F
 	return fidc
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (fidc *FreelancerInferenceDataCreate) SetRawRatingScore(f float64) *FreelancerInferenceDataCreate {
+	fidc.mutation.SetRawRatingScore(f)
+	return fidc
+}
+
+// SetNillableRawRatingScore sets the "raw_rating_score" field if the given value is not nil.
+func (fidc *FreelancerInferenceDataCreate) SetNillableRawRatingScore(f *float64) *FreelancerInferenceDataCreate {
+	if f != nil {
+		fidc.SetRawRatingScore(*f)
+	}
+	return fidc
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (fidc *FreelancerInferenceDataCreate) SetAiEstimatedDuration(pg *pgtype.Interval) *FreelancerInferenceDataCreate {
 	fidc.mutation.SetAiEstimatedDuration(pg)
@@ -87,6 +101,20 @@ func (fidc *FreelancerInferenceDataCreate) SetBudgetAdherencePercentage(f float6
 func (fidc *FreelancerInferenceDataCreate) SetNillableBudgetAdherencePercentage(f *float64) *FreelancerInferenceDataCreate {
 	if f != nil {
 		fidc.SetBudgetAdherencePercentage(*f)
+	}
+	return fidc
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (fidc *FreelancerInferenceDataCreate) SetBudgetOverrunPercentage(f float64) *FreelancerInferenceDataCreate {
+	fidc.mutation.SetBudgetOverrunPercentage(f)
+	return fidc
+}
+
+// SetNillableBudgetOverrunPercentage sets the "budget_overrun_percentage" field if the given value is not nil.
+func (fidc *FreelancerInferenceDataCreate) SetNillableBudgetOverrunPercentage(f *float64) *FreelancerInferenceDataCreate {
+	if f != nil {
+		fidc.SetBudgetOverrunPercentage(*f)
 	}
 	return fidc
 }
@@ -198,6 +226,10 @@ func (fidc *FreelancerInferenceDataCreate) createSpec() (*FreelancerInferenceDat
 		_spec.SetField(freelancerinferencedata.FieldFinalizedRatingScore, field.TypeFloat64, value)
 		_node.FinalizedRatingScore = value
 	}
+	if value, ok := fidc.mutation.RawRatingScore(); ok {
+		_spec.SetField(freelancerinferencedata.FieldRawRatingScore, field.TypeFloat64, value)
+		_node.RawRatingScore = value
+	}
 	if value, ok := fidc.mutation.AiEstimatedDuration(); ok {
 		_spec.SetField(freelancerinferencedata.FieldAiEstimatedDuration, field.TypeOther, value)
 		_node.AiEstimatedDuration = value
@@ -205,6 +237,10 @@ func (fidc *FreelancerInferenceDataCreate) createSpec() (*FreelancerInferenceDat
 	if value, ok := fidc.mutation.BudgetAdherencePercentage(); ok {
 		_spec.SetField(freelancerinferencedata.FieldBudgetAdherencePercentage, field.TypeFloat64, value)
 		_node.BudgetAdherencePercentage = value
+	}
+	if value, ok := fidc.mutation.BudgetOverrunPercentage(); ok {
+		_spec.SetField(freelancerinferencedata.FieldBudgetOverrunPercentage, field.TypeFloat64, value)
+		_node.BudgetOverrunPercentage = value
 	}
 	if nodes := fidc.mutation.UpworkfreelancerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -347,6 +383,30 @@ func (u *FreelancerInferenceDataUpsert) AddFinalizedRatingScore(v float64) *Free
 	return u
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsert {
+	u.Set(freelancerinferencedata.FieldRawRatingScore, v)
+	return u
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsert) UpdateRawRatingScore() *FreelancerInferenceDataUpsert {
+	u.SetExcluded(freelancerinferencedata.FieldRawRatingScore)
+	return u
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsert {
+	u.Add(freelancerinferencedata.FieldRawRatingScore, v)
+	return u
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsert) ClearRawRatingScore() *FreelancerInferenceDataUpsert {
+	u.SetNull(freelancerinferencedata.FieldRawRatingScore)
+	return u
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (u *FreelancerInferenceDataUpsert) SetAiEstimatedDuration(v *pgtype.Interval) *FreelancerInferenceDataUpsert {
 	u.Set(freelancerinferencedata.FieldAiEstimatedDuration, v)
@@ -386,6 +446,30 @@ func (u *FreelancerInferenceDataUpsert) AddBudgetAdherencePercentage(v float64) 
 // ClearBudgetAdherencePercentage clears the value of the "budget_adherence_percentage" field.
 func (u *FreelancerInferenceDataUpsert) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpsert {
 	u.SetNull(freelancerinferencedata.FieldBudgetAdherencePercentage)
+	return u
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsert {
+	u.Set(freelancerinferencedata.FieldBudgetOverrunPercentage, v)
+	return u
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsert) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsert {
+	u.SetExcluded(freelancerinferencedata.FieldBudgetOverrunPercentage)
+	return u
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsert {
+	u.Add(freelancerinferencedata.FieldBudgetOverrunPercentage, v)
+	return u
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsert) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsert {
+	u.SetNull(freelancerinferencedata.FieldBudgetOverrunPercentage)
 	return u
 }
 
@@ -513,6 +597,34 @@ func (u *FreelancerInferenceDataUpsertOne) UpdateFinalizedRatingScore() *Freelan
 	})
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetRawRatingScore(v)
+	})
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddRawRatingScore(v)
+	})
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertOne) UpdateRawRatingScore() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateRawRatingScore()
+	})
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertOne) ClearRawRatingScore() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearRawRatingScore()
+	})
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (u *FreelancerInferenceDataUpsertOne) SetAiEstimatedDuration(v *pgtype.Interval) *FreelancerInferenceDataUpsertOne {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
@@ -559,6 +671,34 @@ func (u *FreelancerInferenceDataUpsertOne) UpdateBudgetAdherencePercentage() *Fr
 func (u *FreelancerInferenceDataUpsertOne) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpsertOne {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.ClearBudgetAdherencePercentage()
+	})
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetBudgetOverrunPercentage(v)
+	})
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddBudgetOverrunPercentage(v)
+	})
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertOne) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateBudgetOverrunPercentage()
+	})
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertOne) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsertOne {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearBudgetOverrunPercentage()
 	})
 }
 
@@ -850,6 +990,34 @@ func (u *FreelancerInferenceDataUpsertBulk) UpdateFinalizedRatingScore() *Freela
 	})
 }
 
+// SetRawRatingScore sets the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) SetRawRatingScore(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetRawRatingScore(v)
+	})
+}
+
+// AddRawRatingScore adds v to the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) AddRawRatingScore(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddRawRatingScore(v)
+	})
+}
+
+// UpdateRawRatingScore sets the "raw_rating_score" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertBulk) UpdateRawRatingScore() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateRawRatingScore()
+	})
+}
+
+// ClearRawRatingScore clears the value of the "raw_rating_score" field.
+func (u *FreelancerInferenceDataUpsertBulk) ClearRawRatingScore() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearRawRatingScore()
+	})
+}
+
 // SetAiEstimatedDuration sets the "ai_estimated_duration" field.
 func (u *FreelancerInferenceDataUpsertBulk) SetAiEstimatedDuration(v *pgtype.Interval) *FreelancerInferenceDataUpsertBulk {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
@@ -896,6 +1064,34 @@ func (u *FreelancerInferenceDataUpsertBulk) UpdateBudgetAdherencePercentage() *F
 func (u *FreelancerInferenceDataUpsertBulk) ClearBudgetAdherencePercentage() *FreelancerInferenceDataUpsertBulk {
 	return u.Update(func(s *FreelancerInferenceDataUpsert) {
 		s.ClearBudgetAdherencePercentage()
+	})
+}
+
+// SetBudgetOverrunPercentage sets the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) SetBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.SetBudgetOverrunPercentage(v)
+	})
+}
+
+// AddBudgetOverrunPercentage adds v to the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) AddBudgetOverrunPercentage(v float64) *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.AddBudgetOverrunPercentage(v)
+	})
+}
+
+// UpdateBudgetOverrunPercentage sets the "budget_overrun_percentage" field to the value that was provided on create.
+func (u *FreelancerInferenceDataUpsertBulk) UpdateBudgetOverrunPercentage() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.UpdateBudgetOverrunPercentage()
+	})
+}
+
+// ClearBudgetOverrunPercentage clears the value of the "budget_overrun_percentage" field.
+func (u *FreelancerInferenceDataUpsertBulk) ClearBudgetOverrunPercentage() *FreelancerInferenceDataUpsertBulk {
+	return u.Update(func(s *FreelancerInferenceDataUpsert) {
+		s.ClearBudgetOverrunPercentage()
 	})
 }
 
