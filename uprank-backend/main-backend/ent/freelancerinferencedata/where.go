@@ -74,6 +74,11 @@ func FinalizedRatingScore(v float64) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldFinalizedRatingScore, v))
 }
 
+// RawRatingScore applies equality check predicate on the "raw_rating_score" field. It's identical to RawRatingScoreEQ.
+func RawRatingScore(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldRawRatingScore, v))
+}
+
 // AiEstimatedDuration applies equality check predicate on the "ai_estimated_duration" field. It's identical to AiEstimatedDurationEQ.
 func AiEstimatedDuration(v *pgtype.Interval) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldAiEstimatedDuration, v))
@@ -82,6 +87,11 @@ func AiEstimatedDuration(v *pgtype.Interval) predicate.FreelancerInferenceData {
 // BudgetAdherencePercentage applies equality check predicate on the "budget_adherence_percentage" field. It's identical to BudgetAdherencePercentageEQ.
 func BudgetAdherencePercentage(v float64) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldBudgetAdherencePercentage, v))
+}
+
+// BudgetOverrunPercentage applies equality check predicate on the "budget_overrun_percentage" field. It's identical to BudgetOverrunPercentageEQ.
+func BudgetOverrunPercentage(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldBudgetOverrunPercentage, v))
 }
 
 // UprankReccomendedEQ applies the EQ predicate on the "uprank_reccomended" field.
@@ -239,6 +249,56 @@ func FinalizedRatingScoreLTE(v float64) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldLTE(FieldFinalizedRatingScore, v))
 }
 
+// RawRatingScoreEQ applies the EQ predicate on the "raw_rating_score" field.
+func RawRatingScoreEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreNEQ applies the NEQ predicate on the "raw_rating_score" field.
+func RawRatingScoreNEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNEQ(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreIn applies the In predicate on the "raw_rating_score" field.
+func RawRatingScoreIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIn(FieldRawRatingScore, vs...))
+}
+
+// RawRatingScoreNotIn applies the NotIn predicate on the "raw_rating_score" field.
+func RawRatingScoreNotIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotIn(FieldRawRatingScore, vs...))
+}
+
+// RawRatingScoreGT applies the GT predicate on the "raw_rating_score" field.
+func RawRatingScoreGT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGT(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreGTE applies the GTE predicate on the "raw_rating_score" field.
+func RawRatingScoreGTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGTE(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreLT applies the LT predicate on the "raw_rating_score" field.
+func RawRatingScoreLT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLT(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreLTE applies the LTE predicate on the "raw_rating_score" field.
+func RawRatingScoreLTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLTE(FieldRawRatingScore, v))
+}
+
+// RawRatingScoreIsNil applies the IsNil predicate on the "raw_rating_score" field.
+func RawRatingScoreIsNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIsNull(FieldRawRatingScore))
+}
+
+// RawRatingScoreNotNil applies the NotNil predicate on the "raw_rating_score" field.
+func RawRatingScoreNotNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotNull(FieldRawRatingScore))
+}
+
 // AiEstimatedDurationEQ applies the EQ predicate on the "ai_estimated_duration" field.
 func AiEstimatedDurationEQ(v *pgtype.Interval) predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldAiEstimatedDuration, v))
@@ -337,6 +397,56 @@ func BudgetAdherencePercentageIsNil() predicate.FreelancerInferenceData {
 // BudgetAdherencePercentageNotNil applies the NotNil predicate on the "budget_adherence_percentage" field.
 func BudgetAdherencePercentageNotNil() predicate.FreelancerInferenceData {
 	return predicate.FreelancerInferenceData(sql.FieldNotNull(FieldBudgetAdherencePercentage))
+}
+
+// BudgetOverrunPercentageEQ applies the EQ predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldEQ(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageNEQ applies the NEQ predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageNEQ(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNEQ(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageIn applies the In predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIn(FieldBudgetOverrunPercentage, vs...))
+}
+
+// BudgetOverrunPercentageNotIn applies the NotIn predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageNotIn(vs ...float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotIn(FieldBudgetOverrunPercentage, vs...))
+}
+
+// BudgetOverrunPercentageGT applies the GT predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageGT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGT(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageGTE applies the GTE predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageGTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldGTE(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageLT applies the LT predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageLT(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLT(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageLTE applies the LTE predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageLTE(v float64) predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldLTE(FieldBudgetOverrunPercentage, v))
+}
+
+// BudgetOverrunPercentageIsNil applies the IsNil predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageIsNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldIsNull(FieldBudgetOverrunPercentage))
+}
+
+// BudgetOverrunPercentageNotNil applies the NotNil predicate on the "budget_overrun_percentage" field.
+func BudgetOverrunPercentageNotNil() predicate.FreelancerInferenceData {
+	return predicate.FreelancerInferenceData(sql.FieldNotNull(FieldBudgetOverrunPercentage))
 }
 
 // HasUpworkfreelancer applies the HasEdge predicate on the "upworkfreelancer" edge.

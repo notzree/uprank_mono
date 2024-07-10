@@ -2,10 +2,7 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"log"
-	"os"
-	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/notzree/uprank-backend/queue-handler/queue"
@@ -54,85 +51,4 @@ func (s *Server) PollForRankingRequest() error {
 		}(ctx, req)
 	}
 	return nil
-}
-
-func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRankingMessage) error {
-	fetched_job_data, err := s.svc.FetchJobData(req)
-	if err != nil {
-		return NewServiceError(err)
-	}
-	start := time.Now()
-	upsert_resp, upsert_err := s.svc.UpsertVectors(*fetched_job_data, req.User_id)
-	if upsert_err != nil {
-		return NewServiceError(upsert_err)
-	}
-	elapsed := time.Since(start)
-	log.Printf("Upsert time: %s", elapsed)
-
-	total_work_histories := s.CountTotalWorkHistories(*fetched_job_data)
-	compute_specialization_req := types.ComputeRawSpecializationScoreRequest{
-		Job_id:                 req.Job_id.String(),
-		Work_history_count:     int32(total_work_histories),
-		Freelancer_count:       int32(len(fetched_job_data.Upwork_job.Edges.UpworkFreelancer)),
-		Job_description_vector: upsert_resp.Job_description_vector,
-	}
-
-	raw_specialization_scores, compute_raw_specialization_err := s.svc.ComputeRawSpecializationScore(compute_specialization_req, context.TODO())
-	if compute_raw_specialization_err != nil {
-		return NewServiceError(compute_raw_specialization_err)
-	}
-
-	final_specialization_scores, apply_specialization_weights_err := s.svc.ApplySpecializationScoreWeights(types.ApplySpecializationScoreWeightsRequest{
-		Description_scores: *raw_specialization_scores.Job_description_specialization_scores,
-		Job_data:           *fetched_job_data,
-	}, context.TODO())
-	if apply_specialization_weights_err != nil {
-		return NewServiceError(apply_specialization_weights_err)
-	}
-	summed_scores := make(map[string]float32)
-	for freelancer_id, scores := range final_specialization_scores.Weighted_scores {
-		sum := float32(0)
-		for _, score := range scores {
-			sum += score
-		}
-		summed_scores[freelancer_id] = sum / float32(len(scores))
-	}
-	svc_err := s.svc.PostJobRankingData(types.FinalizedJobRankingData{
-		Freelancer_score_map: summed_scores,
-		Job_id:               req.Job_id.String(),
-		Platform:             req.Platform,
-		Platform_id:          req.Platform_id,
-		User_id:              req.User_id,
-	}, ctx)
-	if svc_err != nil {
-		return NewServiceError(svc_err)
-	}
-
-	// Write final_specialization_scores to a file as JSON
-	file, err := os.Create("final_specialization_scores.json")
-	if err != nil {
-		return NewServiceError(err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(summed_scores)
-	if err != nil {
-		return NewServiceError(err)
-	}
-
-	err = s.queue.DeleteMessage(context.TODO(), req.Receipt_handle)
-	if err != nil {
-		return NewQError(err)
-	}
-	return nil
-}
-
-func (s *Server) CountTotalWorkHistories(req types.JobEmbeddingData) int {
-	total_workhistories := 0
-	for _, freelancer := range req.Upwork_job.Edges.UpworkFreelancer {
-		total_workhistories += len(freelancer.Edges.WorkHistories)
-	}
-	return total_workhistories
-
 }

@@ -56,6 +56,9 @@ export function JobDataTable({
     freelancers: UpworkFreelancer[];
     job: UpworkJob;
 }) {
+    for (const freelancer of freelancers) {
+        console.log(freelancer.edges.freelancer_inference_data)
+    }
     const columns: ColumnDef<UpworkFreelancer>[] = [
         {
             id: "select",
@@ -419,12 +422,84 @@ export function JobDataTable({
             },
             accessorKey: "specialization_score",
             accessorFn: (row) => {
-                if (row.edges && row.edges.freelancer_inference_data) {
+                if (row.edges && row.edges.freelancer_inference_data?.finalized_rating_score) {
                     return row.edges.freelancer_inference_data.finalized_rating_score.toFixed(
                         2
-                    );
+                    ) || 0;
                 } else {
-                    return "Not enough data";
+                    return 0;
+                }
+            },
+            enableSorting: true,
+        },
+        {
+            id: "budget_adherence_percentage",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Budget adherence percentage
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-right">
+                        {row.getValue("budget_adherence_percentage")+"%" || "No data"}
+                    </div>
+                );
+            },
+            accessorKey: "budget_adherence_percentage",
+            accessorFn: (row) => {
+                if (row.edges && row.edges.freelancer_inference_data?.budget_adherence_percentage) {
+                    return row.edges.freelancer_inference_data.budget_adherence_percentage.toFixed(2) || 0;
+                } else {
+                    return -1;
+                }
+            },
+            enableSorting: true,
+        },
+        {
+            id: "budget_overrun_percentage",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        Budget adherence percentage
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                const value = row.getValue("budget_overrun_percentage");
+                if (value === -1) {
+                    return (
+                        <div className="text-right text-muted-foreground">
+                            No data
+                        </div>
+                    );
+                }
+                return (
+                    <div className="text-right">
+                        {row.getValue("budget_overrun_percentage")+"%"}
+                    </div>
+                );
+            },
+            accessorKey: "budget_overrun_percentage",
+            accessorFn: (row) => {
+                if (row.edges && row.edges.freelancer_inference_data?.budget_overrun_percentage) {
+                    return row.edges.freelancer_inference_data.budget_overrun_percentage.toFixed(2) || 0;
+                } else {
+                    return -1;
                 }
             },
             enableSorting: true,
