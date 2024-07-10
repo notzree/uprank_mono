@@ -659,6 +659,10 @@ func (s *V1Servicer) UpdateUpworkFreelancer(data []types.UpdateUpworkFreelancerR
 }
 
 // Adds rankings for all freelancers of a given job
+// problem: Postgres needs you to explicitely state the constraints.
+// Ent makes it difficult for me to list an edge as a constraint
+// Idfk what I have to do.....
+// Db is lowkey doing the fucky upy.
 func (s *V1Servicer) AddJobRankings(data types.AddJobRankingRequest, user_id string, ctx context.Context) error {
 	bulk := make([]*ent.FreelancerInferenceDataCreate, 0, len(data.Freelancer_ranking_data))
 	for _, inference_data := range data.Freelancer_ranking_data {
@@ -668,9 +672,11 @@ func (s *V1Servicer) AddJobRankings(data types.AddJobRankingRequest, user_id str
 			SetUprankReccomended(inference_data.Uprank_reccomended).
 			SetUprankNotEnoughData(inference_data.Uprank_not_enough_data).
 			SetUprankReccomendedReasons(inference_data.Uprank_reccomended_reasons).
-			SetRawRatingScore(float64(inference_data.Raw_rating_score)))
+			SetRawRatingScore(float64(inference_data.Raw_rating_score)).
+			SetBudgetAdherencePercentage(float64(inference_data.Budget_adherence_percentage)).
+			SetBudgetOverrunPercentage(float64(inference_data.Budget_overrun_percentage)))
 	}
-	_, err := s.ent.FreelancerInferenceData.CreateBulk(bulk...).Save(ctx)
+	err := s.ent.FreelancerInferenceData.CreateBulk(bulk...).OnConflict().DoNothing().Exec(ctx)
 	if err != nil {
 		log.Fatalf("failed creating FreelancerInferenceData: %v", err)
 	}

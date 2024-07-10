@@ -47,6 +47,12 @@ export type UpworkFreelancerEdges = {
 export type FreelancerInferenceData = {
   ai_estimated_duration: any;
   finalized_rating_score: number;
+  raw_rating_score: number;
+  uprank_reccomended: boolean;
+  uprank_reccomended_reasons: string;
+  uprank_not_enough_data: boolean;
+  budget_adherence_percentage: number;
+  budget_overrun_percentage: number;
   id: number;
   edges: any;
 }

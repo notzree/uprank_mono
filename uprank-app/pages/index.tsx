@@ -4,7 +4,8 @@ const inter = Inter({ subsets: ["latin"] });
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardContent, Card } from "@/components/ui/card";
-import { SignOutButton } from "@clerk/nextjs";
+import { buttonVariants } from "@/components/ui/button"
+
 import { useUser } from "@clerk/nextjs";
 type CardData = {
     title: string;
@@ -108,11 +109,12 @@ export default function Component() {
                 </section>
 
                 <section className="py-24 px-10 text-center">
-                    <h2 className="text-3xl font-bold">Sign up for the closed beta today</h2>
+                    <h2 className="text-3xl font-bold">Sign up for early access today</h2>
                     <p className="mt-6 text-lg text-gray-600">
                         Join thousands of business owners who have already enhanced their hiring strategy with Uprank.
                     </p>
-                    <Button className="mt-10">Register for Beta</Button>
+                    <Link className={buttonVariants({ variant: "outline" })} href="https://forms.gle/cJTuPrewaEYWa61s9">Register for early access</Link>
+
                 </section>
             </main>
             <footer className="py-6 px-10 text-center text-sm text-gray-600">

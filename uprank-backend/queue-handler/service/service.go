@@ -15,7 +15,8 @@ type Servicer interface {
 	ComputeRawSpecializationScore(ctx context.Context, req types.ComputeRawSpecializationScoreRequest) (*types.ComputeRawSpecializationScoreResponse, error)
 	ApplySpecializationScoreWeights(req types.ApplySpecializationScoreWeightsRequest, ctx context.Context, weights ...DescriptionWeight) (*types.ApplySpecializationScoreWeightsResponse, error)
 	PostJobRankingData(req types.PostJobRankingDataRequest, ctx context.Context) error
-	SaveRawSpecializationScoreWeights(ctx context.Context, req *types.ComputeRawSpecializationScoreResponse, data []types.FreelancerRankingData) error
-	SaveWeightedSpecializationScoreWeights(ctx context.Context, req *types.ApplySpecializationScoreWeightsResponse, data []types.FreelancerRankingData) error
+	SaveRawSpecializationScoreWeights(ctx context.Context, req *types.ComputeRawSpecializationScoreResponse, data *[]types.FreelancerRankingData) error
+	SaveWeightedSpecializationScoreWeights(ctx context.Context, req *types.ApplySpecializationScoreWeightsResponse, data *[]types.FreelancerRankingData) error
+	ApplyBudgetScores(ctx context.Context, req types.JobData, data *[]types.FreelancerRankingData) error
 	// ComputeEstDuration(ctx context.Context) error
 }
