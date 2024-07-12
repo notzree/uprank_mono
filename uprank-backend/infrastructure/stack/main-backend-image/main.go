@@ -24,11 +24,11 @@ func main() {
 			application_name = "uprank"
 		)
 
-		container_repository, err := pulumi.NewStackReference(ctx, "notzree/container-repository/dev", nil)
+		application_base, err := pulumi.NewStackReference(ctx, "notzree/application_base/dev", nil)
 		if err != nil {
 			return err
 		}
-		container_repository_url := container_repository.GetOutput(pulumi.String("repository_url"))
+		ecr_url := application_base.GetOutput(pulumi.String("ecr_url"))
 
 		container_service, err := pulumi.NewStackReference(ctx, "notzree/container-service/dev", nil)
 		if err != nil {
@@ -64,7 +64,7 @@ func main() {
 		}
 
 		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "main-backend"), &ecrx.ImageArgs{
-			RepositoryUrl: pulumi.StringOutput(container_repository_url),
+			RepositoryUrl: pulumi.StringOutput(ecr_url),
 			Context:       pulumi.String("../../../main-backend"),
 			Dockerfile:    pulumi.String("../../../main-backend/Dockerfile.dev"),
 			Platform:      pulumi.String("linux/amd64"),

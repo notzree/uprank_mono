@@ -5,6 +5,7 @@ import (
 
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ecs"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/servicediscovery"
+	ecrx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/ecr"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -29,6 +30,13 @@ func main() {
 
 		// An ECS cluster to deploy into
 		cluster, err := ecs.NewCluster(ctx, CreateResourceName(env, application_name, "cluster"), nil)
+		if err != nil {
+			return err
+		}
+		// ECR repository for all images
+		repo, err := ecrx.NewRepository(ctx, CreateResourceName(env, application_name, "repo"), &ecrx.RepositoryArgs{
+			ForceDelete: pulumi.Bool(true),
+		})
 		if err != nil {
 			return err
 		}
@@ -63,7 +71,7 @@ func main() {
 		}
 
 		//todo: register services to the service discovery
-
+		ctx.Export("ecr_url", repo.Url)
 		ctx.Export("ecs_cluster_arn", cluster.Arn)
 		return nil
 	}))

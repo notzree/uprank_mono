@@ -16,14 +16,14 @@ func main() {
 			application_name = "uprank"
 		)
 
-		container_repository, err := pulumi.NewStackReference(ctx, "notzree/container-repository/dev", nil)
+		application_base, err := pulumi.NewStackReference(ctx, "notzree/application_base/dev", nil)
 		if err != nil {
 			return err
 		}
-		container_repository_url := container_repository.GetOutput(pulumi.String("repository_url"))
+		ecr_url := application_base.GetOutput(pulumi.String("ecr_url"))
 
 		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "inference-backend"), &ecrx.ImageArgs{
-			RepositoryUrl: pulumi.StringOutput(container_repository_url),
+			RepositoryUrl: pulumi.StringOutput(ecr_url),
 			Context:       pulumi.String("../../../inference-backend"),
 			Dockerfile:    pulumi.String("../../../inference-backend/Dockerfile.dev"),
 			Platform:      pulumi.String("linux/amd64"),

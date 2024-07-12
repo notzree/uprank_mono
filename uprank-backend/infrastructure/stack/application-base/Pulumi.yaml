@@ -1,4 +1,4 @@
-name: container-service
+name: application-base
 runtime: go
 description: Maintains aws ecs and related container services
 config:
