@@ -1,0 +1,7 @@
+name: queue-handler-image
+runtime: go
+description: pulumi project to push queue-handler image to ecr
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-go

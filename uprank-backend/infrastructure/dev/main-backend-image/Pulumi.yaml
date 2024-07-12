@@ -1,4 +1,4 @@
-name: container-image
+name: main-backend-image
 runtime: go
 description: pulumi project to build new image
 config:

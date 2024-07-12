@@ -22,16 +22,16 @@ func main() {
 		}
 		container_repository_url := container_repository.GetOutput(pulumi.String("repository_url"))
 
-		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "image"), &ecrx.ImageArgs{
+		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "inference-backend"), &ecrx.ImageArgs{
 			RepositoryUrl: pulumi.StringOutput(container_repository_url),
-			Context:       pulumi.String("../../main-backend/"),
-			Dockerfile:    pulumi.String("../../main-backend/Dockerfile"),
+			Context:       pulumi.String("../../../inference-backend"),
+			Dockerfile:    pulumi.String("../../../inference-backend/Dockerfile.dev"),
 			Platform:      pulumi.String("linux/amd64"),
 		})
 		if err != nil {
 			return err
 		}
-		ctx.Export("image_uri", image.ImageUri)
+		ctx.Export("inference-backend-image-uri", image.ImageUri)
 		return nil
 	})
 }
