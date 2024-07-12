@@ -1,5 +1,9 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
+
+const scret = new sst.Secret("base_backed_url")
+
+
 export default $config({
     app(input) {
         return {
@@ -9,6 +13,8 @@ export default $config({
         };
     },
     async run() {
-        new sst.aws.Nextjs("MyWeb", {});
+        new sst.aws.Nextjs("MyWeb", {
+            link: [scret]
+        });
     },
 });

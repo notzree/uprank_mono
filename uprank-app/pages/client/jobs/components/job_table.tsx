@@ -49,16 +49,13 @@ import {
 import type { UpworkFreelancer } from "@/types/freelancer";
 import { UpworkJob } from "@/types/job";
 
-export function JobDataTable({
+export default function JobDataTable({
     freelancers,
     job,
 }: {
     freelancers: UpworkFreelancer[];
     job: UpworkJob;
 }) {
-    for (const freelancer of freelancers) {
-        console.log(freelancer.edges.freelancer_inference_data)
-    }
     const columns: ColumnDef<UpworkFreelancer>[] = [
         {
             id: "select",
@@ -539,7 +536,6 @@ export function JobDataTable({
             enableSorting: false,
         },
     ];
-
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
@@ -565,6 +561,15 @@ export function JobDataTable({
             rowSelection,
         },
     });
+    if (!job || !freelancers){
+        return (
+            <div>
+                Missing data
+            </div>
+        )
+    }
+
+    
 
     return (
         <div className="w-full overflow-auto">

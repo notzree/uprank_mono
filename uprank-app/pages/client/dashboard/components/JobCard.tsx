@@ -21,6 +21,13 @@ dayjs.extend(utc);
 export default  function JobCard({ job }: { job: Job }) {
     const { user } = useUser();
     const {getToken} = useAuth();
+    if (job == null){
+        return (
+            <div>
+                No jobs found.
+            </div>
+        )
+    }
     const client = new v1Client(
         process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL
     );
@@ -56,7 +63,7 @@ export default  function JobCard({ job }: { job: Job }) {
         if (job.edges.upworkjob?.id == null){
             return
         }
-        if (job.origin_platform == null){
+        if (job?.origin_platform == null){
             return
         }
         if (token == null){
@@ -66,7 +73,7 @@ export default  function JobCard({ job }: { job: Job }) {
             job_id: job.id,
             user_id: user?.id,
             platform_id: job.edges.upworkjob?.id,
-            platform: job.origin_platform,
+            platform: job?.origin_platform,
     }, token)}
     
     return (
@@ -86,7 +93,7 @@ export default  function JobCard({ job }: { job: Job }) {
                     </a>
                 </CardTitle>
                 <CardDescription className="flex flex-row gap-x-2">
-                    <span> Original Platform: {job.origin_platform}</span> |
+                    <span> Original Platform: {job?.origin_platform}</span> |
                     <span>Created : {created_at.toLocaleString()}</span>
                 </CardDescription>
             </CardHeader>

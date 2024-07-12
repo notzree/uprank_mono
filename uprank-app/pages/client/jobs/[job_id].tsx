@@ -1,5 +1,5 @@
 import Navbar from "../shared/components/navbar";
-import { JobDataTable } from "./components/job_table";
+import  JobDataTable from "./components/job_table";
 
 export default function Jobs({ job_prop }: { job_prop: Job }) {
     const job = job_prop.edges.upworkjob;

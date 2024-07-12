@@ -5,7 +5,7 @@ import JobCard from "./JobCard";
 export default function JobCardList({jobs}: {jobs: Job[]}){
     return (
         <div>
-            {jobs.map((job) => {
+            {jobs?.map((job) => {
                 return (
                     <JobCard key={job.id} job={job} />
                 );
