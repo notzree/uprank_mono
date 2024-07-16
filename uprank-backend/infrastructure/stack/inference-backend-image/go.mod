@@ -5,6 +5,7 @@ go 1.21
 toolchain go1.22.3
 
 require (
+	github.com/pulumi/pulumi-aws/sdk/v6 v6.32.0
 	github.com/pulumi/pulumi-awsx/sdk/v2 v2.10.0
 	github.com/pulumi/pulumi/sdk/v3 v3.113.0
 )
@@ -61,7 +62,6 @@ require (
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231 // indirect
 	github.com/pulumi/esc v0.6.2 // indirect
-	github.com/pulumi/pulumi-aws/sdk/v6 v6.32.0 // indirect
 	github.com/pulumi/pulumi-docker/sdk/v4 v4.4.3 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
@@ -69,6 +69,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.0.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
+	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/texttheater/golang-levenshtein v1.0.1 // indirect
