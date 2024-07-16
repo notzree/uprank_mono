@@ -8,6 +8,8 @@ import (
 	awsec2 "github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ecs"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/lb"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/servicediscovery"
 	"github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/awsx"
 	ecrx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/ecr"
 	ecsx "github.com/pulumi/pulumi-awsx/sdk/v2/go/awsx/ecs"
@@ -23,18 +25,14 @@ func main() {
 			env              = "dev"
 			application_name = "uprank"
 		)
-
-		application_base, err := pulumi.NewStackReference(ctx, "notzree/application_base/dev", nil)
+		// <-- Stack references -->
+		application_base, err := pulumi.NewStackReference(ctx, "notzree/application-base/dev", nil)
 		if err != nil {
 			return err
 		}
 		ecr_url := application_base.GetOutput(pulumi.String("ecr_url"))
-
-		container_service, err := pulumi.NewStackReference(ctx, "notzree/container-service/dev", nil)
-		if err != nil {
-			return err
-		}
-		cluster_arn := container_service.GetOutput(pulumi.String("ecs_cluster_arn"))
+		private_dns_namespace_id := application_base.GetOutput(pulumi.String("private_dns_namespace_id"))
+		cluster_arn := application_base.GetOutput(pulumi.String("ecs_cluster_arn"))
 		networking_repository, err := pulumi.NewStackReference(ctx, "notzree/networking/dev", nil)
 		if err != nil {
 			return err
@@ -48,9 +46,10 @@ func main() {
 			return err
 		}
 		secret_arn := secret_repository.GetOutput(pulumi.String("secretArn"))
+		// <-- End Stack references -->
 
 		cfg := config.New(ctx, "")
-		containerPort := 8080
+		containerPort := 80
 		if param := cfg.GetInt("containerPort"); param != 0 {
 			containerPort = param
 		}
@@ -58,7 +57,7 @@ func main() {
 		if param := cfg.GetInt("cpu"); param != 0 {
 			cpu = param
 		}
-		memory := 128
+		memory := 1024
 		if param := cfg.GetInt("memory"); param != 0 {
 			memory = param
 		}
@@ -66,7 +65,7 @@ func main() {
 		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "main-backend"), &ecrx.ImageArgs{
 			RepositoryUrl: pulumi.StringOutput(ecr_url),
 			Context:       pulumi.String("../../../main-backend"),
-			Dockerfile:    pulumi.String("../../../main-backend/Dockerfile.dev"),
+			Dockerfile:    pulumi.String("../../../main-backend/Dockerfile"),
 			Platform:      pulumi.String("linux/amd64"),
 		})
 		if err != nil {
@@ -74,7 +73,7 @@ func main() {
 		}
 
 		// Create IAM Role for ECS Task Execution
-		taskRole, err := iam.NewRole(ctx, "ecsTaskExecutionRole", &iam.RoleArgs{
+		taskRole, err := iam.NewRole(ctx, "main-backend-ecsTaskExecutionRole", &iam.RoleArgs{
 			AssumeRolePolicy: pulumi.String(`{
 						"Version": "2012-10-17",
 						"Statement": [
@@ -153,12 +152,12 @@ func main() {
 			VpcId: pulumi.StringOutput(vpc_id),
 			Ingress: awsec2.SecurityGroupIngressArray{
 				&awsec2.SecurityGroupIngressArgs{
-					FromPort:   pulumi.Int(80),
+					FromPort:   pulumi.Int(80), //custom http
 					ToPort:     pulumi.Int(80),
 					Protocol:   pulumi.String("tcp"),
 					CidrBlocks: pulumi.StringArray{pulumi.String("0.0.0.0/0")},
 				},
-				&awsec2.SecurityGroupIngressArgs{
+				&awsec2.SecurityGroupIngressArgs{ //default https
 					FromPort:   pulumi.Int(443),
 					ToPort:     pulumi.Int(443),
 					Protocol:   pulumi.String("tcp"),
@@ -186,14 +185,42 @@ func main() {
 
 		// An ALB to serve the container endpoint to the internet
 		loadbalancer, err := lbx.NewApplicationLoadBalancer(ctx, CreateResourceName(env, application_name, "alb"), &lbx.ApplicationLoadBalancerArgs{
-			SubnetIds:              pulumi.StringArrayOutput(public_subnet_ids),
-			DefaultTargetGroupPort: pulumi.Int(containerPort),
+			SubnetIds: pulumi.StringArrayOutput(public_subnet_ids),
+			// DefaultTargetGroupPort: pulumi.Int(80), //default http port
+			DefaultTargetGroup: &lbx.TargetGroupArgs{
+				Name: pulumi.String("main-backend-target-group"),
+				Port: pulumi.Int(80), //forward to default http port
+				HealthCheck: lb.TargetGroupHealthCheckPtrInput(lb.TargetGroupHealthCheckArgs{
+					Port: pulumi.String("traffic-port"),
+					Path: pulumi.String("/healthz"),
+				}),
+			},
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "fargate_service"), &ecsx.FargateServiceArgs{
+		main_backend_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(env, application_name, "main-backend"), &servicediscovery.ServiceArgs{
+			Name: pulumi.String("main-backend"),
+			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
+				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
+				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
+					&servicediscovery.ServiceDnsConfigDnsRecordArgs{
+						Ttl:  pulumi.Int(30),
+						Type: pulumi.String("A"),
+					},
+				},
+				RoutingPolicy: pulumi.String("MULTIVALUE"),
+			},
+			HealthCheckCustomConfig: &servicediscovery.ServiceHealthCheckCustomConfigArgs{
+				FailureThreshold: pulumi.Int(1),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "main_backend_service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
 				AssignPublicIp: pulumi.Bool(true),
@@ -202,6 +229,16 @@ func main() {
 					securityGroup.ID(),
 				},
 			},
+			ServiceRegistries: ecs.ServiceServiceRegistriesPtrInput(
+				&ecs.ServiceServiceRegistriesArgs{
+					RegistryArn: main_backend_service_discovery.Arn,
+				}),
+			//todo: transition from service discovery to service connect
+			// ServiceConnectConfiguration: ecs.ServiceServiceConnectConfigurationPtrInput(ecs.ServiceServiceConnectConfigurationArgs{
+			// 	Enabled:   pulumi.Bool(true),
+			// 	Namespace: pulumi.String("dev.uprank.ca"),
+			// 	Services:  ecs.ServiceServiceConnectConfigurationServiceArray{},
+			// }),
 			// AssignPublicIp: pulumi.Bool(true),
 			TaskDefinitionArgs: &ecsx.FargateServiceTaskDefinitionArgs{
 				LogGroup: &awsx.DefaultLogGroupArgs{
@@ -223,12 +260,21 @@ func main() {
 							TargetGroup:   loadbalancer.DefaultTargetGroup,
 						},
 					},
+					HealthCheck: ecsx.TaskDefinitionHealthCheckPtrInput(&ecsx.TaskDefinitionHealthCheckArgs{
+						Command: pulumi.StringArrayInput(pulumi.ToStringArray([]string{"CMD-SHELL", "curl -f http://localhost:7070/healthz || exit 1"})),
+					}),
 					Secrets: ecsx.TaskDefinitionSecretArray{
 						&ecsx.TaskDefinitionSecretArgs{
-							Name:      pulumi.String("SECRET"),
+							Name:      pulumi.String("MAIN_BACKEND_SECRETS"),
 							ValueFrom: pulumi.StringOutput(secret_arn),
 						},
 					},
+					Environment: ecsx.TaskDefinitionKeyValuePairArrayInput(ecsx.TaskDefinitionKeyValuePairArray{
+						&ecsx.TaskDefinitionKeyValuePairArgs{
+							Name:  pulumi.String("ENV"),
+							Value: pulumi.String("dev"),
+						},
+					}),
 				},
 			},
 		})

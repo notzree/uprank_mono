@@ -16,8 +16,8 @@ COPY . .
 # Build the Go application
 RUN go build -o main .
 
-# Expose the application port (replace 8080 with your app port)
-EXPOSE 7070
+# Expose the application port
+EXPOSE 80
 
 # Command to run the application
 CMD ["./main/main-backend"]
