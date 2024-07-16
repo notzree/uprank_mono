@@ -142,7 +142,7 @@ func main() {
 
 		// Create the CloudWatch Log Group
 		logGroup, err := cloudwatch.NewLogGroup(ctx, "uprank-main-backend-log-group", &cloudwatch.LogGroupArgs{
-			Name: pulumi.String("/ecs/myLogGroup"),
+			Name: pulumi.String("/ecs/main-backend-log-group"),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create log group: %w", err)
@@ -261,7 +261,7 @@ func main() {
 						},
 					},
 					HealthCheck: ecsx.TaskDefinitionHealthCheckPtrInput(&ecsx.TaskDefinitionHealthCheckArgs{
-						Command: pulumi.StringArrayInput(pulumi.ToStringArray([]string{"CMD-SHELL", "curl -f http://localhost:7070/healthz || exit 1"})),
+						Command: pulumi.StringArrayInput(pulumi.ToStringArray([]string{"CMD-SHELL", "curl -f http://localhost:80/healthz || exit 1"})),
 					}),
 					Secrets: ecsx.TaskDefinitionSecretArray{
 						&ecsx.TaskDefinitionSecretArgs{
