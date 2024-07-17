@@ -5,9 +5,9 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
-	"github.com/notzree/uprank-backend/queue-handler/queue"
-	"github.com/notzree/uprank-backend/queue-handler/service"
-	"github.com/notzree/uprank-backend/queue-handler/types"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/queue"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/service"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
 )
 
 type Server struct {
@@ -39,7 +39,6 @@ func (s *Server) PollForRankingRequest() error {
 		return NewQError(err)
 	}
 	for _, req := range requests {
-		//TODO: MAKE THIS A GO ROUTINE
 		log.Println("Received request")
 		ctx := context.TODO()
 		go func(ctx context.Context, req types.UpworkRankingMessage) {
@@ -47,7 +46,6 @@ func (s *Server) PollForRankingRequest() error {
 			if err != nil {
 				HandleError(err)
 			}
-
 		}(ctx, req)
 	}
 	return nil

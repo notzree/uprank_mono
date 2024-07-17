@@ -10,20 +10,20 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/migrate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
-	"github.com/notzree/uprank-backend/main-backend/ent/user"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/freelancerinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // Client is the client that holds all ent builders.

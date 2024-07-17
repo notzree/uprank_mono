@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/notzree/uprank-backend/main-backend/types"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/types"
 )
 
 func (s *Server) CreateUpworkFreelancers(w http.ResponseWriter, r *http.Request) error {

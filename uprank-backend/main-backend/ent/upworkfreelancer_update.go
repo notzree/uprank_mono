@@ -12,12 +12,12 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
-	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/freelancerinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
 )
 
 // UpworkFreelancerUpdate is the builder for updating UpworkFreelancer entities.

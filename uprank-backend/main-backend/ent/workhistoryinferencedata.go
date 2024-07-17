@@ -8,8 +8,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // WorkhistoryInferenceData is the model entity for the WorkhistoryInferenceData schema.

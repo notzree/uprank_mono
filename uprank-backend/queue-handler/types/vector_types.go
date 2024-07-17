@@ -1,7 +1,7 @@
 package types
 
 import (
-	proto "github.com/notzree/uprank-backend/queue-handler/proto"
+	proto "github.com/notzree/uprank_mono/uprank-backend/queue-handler/proto"
 )
 
 type Metadata struct {

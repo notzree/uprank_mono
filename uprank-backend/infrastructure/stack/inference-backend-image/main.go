@@ -46,7 +46,6 @@ func main() {
 			return err
 		}
 		secret_arn := secret_repository.GetOutput(pulumi.String("secretArn"))
-
 		// <-- End Stack references -->
 
 		// <--Create Fargate config -->

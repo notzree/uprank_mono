@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
 )
 
 // WorkHistory is the model entity for the WorkHistory schema.

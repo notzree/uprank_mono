@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
 )
 
 // UpworkJob is the model entity for the UpworkJob schema.

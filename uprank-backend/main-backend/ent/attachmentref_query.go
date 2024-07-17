@@ -10,9 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
 // AttachmentRefQuery is the builder for querying AttachmentRef entities.

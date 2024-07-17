@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/notzree/uprank-backend/main-backend/ent"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 )
 
 type CreateUserRequest struct {

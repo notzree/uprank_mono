@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	auth "github.com/notzree/uprank-backend/main-backend/authenticator"
-	svc "github.com/notzree/uprank-backend/main-backend/service"
+	auth "github.com/notzree/uprank_mono/uprank-backend/main-backend/authenticator"
+	svc "github.com/notzree/uprank_mono/uprank-backend/main-backend/service"
 )
 
 // todo: remove hard dependenceis on ent and clerk

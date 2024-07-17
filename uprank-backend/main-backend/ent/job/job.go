@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/schema"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/schema"
 )
 
 const (

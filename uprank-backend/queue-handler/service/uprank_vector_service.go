@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	proto "github.com/notzree/uprank-backend/queue-handler/proto"
-	"github.com/notzree/uprank-backend/queue-handler/types"
+	proto "github.com/notzree/uprank_mono/uprank-backend/queue-handler/proto"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
+	sd "github.com/notzree/uprank_mono/uprank-backend/shared/service-discovery"
 )
 
 const (
@@ -24,25 +25,32 @@ const (
 )
 
 type UprankVecService struct {
-	backend_url string
-	ms_api_key  string
-	infer       proto.InferenceClient
-	httpClient  http.Client
+	ServiceDiscoveryClient sd.ServiceDiscoveryClient
+	MsApiKey               string
+	InferenceClient        proto.InferenceClient
+	HttpClient             http.Client
 }
 
-func NewUprankVecService(backend_url string, ms_api_key string, infer proto.InferenceClient, httpClient http.Client) *UprankVecService {
+type NewUprankVecServiceInput struct {
+	ServiceDiscoveryClient sd.ServiceDiscoveryClient
+	MsApiKey               string
+	InferenceClient        proto.InferenceClient
+	HttpClient             http.Client
+}
+
+func NewUprankVecService(params NewUprankVecServiceInput) *UprankVecService {
 	return &UprankVecService{
-		backend_url: backend_url,
-		ms_api_key:  ms_api_key,
-		infer:       infer,
-		httpClient:  httpClient,
+		ServiceDiscoveryClient: params.ServiceDiscoveryClient,
+		MsApiKey:               params.MsApiKey,
+		InferenceClient:        params.InferenceClient,
+		HttpClient:             params.HttpClient,
 	}
 }
 
 func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData, user_id string) (*types.UpsertVectorResponse, error) {
 	upserted_freelancer_ids := []string{} //freelancers that have been upserted or are already upserted.
 
-	job_description_vector, embed_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
+	job_description_vector, embed_err := s.InferenceClient.EmbedText(ctx, &proto.EmbedTextRequest{
 		Id:       req.Upwork_job.Upwork_id,
 		Text:     req.Upwork_job.Description,
 		Metadata: CreateMetadata(user_id, req.Job_id, "job_description", "upwork"),
@@ -50,7 +58,7 @@ func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData,
 	if embed_err != nil {
 		return nil, embed_err
 	}
-	_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+	_, upsert_vector_err := s.InferenceClient.UpsertVector(ctx, &proto.UpsertVectorRequest{
 		Namespace: DESCRIPTION_NAMESPACE,
 		Vectors:   []*proto.Vector{job_description_vector.Vector},
 	})
@@ -65,7 +73,7 @@ func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData,
 		description_vectors := []*proto.Vector{}
 
 		//Embed and add vectors to array to embed in 1 trip
-		freelancer_description_vector, embed_description_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
+		freelancer_description_vector, embed_description_vector_err := s.InferenceClient.EmbedText(ctx, &proto.EmbedTextRequest{
 			Id:       freelancer.ID,
 			Text:     freelancer.Description,
 			Metadata: CreateMetadata(user_id, req.Job_id, "freelancer_description", "upwork", WithFreelancerId(freelancer.ID)),
@@ -83,7 +91,7 @@ func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData,
 			if work_history.Description == "" {
 				continue
 			}
-			work_history_description_vector, embed_work_history_vector_err := s.infer.EmbedText(ctx, &proto.EmbedTextRequest{
+			work_history_description_vector, embed_work_history_vector_err := s.InferenceClient.EmbedText(ctx, &proto.EmbedTextRequest{
 				Id:       strconv.Itoa(work_history.ID),
 				Text:     work_history.Description,
 				Metadata: CreateMetadata(user_id, req.Job_id, "work_history_description", "upwork", WithFreelancerId(freelancer.ID), WithWorkHistoryId(work_history.ID)),
@@ -95,7 +103,7 @@ func (s *UprankVecService) UpsertVectors(ctx context.Context, req types.JobData,
 			description_vectors = append(description_vectors, work_history_description_vector.Vector)
 		}
 		if len(description_vectors) != 0 {
-			_, upsert_vector_err := s.infer.UpsertVector(ctx, &proto.UpsertVectorRequest{
+			_, upsert_vector_err := s.InferenceClient.UpsertVector(ctx, &proto.UpsertVectorRequest{
 				Namespace: DESCRIPTION_NAMESPACE,
 				Vectors:   description_vectors,
 			})
@@ -137,7 +145,7 @@ func (s *UprankVecService) ComputeRawSpecializationScore(ctx context.Context, re
 	description_filter["job_id"] = req.Job_data.Job_id
 	description_filter["type"] = WORK_HISTORY_DESCRIPTION_TYPE
 	work_history_count := int32(s.CountTotalWorkHistories(req.Job_data))
-	description_response, err := s.infer.QueryVector(ctx, &proto.QueryVectorRequest{
+	description_response, err := s.InferenceClient.QueryVector(ctx, &proto.QueryVectorRequest{
 		Namespace: DESCRIPTION_NAMESPACE,
 		Vector:    upwork_job_description_vector.Vector,
 		TopK:      work_history_count,
@@ -299,7 +307,13 @@ func (s *UprankVecService) ApplyBudgetScores(ctx context.Context, req types.JobD
 }
 
 func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataRequest, ctx context.Context) error {
-	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/rank", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
+	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+		ServiceName: "uprank-backend",
+	})
+	if err != nil {
+		return err
+	}
+	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/rank", *base_url, req.Job_id, req.Platform, req.Platform_id)
 	bodyData := types.AddJobRankingRequest{
 		Freelancer_ranking_data: req.Freelancer_ranking_data,
 	}
@@ -312,10 +326,10 @@ func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataReques
 	if err != nil {
 		return err
 	}
-	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
-	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
+	httpreq.Header.Set("USER-ID", req.User_id)
 	httpreq.Header.Set("Content-Type", "application/json")
-	resp, err := s.httpClient.Do(httpreq)
+	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return err
 	}
@@ -325,15 +339,21 @@ func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataReques
 }
 
 func (s *UprankVecService) FetchJobData(ctx context.Context, req types.UpworkRankingMessage) (*types.JobData, []types.FreelancerRankingData, error) {
-	fetch_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/embeddings/job_data", s.backend_url, req.Job_id, req.Platform, req.Platform_id)
-	log.Println("Fetching data from:", fetch_url)
-	httpreq, err := http.NewRequest("GET", fetch_url, nil)
+	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+		ServiceName: "uprank-backend",
+	})
 	if err != nil {
 		return nil, nil, err
 	}
-	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/embeddings/job_data", *base_url, req.Job_id, req.Platform, req.Platform_id)
+	log.Println("Fetching data from:", url)
+	httpreq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
 	httpreq.Header.Set("User_id", req.User_id)
-	resp, err := s.httpClient.Do(httpreq)
+	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return nil, nil, err
 
@@ -365,8 +385,13 @@ func (s *UprankVecService) FetchJobData(ctx context.Context, req types.UpworkRan
 
 func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req types.MarkFreelancersAsEmbeddedRequest) error {
 	log.Println("Marking freelancers as embedded")
-	//todo: change the date to be whenever its embedded, not when its marked as embedded
-	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/freelancers/update", s.backend_url, req.Job_id, "upwork", req.Upwork_job_id)
+	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+		ServiceName: "uprank-backend",
+	})
+	if err != nil {
+		return err
+	}
+	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/freelancers/update", *base_url, req.Job_id, "upwork", req.Upwork_job_id)
 
 	bodyData := []types.UpdateUpworkFreelancerRequest{}
 	for _, freelancer_id := range req.Upserted_freelancer_ids {
@@ -384,11 +409,11 @@ func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req ty
 	if err != nil {
 		return err
 	}
-	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
 	httpreq.Header.Set("User_id", req.User_id)
 	httpreq.Header.Set("Content-Type", "application/json")
 
-	resp, err := s.httpClient.Do(httpreq)
+	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return err
 	}
@@ -398,7 +423,13 @@ func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req ty
 
 func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req types.MarkUpworkJobAsEmbeddedRequest) error {
 	log.Println("Marking job as embedded")
-	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/update", s.backend_url, req.Job_id, "upwork", req.Upwork_id)
+	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+		ServiceName: "uprank-backend",
+	})
+	if err != nil {
+		return err
+	}
+	update_freelancer_url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/update", *base_url, req.Job_id, "upwork", req.Upwork_id)
 	current_time := time.Now()
 	bodyData := types.UpdateUpworkJobRequest{
 		Upwork_id:   req.Upwork_id,
@@ -412,11 +443,11 @@ func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req type
 	if err != nil {
 		return err
 	}
-	httpreq.Header.Set("X-API-KEY", s.ms_api_key)
+	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
 	httpreq.Header.Set("User_id", req.User_id)
 	httpreq.Header.Set("Content-Type", "application/json")
 
-	resp, err := s.httpClient.Do(httpreq)
+	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return err
 	}

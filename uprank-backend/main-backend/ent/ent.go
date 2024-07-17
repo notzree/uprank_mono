@@ -12,14 +12,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/notzree/uprank-backend/main-backend/ent/attachmentref"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
-	"github.com/notzree/uprank-backend/main-backend/ent/user"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/attachmentref"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/freelancerinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // ent aliases to avoid import conflicts in user's code.

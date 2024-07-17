@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/notzree/uprank-backend/queue-handler/types"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
 )
 
 // TODO: add context to all of these so we can cancel the request if needed

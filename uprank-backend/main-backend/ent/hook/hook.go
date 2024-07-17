@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/notzree/uprank-backend/main-backend/ent"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 )
 
 // The AttachmentRefFunc type is an adapter to allow the use of ordinary

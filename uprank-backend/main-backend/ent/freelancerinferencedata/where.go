@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/jackc/pgtype"
-	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/notzree/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/user"
 )
 
 // User is the model entity for the User schema.

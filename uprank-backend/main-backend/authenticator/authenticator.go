@@ -31,8 +31,7 @@ func NewClerkAuthenticator(clerk_secret_key string, ms_api_key string) *ClerkAut
 
 func (c *ClerkAuthenticator) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-API-KEY") == c.ms_api_key {
-			//todo: ensure that the user_id is in the request
+		if r.Header.Get("X-API-KEY") == c.ms_api_key && r.Header.Get("USER-ID") != "" {
 			next.ServeHTTP(w, r)
 		} else {
 			token, err := c.GetToken(r)
@@ -60,7 +59,7 @@ func (c *ClerkAuthenticator) GetIdFromRequest(r *http.Request) (string, error) {
 	claims, exist := clerk.SessionClaimsFromContext(ctx)
 	if !exist {
 		// try to grab id from request:
-		id := r.Header.Get("User_id")
+		id := r.Header.Get("USER-ID")
 		if id == "" {
 			return "", errors.New("user_id is required")
 		}

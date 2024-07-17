@@ -50,29 +50,11 @@ func main() {
 		if err != nil {
 			return err
 		}
-		_, err = servicediscovery.NewService(ctx, CreateResourceName(env, application_name, "service-discovery"), &servicediscovery.ServiceArgs{
-			Name: pulumi.String("service-discovery"),
-			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
-				NamespaceId: private_dns_namespace.ID(),
-				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
-					&servicediscovery.ServiceDnsConfigDnsRecordArgs{
-						Ttl:  pulumi.Int(30),
-						Type: pulumi.String("A"),
-					},
-				},
-				RoutingPolicy: pulumi.String("MULTIVALUE"),
-			},
-			HealthCheckCustomConfig: &servicediscovery.ServiceHealthCheckCustomConfigArgs{
-				FailureThreshold: pulumi.Int(1),
-			},
-		})
-		if err != nil {
-			return err
-		}
 
 		//todo: register services to the service discovery
 		ctx.Export("ecr_url", repo.Url)
 		ctx.Export("ecs_cluster_arn", cluster.Arn)
+		ctx.Export("private_dns_namespace_id", private_dns_namespace.ID())
 		return nil
 	}))
 }

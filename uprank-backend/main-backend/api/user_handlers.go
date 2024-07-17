@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/notzree/uprank-backend/main-backend/types"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/types"
 )
 
 // Creates a user in the database after they have signed up w/ clerk + completed onboarding

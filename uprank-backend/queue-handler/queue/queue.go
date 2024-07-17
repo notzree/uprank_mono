@@ -3,7 +3,7 @@ package queue
 import (
 	"context"
 
-	types "github.com/notzree/uprank-backend/queue-handler/types"
+	types "github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
 )
 
 type Queue interface {

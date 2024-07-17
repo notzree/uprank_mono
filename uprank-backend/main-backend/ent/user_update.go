@@ -12,10 +12,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
-	"github.com/notzree/uprank-backend/main-backend/ent/predicate"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
-	"github.com/notzree/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/predicate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/user"
 )
 
 // UserUpdate is the builder for updating User entities.

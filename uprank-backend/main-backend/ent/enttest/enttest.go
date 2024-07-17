@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/notzree/uprank-backend/main-backend/ent"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 	// required by schema hooks.
-	_ "github.com/notzree/uprank-backend/main-backend/ent/runtime"
+	_ "github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/notzree/uprank-backend/main-backend/ent/migrate"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/migrate"
 )
 
 type (

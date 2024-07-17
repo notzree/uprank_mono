@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/jackc/pgtype"
-	"github.com/notzree/uprank-backend/main-backend/ent/freelancerinferencedata"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/freelancerinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
 )
 
 // FreelancerInferenceDataCreate is the builder for creating a FreelancerInferenceData entity.

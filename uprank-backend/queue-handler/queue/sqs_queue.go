@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/google/uuid"
-	types "github.com/notzree/uprank-backend/queue-handler/types"
+	types "github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
 )
 
 type SqsQueue struct {

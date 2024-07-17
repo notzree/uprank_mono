@@ -13,18 +13,55 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	_ "github.com/lib/pq"
-	"github.com/notzree/uprank-backend/main-backend/api"
-	"github.com/notzree/uprank-backend/main-backend/authenticator"
-	"github.com/notzree/uprank-backend/main-backend/ent"
-	svc "github.com/notzree/uprank-backend/main-backend/service"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/api"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/authenticator"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
+	svc "github.com/notzree/uprank_mono/uprank-backend/main-backend/service"
+	EnvGetter "github.com/notzree/uprank_mono/uprank-backend/shared/env"
 )
 
+func getEnvVariables(env_getter EnvGetter.EnvGetter, vars []string) (map[string]string, error) {
+	envVars := make(map[string]string)
+	for _, v := range vars {
+		value, err := env_getter.GetEnv(v)
+		if err != nil {
+			return nil, err
+		}
+		envVars[v] = value
+	}
+	return envVars, nil
+}
+
 func main() {
-	clerk_secret_key := os.Getenv("CLERK_SECRET_KEY")
-	db_connection_string := os.Getenv("DB_CONNECTION_STRING")
-	server_port := os.Getenv("SERVER_PORT")
-	ranking_queue_url := os.Getenv("RANKING_QUEUE_URL")
-	ms_api_key := os.Getenv("MS_API_KEY")
+	env := os.Getenv("ENV")
+	var eg EnvGetter.EnvGetter
+
+	if env == "dev" {
+		log.Default().Println("Running in dev environment")
+		eg = EnvGetter.NewAwsEnvGetter("MAIN_BACKEND_SECRETS")
+	} else {
+		log.Default().Println("Running in local environment")
+		eg = &EnvGetter.LocalEnvGetter{}
+	}
+
+	vars := []string{
+		"CLERK_SECRET_KEY",
+		"DB_CONNECTION_STRING",
+		"SERVER_PORT",
+		"RANKING_QUEUE_URL",
+		"MS_API_KEY",
+	}
+
+	envVars, err := getEnvVariables(eg, vars)
+	if err != nil {
+		log.Fatalf("failed to get environment variable: %v", err)
+	}
+
+	clerk_secret_key := envVars["CLERK_SECRET_KEY"]
+	db_connection_string := envVars["DB_CONNECTION_STRING"]
+	server_port := envVars["SERVER_PORT"]
+	ranking_queue_url := envVars["RANKING_QUEUE_URL"]
+	ms_api_key := envVars["MS_API_KEY"]
 
 	//Create db connection
 	ent_client, err := ent.Open("postgres", db_connection_string)

@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistory"
-	"github.com/notzree/uprank-backend/main-backend/ent/workhistoryinferencedata"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistory"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/workhistoryinferencedata"
 )
 
 // WorkhistoryInferenceDataCreate is the builder for creating a WorkhistoryInferenceData entity.

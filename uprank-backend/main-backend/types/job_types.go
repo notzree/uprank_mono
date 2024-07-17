@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 )
 
 type CreateJobRequest struct {

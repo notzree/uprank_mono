@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/notzree/uprank-backend/queue-handler/types"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/types"
 )
 
 func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRankingMessage) error {

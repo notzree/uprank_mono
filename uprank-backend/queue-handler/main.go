@@ -1,31 +1,86 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 	"os"
 
-	client "github.com/notzree/uprank-backend/queue-handler/grpc_client"
-	"github.com/notzree/uprank-backend/queue-handler/queue"
-	"github.com/notzree/uprank-backend/queue-handler/server"
-	"github.com/notzree/uprank-backend/queue-handler/service"
+	client "github.com/notzree/uprank_mono/uprank-backend/queue-handler/grpc_client"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/queue"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/server"
+	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/service"
+	EnvGetter "github.com/notzree/uprank_mono/uprank-backend/shared/env"
+	sd "github.com/notzree/uprank_mono/uprank-backend/shared/service-discovery"
 )
 
 func main() {
-	ranking_queue_url := os.Getenv("RANKING_QUEUE_URL")
-	main_backend_url := os.Getenv("MAIN_BACKEND_URL")
-	// inference_server_url := os.Getenv("INFERENCE_SERVER_URL")
-	// log.Default().Println(fmt.Sprintf("inf server url: %v", inference_server_url))
-	inference_server_url := "uprank-inference-backend:50051"
-	ms_api_key := os.Getenv("MS_API_KEY")
-	queue := queue.NewSqsQueue(ranking_queue_url)
-	grpc_inference_client, err := client.NewGRPCInferenceClient(inference_server_url)
-	svc := service.NewUprankVecService(main_backend_url, ms_api_key, grpc_inference_client, http.Client{})
+	//TODO: Based on environment variables, we will switch between different service discovery options
+	env := os.Getenv("ENV")
+	var eg EnvGetter.EnvGetter
+	var sdc sd.ServiceDiscoveryClient
+
+	if env == "dev" {
+		log.Default().Println("Running in dev environment")
+		eg = EnvGetter.NewAwsEnvGetter("MAIN_BACKEND_SECRETS")
+		sdc_pointer, err := sd.NewECSServiceDiscoveryClient("dev.uprank.ca")
+		if err != nil {
+			log.Fatal("error creating service discovery client:", err)
+		}
+		sdc = sdc_pointer
+		ctx := context.TODO()
+		test, err := sdc.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+			ServiceName: "uprank-inference-backend",
+		})
+		if err != nil {
+			log.Fatal("error getting instance url:", err)
+		}
+		log.Default().Printf("test: %s", *test)
+	} else if env == "local" {
+		log.Default().Println("Running in local environment")
+		eg = &EnvGetter.LocalEnvGetter{}
+		sdc = sd.NewLocalServiceDiscoveryClient()
+	}
+	vars := []string{
+		"RANKING_QUEUE_URL",
+		"MS_API_KEY",
+	}
+	envVars, err := getEnvVariables(eg, vars)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Error creating grpc client: %v", err))
+		log.Fatalf("failed to get environment variable: %v", err)
+	}
+	ranking_queue_url := envVars["RANKING_QUEUE_URL"]
+	ms_api_key := envVars["MS_API_KEY"]
+
+	queue := queue.NewSqsQueue(ranking_queue_url)
+	// FIXME: This url should be discovererd, for now hardcoded.
+	inference_server_url := "uprank-inference-backend:50051"
+	grpc_inference_client, err := client.NewGRPCInferenceClient(inference_server_url)
+	if err != nil {
+		log.Fatal("error creating grpc client:", err)
+	}
+	svc := service.NewUprankVecService(service.NewUprankVecServiceInput{
+		ServiceDiscoveryClient: sdc,
+		MsApiKey:               ms_api_key,
+		InferenceClient:        grpc_inference_client,
+		HttpClient:             http.Client{},
+	})
+	if err != nil {
+		log.Fatal("error creating grpc client:", err)
 	}
 
 	server := server.NewServer(queue, svc)
 	server.Start()
+}
+
+func getEnvVariables(env_getter EnvGetter.EnvGetter, vars []string) (map[string]string, error) {
+	envVars := make(map[string]string)
+	for _, v := range vars {
+		value, err := env_getter.GetEnv(v)
+		if err != nil {
+			return nil, err
+		}
+		envVars[v] = value
+	}
+	return envVars, nil
 }

@@ -12,13 +12,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqs_types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/google/uuid"
-	"github.com/notzree/uprank-backend/main-backend/ent"
-	"github.com/notzree/uprank-backend/main-backend/ent/job"
-	"github.com/notzree/uprank-backend/main-backend/ent/schema"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkfreelancer"
-	"github.com/notzree/uprank-backend/main-backend/ent/upworkjob"
-	"github.com/notzree/uprank-backend/main-backend/ent/user"
-	"github.com/notzree/uprank-backend/main-backend/types"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/job"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/schema"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkfreelancer"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/upworkjob"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent/user"
+	"github.com/notzree/uprank_mono/uprank-backend/main-backend/types"
 )
 
 type V1Servicer struct {
