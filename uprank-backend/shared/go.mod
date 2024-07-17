@@ -1,4 +1,4 @@
-module github.com/notzree/uprank-backend/shared
+module github.com/notzree/uprank_mono/uprank-backend/shared
 
 go 1.22.3
 

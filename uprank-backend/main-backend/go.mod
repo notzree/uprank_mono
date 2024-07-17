@@ -1,4 +1,4 @@
-module github.com/notzree/uprank-backend/main-backend
+module github.com/notzree/uprank_mono/uprank-backend/main-backend
 
 go 1.22
 
