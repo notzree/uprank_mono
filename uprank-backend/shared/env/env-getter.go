@@ -15,8 +15,8 @@ type AwsEnvGetter struct {
 	EnvMap map[string]string
 }
 
-func NewAwsEnvGetter() *AwsEnvGetter {
-	all_secrets := os.Getenv("MAIN_BACKEND_SECRETS")
+func NewAwsEnvGetter(NestedSecret string) *AwsEnvGetter {
+	all_secrets := os.Getenv(NestedSecret)
 	em := make(map[string]string)
 	if err := json.Unmarshal([]byte(all_secrets), &em); err != nil {
 		log.Fatalf("failed to unmarshal secrets: %v", err)
