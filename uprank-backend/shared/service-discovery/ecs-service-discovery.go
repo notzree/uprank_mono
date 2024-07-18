@@ -43,6 +43,9 @@ func (e *ECSServiceDiscoveryClient) GetInstanceUrl(ctx context.Context, params G
 	if err != nil {
 		return nil, err
 	}
+	if result.Instances == nil || len(result.Instances) == 0 {
+		return nil, errors.New("no instances found")
+	}
 	instance_ip := result.Instances[0].Attributes["AWS_INSTANCE_IPV4"]
 	instance_port := result.Instances[0].Attributes["AWS_INSTANCE_PORT"]
 	url := fmt.Sprintf("http://%s:%s", instance_ip, instance_port)
