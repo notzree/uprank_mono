@@ -73,7 +73,50 @@ func main() {
 		}
 
 		// Create IAM Role for ECS Task Execution
-		taskRole, err := iam.NewRole(ctx, "main-backend-ecsTaskExecutionRole", &iam.RoleArgs{
+		taskRole, err := iam.NewRole(ctx, "main-backend-ecs-task-role", &iam.RoleArgs{
+			AssumeRolePolicy: pulumi.String(`{
+						"Version": "2012-10-17",
+						"Statement": [
+							{
+								"Effect": "Allow",
+								"Principal": {
+									"Service": "ecs-tasks.amazonaws.com"
+								},
+								"Action": "sts:AssumeRole"
+							}
+						]
+					}`),
+		})
+		if err != nil {
+			return err
+		}
+		// Create role policy to access SQS
+		_, err = iam.NewRolePolicy(ctx, "ecsSQSAccess", &iam.RolePolicyArgs{
+			Role: taskRole.Name,
+			Policy: pulumi.String(`{
+				"Version": "2012-10-17",
+				"Statement": [
+					{
+						"Effect": "Allow",
+						"Action": [
+							"sqs:receivemessage",
+							"sqs:DeleteMessage",
+							"sqs:ListQueues",
+							"sqs:GetQueueAttributes",
+							"sqs:CancelMessageMoveTask",
+							"sqs:SendMessage"
+						],
+						"Resource": "*"
+					}
+				]
+			}`),
+		})
+		if err != nil {
+			return err
+		}
+
+		// Create IAM Role for ECS Task Execution
+		executionRole, err := iam.NewRole(ctx, "main-backend-ecs-task-execution-role", &iam.RoleArgs{
 			AssumeRolePolicy: pulumi.String(`{
 						"Version": "2012-10-17",
 						"Statement": [
@@ -93,7 +136,7 @@ func main() {
 
 		// Attach the policy to the IAM Role
 		_, err = iam.NewRolePolicyAttachment(ctx, "ecsTaskExecutionRolePolicy", &iam.RolePolicyAttachmentArgs{
-			Role:      taskRole.Name,
+			Role:      executionRole.Name,
 			PolicyArn: pulumi.String("arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"),
 		})
 		if err != nil {
@@ -102,7 +145,7 @@ func main() {
 
 		// Attach the custom Secrets Manager policy to the IAM Role
 		_, err = iam.NewRolePolicy(ctx, "ecsTaskSecretsManagerPolicy", &iam.RolePolicyArgs{
-			Role: taskRole.Name,
+			Role: executionRole.Name,
 			Policy: pulumi.String(`{
 						"Version": "2012-10-17",
 						"Statement": [
@@ -121,7 +164,7 @@ func main() {
 		}
 
 		_, err = iam.NewRolePolicy(ctx, "ecsTaskCloudWatchPolicy", &iam.RolePolicyArgs{
-			Role: taskRole.Name,
+			Role: executionRole.Name,
 			Policy: pulumi.String(`{
 				"Version": "2012-10-17",
 				"Statement": [
@@ -206,21 +249,22 @@ func main() {
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
 				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
 					&servicediscovery.ServiceDnsConfigDnsRecordArgs{
-						Ttl:  pulumi.Int(30),
+						Ttl: pulumi.Int(30),
+
 						Type: pulumi.String("A"),
 					},
 				},
 				RoutingPolicy: pulumi.String("MULTIVALUE"),
 			},
 			HealthCheckCustomConfig: &servicediscovery.ServiceHealthCheckCustomConfigArgs{
-				FailureThreshold: pulumi.Int(1),
+				FailureThreshold: pulumi.Int(3),
 			},
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "main_backend_service"), &ecsx.FargateServiceArgs{
+		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "main-backend-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
 				AssignPublicIp: pulumi.Bool(true),
@@ -229,6 +273,7 @@ func main() {
 					securityGroup.ID(),
 				},
 			},
+			HealthCheckGracePeriodSeconds: pulumi.Int(30),
 			ServiceRegistries: ecs.ServiceServiceRegistriesPtrInput(
 				&ecs.ServiceServiceRegistriesArgs{
 					RegistryArn: main_backend_service_discovery.Arn,
@@ -246,8 +291,11 @@ func main() {
 						Arn: logGroup.Arn,
 					},
 				},
-				ExecutionRole: &awsx.DefaultRoleWithPolicyArgs{
+				TaskRole: &awsx.DefaultRoleWithPolicyArgs{
 					RoleArn: taskRole.Arn,
+				},
+				ExecutionRole: &awsx.DefaultRoleWithPolicyArgs{
+					RoleArn: executionRole.Arn,
 				},
 				Container: &ecsx.TaskDefinitionContainerDefinitionArgs{
 					Image:     image.ImageUri,
@@ -261,7 +309,8 @@ func main() {
 						},
 					},
 					HealthCheck: ecsx.TaskDefinitionHealthCheckPtrInput(&ecsx.TaskDefinitionHealthCheckArgs{
-						Command: pulumi.StringArrayInput(pulumi.ToStringArray([]string{"CMD-SHELL", "curl -f http://localhost:80/healthz || exit 1"})),
+						StartPeriod: pulumi.Int(60),
+						Command:     pulumi.StringArrayInput(pulumi.ToStringArray([]string{"CMD-SHELL", "curl -f http://localhost:80/healthz || exit 1"})),
 					}),
 					Secrets: ecsx.TaskDefinitionSecretArray{
 						&ecsx.TaskDefinitionSecretArgs{
