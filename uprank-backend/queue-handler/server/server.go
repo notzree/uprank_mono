@@ -25,6 +25,7 @@ func NewServer(queue queue.Queue, svc service.Servicer) *Server {
 // in the future if we have more than 1 queue then we should delegate each listener to a go routine
 func (s *Server) Start() {
 	log.Println("Starting queue_handler...")
+
 	for {
 		err := s.PollForRankingRequest()
 		if err != nil {

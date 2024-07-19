@@ -308,7 +308,7 @@ func (s *UprankVecService) ApplyBudgetScores(ctx context.Context, req types.JobD
 
 func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataRequest, ctx context.Context) error {
 	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-		ServiceName: "uprank-backend",
+		ServiceName: "main-backend",
 	})
 	if err != nil {
 		return err
@@ -340,25 +340,31 @@ func (s *UprankVecService) PostJobRankingData(req types.PostJobRankingDataReques
 
 func (s *UprankVecService) FetchJobData(ctx context.Context, req types.UpworkRankingMessage) (*types.JobData, []types.FreelancerRankingData, error) {
 	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-		ServiceName: "uprank-backend",
+		ServiceName: "main-backend",
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 	url := fmt.Sprintf("%s/v1/private/jobs/%s/%s/%s/embeddings/job_data", *base_url, req.Job_id, req.Platform, req.Platform_id)
 	log.Println("Fetching data from:", url)
-	httpreq, err := http.NewRequest("GET", url, nil)
+
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+	httpreq, err := http.NewRequestWithContext(ctxWithTimeout, "GET", url, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
-	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("USER-ID", req.User_id)
 	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return nil, nil, err
-
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, fmt.Errorf("failed to fetch %s | status code: %d ", url, resp.StatusCode)
 	}
 	defer resp.Body.Close()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, nil, err
@@ -386,7 +392,7 @@ func (s *UprankVecService) FetchJobData(ctx context.Context, req types.UpworkRan
 func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req types.MarkFreelancersAsEmbeddedRequest) error {
 	log.Println("Marking freelancers as embedded")
 	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-		ServiceName: "uprank-backend",
+		ServiceName: "main-backend",
 	})
 	if err != nil {
 		return err
@@ -410,12 +416,15 @@ func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req ty
 		return err
 	}
 	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
-	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("USER-ID", req.User_id)
 	httpreq.Header.Set("Content-Type", "application/json")
 
 	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to fetch %s | status code: %d ", update_freelancer_url, resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	return nil
@@ -424,7 +433,7 @@ func (s *UprankVecService) MarkFreelancersAsEmbedded(ctx context.Context, req ty
 func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req types.MarkUpworkJobAsEmbeddedRequest) error {
 	log.Println("Marking job as embedded")
 	base_url, err := s.ServiceDiscoveryClient.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-		ServiceName: "uprank-backend",
+		ServiceName: "main-backend",
 	})
 	if err != nil {
 		return err
@@ -444,12 +453,15 @@ func (s *UprankVecService) MarkUpworkJobAsEmbedded(ctx context.Context, req type
 		return err
 	}
 	httpreq.Header.Set("X-API-KEY", s.MsApiKey)
-	httpreq.Header.Set("User_id", req.User_id)
+	httpreq.Header.Set("USER-ID", req.User_id)
 	httpreq.Header.Set("Content-Type", "application/json")
 
 	resp, err := s.HttpClient.Do(httpreq)
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to fetch %s | status code: %d ", update_freelancer_url, resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	return nil

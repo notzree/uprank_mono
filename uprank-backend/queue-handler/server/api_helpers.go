@@ -18,15 +18,19 @@ func NewQError(err error) QError {
 }
 
 type ServiceError struct {
-	Msg any `json:"msg"`
+	Msg          any    `json:"msg"`
+	FunctionName string `json:"function_name"`
 }
 
 func (e ServiceError) Error() string {
-	return fmt.Sprintf("api error: %s:", e.Msg)
+	return fmt.Sprintf(" %s | %s:", e.FunctionName, e.Msg)
 }
 
-func NewServiceError(err error) ServiceError {
-	return ServiceError{Msg: err.Error()}
+func NewServiceError(err error, function_name string) ServiceError {
+	return ServiceError{
+		Msg:          err.Error(),
+		FunctionName: function_name,
+	}
 }
 
 func HandleError(err error) {

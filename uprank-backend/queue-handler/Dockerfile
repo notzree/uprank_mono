@@ -1,9 +1,8 @@
 # Use the official Golang image as the base image
 FROM golang:1.22.3-alpine
 
-# Install reflex for hot reloading
-RUN apk add --no-cache git
-RUN go install github.com/cespare/reflex@latest
+# Install curl
+RUN apk update && apk add curl
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,8 +16,14 @@ RUN go mod download
 # Copy the rest of the application code
 COPY . .
 
-# Expose the application port (replace 8080 with your app port)
+
+# Build the Go application
+RUN go build -o main .
+
+# Expose the application port
 EXPOSE 80
 
-# Command to run reflex for hot reloading
-CMD ["reflex", "-r", "\\.go$", "-s", "--", "go", "run", "."]
+# Command to run the application
+CMD ["./main"]
+
+

@@ -12,6 +12,7 @@ import (
 	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/service"
 	EnvGetter "github.com/notzree/uprank_mono/uprank-backend/shared/env"
 	sd "github.com/notzree/uprank_mono/uprank-backend/shared/service-discovery"
+	_ "go.uber.org/automaxprocs"
 )
 
 func main() {
@@ -28,19 +29,12 @@ func main() {
 			log.Fatal("error creating service discovery client:", err)
 		}
 		sdc = sdc_pointer
-		ctx := context.TODO()
-		test, err := sdc.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-			ServiceName: "uprank-inference-backend",
-		})
-		if err != nil {
-			log.Fatal("error getting instance url:", err)
-		}
-		log.Default().Printf("test: %s", *test)
-	} else if env == "local" {
+	} else if env == "local" || env == "" {
 		log.Default().Println("Running in local environment")
 		eg = &EnvGetter.LocalEnvGetter{}
 		sdc = sd.NewLocalServiceDiscoveryClient()
 	}
+
 	vars := []string{
 		"RANKING_QUEUE_URL",
 		"MS_API_KEY",
@@ -53,9 +47,16 @@ func main() {
 	ms_api_key := envVars["MS_API_KEY"]
 
 	queue := queue.NewSqsQueue(ranking_queue_url)
-	// FIXME: This url should be discovererd, for now hardcoded.
-	inference_server_url := "uprank-inference-backend:50051"
-	grpc_inference_client, err := client.NewGRPCInferenceClient(inference_server_url)
+
+	// inference_server_url := "uprank-inference-backend:50051"
+	ctx := context.TODO()
+	inference_server_url, err := sdc.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+		ServiceName: "inference-backend",
+	})
+	if err != nil {
+		log.Fatal("error getting instance url:", err)
+	}
+	grpc_inference_client, err := client.NewGRPCInferenceClient(*inference_server_url)
 	if err != nil {
 		log.Fatal("error creating grpc client:", err)
 	}
@@ -68,6 +69,14 @@ func main() {
 	if err != nil {
 		log.Fatal("error creating grpc client:", err)
 	}
+
+	go func() {
+		http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			w.Write([]byte("healthy"))
+		})
+		log.Fatal(http.ListenAndServe(":80", nil))
+	}()
 
 	server := server.NewServer(queue, svc)
 	server.Start()
