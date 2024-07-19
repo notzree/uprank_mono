@@ -18,6 +18,7 @@ import (
 	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 	svc "github.com/notzree/uprank_mono/uprank-backend/main-backend/service"
 	EnvGetter "github.com/notzree/uprank_mono/uprank-backend/shared/env"
+	_ "go.uber.org/automaxprocs"
 )
 
 func getEnvVariables(env_getter EnvGetter.EnvGetter, vars []string) (map[string]string, error) {

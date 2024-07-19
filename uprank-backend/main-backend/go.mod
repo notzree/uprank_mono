@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgtype v1.14.3
 	github.com/lib/pq v1.10.9
-	github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717011432-cadacb8f7be0
+	github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717021249-38b0fe0c3b38
 )
 
 require (
@@ -45,8 +45,7 @@ require (
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
+	go.uber.org/automaxprocs v1.5.3 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 )
-
-replace github.com/notzree/uprank_mono/uprank-backend/shared => ../shared
