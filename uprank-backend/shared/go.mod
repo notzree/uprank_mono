@@ -1,6 +1,6 @@
 module github.com/notzree/uprank_mono/uprank-backend/shared
 
-go 1.22.3
+go 1.22
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.30.3
