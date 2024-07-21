@@ -1,3 +1,4 @@
 uprank-backend/.env
 .DS_Store
 uprank-backend/inference-backend/.venv/
+backend/.env
