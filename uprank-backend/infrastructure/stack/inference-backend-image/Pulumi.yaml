@@ -1,7 +1,0 @@
-name: inference-backend-image
-runtime: go
-description: pulumi project to push inference backend image to ecr
-config:
-  pulumi:tags:
-    value:
-      pulumi:template: aws-go
