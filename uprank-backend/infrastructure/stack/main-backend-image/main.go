@@ -37,7 +37,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		// private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
+		private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
 		public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 
@@ -231,8 +231,9 @@ func main() {
 			SubnetIds: pulumi.StringArrayOutput(public_subnet_ids),
 			// DefaultTargetGroupPort: pulumi.Int(80), //default http port
 			DefaultTargetGroup: &lbx.TargetGroupArgs{
-				Name: pulumi.String("main-backend-target-group"),
-				Port: pulumi.Int(80), //forward to default http port
+				Name:     pulumi.String("main-backend-target-group"),
+				Port:     pulumi.Int(80), //forward to default http port
+				Protocol: pulumi.String("HTTP"),
 				HealthCheck: lb.TargetGroupHealthCheckPtrInput(lb.TargetGroupHealthCheckArgs{
 					Port: pulumi.String("traffic-port"),
 					Path: pulumi.String("/healthz"),
@@ -267,8 +268,8 @@ func main() {
 		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "main-backend-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
-				AssignPublicIp: pulumi.Bool(true),
-				Subnets:        pulumi.StringArrayOutput(public_subnet_ids),
+				AssignPublicIp: pulumi.Bool(false),
+				Subnets:        pulumi.StringArrayOutput(private_subnet_ids),
 				SecurityGroups: pulumi.StringArray{
 					securityGroup.ID(),
 				},
@@ -284,7 +285,6 @@ func main() {
 			// 	Namespace: pulumi.String("dev.uprank.ca"),
 			// 	Services:  ecs.ServiceServiceConnectConfigurationServiceArray{},
 			// }),
-			// AssignPublicIp: pulumi.Bool(true),
 			TaskDefinitionArgs: &ecsx.FargateServiceTaskDefinitionArgs{
 				LogGroup: &awsx.DefaultLogGroupArgs{
 					Existing: &awsx.ExistingLogGroupArgs{
@@ -326,7 +326,9 @@ func main() {
 					}),
 				},
 			},
-		})
+		},
+			pulumi.DependsOn([]pulumi.Resource{main_backend_service_discovery, loadbalancer}),
+		)
 		if err != nil {
 			return err
 		}

@@ -9,6 +9,7 @@ import (
 )
 
 func (s *Server) TestRanking(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
 
 	var req TestRequest
 
@@ -22,7 +23,7 @@ func (s *Server) TestRanking(w http.ResponseWriter, r *http.Request) error {
 		Platform:          req.Platform,
 		Platform_id:       req.PlatformID,
 	}
-	err := s.svc.SendRankingrequest(data, r.Context())
+	err := s.ranking.SendRankingrequest(ctx, data)
 	if err != nil {
 		return err
 	}
@@ -34,4 +35,30 @@ type TestRequest struct {
 	UserID     string    `json:"user_id"`
 	Platform   string    `json:"platform"`
 	PlatformID string    `json:"platform_id"`
+}
+
+func (s *Server) AddJobRankings(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+	_, user_id_err := s.authenticator.GetIdFromRequest(r)
+	if user_id_err != nil {
+		return user_id_err
+	}
+	var req types.AddJobRankingRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return InvalidJSON()
+	}
+
+	defer r.Body.Close()
+	if errors := req.Validate(); len(errors) > 0 {
+		return InvalidRequestData(errors)
+	}
+
+	err := s.ranking.AddJobRankings(ctx, types.AddJobRankingRequest{
+		Freelancer_ranking_data: req.Freelancer_ranking_data,
+	})
+	if err != nil {
+		return err
+	}
+	return writeJSON(w, http.StatusCreated, nil)
+
 }

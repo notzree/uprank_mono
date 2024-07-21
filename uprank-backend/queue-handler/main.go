@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"github.com/notzree/uprank_mono/uprank-backend/queue-handler/service"
 	EnvGetter "github.com/notzree/uprank_mono/uprank-backend/shared/env"
 	sd "github.com/notzree/uprank_mono/uprank-backend/shared/service-discovery"
-	_ "go.uber.org/automaxprocs"
 )
 
 func main() {
@@ -29,7 +27,7 @@ func main() {
 			log.Fatal("error creating service discovery client:", err)
 		}
 		sdc = sdc_pointer
-	} else if env == "local" || env == "" {
+	} else {
 		log.Default().Println("Running in local environment")
 		eg = &EnvGetter.LocalEnvGetter{}
 		sdc = sd.NewLocalServiceDiscoveryClient()
@@ -45,18 +43,17 @@ func main() {
 	}
 	ranking_queue_url := envVars["RANKING_QUEUE_URL"]
 	ms_api_key := envVars["MS_API_KEY"]
-
 	queue := queue.NewSqsQueue(ranking_queue_url)
 
-	// inference_server_url := "uprank-inference-backend:50051"
-	ctx := context.TODO()
-	inference_server_url, err := sdc.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
-		ServiceName: "inference-backend",
-	})
-	if err != nil {
-		log.Fatal("error getting instance url:", err)
-	}
-	grpc_inference_client, err := client.NewGRPCInferenceClient(*inference_server_url)
+	inference_server_url := "uprank-inference-backend:50051"
+	// _ := context.TODO()
+	// inference_server_url, err := sdc.GetInstanceUrl(ctx, sd.GetInstanceUrlInput{
+	// 	ServiceName: "inference-backend",
+	// })
+	// if err != nil {
+	// 	log.Fatal("error getting instance url:", err)
+	// }
+	grpc_inference_client, err := client.NewGRPCInferenceClient(inference_server_url)
 	if err != nil {
 		log.Fatal("error creating grpc client:", err)
 	}
@@ -67,7 +64,7 @@ func main() {
 		HttpClient:             http.Client{},
 	})
 	if err != nil {
-		log.Fatal("error creating grpc client:", err)
+		log.Fatal("error creating service:", err)
 	}
 
 	go func() {

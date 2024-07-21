@@ -10,23 +10,52 @@ import (
 
 // todo: remove hard dependenceis on ent and clerk
 type Server struct {
-	Port          string
-	authenticator auth.Authenticator
-	Router        *chi.Mux
-	svc           svc.Servicer
+	Port              string
+	authenticator     auth.Authenticator
+	router            *chi.Mux
+	user              svc.UserService
+	job               svc.JobService
+	upwork_job        svc.UpworkJobService
+	upwork_freelancer svc.UpworkFreelancerService
+	ranking           svc.RankingService
 }
 
-func NewServer(listen_addr string, router *chi.Mux, authenticator auth.Authenticator, servicer svc.Servicer) *Server {
-	return &Server{
-		Port:          listen_addr,
-		Router:        router,
-		authenticator: authenticator,
-		svc:           servicer,
+type NewServerParams struct {
+	Authenticator     auth.Authenticator
+	Router            *chi.Mux
+	User              svc.UserService
+	Job               svc.JobService
+	Upwork_job        svc.UpworkJobService
+	Upwork_freelancer svc.UpworkFreelancerService
+	Ranking           svc.RankingService
+}
+
+type Option func(s *Server)
+
+func WithPort(port string) Option {
+	return func(s *Server) {
+		s.Port = port
 	}
 }
 
+func NewServer(params NewServerParams, opts ...Option) (*Server, error) {
+
+	s := &Server{
+		router:        params.Router,
+		authenticator: params.Authenticator,
+		user:          params.User,
+		job:           params.Job,
+		upwork_job:    params.Upwork_job,
+		ranking:       params.Ranking,
+	}
+	for _, opt := range opts {
+		opt(s)
+	}
+	return s, nil
+}
+
 func (s *Server) Start() error {
-	s.Router.Route("/v1", func(v1_router chi.Router) {
+	s.router.Route("/v1", func(v1_router chi.Router) {
 		//public apis
 		v1_router.Group(func(public_router chi.Router) {
 			public_router.Route("/public", func(public_sub_router chi.Router) {
@@ -72,6 +101,6 @@ func (s *Server) Start() error {
 			})
 		})
 	})
-	s.Router.Get("/healthz", Make(s.HealthCheck))
-	return http.ListenAndServe(s.Port, s.Router)
+	s.router.Get("/healthz", Make(s.HealthCheck))
+	return http.ListenAndServe(s.Port, s.router)
 }

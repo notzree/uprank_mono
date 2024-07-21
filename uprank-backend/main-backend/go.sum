@@ -149,13 +149,13 @@ github.com/mattn/go-sqlite3 v1.14.16 h1:yOQRA0RpS5PFz/oikGwBEqvAWhWg5ufRz4ETLjwp
 github.com/mattn/go-sqlite3 v1.14.16/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
 github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 h1:DpOJ2HYzCv8LZP15IdmG+YdwD2luVPHITV96TkirNBM=
 github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7/go.mod h1:ZXFpozHsX6DPmq2I0TCekCxypsnAUbP2oI0UX1GXzOo=
-github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717013334-dce2525602bd h1:WxEUy33iMPhmsOt+aWlznkPvtyyGpjPwrY4lhBVrW3w=
-github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717013334-dce2525602bd/go.mod h1:Obg7xVQ9zCJQpX6ORR68t6gtXO2No6Qz/h9DuAITsXI=
 github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717021249-38b0fe0c3b38 h1:E+7RDxs1aZUqR5Zkqm/+i/riLvqBw4e0ZzZSD15k+us=
 github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717021249-38b0fe0c3b38/go.mod h1:Obg7xVQ9zCJQpX6ORR68t6gtXO2No6Qz/h9DuAITsXI=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/prashantv/gostub v1.1.0 h1:BTyx3RfQjRHnUWaGF9oQos79AlQ5k8WNktv7VGvVH4g=
+github.com/prashantv/gostub v1.1.0/go.mod h1:A5zLQHz7ieHGG7is6LLXLz7I8+3LZzsrV0P1IAHhP5U=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
 github.com/rs/zerolog v1.13.0/go.mod h1:YbFCdg8HfsridGWAh22vktObvhZbQsZXe4/zB0OKkWU=

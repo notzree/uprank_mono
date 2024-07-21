@@ -7,9 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
+type QueryUpworkJobRequest struct {
+	Upwork_job_id string `json:"upwork_job_id,omitempty"`
+	User_id       string `json:"user_id,omitempty"`
+}
+
 type AttachUpworkJobRequest struct {
-	Job_Id           uuid.UUID  `json:"job_id"`
-	Id               string     `json:"id"`
+	Job_id          uuid.UUID           `json:"job_id"`
+	User_id         string              `json:"user_id"`
+	Upwork_job_data AttachUpworkJobData `json:"upwork_job_data"`
+}
+
+type AttachUpworkJobData struct {
+	Upwork_job_id    string     `json:"upwork_job_id"`
 	Title            string     `json:"title"`
 	Location         string     `json:"location"`
 	Description      string     `json:"description"`
@@ -23,10 +33,10 @@ type AttachUpworkJobRequest struct {
 	Ranked_at        *time.Time `json:"ranked_at"`
 }
 
-func (req *AttachUpworkJobRequest) Validate() map[string]interface{} {
+func (req *AttachUpworkJobData) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 
-	if strings.TrimSpace(req.Id) == "" {
+	if strings.TrimSpace(req.Upwork_job_id) == "" {
 		errors["id"] = "id cannot be nil"
 	}
 	if strings.TrimSpace(req.Title) == "" {
@@ -54,6 +64,10 @@ type ScrapeUpworkFreelancerData struct {
 }
 
 type UpdateUpworkJobRequest struct {
+	User_id string
+	Data    UpdateUpworkJobData
+}
+type UpdateUpworkJobData struct {
 	Upwork_id        string     `json:"upwork_id,omitempty"`
 	Title            *string    `json:"title,omitempty"`
 	Location         *string    `json:"location,omitempty"`
@@ -68,7 +82,7 @@ type UpdateUpworkJobRequest struct {
 	Ranked_at        *time.Time `json:"ranked_at,omitempty"`
 }
 
-func (req *UpdateUpworkJobRequest) Validate() map[string]interface{} {
+func (req *UpdateUpworkJobData) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 	// nilArray := findNilFields(req)
 	// if len(nilArray) == getNumFields(req) {

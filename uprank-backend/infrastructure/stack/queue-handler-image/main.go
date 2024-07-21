@@ -35,8 +35,8 @@ func main() {
 		if err != nil {
 			return err
 		}
-		// private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
-		public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
+		private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
+		// public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 
 		secret_repository, err := pulumi.NewStackReference(ctx, "notzree/secrets/dev", nil)
@@ -225,12 +225,12 @@ func main() {
 					Protocol:   pulumi.String("tcp"),
 					CidrBlocks: pulumi.StringArray{pulumi.String("0.0.0.0/0")},
 				},
-				&awsec2.SecurityGroupIngressArgs{ //default https
-					FromPort:   pulumi.Int(443),
-					ToPort:     pulumi.Int(443),
-					Protocol:   pulumi.String("tcp"),
-					CidrBlocks: pulumi.StringArray{pulumi.String("0.0.0.0/0")},
-				},
+				// &awsec2.SecurityGroupIngressArgs{ //default https
+				// 	FromPort:   pulumi.Int(443),
+				// 	ToPort:     pulumi.Int(443),
+				// 	Protocol:   pulumi.String("tcp"),
+				// 	CidrBlocks: pulumi.StringArray{pulumi.String("0.0.0.0/0")},
+				// },
 			},
 			Egress: awsec2.SecurityGroupEgressArray{
 				&awsec2.SecurityGroupEgressArgs{
@@ -274,8 +274,8 @@ func main() {
 		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "queue-handler-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
-				AssignPublicIp: pulumi.Bool(true),
-				Subnets:        pulumi.StringArrayOutput(public_subnet_ids),
+				AssignPublicIp: pulumi.Bool(false),
+				Subnets:        pulumi.StringArrayOutput(private_subnet_ids),
 				SecurityGroups: pulumi.StringArray{
 					securityGroup.ID(),
 				},
@@ -332,7 +332,9 @@ func main() {
 					}),
 				},
 			},
-		})
+		},
+			pulumi.DependsOn([]pulumi.Resource{queue_handler_service_discovery}),
+		)
 		if err != nil {
 			return err
 		}

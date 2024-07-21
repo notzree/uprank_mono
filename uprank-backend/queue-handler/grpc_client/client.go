@@ -7,7 +7,7 @@ import (
 )
 
 func NewGRPCInferenceClient(remoteAddr string) (proto.InferenceClient, error) {
-	conn, err := grpc.Dial(remoteAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(remoteAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

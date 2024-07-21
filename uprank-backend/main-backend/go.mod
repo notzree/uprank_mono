@@ -2,6 +2,8 @@ module github.com/notzree/uprank_mono/uprank-backend/main-backend
 
 go 1.22.3
 
+toolchain go1.22.5
+
 require (
 	entgo.io/ent v0.13.1
 	github.com/go-chi/chi/v5 v5.0.12
@@ -16,6 +18,7 @@ require (
 	github.com/jackc/pgtype v1.14.3
 	github.com/lib/pq v1.10.9
 	github.com/notzree/uprank_mono/uprank-backend/shared v0.0.0-20240717021249-38b0fe0c3b38
+	go.uber.org/automaxprocs v1.5.3
 )
 
 require (
@@ -45,7 +48,6 @@ require (
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
-	go.uber.org/automaxprocs v1.5.3 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 )

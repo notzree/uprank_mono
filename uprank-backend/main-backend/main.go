@@ -80,8 +80,16 @@ func main() {
 	}
 	sqs_client := sqs.NewFromConfig(sdkConfig)
 
-	servicer := svc.NewV1Servicer(ent_client, sqs_client, ranking_queue_url)
-
+	//Create server components
+	user := svc.NewUserService(svc.NewUserServiceParams{Ent: ent_client})
+	job := svc.NewJobService(svc.NewJobServiceParams{Ent: ent_client})
+	upwork_job := svc.NewUpworkJobService(svc.NewUpworkJobServiceParams{Ent: ent_client})
+	upwork_freelancer := svc.NewUpworkFreelancerService(svc.NewUpworkFreelancerServiceParams{Ent: ent_client})
+	ranking := svc.NewRankingService(svc.NewRankingServiceParams{
+		Ent:               ent_client,
+		Sqs_client:        sqs_client,
+		Ranking_queue_url: ranking_queue_url,
+	})
 	authenticator := authenticator.NewClerkAuthenticator(clerk_secret_key, ms_api_key)
 
 	//Create router
@@ -106,7 +114,15 @@ func main() {
 		w.Write([]byte("method is not valid"))
 	})
 
-	server := api.NewServer(server_port, router, authenticator, servicer)
+	server, err := api.NewServer(api.NewServerParams{
+		Authenticator:     authenticator,
+		Router:            router,
+		User:              user,
+		Job:               job,
+		Upwork_job:        upwork_job,
+		Upwork_freelancer: upwork_freelancer,
+		Ranking:           ranking,
+	})
 	fmt.Println("Server listening on port:", server_port)
 	log.Fatal(server.Start())
 }

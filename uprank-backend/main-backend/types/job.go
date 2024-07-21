@@ -5,9 +5,12 @@ import (
 	"github.com/notzree/uprank_mono/uprank-backend/main-backend/ent"
 )
 
+//issue is: CreateJobRequest takes in a AttachPlatformSpecificJobsRequest, which requires Job_id.
+
 type CreateJobRequest struct {
-	Origin              string                            `json:"origin,omitempty"`
-	PlatformJobRequests AttachPlatformSpecificJobsRequest `json:"platform_job_requests"`
+	User_id             string                         `json:"user_id,omitempty"`
+	Origin              string                         `json:"origin,omitempty"`
+	PlatformJobRequests AttachPlatformSpecificJobsData `json:"platform_job_requests"`
 }
 
 func (req *CreateJobRequest) Validate() map[string]interface{} {
@@ -21,15 +24,23 @@ func (req *CreateJobRequest) Validate() map[string]interface{} {
 }
 
 type AttachPlatformSpecificJobsRequest struct {
-	UpworkRequest *AttachUpworkJobRequest `json:"upwork_request,omitempty"`
+	User_id                 string                         `json:"user_id,omitempty"`
+	Job_id                  uuid.UUID                      `json:"job_id,omitempty"`
+	PlatformSpecificJobdata AttachPlatformSpecificJobsData `json:"upwork_request,omitempty"`
 }
 
-func (req *AttachPlatformSpecificJobsRequest) Validate() map[string]interface{} {
+type AttachPlatformSpecificJobsData struct {
+	UpworkRequest *AttachUpworkJobData `json:"upwork_request,omitempty"`
+}
+
+func (req *AttachPlatformSpecificJobsData) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
-	// nil_array := findNilFields(req)
-	// if len(nil_array) == getNumFields(req) {
-	// 	errors["PlatformJobRequests"] = "At least one platform request is required"
-	// }
+
+	nil_array := findNilFields(req)
+	if len(nil_array) == getNumFields(req) {
+		errors["PlatformJobRequests"] = "At least one platform request is required"
+	}
+
 	if req.UpworkRequest != nil {
 		upwork_errors := req.UpworkRequest.Validate()
 		if len(upwork_errors) > 0 {
@@ -101,4 +112,13 @@ func (req *AddJobRankingRequest) Validate() map[string]interface{} {
 		}
 	}
 	return errors
+}
+
+type GetAllJobsForUserRequest struct {
+	User_id string `json:"user_id"`
+}
+
+type GetJobByIdRequest struct {
+	Job_id  string `json:"job_id"`
+	User_id string `json:"user_id"`
 }

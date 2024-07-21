@@ -9,9 +9,12 @@ func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 
 		// Allocate a new VPC with the default settings.
-		vpc, err := ec2.NewVpc(ctx, "vpc", &ec2.VpcArgs{
+		vpc, err := ec2.NewVpc(ctx, "uprank-dev-vpc", &ec2.VpcArgs{
 			EnableDnsSupport:   pulumi.Bool(true),
 			EnableDnsHostnames: pulumi.Bool(true),
+			NatGateways: &ec2.NatGatewayConfigurationArgs{
+				Strategy: ec2.NatGatewayStrategyOnePerAz,
+			},
 		})
 		if err != nil {
 			return err

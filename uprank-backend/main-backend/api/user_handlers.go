@@ -9,6 +9,7 @@ import (
 
 // Creates a user in the database after they have signed up w/ clerk + completed onboarding
 func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
 	var req types.CreateUserRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -19,7 +20,7 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) error {
 		return InvalidRequestData(errors)
 	}
 
-	new_user, err := s.svc.CreateUser(req, r.Context())
+	new_user, err := s.user.CreateUser(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -27,6 +28,7 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
 	//Clerk sends the request via webhooks so the body is guaranteed to be well formatted
 	var req types.UpdateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -34,7 +36,7 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) error {
 	}
 	defer r.Body.Close()
 
-	updated_user, err := s.svc.UpdateUser(req, r.Context())
+	updated_user, err := s.user.UpdateUser(ctx, req)
 
 	if err != nil {
 		return err

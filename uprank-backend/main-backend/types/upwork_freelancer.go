@@ -7,6 +7,18 @@ import (
 )
 
 type CreateUpworkFreelancerRequest struct {
+	UserId      string
+	UpworkJobId string
+	Data        []CreateUpworkFreelancerData
+}
+
+type CreateUpworkFreelancerResponse struct {
+	CreatedFreelancerCount int `json:"created_freelancer_count"`
+	UpdatedFreelancerCount int `json:"updated_freelancer_count"`
+	DeletedFreelancerCount int `json:"deleted_freelancer_count"`
+}
+
+type CreateUpworkFreelancerData struct {
 	Name                     string                              `json:"name"`
 	Title                    string                              `json:"title"`
 	Description              string                              `json:"description"`
@@ -73,7 +85,7 @@ type ScrapedUpworkWorkHistoryData struct {
 	Client_Location     string  `json:"client_location"`
 }
 
-func (req *CreateUpworkFreelancerRequest) Validate() map[string]interface{} {
+func (req *CreateUpworkFreelancerData) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 
 	if strings.TrimSpace(req.Name) == "" {
@@ -150,6 +162,12 @@ type UpsertFreelancerResponse struct {
 }
 
 type UpdateUpworkFreelancerRequest struct {
+	UserId      string
+	UpworkJobId string
+	Data        []UpdateUpworkFreelancerData
+}
+
+type UpdateUpworkFreelancerData struct {
 	Name                     *string                              `json:"name,omitempty"`
 	Title                    *string                              `json:"title,omitempty"`
 	Description              *string                              `json:"description,omitempty"`
@@ -181,7 +199,7 @@ type UpdateUpworkFreelancerRequest struct {
 	Embedded_at              *time.Time                           `json:"embedded_at,omitempty"`
 }
 
-func (req *UpdateUpworkFreelancerRequest) Validate() map[string]interface{} {
+func (req *UpdateUpworkFreelancerData) Validate() map[string]interface{} {
 	errors := make(map[string]interface{})
 	if req.Name != nil && strings.TrimSpace(*req.Name) == "" {
 		errors["name"] = "name cannot be empty"

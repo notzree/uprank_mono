@@ -8,36 +8,17 @@ import (
 	"github.com/notzree/uprank_mono/uprank-backend/main-backend/types"
 )
 
-func (s *Server) AttachPlatformSpecificJobs(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
-	if user_id_err != nil {
-		return user_id_err
-	}
-	var req types.AttachPlatformSpecificJobsRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return InvalidJSON()
-	}
-
-	defer r.Body.Close()
-	if errors := req.Validate(); len(errors) > 0 {
-		return InvalidRequestData(errors)
-	}
-	new_upwork_job, err := s.svc.AttachPlatformSpecificjobs(req, user_id, nil, r.Context())
-	if err != nil {
-		return err
-	}
-
-	return writeJSON(w, http.StatusCreated, new_upwork_job)
-}
-
 func (s *Server) GetUpworkJob(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
+	ctx := r.Context()
+	userId, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
-	upwork_job_id := chi.URLParam(r, "upwork_job_id")
-	job, err := s.svc.GetUpworkJob(upwork_job_id, user_id, r.Context())
+	upworkJobId := chi.URLParam(r, "upwork_job_id")
+	job, err := s.upwork_job.GetAllUpworkJobsForUser(ctx, types.QueryUpworkJobRequest{
+		Upwork_job_id: upworkJobId,
+		User_id:       userId,
+	})
 	if err != nil {
 		return err
 	}
@@ -46,6 +27,7 @@ func (s *Server) GetUpworkJob(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) GetUpworkJobEmbeddingData(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
 	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
@@ -53,7 +35,10 @@ func (s *Server) GetUpworkJobEmbeddingData(w http.ResponseWriter, r *http.Reques
 	upwork_job_id := chi.URLParam(r, "upwork_job_id")
 	job_id := chi.URLParam(r, "job_id")
 
-	job, err := s.svc.GetUpworkJobEmbeddingData(upwork_job_id, user_id, r.Context())
+	job, err := s.upwork_job.GetUpworkJobEmbeddingData(ctx, types.QueryUpworkJobRequest{
+		Upwork_job_id: upwork_job_id,
+		User_id:       user_id,
+	})
 	if err != nil {
 		return err
 	}
@@ -65,11 +50,12 @@ func (s *Server) GetUpworkJobEmbeddingData(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *Server) UpdateUpworkJob(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
 	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
 	if user_id_err != nil {
 		return user_id_err
 	}
-	var req types.UpdateUpworkJobRequest
+	var req types.UpdateUpworkJobData
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return InvalidJSON()
@@ -79,33 +65,13 @@ func (s *Server) UpdateUpworkJob(w http.ResponseWriter, r *http.Request) error {
 	if errors := req.Validate(); len(errors) > 0 {
 		return InvalidRequestData(errors)
 	}
-	upwork_job, err := s.svc.UpdateUpworkJob(req, user_id, r.Context())
+	upwork_job, err := s.upwork_job.UpdateUpworkJob(ctx, types.UpdateUpworkJobRequest{
+		User_id: user_id,
+		Data:    req,
+	})
 	if err != nil {
 		return err
 	}
 
 	return writeJSON(w, http.StatusOK, upwork_job)
-}
-
-func (s *Server) AddJobRankings(w http.ResponseWriter, r *http.Request) error {
-	user_id, user_id_err := s.authenticator.GetIdFromRequest(r)
-	if user_id_err != nil {
-		return user_id_err
-	}
-	var req types.AddJobRankingRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return InvalidJSON()
-	}
-
-	defer r.Body.Close()
-	if errors := req.Validate(); len(errors) > 0 {
-		return InvalidRequestData(errors)
-	}
-
-	err := s.svc.AddJobRankings(req, user_id, r.Context())
-	if err != nil {
-		return err
-	}
-	return writeJSON(w, http.StatusCreated, nil)
-
 }

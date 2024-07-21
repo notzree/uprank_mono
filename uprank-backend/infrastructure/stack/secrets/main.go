@@ -10,6 +10,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+// Uploads secrets and ACM content to AWS
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		const (
@@ -38,13 +39,11 @@ func main() {
 			return fmt.Errorf("failed to marshal env map to JSON: %w", err)
 		}
 
-		// Create a secret in AWS Secrets Manager
 		secret, err := secretsmanager.NewSecret(ctx, "backend-secrets", &secretsmanager.SecretArgs{})
 		if err != nil {
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
 
-		// Store the contents of the .env file in the secret
 		_, err = secretsmanager.NewSecretVersion(ctx, CreateResourceName(env, application_name, "backend-secrets"), &secretsmanager.SecretVersionArgs{
 			SecretId:     secret.ID(),
 			SecretString: pulumi.String(envJSON),
