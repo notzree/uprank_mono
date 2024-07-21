@@ -11,4 +11,6 @@ RUN chmod +x /bin/grpc_health_probe
 
 COPY . .
 
+EXPOSE 50051
+
 CMD ["python", "src/main.py"]

@@ -21,5 +21,7 @@ RUN pip install watchdog
 # Install entr for file change detection and hot-reloading
 RUN apt-get update && apt-get install -y entr
 
+EXPOSE 50051
+
 # Define the command to run the application with hot-reloading using watchdog
 CMD ["watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "python", "src/main.py"]
