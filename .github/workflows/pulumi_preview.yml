@@ -20,18 +20,18 @@ jobs:
                         - backend/infrastructure/stack/queue-handler-image
         steps:
         - name: "Checkout repository"
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
 
         - name: "Set up Go"
-          uses: actions/setup-go@v3
+          uses: actions/setup-go@v5
           with:
             go-version: 'stable'
 
         - name: "Configure AWS Credentials"
-          uses: aws-actions/configure-aws-credentials@v1
+          uses: aws-actions/configure-aws-credentials@v4
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-region: ${{ secrets.AWS_REGION }}
+            aws-region: ${{ vars.AWS_REGION }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
         - name: "Install dependencies"
@@ -40,9 +40,9 @@ jobs:
             go mod download
             
         - name: "Run Pulumi Preview"
-          uses: pulumi/actions@v3
+          uses: pulumi/actions@v5
           with:
             command: preview
-            stack-name: dev
+            stack-name: ${{vars.PULUMI_STACK_NAME}}
           env:    
             PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
