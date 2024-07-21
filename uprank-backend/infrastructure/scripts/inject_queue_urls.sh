@@ -15,11 +15,12 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-cd ../uprank-backend
+cd ../../ #uprank-backend root directory
+
 # Define the Pulumi stack name and paths based on the environment
 FULLY_QUALIFIED_STACK_NAME="notzree/queues/$ENV"
-RELATIVE_QUEUE_PATH="/infrastructure/$ENV/queues" # Path to the Pulumi stack from this file
-RELATIVE_ENV_PATH="/.env" # Path to the .env file from this file
+RELATIVE_QUEUE_PATH="./infrastructure/stack/queues" # Path to the Pulumi stack from this file
+RELATIVE_ENV_PATH=".env" # Path to the .env file from this file
 
 # Flag to track if the stack was deployed by this script
 STACK_DEPLOYED=0
@@ -86,6 +87,7 @@ append_outputs_to_env() {
 
 
 # Check if the Pulumi stack is deployed
+
 if ! is_queue_deployed; then
     echo "Deploying the stack $FULLY_QUALIFIED_STACK_NAME..."
     deploy_stack
