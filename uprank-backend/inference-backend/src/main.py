@@ -30,12 +30,12 @@ if __name__ == '__main__':
         pinecone_api_key = secret_map["PINECONE_API_KEY"]
         openai_api_key = secret_map["OPENAI_API_KEY"]
         server_port = int(secret_map["EXPOSED_INFERENCE_SERVER_PORT"])
-        
+
     pc = Pinecone(api_key=pinecone_api_key)
     model_name = "text-embedding-ada-002"
     embeddings = OpenAIEmbeddings(
         model=model_name,
-        openai_api_key=openai_api_key,
+        api_key=openai_api_key,
     )
     infer = InferenceService(embed=embeddings, pc=pc, index_name="uprank-dev", logger=service_logger)
     s = Server(infer=infer, max_workers=10, port=server_port, logger=server_logger)

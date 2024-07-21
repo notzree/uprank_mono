@@ -56,7 +56,7 @@ class InferenceService(inference_pb2_grpc.InferenceServicer):
         for v in request.vectors:
             transformed_vectors.append((v.id, v.vector, dict(v.metadata)))
         try:
-            upsert_response = self.index.upsert(
+            _ = self.index.upsert(
                 namespace=request.namespace,
                 vectors=transformed_vectors
             )
@@ -70,15 +70,8 @@ class InferenceService(inference_pb2_grpc.InferenceServicer):
             error=""
         )
 
-    def QueryVector(self, request, context):
+    def QueryVector(self, request, context) -> inference_pb2.QueryVectorResponse:
         matches: List[inference_pb2.Match] = []
-        demo ={
-            'job_id':'1788207506953621504',
-            'type': 'work_history_description',
-        }
-        print(type(demo), type(dict(request.filter)))
-        print(demo == dict(request.filter))
-        print(dict(request.filter))
         try:
             query_response = self.index.query(
                 namespace=request.namespace,
@@ -112,13 +105,13 @@ class InferenceService(inference_pb2_grpc.InferenceServicer):
             matches=matches,
             namespace=request.namespace,
             usage=inference_pb2.Usage(
-                read_units= query_response['usage']['read_units']
+                read_units=query_response['usage']['read_units']
             )
         )
 
     def DeleteVector(self, request, context):
         try:
-            delete_response = self.index.delete(
+            _ = self.index.delete(
                 namespace=request.namespace,
                 ids=request.ids
             )
