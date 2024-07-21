@@ -1,0 +1,27 @@
+# Use the official Python 3.11 image from the Docker Hub
+FROM python:3.11-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code into the container
+COPY . .
+
+# Install watchdog for hot-reloading
+RUN pip install watchdog
+
+# Expose the port the app runs on
+
+# Install entr for file change detection and hot-reloading
+RUN apt-get update && apt-get install -y entr
+
+EXPOSE 50051
+
+# Define the command to run the application with hot-reloading using watchdog
+CMD ["watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "python", "src/main.py"]

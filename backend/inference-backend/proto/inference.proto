@@ -1,0 +1,96 @@
+syntax = "proto3";
+package inference;
+option go_package = "github.com/notzree/uprank.ai/backend/inference-backend";
+
+service Inference {
+  rpc EmbedText(EmbedTextRequest) returns (EmbedTextResponse);
+  // rpc Embed()
+  rpc UpsertVector(UpsertVectorRequest) returns (UpsertVectorResponse);
+  rpc QueryVector (QueryVectorRequest) returns (QueryVectorResponse);
+  rpc DeleteVector(DeleteVectorRequest) returns (DeleteVectorResponse);
+}
+
+//consider merging upsert and embed into 1 method that takes an optioanal param to upsert after embedding...
+// message EmbedRequest {
+//   string text = 1;
+// }
+//todo: remove all errors from messages
+
+message EmbedTextRequest {
+  string id = 1;
+  string text = 2;
+  map<string, string> metadata = 3;
+}
+
+message EmbedTextResponse {
+  Vector vector = 1;
+  string error = 2;
+}
+
+message UpsertVectorRequest{
+  string namespace = 1;
+  repeated Vector vectors = 2;
+}
+
+message Vector {
+  string id = 1;
+  repeated float vector = 2;
+  map<string, string> metadata = 3;
+}
+
+message UpsertVectorResponse {
+  string error = 1;
+}
+
+message QueryVectorRequest {
+  string namespace = 1;
+  repeated float vector = 2;
+  int32 top_k = 3;
+  map<string, string> filter = 4;
+}
+
+
+// Define the response message
+message QueryVectorResponse {
+  repeated Match matches = 1;
+  string namespace = 2;
+  Usage usage = 3;
+}
+
+// Define the Match message
+message Match {
+  float score = 1;
+  string id = 2;
+  map<string, string> metadata = 3;
+}
+
+// Define the Usage message
+message Usage {
+  int32 read_units = 1;
+}
+
+message DeleteVectorRequest {
+  repeated string ids = 1;
+  string namespace = 2;
+}
+
+message DeleteVectorResponse {
+  repeated string ids = 1;
+  bool ok = 2;
+  string error = 3;
+}
+
+
+
+
+//Flow from the sqs queue:
+//1. Poll for the message
+//once you get the message, then you want to create a vector from the message
+//then you want to embed the vector
+//then you want to run a query on the vector
+
+
+//3 methods:
+// Create vector
+// Insert vector into pinecone
+// Query vector
