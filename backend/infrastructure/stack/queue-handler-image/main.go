@@ -252,7 +252,8 @@ func main() {
 		}
 
 		queue_handler_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(stack, application_name, "queue-handler"), &servicediscovery.ServiceArgs{
-			Name: pulumi.String("queue-handler"),
+			Name:         pulumi.String("queue-handler"),
+			ForceDestroy: pulumi.Bool(true),
 			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
 				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
@@ -332,9 +333,7 @@ func main() {
 					}),
 				},
 			},
-		},
-			pulumi.DependsOn([]pulumi.Resource{queue_handler_service_discovery}),
-		)
+		})
 		if err != nil {
 			return err
 		}

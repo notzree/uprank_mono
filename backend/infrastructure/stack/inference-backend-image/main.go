@@ -194,7 +194,8 @@ func main() {
 
 		// <-- Create service discovery -->
 		inference_backend_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(stack, application_name, "inference-backend"), &servicediscovery.ServiceArgs{
-			Name: pulumi.String("inference-backend"),
+			Name:         pulumi.String("inference-backend"),
+			ForceDestroy: pulumi.Bool(true),
 			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
 				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
@@ -267,9 +268,7 @@ func main() {
 					}),
 				},
 			},
-		},
-			pulumi.DependsOn([]pulumi.Resource{inference_backend_service_discovery}),
-		)
+		})
 		if err != nil {
 			return err
 		}
