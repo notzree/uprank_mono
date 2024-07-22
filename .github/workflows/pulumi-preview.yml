@@ -3,7 +3,7 @@ name: Pulumi preview
 on:
   pull_request:
     paths:
-      - 'backend/infrastructure/stack/**'
+      - 'backend/**'
 
 env:
   PULUMI_DEV_STACK_NAME: dev
