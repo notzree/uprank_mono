@@ -5,61 +5,127 @@ on:
     branches:
       - main
     paths:
-      -'backend/**'
+      - 'backend/**'
 
 env:
   PULUMI_DEV_STACK_NAME: dev
   PULUMI_PROD_STACK_NAME: prod
 
 jobs:
-    build:
-        name: Build and deploy backend infrastructure, including container images.
-        runs-on: ubuntu-latest
-        environment: dev # this is just the environemnt with all of the required variables.
-        strategy:
-            matrix:
-                project:
-                  - backend/infrastructure/stack/secrets
-                  - backend/infrastructure/stack/networking
-                  - backend/infrastructure/stack/container-repository
-                  - backend/infrastructure/stack/application-base
-                  - backend/infrastructure/stack/queues
-                  - backend/infrastructure/stack/main-backend-image
-                  - backend/infrastructure/stack/inference-backend-image
-                  - backend/infrastructure/stack/queue-handler-image
-        steps:
-        - name: "Checkout repository"
-          uses: actions/checkout@v4
-        
-        - name: "Set Environment Variables"
-          run: |
-            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-              echo "PULUMI_STACK_NAME=$PULUMI_PROD_STACK_NAME" >> $GITHUB_ENV
-            else
-              echo "PULUMI_STACK_NAME=$PULUMI_DEV_STACK_NAME" >> $GITHUB_ENV
-            fi
+  build:
+    name: Build and deploy backend infrastructure, including container images.
+    runs-on: ubuntu-latest
+    environment: dev # this is just the environment with all of the required variables.
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      
+      - name: "Set Environment Variables"
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "PULUMI_STACK_NAME=$PULUMI_PROD_STACK_NAME" >> $GITHUB_ENV
+          else
+            echo "PULUMI_STACK_NAME=$PULUMI_DEV_STACK_NAME" >> $GITHUB_ENV
 
-        - name: "Set up Go"
-          uses: actions/setup-go@v3
-          with:
-            go-version: 'stable'
+      - name: "Set up Go"
+        uses: actions/setup-go@v3
+        with:
+          go-version: 'stable'
 
-        - name: "Configure AWS Credentials"
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-region: ${{ vars.AWS_REGION }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-        - name: "Install dependencies"
-          run: |
-            cd ${{ matrix.project }}
-            go mod download
-            
-        - name: "Run Pulumi Up"
-          uses: pulumi/actions@v5
-          with:
-            command: up
-            stack-name: $PULUMI_STACK_NAME # this will always be prod for now. 
-          env:
-            PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      - name: "Install dependencies for queues"
+        run: |
+          cd backend/infrastructure/stack/queues
+          go mod download
+
+      - name: "Deploy queues stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for networking"
+        run: |
+          cd backend/infrastructure/stack/networking
+          go mod download
+
+      - name: "Deploy networking stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for application-base"
+        run: |
+          cd backend/infrastructure/stack/application-base
+          go mod download
+
+      - name: "Deploy application-base stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for secrets"
+        run: |
+          cd backend/infrastructure/stack/secrets
+          go mod download
+
+      - name: "Deploy secrets stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for main-backend-image"
+        run: |
+          cd backend/infrastructure/stack/main-backend-image
+          go mod download
+
+      - name: "Deploy main-backend-image stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for inference-backend-image"
+        run: |
+          cd backend/infrastructure/stack/inference-backend-image
+          go mod download
+
+      - name: "Deploy inference-backend-image stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "Install dependencies for queue-handler-image"
+        run: |
+          cd backend/infrastructure/stack/queue-handler-image
+          go mod download
+
+      - name: "Deploy queue-handler-image stack"
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: $PULUMI_STACK_NAME
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
