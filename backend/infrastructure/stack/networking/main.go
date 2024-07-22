@@ -19,8 +19,6 @@ func main() {
 		if err != nil {
 			return err
 		}
-
-		// Export a few properties to make them easy to use.
 		ctx.Export("vpc_id", vpc.VpcId)
 		ctx.Export("private_subnet_ids", vpc.PrivateSubnetIds)
 		ctx.Export("public_subnet_ids", vpc.PublicSubnetIds)
