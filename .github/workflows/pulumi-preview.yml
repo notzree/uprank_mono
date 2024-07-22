@@ -18,7 +18,6 @@ jobs:
             matrix:
                 project:
                   - backend/infrastructure/stack/networking
-                  - backend/infrastructure/stack/container-repository
                   - backend/infrastructure/stack/application-base
                   - backend/infrastructure/stack/queues
                   - backend/infrastructure/stack/secrets
