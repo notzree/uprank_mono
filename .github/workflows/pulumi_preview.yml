@@ -1,7 +1,9 @@
 name: Pulumi preview
 
 on:
-    - pull_request
+  pull_request:
+    paths:
+      - 'backend/infrastructure/stack/**'
 
 jobs:
     preview:
