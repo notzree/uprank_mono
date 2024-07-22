@@ -48,84 +48,91 @@ jobs:
       - name: "Deploy queues stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/queues
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for networking"
+        working-directory: backend/infrastructure/stack/networking
         run: |
-          cd backend/infrastructure/stack/networking
           go mod download
 
       - name: "Deploy networking stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/networking
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for application-base"
+        working-directory: backend/infrastructure/stack/application-base
         run: |
-          cd backend/infrastructure/stack/application-base
           go mod download
 
       - name: "Deploy application-base stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/application-base
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for secrets"
+        working-directory: backend/infrastructure/stack/secrets
         run: |
-          cd backend/infrastructure/stack/secrets
           go mod download
 
       - name: "Deploy secrets stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/secrets
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for main-backend-image"
+        working-directory: backend/infrastructure/stack/main-backend-image
         run: |
-          cd backend/infrastructure/stack/main-backend-image
           go mod download
 
       - name: "Deploy main-backend-image stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/main-backend-image
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for inference-backend-image"
+        working-directory: backend/infrastructure/stack/inference-backend-image
         run: |
-          cd backend/infrastructure/stack/inference-backend-image
           go mod download
 
       - name: "Deploy inference-backend-image stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/inference-backend-image
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: "Install dependencies for queue-handler-image"
+        working-directory: backend/infrastructure/stack/queue-handler-image
         run: |
-          cd backend/infrastructure/stack/queue-handler-image
           go mod download
 
       - name: "Deploy queue-handler-image stack"
         uses: pulumi/actions@v5
         with:
+          work-dir: backend/infrastructure/stack/queue-handler-image
           command: up
           stack-name: $PULUMI_STACK_NAME
         env:
