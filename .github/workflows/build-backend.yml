@@ -38,7 +38,6 @@ jobs:
             else
               echo "PULUMI_STACK_NAME=$PULUMI_DEV_STACK_NAME" >> $GITHUB_ENV
             fi
-
         - name: "Set up Go"
           uses: actions/setup-go@v3
           with:

@@ -81,6 +81,9 @@ append_outputs_to_env() {
         # Check if the key already exists in the .env file
         if ! grep -q "^$UPPER_KEY=" $RELATIVE_ENV_PATH; then
             echo "$UPPER_KEY=$value" >> $RELATIVE_ENV_PATH
+            echo "Done."
+        else
+            echo "Key $UPPER_KEY already exists in the .env file. Skipping..."
         fi
     done
 }
@@ -98,4 +101,3 @@ fi
 # Append stack outputs to the .env file
 append_outputs_to_env
 
-echo "Done."
