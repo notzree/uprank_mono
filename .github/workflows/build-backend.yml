@@ -81,20 +81,6 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
-      - name: "Install dependencies for secrets"
-        working-directory: backend/infrastructure/stack/secrets
-        run: |
-          go mod download
-
-      - name: "Deploy secrets stack"
-        uses: pulumi/actions@v5
-        with:
-          work-dir: backend/infrastructure/stack/secrets
-          command: up
-          stack-name: ${{ env.PULUMI_STACK_NAME }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
       - name: "Install dependencies for main-backend-image"
         working-directory: backend/infrastructure/stack/main-backend-image
         run: |
