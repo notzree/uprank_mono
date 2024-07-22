@@ -19,7 +19,6 @@ import (
 )
 
 func main() {
-	//this can be used to push new images to the repository
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		const (
 			env              = "dev"
