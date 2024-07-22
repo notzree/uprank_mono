@@ -19,19 +19,19 @@ import (
 func main() {
 	//this can be used to push new images to the repository
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		stack := ctx.Stack()
 		const (
-			env              = "dev"
 			application_name = "uprank"
 		)
 		// <-- Stack references -->
-		application_base, err := pulumi.NewStackReference(ctx, "notzree/application-base/dev", nil)
+		application_base, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/application-base/%s", stack), nil)
 		if err != nil {
 			return err
 		}
 		ecr_url := application_base.GetOutput(pulumi.String("ecr_url"))
 		private_dns_namespace_id := application_base.GetOutput(pulumi.String("private_dns_namespace_id"))
 		cluster_arn := application_base.GetOutput(pulumi.String("ecs_cluster_arn"))
-		networking_repository, err := pulumi.NewStackReference(ctx, "notzree/networking/dev", nil)
+		networking_repository, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/networking/%s", stack), nil)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func main() {
 		// public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 
-		secret_repository, err := pulumi.NewStackReference(ctx, "notzree/secrets/dev", nil)
+		secret_repository, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/secrets/%s", stack), nil)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func main() {
 			memory = param
 		}
 
-		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "queue-handler"), &ecrx.ImageArgs{
+		image, err := ecrx.NewImage(ctx, CreateImageName(stack, application_name, "queue-handler"), &ecrx.ImageArgs{
 			RepositoryUrl: pulumi.StringOutput(ecr_url),
 			Context:       pulumi.String("../../../queue-handler"),
 			Dockerfile:    pulumi.String("../../../queue-handler/Dockerfile"),
@@ -209,7 +209,7 @@ func main() {
 		}
 
 		// Create the CloudWatch Log Group
-		logGroup, err := cloudwatch.NewLogGroup(ctx, CreateResourceName(env, application_name, "queue-handler-log-group"), &cloudwatch.LogGroupArgs{
+		logGroup, err := cloudwatch.NewLogGroup(ctx, CreateResourceName(stack, application_name, "queue-handler-log-group"), &cloudwatch.LogGroupArgs{
 			Name: pulumi.String("/ecs/queue-handler-log-group"),
 		})
 		if err != nil {
@@ -251,7 +251,7 @@ func main() {
 			return err
 		}
 
-		queue_handler_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(env, application_name, "queue-handler"), &servicediscovery.ServiceArgs{
+		queue_handler_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(stack, application_name, "queue-handler"), &servicediscovery.ServiceArgs{
 			Name: pulumi.String("queue-handler"),
 			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
@@ -271,7 +271,7 @@ func main() {
 			return err
 		}
 
-		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "queue-handler-service"), &ecsx.FargateServiceArgs{
+		_, err = ecsx.NewFargateService(ctx, CreateResourceName(stack, application_name, "queue-handler-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
 				AssignPublicIp: pulumi.Bool(false),

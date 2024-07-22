@@ -13,8 +13,8 @@ import (
 // Uploads secrets and ACM content to AWS
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		stack := ctx.Stack()
 		const (
-			env              = "dev"
 			application_name = "uprank"
 		)
 		// Read the .env file
@@ -44,7 +44,7 @@ func main() {
 			return fmt.Errorf("failed to create secret: %w", err)
 		}
 
-		_, err = secretsmanager.NewSecretVersion(ctx, CreateResourceName(env, application_name, "backend-secrets"), &secretsmanager.SecretVersionArgs{
+		_, err = secretsmanager.NewSecretVersion(ctx, CreateResourceName(stack, application_name, "backend-secrets"), &secretsmanager.SecretVersionArgs{
 			SecretId:     secret.ID(),
 			SecretString: pulumi.String(envJSON),
 		})

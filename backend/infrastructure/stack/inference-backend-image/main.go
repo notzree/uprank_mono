@@ -21,12 +21,12 @@ import (
 func main() {
 	//this can be used to push new images to the repository
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		stack := ctx.Stack()
 		const (
-			env              = "dev"
 			application_name = "uprank"
 		)
 		// <-- Stack references -->
-		application_base, err := pulumi.NewStackReference(ctx, "notzree/application-base/dev", nil)
+		application_base, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/application-base/%s", stack), nil)
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func main() {
 		private_dns_namespace_id := application_base.GetOutput(pulumi.String("private_dns_namespace_id"))
 		cluster_arn := application_base.GetOutput(pulumi.String("ecs_cluster_arn"))
 
-		networking_repository, err := pulumi.NewStackReference(ctx, "notzree/networking/dev", nil)
+		networking_repository, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/networking/%s", stack), nil)
 		if err != nil {
 			return err
 		}
@@ -42,7 +42,7 @@ func main() {
 		// public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 
-		secret_repository, err := pulumi.NewStackReference(ctx, "notzree/secrets/dev", nil)
+		secret_repository, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/secrets/%s", stack), nil)
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func main() {
 		// <-- End Create Fargate config -->
 
 		// <-- Create ECR Image -->
-		image, err := ecrx.NewImage(ctx, CreateImageName(env, application_name, "inference-backend"), &ecrx.ImageArgs{
+		image, err := ecrx.NewImage(ctx, CreateImageName(stack, application_name, "inference-backend"), &ecrx.ImageArgs{
 			RepositoryUrl: pulumi.StringOutput(ecr_url),
 			Context:       pulumi.String("../../../inference-backend"),
 			Dockerfile:    pulumi.String("../../../inference-backend/Dockerfile"),
@@ -193,7 +193,7 @@ func main() {
 		// <-- End Create Security group -->
 
 		// <-- Create service discovery -->
-		inference_backend_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(env, application_name, "inference-backend"), &servicediscovery.ServiceArgs{
+		inference_backend_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(stack, application_name, "inference-backend"), &servicediscovery.ServiceArgs{
 			Name: pulumi.String("inference-backend"),
 			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
@@ -215,7 +215,7 @@ func main() {
 		// <-- End Create service discovery -->
 
 		// <-- Create ECS Service -->
-		_, err = ecsx.NewFargateService(ctx, CreateResourceName(env, application_name, "inference_service"), &ecsx.FargateServiceArgs{
+		_, err = ecsx.NewFargateService(ctx, CreateResourceName(stack, application_name, "inference_service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
 				AssignPublicIp: pulumi.Bool(false),
