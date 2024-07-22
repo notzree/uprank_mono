@@ -17,7 +17,6 @@ func main() {
 		const (
 			application_name = "uprank"
 		)
-		// Read the .env file
 		envFileContent, err := os.ReadFile("../../../.env")
 		if err != nil {
 			return fmt.Errorf("failed to read .env file: %w", err)
