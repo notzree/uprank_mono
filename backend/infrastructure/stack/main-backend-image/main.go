@@ -327,7 +327,7 @@ func main() {
 				},
 			},
 		},
-			pulumi.DependsOn([]pulumi.Resource{main_backend_service_discovery, loadbalancer}),
+			pulumi.DependsOn([]pulumi.Resource{loadbalancer}),
 		)
 		if err != nil {
 			return err
