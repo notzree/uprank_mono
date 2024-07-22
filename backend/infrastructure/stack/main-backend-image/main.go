@@ -244,7 +244,8 @@ func main() {
 		}
 
 		main_backend_service_discovery, err := servicediscovery.NewService(ctx, CreateResourceName(stack, application_name, "main-backend"), &servicediscovery.ServiceArgs{
-			Name: pulumi.String("main-backend"),
+			Name:         pulumi.String("main-backend-servicediscovery"),
+			ForceDestroy: pulumi.Bool(true),
 			DnsConfig: &servicediscovery.ServiceDnsConfigArgs{
 				NamespaceId: pulumi.StringOutput(private_dns_namespace_id),
 				DnsRecords: servicediscovery.ServiceDnsConfigDnsRecordArray{
