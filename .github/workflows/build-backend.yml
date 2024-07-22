@@ -6,11 +6,16 @@ on:
       - main
     paths:
       -'backend/**'
+
+env:
+  PULUMI_DEV_STACK_NAME: dev
+  PULUMI_PROD_STACK_NAME: prod
+
 jobs:
     build:
-        name: Preview Pulumi Projects
+        name: Build and deploy backend infrastructure, including container images.
         runs-on: ubuntu-latest
-        environment: dev
+        environment: dev # this is just the environemnt with all of the required variables.
         strategy:
             matrix:
                 project:
@@ -24,7 +29,15 @@ jobs:
                   - backend/infrastructure/stack/queue-handler-image
         steps:
         - name: "Checkout repository"
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
+        
+        - name: "Set Environment Variables"
+          run: |
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "PULUMI_STACK_NAME=$PULUMI_PROD_STACK_NAME" >> $GITHUB_ENV
+            else
+              echo "PULUMI_STACK_NAME=$PULUMI_DEV_STACK_NAME" >> $GITHUB_ENV
+            fi
 
         - name: "Set up Go"
           uses: actions/setup-go@v3
@@ -47,6 +60,6 @@ jobs:
           uses: pulumi/actions@v5
           with:
             command: up
-            stack-name: ${{vars.PULUMI_STACK_NAME}}
+            stack-name: $PULUMI_STACK_NAME # this will always be prod for now. 
           env:
             PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
