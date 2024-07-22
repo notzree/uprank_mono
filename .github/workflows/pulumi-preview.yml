@@ -5,6 +5,10 @@ on:
     paths:
       - 'backend/infrastructure/stack/**'
 
+env:
+  PULUMI_DEV_STACK_NAME: dev
+  PULUMI_PROD_STACK_NAME: prod
+
 jobs:
     preview:
         name: Preview Pulumi Projects
@@ -13,17 +17,25 @@ jobs:
         strategy:
             matrix:
                 project:
-                        - backend/infrastructure/stack/networking
-                        - backend/infrastructure/stack/container-repository
-                        - backend/infrastructure/stack/application-base
-                        - backend/infrastructure/stack/queues
-                        - backend/infrastructure/stack/secrets
-                        - backend/infrastructure/stack/main-backend-image
-                        - backend/infrastructure/stack/inference-backend-image
-                        - backend/infrastructure/stack/queue-handler-image
+                  - backend/infrastructure/stack/networking
+                  - backend/infrastructure/stack/container-repository
+                  - backend/infrastructure/stack/application-base
+                  - backend/infrastructure/stack/queues
+                  - backend/infrastructure/stack/secrets
+                  - backend/infrastructure/stack/main-backend-image
+                  - backend/infrastructure/stack/inference-backend-image
+                  - backend/infrastructure/stack/queue-handler-image
         steps:
         - name: "Checkout repository"
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
+        
+        - name: "Set Environment Variables"
+          run: |
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "PULUMI_STACK_NAME=$PULUMI_PROD_STACK_NAME" >> $GITHUB_ENV
+            else
+              echo "PULUMI_STACK_NAME=$PULUMI_DEV_STACK_NAME" >> $GITHUB_ENV
+            fi
 
         - name: "Set up Go"
           uses: actions/setup-go@v3
@@ -46,6 +58,6 @@ jobs:
           uses: pulumi/actions@v3
           with:
             command: preview
-            stack-name: dev
+            stack-name: prod #todo: change to it to $PULUMI_STACK_NAME when we have enough money to pay for multiple environments
           env:    
             PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

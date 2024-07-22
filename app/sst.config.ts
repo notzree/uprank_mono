@@ -1,7 +1,7 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
 
-const scret = new sst.Secret("base_backed_url")
+
 
 
 export default $config({
@@ -13,8 +13,6 @@ export default $config({
         };
     },
     async run() {
-        new sst.aws.Nextjs("MyWeb", {
-            link: [scret]
-        });
+        new sst.aws.Nextjs("Uprank-App");
     },
 });
