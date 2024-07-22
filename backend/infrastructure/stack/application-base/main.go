@@ -34,7 +34,7 @@ func main() {
 			return err
 		}
 		// ECR repository for all images
-		repo, err := ecrx.NewRepository(ctx, CreateResourceName(env, application_name, "repo"), &ecrx.RepositoryArgs{
+		repo, err := ecrx.NewRepository(ctx, CreateResourceName(env, application_name, "uprank-repo"), &ecrx.RepositoryArgs{
 			ForceDelete: pulumi.Bool(true),
 		})
 		if err != nil {
