@@ -17,7 +17,7 @@ import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 import { CreateUserBody } from "@/types/user";
-import { v1Client } from "@/client/v1_client";
+import { BackendClient } from "@/backend-client/backend-client";
 
 const formSchema = z.object({
     first_name: z.string().trim().min(1, {
@@ -32,7 +32,7 @@ const formSchema = z.object({
 });
 
 export default function Home() {
-    const client = new v1Client(process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL);
+    const client = new BackendClient();
     const { isLoaded, user } = useUser();
     const { toast } = useToast();
     const router = useRouter();
@@ -72,7 +72,6 @@ export default function Home() {
         };
         const sync_user = await client.SyncUser(request_body);
         if (!sync_user.ok) {
-            console.log(sync_user);
             alert("Failed to sync user data, please try again.");
             return;
         }

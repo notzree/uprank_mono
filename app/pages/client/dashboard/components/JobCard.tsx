@@ -13,12 +13,13 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { return_origin_job } from "@/utils/job_utils";
-import { v1Client } from "@/client/v1_client";
+import { BackendClient } from "@/backend-client/backend-client";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 dayjs.extend(localizedFormat);
 dayjs.extend(utc);
-export default  function JobCard({ job }: { job: Job }) {
+
+export default function JobCard({ job }: { job: Job }) {
     const { user } = useUser();
     const {getToken} = useAuth();
     if (job == null){
@@ -28,9 +29,7 @@ export default  function JobCard({ job }: { job: Job }) {
             </div>
         )
     }
-    const client = new v1Client(
-        process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL
-    );
+    const client = new BackendClient();
     const og = return_origin_job(job);
     let display_title = og.title || "No title found";
     let display_description = og.description || "No description found";

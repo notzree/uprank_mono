@@ -1,7 +1,13 @@
+import * as React from "react";
 import Navbar from "../shared/components/navbar";
-import  JobDataTable from "./components/job_table";
+import FreelancerTable from "./components/freelancer-table";
+import type { UpworkFreelancer } from "@/types/freelancer";
 
 export default function Jobs({ job_prop }: { job_prop: Job }) {
+    const [freelancers, setFreelancers] = React.useState<UpworkFreelancer[]>(
+        job_prop.edges.upworkjob?.edges.upworkfreelancer || []
+    );
+    const [showFilters, setShowFilters] = React.useState(true);
     const job = job_prop.edges.upworkjob;
     if (!job) {
         return <div>Job not found</div>;
@@ -12,11 +18,17 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
                 <Navbar />
                 <main className="flex flex-1 flex-col pt-16">
                     <div className="flex flex-row w-screen px-6">
-                        <JobDataTable
-                            freelancers={
-                                job_prop.edges.upworkjob?.edges
-                                    .upworkfreelancer || []
-                            }
+                       {showFilters && <FreelancerSearchFilter
+                        job={job}
+                        original_freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []} 
+                        visible_freelancers={freelancers}
+                        setFreelancers={setFreelancers}
+                        />
+                       }
+                        <FreelancerTable
+                            original_freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []}
+                            visible_freelancers={freelancers}
+                            setFreelancers={setFreelancers}
                             job={job}
                         />
                     </div>
@@ -28,11 +40,11 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
 
 import { getAuth } from "@clerk/nextjs/server";
 import { GetServerSideProps } from "next";
-import { v1Client } from "@/client/v1_client";
+import { BackendClient } from "@/backend-client/backend-client";
 import { Job } from "@/types/job";
+import FreelancerSearchFilter from "./components/freelancer-filter";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const base_url = process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL;
     const { userId, getToken } = getAuth(ctx.req);
     const token = await getToken();
     const { job_id } = ctx.params!;
@@ -46,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         };
     }
 
-    const client = new v1Client(base_url);
+    const client = new BackendClient();
     const job = await client.GetPlatformJobById(job_id, token);
 
     if (!job) {

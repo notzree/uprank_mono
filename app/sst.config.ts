@@ -13,6 +13,6 @@ export default $config({
         };
     },
     async run() {
-        new sst.aws.Nextjs("Uprank-App");
+        new sst.aws.Nextjs("UprankApp");
     },
 });

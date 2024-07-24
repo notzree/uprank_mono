@@ -1,10 +1,10 @@
 import * as React from "react";
-import { GetJobResponse } from "@/client/client";
+import { GetJobResponse } from "@/backend-client/backend-client";
 import Navbar from "../shared/components/navbar";
 import JobCardList from "./components/JobCardList";
 import JobSearchFilter from "./components/JobSearchFilter";
-export default function Dashboard({ jobs_props }: {jobs_props: GetJobResponse}) {
-    const [jobs, setJobs] = React.useState(jobs_props.jobs);
+export default function Dashboard({ job_props }: {job_props: Job[]}) {
+    const [jobs, setJobs] = React.useState(job_props);
     return (
         <div className="grid min-h-screen w-full">
             <div className="flex flex-col">
@@ -12,7 +12,7 @@ export default function Dashboard({ jobs_props }: {jobs_props: GetJobResponse}) 
                 <main className="flex flex-1 flex-col pt-16">
                     <div className="flex flex-row w-full ">
                         <div className=" flex w-96 px-4">
-                        <JobSearchFilter jobs={jobs_props.jobs} setJob={setJobs} />
+                        <JobSearchFilter jobs={job_props} setJob={setJobs} />
                         </div>
                         <div className=" flex flex-col items-center justify-center w-full text-left">
                             <h1 className=" text-2xl font-bold pb-4">Your current job postings</h1>
@@ -31,8 +31,8 @@ export default function Dashboard({ jobs_props }: {jobs_props: GetJobResponse}) 
 
 import { getAuth } from "@clerk/nextjs/server";
 import { GetServerSideProps } from "next";
-import { v1Client } from "@/client/v1_client";
-
+import { BackendClient } from "@/backend-client/backend-client";
+import { Job } from "@/types/job";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const base_url = process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL;
@@ -46,11 +46,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             },
         };
     }
-    const client = new v1Client(base_url);
+    const client = new BackendClient();
     const jobs = await client.GetAllJobs(token);
     return {
         props: {
-            jobs_props: jobs,
+            job_props: jobs,
         },
     };
 }
