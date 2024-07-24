@@ -34,6 +34,7 @@ jobs:
                     fi
             - name: "Extract backend url"
               run: |
+                    PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}
                     BACKEND_URL=$(pulumi stack output -s $PULUMI_STACK_NAME main-backend-alb-url)
                     echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
             - name: "Install dependencies"
@@ -43,5 +44,5 @@ jobs:
             - name: "Build app"
               run: |
                     cd app
-                    NEXT_PUBLIC_BACKEND_DEV_BASE_URL=$BACKEND_URL npx sst deploy
+                    NEXT_PUBLIC_BACKEND_DEV_BASE_URL=${{env.BACKEND_URL}} npx sst deploy
 
