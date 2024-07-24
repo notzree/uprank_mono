@@ -120,28 +120,9 @@ function formate_date(date: Date): string {
 }
 
 
-function BriefcaseIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-      <rect width="20" height="14" x="2" y="6" rx="2" />
-    </svg>
-  )
-}
 
 
-function CalendarIcon(props) {
+function CalendarIcon(props: any) {
   return (
     <svg
       {...props}
@@ -164,7 +145,7 @@ function CalendarIcon(props) {
 }
 
 
-function ChevronRightIcon(props) {
+function ChevronRightIcon(props: any) {
   return (
     <svg
       {...props}
@@ -184,7 +165,7 @@ function ChevronRightIcon(props) {
 }
 
 
-function LocateIcon(props) {
+function LocateIcon(props: any) {
   return (
     <svg
       {...props}
@@ -203,27 +184,6 @@ function LocateIcon(props) {
       <line x1="12" x2="12" y1="2" y2="5" />
       <line x1="12" x2="12" y1="19" y2="22" />
       <circle cx="12" cy="12" r="7" />
-    </svg>
-  )
-}
-
-
-function XIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
     </svg>
   )
 }
