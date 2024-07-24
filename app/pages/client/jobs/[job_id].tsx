@@ -25,12 +25,15 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
                         setFreelancers={setFreelancers}
                         />
                        }
-                        <FreelancerTable
+                       <div className="flex flex-col overflow-auto">
+                       <JobCard job={job_prop} />
+                       <FreelancerTable
                             original_freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []}
                             visible_freelancers={freelancers}
                             setFreelancers={setFreelancers}
                             job={job}
                         />
+                       </div>
                     </div>
                 </main>
             </div>
@@ -43,6 +46,7 @@ import { GetServerSideProps } from "next";
 import { BackendClient } from "@/backend-client/backend-client";
 import { Job } from "@/types/job";
 import FreelancerSearchFilter from "./components/freelancer-filter";
+import JobCard from "./components/detailed-job-card";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const { userId, getToken } = getAuth(ctx.req);

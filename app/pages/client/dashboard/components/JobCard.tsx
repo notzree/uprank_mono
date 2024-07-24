@@ -75,6 +75,7 @@ export default function JobCard({ job }: { job: Job }) {
             platform: job?.origin_platform,
     }, token)}
     
+    
     return (
         <Card>
             <CardHeader>

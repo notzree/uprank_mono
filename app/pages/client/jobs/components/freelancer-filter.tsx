@@ -148,6 +148,7 @@ export default function FreelancerSearchFilter({
         };
 
         filterFreelancers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterData]);
 
     return (
