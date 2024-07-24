@@ -5,7 +5,7 @@ on:
         branches:
         - main
         paths:
-        - 'frontend/**'
+        - 'app/**'
     
 env:
     PULUMI_DEV_STACK_NAME: dev
