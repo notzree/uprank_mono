@@ -11,7 +11,6 @@ type CardData = {
     title: string;
     content: string;
 };
-
 const FreelancerCardData: CardData[] = [
     {
         title: "AI powered insights",
@@ -29,6 +28,7 @@ const FreelancerCardData: CardData[] = [
             "Our powerful spreadsheet interface allows you to apply custom filters on specific freelancer data, making it easy to narrow down your search and find the ideal candidate for your project. Leverage data analysis tools to gain deeper insights and make well-informed decisions.",
     },
 ];
+
 export default function Component() {
     const { user } = useUser();
     return (
