@@ -6,7 +6,7 @@ export class BackendClient {
 
     constructor(base_url = "") {
         if (base_url != "") {
-            console.log("Default url overridden, using: " + base_url);
+            console.log("Default url over-ridden, using: " + base_url);
             this.base_url = base_url;
             return
         } 

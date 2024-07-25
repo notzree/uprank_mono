@@ -50,24 +50,32 @@ import type { UpworkFreelancer } from "@/types/freelancer";
 import { UpworkJob } from "@/types/job";
 
 export default function FreelancerTable({
-    original_freelancers : original_freelancers,
+    original_freelancers: original_freelancers,
     visible_freelancers: visible_freelancers,
     setFreelancers,
     job,
+    average_specialization_score,
+    average_budget_adherence_percentage,
+    average_budget_overrun_percentage,
 }: {
     original_freelancers: UpworkFreelancer[];
     visible_freelancers: UpworkFreelancer[];
     job: UpworkJob;
     setFreelancers: React.Dispatch<React.SetStateAction<UpworkFreelancer[]>>;
+    average_specialization_score: number;
+    average_budget_adherence_percentage: number;
+    average_budget_overrun_percentage: number;
 }) {
-    const columns = React.useMemo<ColumnDef<UpworkFreelancer>[]>(()=>[
+    const columns = React.useMemo<ColumnDef<UpworkFreelancer>[]>(
+        () => [
             {
                 id: "select",
                 header: ({ table }) => (
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                            (table.getIsSomePageRowsSelected() &&
+                                "indeterminate")
                         }
                         onCheckedChange={(value) =>
                             table.toggleAllPageRowsSelected(!!value)
@@ -93,7 +101,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Name
@@ -125,6 +135,155 @@ export default function FreelancerTable({
                 },
                 enableSorting: true,
                 enableHiding: false,
+            },
+            {
+                id: "specialization_score",
+                header: ({ column }) => {
+                    return (
+                        <div className="flex flex-row">
+                            <Button
+                            variant="ghost"
+                            onClick={() =>
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
+                            }
+                        >
+                            <span className=" font-bold">
+                                Specialization score
+                            </span>
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                        </div>
+                        
+                        
+                    );
+                },
+                cell: ({ row }) => {
+                    const value: number = row.getValue('specialization_score');
+                    const color = value > average_specialization_score ? 'text-green-600' : 'text-red-600';
+                    return (
+                      <div className={`text-right ${color}`}>
+                        {value}
+                      </div>
+                    );
+                  },
+                accessorKey: "specialization_score",
+                accessorFn: (row) => {
+                    if (
+                        row.edges &&
+                        row.edges.freelancer_inference_data
+                            ?.finalized_rating_score
+                    ) {
+                        return (
+                            row.edges.freelancer_inference_data.finalized_rating_score.toFixed(
+                                2
+                            ) || 0
+                        );
+                    } else {
+                        return 0;
+                    }
+                },
+                enableSorting: true,
+            },
+            {
+                id: "budget_adherence_percentage",
+                header: ({ column }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            onClick={() =>
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
+                            }
+                        >
+                            Budget adherence percentage
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }) => {
+                    const value: number = row.getValue('budget_adherence_percentage');
+                    const color = value > average_budget_adherence_percentage ? 'text-green-600' : 'text-red-500';
+                    return (
+                      <div className={`text-right ${color}`}>
+                        {value === -1 ? 'Not enough data' : `${value}%`}
+                      </div>
+                    );
+                  },
+                accessorKey: "budget_adherence_percentage",
+                accessorFn: (row) => {
+                    if (
+                        row.edges &&
+                        row.edges.freelancer_inference_data
+                            ?.budget_adherence_percentage
+                    ) {
+                        return (
+                            row.edges.freelancer_inference_data.budget_adherence_percentage.toFixed(
+                                2
+                            ) || 0
+                        );
+                    } else {
+                        return -1;
+                    }
+                },
+                enableSorting: true,
+            },
+            {
+                id: "budget_overrun_percentage",
+                header: ({ column }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            onClick={() =>
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
+                            }
+                        >
+                            Budget overrun percentage
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }) => {
+                    const value: number = row.getValue("budget_overrun_percentage");
+                    const color = value=== -1 ? 'text-green-600' : 'text-red-500';
+                    if (value === -1) {
+                        return (
+                            <div className="text-right text-muted-foreground">
+                                <span className={`text-right ${color}`}>
+                                    Freelancer never exceeded budget
+                                </span>
+                            </div>
+                        );
+                    }
+                    return (
+                        <div className="text-right">
+                            <span className={`text-right ${color}`}>
+                            {row.getValue("budget_overrun_percentage") + "%"}
+                            </span>
+                        </div>
+                    );
+                },
+                accessorKey: "budget_overrun_percentage",
+                accessorFn: (row) => {
+                    if (
+                        row.edges &&
+                        row.edges.freelancer_inference_data
+                            ?.budget_overrun_percentage
+                    ) {
+                        return (
+                            row.edges.freelancer_inference_data.budget_overrun_percentage.toFixed(
+                                2
+                            ) || 0
+                        );
+                    } else {
+                        return -1;
+                    }
+                },
+                enableSorting: true,
             },
             {
                 id: "Location",
@@ -168,7 +327,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Percent skills matched
@@ -179,7 +340,8 @@ export default function FreelancerTable({
                 cell: ({ row }) => {
                     return (
                         <div className="text-right flex justify-end items-center gap-x-4">
-                            {row.getValue("skills") + "%" || "No skills indicated"}
+                            {row.getValue("skills") + "%" ||
+                                "No skills indicated"}
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button variant="outline">View</Button>
@@ -202,7 +364,9 @@ export default function FreelancerTable({
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogAction>Close</AlertDialogAction>
+                                        <AlertDialogAction>
+                                            Close
+                                        </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
@@ -236,7 +400,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Proposed Rate
@@ -272,7 +438,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Recent hours
@@ -298,7 +466,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Total hours
@@ -324,7 +494,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Average Recent Earnings
@@ -335,7 +507,8 @@ export default function FreelancerTable({
                 cell: ({ row }) => {
                     let earnings = "0";
                     if (row.original.average_recent_earnings) {
-                        earnings = row.original.average_recent_earnings.toFixed(0);
+                        earnings =
+                            row.original.average_recent_earnings.toFixed(0);
                     }
                     return <div className="text-right">${earnings}</div>;
                 },
@@ -351,7 +524,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Recent Earnings
@@ -378,7 +553,9 @@ export default function FreelancerTable({
                         <Button
                             variant="ghost"
                             onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
                             }
                         >
                             Total Earnings
@@ -389,7 +566,8 @@ export default function FreelancerTable({
                 cell: ({ row }) => {
                     let earnings = "0";
                     if (row.original.combined_total_earnings) {
-                        earnings = row.original.combined_total_earnings.toFixed(0);
+                        earnings =
+                            row.original.combined_total_earnings.toFixed(0);
                     }
                     return <div className="text-right">${earnings}</div>;
                 },
@@ -398,139 +576,11 @@ export default function FreelancerTable({
                 enableHiding: true,
             },
             {
-                id: "specialization_score",
-                header: ({ column }) => {
-                    return (
-                        <Button
-                            variant="ghost"
-                            onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
-                            }
-                        >
-                            Specialization score
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    );
-                },
-                cell: ({ row }) => {
-                    return (
-                        <div className="text-right">
-                            {row.getValue("specialization_score")}
-                        </div>
-                    );
-                },
-                accessorKey: "specialization_score",
-                accessorFn: (row) => {
-                    if (
-                        row.edges &&
-                        row.edges.freelancer_inference_data?.finalized_rating_score
-                    ) {
-                        return (
-                            row.edges.freelancer_inference_data.finalized_rating_score.toFixed(
-                                2
-                            ) || 0
-                        );
-                    } else {
-                        return 0;
-                    }
-                },
-                enableSorting: true,
-            },
-            {
-                id: "budget_adherence_percentage",
-                header: ({ column }) => {
-                    return (
-                        <Button
-                            variant="ghost"
-                            onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
-                            }
-                        >
-                            Budget adherence percentage
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    );
-                },
-                cell: ({ row }) => {
-                    return (
-                        <div className="text-right">
-                            {row.getValue("budget_adherence_percentage") + "%" ||
-                                "No data"}
-                        </div>
-                    );
-                },
-                accessorKey: "budget_adherence_percentage",
-                accessorFn: (row) => {
-                    if (
-                        row.edges &&
-                        row.edges.freelancer_inference_data
-                            ?.budget_adherence_percentage
-                    ) {
-                        return (
-                            row.edges.freelancer_inference_data.budget_adherence_percentage.toFixed(
-                                2
-                            ) || 0
-                        );
-                    } else {
-                        return -1;
-                    }
-                },
-                enableSorting: true,
-            },
-            {
-                id: "budget_overrun_percentage",
-                header: ({ column }) => {
-                    return (
-                        <Button
-                            variant="ghost"
-                            onClick={() =>
-                                column.toggleSorting(column.getIsSorted() === "asc")
-                            }
-                        >
-                            Budget overrun percentage
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    );
-                },
-                cell: ({ row }) => {
-                    const value = row.getValue("budget_overrun_percentage");
-                    if (value === -1) {
-                        return (
-                            <div className="text-right text-muted-foreground">
-                                No data
-                            </div>
-                        );
-                    }
-                    return (
-                        <div className="text-right">
-                            {row.getValue("budget_overrun_percentage") + "%"}
-                        </div>
-                    );
-                },
-                accessorKey: "budget_overrun_percentage",
-                accessorFn: (row) => {
-                    if (
-                        row.edges &&
-                        row.edges.freelancer_inference_data
-                            ?.budget_overrun_percentage
-                    ) {
-                        return (
-                            row.edges.freelancer_inference_data.budget_overrun_percentage.toFixed(
-                                2
-                            ) || 0
-                        );
-                    } else {
-                        return -1;
-                    }
-                },
-                enableSorting: true,
-            },
-            {
                 id: "actions",
                 enableHiding: false,
                 cell: ({ row }) => {
                     const freelancer = row.original;
-    
+
                     return (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -543,13 +593,17 @@ export default function FreelancerTable({
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        navigator.clipboard.writeText(freelancer.id)
+                                        navigator.clipboard.writeText(
+                                            freelancer.id
+                                        )
                                     }
                                 >
                                     Copy freelancer url
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>View customer</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    View customer
+                                </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     View payment details
                                 </DropdownMenuItem>
@@ -559,16 +613,25 @@ export default function FreelancerTable({
                 },
                 enableSorting: false,
             },
-    ],[])
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+        ],
+        []
+    );
+    const initial_sorting_state = [
+        {
+            id: "specialization_score",
+            desc: true,
+        },
+    ];
+    const [sorting, setSorting] = React.useState<SortingState>(
+        initial_sorting_state
+    );
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
-        type RowSelection = { [key: number]: boolean };
+    type RowSelection = { [key: number]: boolean };
     const [rowSelection, setRowSelection] = React.useState<RowSelection>({});
     const data = visible_freelancers;
-
     const table = useReactTable({
         data,
         columns,
@@ -599,25 +662,27 @@ export default function FreelancerTable({
                 <div className="flex space-x-4">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                            <Button variant="outline" className="ml-auto">
                                 Actions <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                        <DropdownMenuItem
+                            <DropdownMenuItem
                                 onClick={() => {
-                                    setFreelancers(getVisibleRow(data, rowSelection));
-                                }
-                                }
+                                    setFreelancers(
+                                        getVisibleRow(data, rowSelection)
+                                    );
+                                }}
                             >
                                 Hide selected Freelancers
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                            onClick={()=>{
-                                setFreelancers(original_freelancers)
-                            }}
-                            >Unhide all Freelancers
+                                onClick={() => {
+                                    setFreelancers(original_freelancers);
+                                }}
+                            >
+                                Unhide all Freelancers
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                                 View payment details

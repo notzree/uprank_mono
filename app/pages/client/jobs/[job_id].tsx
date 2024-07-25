@@ -1,14 +1,47 @@
 import * as React from "react";
 import Navbar from "../shared/components/navbar";
 import FreelancerTable from "./components/freelancer-table";
+import DetailedJobCard from "./components/detailed-job-card";
 import type { UpworkFreelancer } from "@/types/freelancer";
 
 export default function Jobs({ job_prop }: { job_prop: Job }) {
+    
     const [freelancers, setFreelancers] = React.useState<UpworkFreelancer[]>(
         job_prop.edges.upworkjob?.edges.upworkfreelancer || []
     );
     const [showFilters, setShowFilters] = React.useState(true);
     const job = job_prop.edges.upworkjob;
+    const original_freelancers = job_prop.edges.upworkjob?.edges.upworkfreelancer || [];
+        // START temporary fix for MVP, should be computed on the backend in the future
+        let average_specialization_score = 0;
+        let num_specialization_scores = 0;
+        let average_budget_adherence_percentage = 0;
+        let num_budget_adherence_percentage = 0;
+        let average_budget_overrun_percentage = 0;
+        let num_budget_overrun_percentage = 0;
+        for (let freelancer of original_freelancers){
+            if (freelancer.edges && freelancer.edges.freelancer_inference_data){
+                if (freelancer.edges.freelancer_inference_data.finalized_rating_score && freelancer.edges.freelancer_inference_data.finalized_rating_score > 0){
+                    num_specialization_scores += 1;
+                    average_specialization_score += freelancer.edges.freelancer_inference_data.finalized_rating_score;
+                }
+                if (freelancer.edges.freelancer_inference_data.budget_adherence_percentage){
+                    num_budget_adherence_percentage += 1;
+                    average_budget_adherence_percentage += freelancer.edges.freelancer_inference_data.budget_adherence_percentage;
+                }
+                if (freelancer.edges.freelancer_inference_data.budget_overrun_percentage){
+                    num_budget_overrun_percentage += 1;
+                    average_budget_overrun_percentage += freelancer.edges.freelancer_inference_data.budget_overrun_percentage;
+                }
+            }
+        }
+
+        average_specialization_score /= num_specialization_scores
+        average_budget_adherence_percentage /= num_budget_adherence_percentage
+        average_budget_overrun_percentage /= num_budget_overrun_percentage
+
+        // END temporary fix for MVP
+
     if (!job) {
         return <div>Job not found</div>;
     }
@@ -20,18 +53,25 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
                     <div className="flex flex-row w-screen px-6">
                        {showFilters && <FreelancerSearchFilter
                         job={job}
-                        original_freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []} 
+                        original_freelancers={original_freelancers} 
                         visible_freelancers={freelancers}
                         setFreelancers={setFreelancers}
                         />
                        }
                        <div className="flex flex-col overflow-auto">
-                       <JobCard job={job_prop} />
+                       <DetailedJobCard job={job_prop}
+                        average_specialization_score={average_specialization_score}
+                        average_budget_adherence_percentage={average_budget_adherence_percentage}
+                        average_budget_overrun_percentage={average_budget_overrun_percentage}
+                       />
                        <FreelancerTable
-                            original_freelancers={job_prop.edges.upworkjob?.edges.upworkfreelancer || []}
+                            original_freelancers={original_freelancers}
                             visible_freelancers={freelancers}
                             setFreelancers={setFreelancers}
                             job={job}
+                            average_specialization_score={average_specialization_score}
+                            average_budget_adherence_percentage={average_budget_adherence_percentage}
+                            average_budget_overrun_percentage={average_budget_overrun_percentage}
                         />
                        </div>
                     </div>
