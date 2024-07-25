@@ -27,7 +27,7 @@ jobs:
                     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             - name: "Set Environment Variables"
               run: |
-                    if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+                    if [[ "${{ github.ref }}" == "refs/heads/production" ]]; then
                     echo "PULUMI_STACK_NAME=${{env.PULUMI_PROD_STACK_NAME}}" >> $GITHUB_ENV
                     else
                     echo "PULUMI_STACK_NAME=${{env.PULUMI_DEV_STACK_NAME}}" >> $GITHUB_ENV

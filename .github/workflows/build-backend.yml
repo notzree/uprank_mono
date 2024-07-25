@@ -22,7 +22,7 @@ jobs:
       
       - name: "Set Environment Variables"
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/production" ]]; then
             echo "PULUMI_STACK_NAME=${PULUMI_PROD_STACK_NAME}" >> $GITHUB_ENV
           else
             echo "PULUMI_STACK_NAME=${PULUMI_DEV_STACK_NAME}" >> $GITHUB_ENV
