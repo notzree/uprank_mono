@@ -43,6 +43,9 @@ jobs:
               run: |
                     cd app
                     npm i
+            - uses: croco-dev/setup-ion@v1
+              with:
+                version: latest
             - name: "Build app"
               run: |
                     cd app
