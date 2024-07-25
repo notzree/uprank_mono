@@ -26,8 +26,9 @@ type ComputeRawSpecializationScoreResponse struct {
 }
 
 type ApplySpecializationScoreWeightsRequest struct {
-	Description_scores map[string]map[int]float32 `json:"description_scores"`
-	Job_data           JobData                    `json:"job_data"`
+	Description_scores     map[string]map[int]float32 `json:"description_scores"`
+	Remaining_ranking_data []FreelancerRankingData    `json:"remaining_ranking_data"`
+	Job_data               JobData                    `json:"job_data"`
 }
 
 type ApplySpecializationScoreWeightsResponse struct {

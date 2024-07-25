@@ -12,10 +12,10 @@ import (
 
 type Server struct {
 	queue queue.Queue
-	svc   service.Servicer
+	svc   service.UprankVecService
 }
 
-func NewServer(queue queue.Queue, svc service.Servicer) *Server {
+func NewServer(queue queue.Queue, svc service.UprankVecService) *Server {
 	return &Server{
 		queue: queue,
 		svc:   svc,

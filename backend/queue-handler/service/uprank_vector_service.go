@@ -183,28 +183,44 @@ func (s *UprankVecService) ApplySpecializationScoreWeights(req types.ApplySpecia
 	new_weights := make(map[string]map[int]float32)
 	freelancers := req.Job_data.Upwork_job.Edges.UpworkFreelancer
 	score_data := req.Description_scores
+	remaining_job_data_map := make(map[string]types.FreelancerRankingData)
+	for _, remaining_data := range req.Remaining_ranking_data {
+		remaining_job_data_map[remaining_data.Freelancer_id] = remaining_data
+	}
+
+	const (
+		SIMILARITY_SCORE_WEIGHT = 0.7
+		BUDGET_ADHERENCE_WEIGHT = 0.22
+		BUDGET_OVERRUN_WEIGHT   = 0.08
+	)
 	for _, freelancer := range freelancers {
 		if _, exists := score_data[freelancer.ID]; exists {
 			work_histories := freelancer.Edges.WorkHistories
 			for _, work_history := range work_histories {
-				if _, exists := score_data[freelancer.ID][work_history.ID]; exists {
-					var budget_adherence_score float32
-					job_similarity_score := ExponentialScaling(score_data[freelancer.ID][work_history.ID])
-					if work_history.Budget != 0 {
-						if work_history.FreelancerEarnings > work_history.Budget {
-							budget_adherence_score = 0.0
-						} else {
-							budget_adherence_score = 1.0
+				if remaining_data, remaining_data_exists := remaining_job_data_map[freelancer.ID]; remaining_data_exists {
+					if score, score_exists := score_data[freelancer.ID][work_history.ID]; score_exists {
+						job_similarity_score := ExponentialScaling(score)
+						var weighted_combined_budget_score float32
+
+						// Normalize the budget adherence percentage
+						normalized_budget_adherence_score := remaining_data.Budget_adherence_percentage / 100
+						// Normalize the budget overrun score
+						normalized_budget_overrun_score := 1 / (1 + normalized_budget_adherence_score)
+
+						// Calculate the weighted combined budget score
+						weighted_combined_budget_score = normalized_budget_overrun_score*BUDGET_OVERRUN_WEIGHT +
+							normalized_budget_adherence_score*BUDGET_ADHERENCE_WEIGHT
+
+						// Combine the similarity score with the weighted budget score
+						new_weight := SIMILARITY_SCORE_WEIGHT*job_similarity_score + weighted_combined_budget_score
+
+						// Initialize the map if not already initialized
+						if new_weights[freelancer.ID] == nil {
+							new_weights[freelancer.ID] = make(map[int]float32)
 						}
-					} else {
-						budget_adherence_score = 0.5
-					}
-					new_weight := 0.95*job_similarity_score + 0.05*budget_adherence_score
-					if new_weights[freelancer.ID] == nil {
-						new_weights[freelancer.ID] = make(map[int]float32)
+						// Assign the new weight
 						new_weights[freelancer.ID][work_history.ID] = new_weight
 					}
-					new_weights[freelancer.ID][work_history.ID] = new_weight
 				}
 			}
 		}
@@ -502,3 +518,11 @@ func WithWorkHistoryId(work_history_id int) MetadataOption {
 		metadata["work_history_id"] = strconv.Itoa(work_history_id)
 	}
 }
+
+//Refactor condiserations:
+
+//The service will be refactored
+//It will become a Ranker struct, which will implement all the logic to rank a job ( all of the existing methods)
+//it will expose a run method for now, which will call all the methods in order, and allocating goroutines
+//in the ranking_handler function, we will instantiate a Ranker, and call the run method
+//We will build this following CSP, but in the future try to move to actors

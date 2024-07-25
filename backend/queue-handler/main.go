@@ -75,7 +75,7 @@ func main() {
 		log.Fatal(http.ListenAndServe(":80", nil))
 	}()
 
-	server := server.NewServer(queue, svc)
+	server := server.NewServer(queue, *svc)
 	server.Start()
 }
 

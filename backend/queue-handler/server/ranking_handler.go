@@ -27,9 +27,15 @@ func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRanki
 	if save_raw_score_err != nil {
 		return NewServiceError(save_raw_score_err, "s.svc.SaveRawSpecializationScoreWeights")
 	}
+	budget_err := s.svc.ApplyBudgetScores(ctx, *fetched_job_data, &freelancer_ranking_data)
+	if budget_err != nil {
+		return NewServiceError(budget_err, "s.svc.ApplyBudgetScores")
+	}
+
 	final_specialization_scores, apply_specialization_weights_err := s.svc.ApplySpecializationScoreWeights(types.ApplySpecializationScoreWeightsRequest{
-		Description_scores: *raw_specialization_scores.Job_description_specialization_scores,
-		Job_data:           *fetched_job_data,
+		Description_scores:     *raw_specialization_scores.Job_description_specialization_scores,
+		Remaining_ranking_data: freelancer_ranking_data,
+		Job_data:               *fetched_job_data,
 	}, context.TODO())
 	if apply_specialization_weights_err != nil {
 		return NewServiceError(apply_specialization_weights_err, "s.svc.ApplySpecializationScoreWeights")
@@ -37,10 +43,6 @@ func (s *Server) HandleRankingRequest(ctx context.Context, req types.UpworkRanki
 	save_weighted_score_err := s.svc.SaveWeightedSpecializationScoreWeights(ctx, final_specialization_scores, &freelancer_ranking_data)
 	if save_weighted_score_err != nil {
 		return NewServiceError(save_weighted_score_err, "s.svc.SaveWeightedSpecializationScoreWeights")
-	}
-	budget_err := s.svc.ApplyBudgetScores(ctx, *fetched_job_data, &freelancer_ranking_data)
-	if budget_err != nil {
-		return NewServiceError(budget_err, "s.svc.ApplyBudgetScores")
 	}
 
 	svc_err := s.svc.PostJobRankingData(types.PostJobRankingDataRequest{
