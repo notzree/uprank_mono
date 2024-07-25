@@ -42,13 +42,12 @@ jobs:
             - name: "Install dependencies"
               run: |
                     cd app
-                    npm i
+                    npm install
             - uses: croco-dev/setup-ion@v1
               with:
                 version: latest
             - name: "Build app"
+              working-directory: app
               run: |
-                    cd app
-                    NEXT_PUBLIC_BACKEND_DEV_BASE_URL=${{env.BACKEND_URL}} 
-                    npx sst deploy
+                    NEXT_PUBLIC_BACKEND_DEV_BASE_URL=${{env.BACKEND_URL}} sst deploy --stage production
 
