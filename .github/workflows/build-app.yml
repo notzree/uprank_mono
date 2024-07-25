@@ -33,6 +33,7 @@ jobs:
                     echo "PULUMI_STACK_NAME=${{env.PULUMI_DEV_STACK_NAME}}" >> $GITHUB_ENV
                     fi
             - name: "Extract backend url"
+              working-directory: backend/infrastructure/stack/main-backend-image
               run: |
                     BACKEND_URL=$(pulumi stack output -s ${{ env.PULUMI_STACK_NAME }} main-backend-alb-url)
                     echo "BACKEND_URL=${BACKEND_URL}" >> $GITHUB_ENV
