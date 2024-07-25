@@ -45,11 +45,12 @@ jobs:
                     npm install
             - uses: croco-dev/setup-ion@v1
               with:
+                working-directory: app
                 version: latest
             - name: "Build app"
               working-directory: app
               run: |
-                    sst deploy --stage production
+                    sst deploy --stage production --verbose
               env:
                 NODE_ENV: production
                 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
