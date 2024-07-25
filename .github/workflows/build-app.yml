@@ -8,8 +8,8 @@ on:
         - 'app/**'
     
 env:
-    PULUMI_DEV_STACK_NAME: dev
-    PULUMI_PROD_STACK_NAME: prod
+  PULUMI_DEV_STACK_NAME: dev
+  PULUMI_PROD_STACK_NAME: prod
 
 jobs:
     build:
@@ -28,13 +28,13 @@ jobs:
             - name: "Set Environment Variables"
               run: |
                     if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-                    echo "PULUMI_STACK_NAME=${PULUMI_PROD_STACK_NAME}" >> $GITHUB_ENV
+                    echo "PULUMI_STACK_NAME=${{env.PULUMI_PROD_STACK_NAME}}" >> $GITHUB_ENV
                     else
-                    echo "PULUMI_STACK_NAME=${PULUMI_DEV_STACK_NAME}" >> $GITHUB_ENV
+                    echo "PULUMI_STACK_NAME=${{env.PULUMI_DEV_STACK_NAME}}" >> $GITHUB_ENV
                     fi
             - name: "Extract backend url"
               run: |
-                    BACKEND_URL=$(pulumi stack output -s ${PULUMI_STACK_NAME} main-backend-alb-url)
+                    BACKEND_URL=$(pulumi stack output -s ${{ env.PULUMI_STACK_NAME }} main-backend-alb-url)
                     echo "BACKEND_URL=${BACKEND_URL}" >> $GITHUB_ENV
               env:
                 PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
