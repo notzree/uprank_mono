@@ -36,7 +36,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
+		// private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
 		public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 

@@ -55,6 +55,7 @@ jobs:
         - name: "Run Pulumi Preview"
           uses: pulumi/actions@v3
           with:
+            work-dir: ${{ matrix.project }}
             command: preview
             stack-name: prod #todo: change to it to $PULUMI_STACK_NAME when we have enough money to pay for multiple environments
           env:    
