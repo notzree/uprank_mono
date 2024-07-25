@@ -7,6 +7,5 @@ export default function Subscription() {
             </p>
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeBaHMQRNB_rh3clyM3HzszbRgr9-3Zdk2nOLx8i2UIugRXMQ/viewform?embedded=true" width="640" height="600">Loading…</iframe>
         </div>
-
     )
 }
