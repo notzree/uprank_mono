@@ -268,8 +268,8 @@ func main() {
 		_, err = ecsx.NewFargateService(ctx, CreateResourceName(stack, application_name, "main-backend-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
-				AssignPublicIp: pulumi.Bool(false),
-				Subnets:        pulumi.StringArrayOutput(private_subnet_ids),
+				AssignPublicIp: pulumi.Bool(true),
+				Subnets:        pulumi.StringArrayOutput(public_subnet_ids),
 				SecurityGroups: pulumi.StringArray{
 					securityGroup.ID(),
 				},

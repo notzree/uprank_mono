@@ -35,8 +35,8 @@ func main() {
 		if err != nil {
 			return err
 		}
-		private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
-		// public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
+		// private_subnet_ids := networking_repository.GetOutput(pulumi.String("private_subnet_ids"))
+		public_subnet_ids := networking_repository.GetOutput(pulumi.String("public_subnet_ids"))
 		vpc_id := networking_repository.GetOutput(pulumi.String("vpc_id"))
 
 		secret_repository, err := pulumi.NewStackReference(ctx, fmt.Sprintf("notzree/secrets/%s", stack), nil)
@@ -275,8 +275,8 @@ func main() {
 		_, err = ecsx.NewFargateService(ctx, CreateResourceName(stack, application_name, "queue-handler-service"), &ecsx.FargateServiceArgs{
 			Cluster: pulumi.StringOutput(cluster_arn),
 			NetworkConfiguration: &ecs.ServiceNetworkConfigurationArgs{
-				AssignPublicIp: pulumi.Bool(false),
-				Subnets:        pulumi.StringArrayOutput(private_subnet_ids),
+				AssignPublicIp: pulumi.Bool(true),
+				Subnets:        pulumi.StringArrayOutput(public_subnet_ids),
 				SecurityGroups: pulumi.StringArray{
 					securityGroup.ID(),
 				},
