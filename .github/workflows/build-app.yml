@@ -49,9 +49,11 @@ jobs:
             - name: "Build app"
               working-directory: app
               run: |
-                    NEXT_PUBLIC_BACKEND_DEV_BASE_URL=${{env.BACKEND_URL}} sst deploy --stage production
+                    sst deploy --stage production
               env:
+                NODE_ENV: production
                 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
                 NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
                 NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
                 CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+                NEXT_PUBLIC_BACKEND_DEV_BASE_URL: ${{env.BACKEND_URL}}
