@@ -616,6 +616,7 @@ export default function FreelancerTable({
         ],
         []
     );
+    
     const initial_sorting_state = [
         {
             id: "specialization_score",
