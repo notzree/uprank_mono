@@ -16,6 +16,8 @@ jobs:
         name: Build and deploy SST ION Next.js App
         runs-on: ubuntu-latest
         environment: dev
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         steps:
             - name: "Checkout repository"
               uses: actions/checkout@v4
@@ -34,7 +36,6 @@ jobs:
                     fi
             - name: "Extract backend url"
               run: |
-                    PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}
                     BACKEND_URL=$(pulumi stack output -s $PULUMI_STACK_NAME main-backend-alb-url)
                     echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
             - name: "Install dependencies"
