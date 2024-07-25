@@ -16,9 +16,9 @@ export default $config({
                     if (event.type === "branch" && event.branch === "production" && event.action === "pushed") {
                         return { stage: "production" };
                     }
-                    if (event.type ==="branch" && event.branch ==="main" && event.action ==="pushed"){
-                        return {stage: "dev"};
-                    }
+                    // if (event.type ==="branch" && event.branch ==="main" && event.action ==="pushed"){
+                    //     return {stage: "dev"};
+                    // }
                     return;
                 }
             }
