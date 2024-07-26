@@ -35,7 +35,6 @@ import { BackendClient } from "@/backend-client/backend-client";
 import { Job } from "@/types/job";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const base_url = process.env.NEXT_PUBLIC_BACKEND_DEV_BASE_URL;
     const { userId, getToken } = getAuth(ctx.req);
     const token = await getToken();
     if (!userId || !token) {

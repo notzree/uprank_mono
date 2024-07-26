@@ -57,6 +57,8 @@ export default function FreelancerTable({
     average_specialization_score,
     average_budget_adherence_percentage,
     average_budget_overrun_percentage,
+    setShowFilters,
+    showFilters
 }: {
     original_freelancers: UpworkFreelancer[];
     visible_freelancers: UpworkFreelancer[];
@@ -65,6 +67,8 @@ export default function FreelancerTable({
     average_specialization_score: number;
     average_budget_adherence_percentage: number;
     average_budget_overrun_percentage: number;
+    setShowFilters: React.Dispatch<React.SetStateAction<boolean>>;
+    showFilters: boolean;
 }) {
     const columns = React.useMemo<ColumnDef<UpworkFreelancer>[]>(
         () => [
@@ -662,6 +666,11 @@ export default function FreelancerTable({
             <div className="flex items-center py-4  justify-end">
                 <div className="flex space-x-4">
                     <DropdownMenu>
+                    <Button variant="outline" className="ml-auto"
+                    onClick={()=> setShowFilters(!showFilters)}>
+                                Toggle Filters
+
+                                </Button>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
                                 Actions <ChevronDown className="ml-2 h-4 w-4" />

@@ -3,6 +3,7 @@ import Navbar from "../shared/components/navbar";
 import FreelancerTable from "./components/freelancer-table";
 import DetailedJobCard from "./components/detailed-job-card";
 import type { UpworkFreelancer } from "@/types/freelancer";
+import { Button } from "@/components/ui/button";
 
 export default function Jobs({ job_prop }: { job_prop: Job }) {
     
@@ -72,6 +73,9 @@ export default function Jobs({ job_prop }: { job_prop: Job }) {
                             average_specialization_score={average_specialization_score}
                             average_budget_adherence_percentage={average_budget_adherence_percentage}
                             average_budget_overrun_percentage={average_budget_overrun_percentage}
+                            setShowFilters={setShowFilters}
+                            showFilters={showFilters}
+
                         />
                        </div>
                     </div>

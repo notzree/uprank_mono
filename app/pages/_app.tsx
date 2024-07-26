@@ -7,7 +7,9 @@ export default function App({
     pageProps: { session, ...pageProps },
 }: AppProps) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+        publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        >
                 <Component {...pageProps} />
             <Toaster/>
         </ClerkProvider>

@@ -1,4 +1,4 @@
-import { Job, UpworkJob } from "@/types/job";
+import {UpworkJob } from "@/types/job";
 import { Input } from "@/components/ui/input";
 import {
     Accordion,
@@ -6,12 +6,10 @@ import {
     AccordionTrigger,
     AccordionContent,
 } from "@/components/ui/accordion";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import * as React from "react";
 import Fuse from "fuse.js";
 import type { UpworkFreelancer } from "@/types/freelancer";
-import { return_origin_job } from "@/utils/job_utils";
 
 //Filter requirements:
 // - All columns in the freelancer-table
