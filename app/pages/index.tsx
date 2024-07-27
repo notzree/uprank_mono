@@ -205,7 +205,23 @@ export default function Component() {
                 </section>
             </main>
             <footer className="py-6 px-10 text-center text-sm text-gray-600">
-                © Uprank Design. All Rights Reserved.
+                <div>
+                    <p> © Richard Zhang Labs Limited. All Rights Reserved.</p>
+                    <div className="w-full flex flex-row space-x-4">
+                        <Link
+                            className="text-sm font-medium hover:underline"
+                            href="/privacy-policy"
+                        >
+                            Privacy Policy
+                        </Link>
+                        <br/>
+                        <Link
+                            className="text-sm font-medium hover:underline"
+                            href="/terms"
+                            >Terms of service</Link>
+
+                    </div>
+                </div>
             </footer>
         </div>
     );

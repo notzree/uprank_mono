@@ -3,7 +3,7 @@
   "displayName": "Uprank extension",
   "version": "0.0.1",
   "description": "Uprank extension ",
-  "author": "Richard Zhang notzree@gmail.com",
+  "author": "Richard Zhang richard@uprank.app",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
