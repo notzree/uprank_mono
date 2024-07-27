@@ -1,7 +1,7 @@
 import { authMiddleware, redirectToSignIn } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 export default authMiddleware({
-    ignoredRoutes: ["/", "/sign-in", "/sign-up", "/api/public/(.*)"],
+    ignoredRoutes: ["/", "/demo", "/privacy-policy", "/tos", "/sign-in", "/sign-up", "/api/public/(.*)"],
     apiRoutes: ["/api/private/(.*)"],
     afterAuth(auth, req, evt) {
         const res = NextResponse.next();
