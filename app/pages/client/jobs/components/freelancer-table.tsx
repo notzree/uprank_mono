@@ -608,9 +608,6 @@ export default function FreelancerTable({
                                 <DropdownMenuItem>
                                     View customer
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    View payment details
-                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     );

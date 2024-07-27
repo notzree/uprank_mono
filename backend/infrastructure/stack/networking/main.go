@@ -17,9 +17,7 @@ func main() {
 		vpc, err := ec2.NewVpc(ctx, CreateResourceName(stack, application_name, "vpc"), &ec2.VpcArgs{
 			EnableDnsSupport:   pulumi.Bool(true),
 			EnableDnsHostnames: pulumi.Bool(true),
-			// NatGateways: &ec2.NatGatewayConfigurationArgs{
-			// 	Strategy: ec2.NatGatewayStrategyOnePerAz,
-			// },
+			NatGateways:        nil,
 		})
 		if err != nil {
 			return err

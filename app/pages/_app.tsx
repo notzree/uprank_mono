@@ -8,6 +8,11 @@ export default function App({
 }: AppProps) {
     return (
         <ClerkProvider
+        appearance={{
+            elements: {
+                footer: "hidden",
+            },
+        }}
         publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
         >
                 <Component {...pageProps} />

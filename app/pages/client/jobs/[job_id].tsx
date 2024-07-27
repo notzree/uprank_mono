@@ -3,7 +3,7 @@ import Navbar from "../shared/components/navbar";
 import FreelancerTable from "./components/freelancer-table";
 import DetailedJobCard from "./components/detailed-job-card";
 import type { UpworkFreelancer } from "@/types/freelancer";
-import { Button } from "@/components/ui/button";
+import FreelancerSearchFilter from "./components/freelancer-filter";
 
 export default function Jobs({ job_prop }: { job_prop: Job }) {
     
@@ -89,8 +89,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import { GetServerSideProps } from "next";
 import { BackendClient } from "@/backend-client/backend-client";
 import { Job } from "@/types/job";
-import FreelancerSearchFilter from "./components/freelancer-filter";
-import JobCard from "./components/detailed-job-card";
+
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const { userId, getToken } = getAuth(ctx.req);

@@ -27,13 +27,15 @@ export default function DetailedJobCard({
     average_specialization_score,
     average_budget_adherence_percentage,
     average_budget_overrun_percentage,
+    defaultOpen = true,
 }: {
     job: Job;
     average_specialization_score: number;
     average_budget_adherence_percentage: number;
     average_budget_overrun_percentage: number;
+    defaultOpen?: boolean;
 }) {
-    const [showFullDisplay, setShowFullDisplay] = React.useState(true);
+    const [showFullDisplay, setShowFullDisplay] = React.useState(defaultOpen);
     if (job == null) {
         return <div>No jobs found.</div>;
     }
@@ -52,7 +54,7 @@ export default function DetailedJobCard({
 
     return (
         <Card className="w-full max-w-3xl rounded-lg overflow-hidden">
-            <CardContent className="grid grid-cols-[1fr_auto] gap-6 p-4 sm:p-6">
+            <CardContent className="grid grid-cols-2 gap-6 p-4 sm:p-6">
                 <div className="grid gap-2">
                     <div className="flex items-center gap-2">
                         <h3 className="text-lg font-semibold">
@@ -75,7 +77,7 @@ export default function DetailedJobCard({
                             : truncated_description}
                     </p>
                     <div className="flex items-center gap-4 text-sm"></div>
-                    <Collapsible defaultOpen={true}>
+                    <Collapsible defaultOpen={defaultOpen}>
                         <CollapsibleContent>
                             <div className="grid gap-4">
                                 <div>
@@ -114,24 +116,18 @@ export default function DetailedJobCard({
                     </Collapsible>
                 </div>
                 <div className="flex flex-col items-end gap-4">
-                    {/* <Button variant="secondary" size="sm">
-                Add Details
-            </Button> */}
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <CalendarIcon className="w-4 h-4" />
-                        <span>Created: {created_at.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <LocateIcon className="w-4 h-4 text-muted-foreground" />
-                        <span>Original Platform: {job?.origin_platform}</span>
-                    </div>
-                    <div className="flex flex-col justify-end">
-                        <h3>Important Metrics</h3>
-                        <div className="flex justify-start items-center">
+                <div className="flex flex-col justify-between space-y-4">
+                <h3 className="text-lg font-semibold">
+                    Uprank Metrics
+                </h3>
+                        <div className="flex justify-between items-center">
                             <h4 className=" text-md text-left">
                                 Average Specialization Score:
                             </h4>
-                            {average_specialization_score.toFixed(2)}
+                            <div className="flex flex-row items-center">
+                                <p className="">
+                                {average_specialization_score.toFixed(2)}
+                            </p>
                             <TooltipProvider>
                                 <Tooltip delayDuration={300}>
                                     <TooltipTrigger asChild>
@@ -184,13 +180,17 @@ export default function DetailedJobCard({
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
+                            </div>
+                            
                         </div>
-                        <div className="flex justify-start items-center">
+                        <div className="flex justify-between items-center">
                             <h4 className="text-md">
                                 Average Budget Adherence Percentage:
                             </h4>
+                            <p>
                             {average_budget_adherence_percentage.toFixed(0) +
                                 "%"}
+                            </p>
                             <TooltipProvider>
                                 <Tooltip delayDuration={300}>
                                     <TooltipTrigger asChild>
@@ -302,6 +302,14 @@ export default function DetailedJobCard({
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <CalendarIcon className="w-4 h-4" />
+                        <span>Created: {created_at.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <LocateIcon className="w-4 h-4 text-muted-foreground" />
+                        <span>Original Platform: {job?.origin_platform}</span>
                     </div>
                 </div>
             </CardContent>

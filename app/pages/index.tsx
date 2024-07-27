@@ -1,46 +1,41 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { CardHeader, CardContent, Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button"
-
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
+import { buttonVariants } from "@/components/ui/button";
+import type { UpworkFreelancer } from "@/types/freelancer";
+import * as React from "react";
 import { useUser } from "@clerk/nextjs";
 type CardData = {
     title: string;
     content: string;
 };
-const FreelancerCardData: CardData[] = [
-    {
-        title: "AI powered insights",
-        content:
-            "Make smarter hiring decisions with our AI-powered insights. Our advanced algorithms provide a job compatibility score, analyzing how well a freelancer's past experiences align with your project needs. Additionally, get AI-driven estimated completion times to better plan and manage your projects.",
-    },
-    {
-        title: "Comprehensive Freelancer Metrics",
-        content:
-            "Make informed hiring decisions with our extensive freelancer metrics. Access vital statistics like budget adherence rates, average client hire count, and more, all designed to help you assess the quality and reliability of freelancers effectively.",
-    },
-    {
-        title: " Custom Filtering and Data Analysis",
-        content:
-            "Our powerful spreadsheet interface allows you to apply custom filters on specific freelancer data, making it easy to narrow down your search and find the ideal candidate for your project. Leverage data analysis tools to gain deeper insights and make well-informed decisions.",
-    },
-];
 
 export default function Component() {
     const { user } = useUser();
     return (
         <div key="1" className="flex flex-col min-h-screen">
+            {/* <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+            </head> */}
             <header className="flex items-center justify-between px-8 py-6 border-b">
                 <div className="flex items-center">
-                    <ReplyIcon className="w-6 h-6 mr-2" />
                     <Link className="text-lg font-bold" href="#">
                         Uprank
                     </Link>
                 </div>
                 <nav className="flex gap-4">
+                <Link href="/demo"
+                className="text-sm font-medium hover:underline"
+                >
+                    Demo
+                    </Link>
                     {user?.id ? (
                         <Link
                             className="text-sm font-medium hover:underline"
@@ -68,53 +63,128 @@ export default function Component() {
                 </nav>
             </header>
             <main className="flex-1">
-                <section className="py-16 px-10 text-center">
-                    <h1 className="text-4xl font-bold">
-                        We help business owners hire the best freelancers
+                <section className="py-16 px-10 text-center flex flex-col justify-center items-center m-auto">
+                    <h1 className="text-2xl md:text-5xl font-bold text-left ">
+                        The Freelancer Analytics Platform.
                     </h1>
-                    <div className="flex justify-center items-center">
-                        <p className="mt-4 text-lg text-foreground w-[40rem] text-left">
-                            Discover a smarter way to hire freelancers with our
-                            cutting-edge SaaS solution. Our Chrome extension and
-                            AI recommender algorithm streamline the hiring
-                            process, offering powerful insights and
-                            comprehensive data to help you find the perfect
-                            match for your project. Elevate your hiring strategy
-                            with custom filters, AI-powered insights, and
-                            essential metrics, all within an intuitive
-                            spreadsheet ui.
+                    <div className="flex justify-center items-center ">
+                        <p className="mt-4 text-lg text-foreground w-[20rem] md:w-[40rem] text-center">
+                            Replace hours of manual research with comprehensive
+                            freelancer metrics like specialization scores,
+                            budget adherence rates, and more.
                         </p>
                     </div>
-                </section>
-                <section className="py-2 px-10 bg-background" id="features">
-                    <h2 className="text-3xl font-bold text-center">Features</h2>
-                    <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {FreelancerCardData.map(
-                            (card: CardData, index: any) => (
-                                <Card key={index}>
-                                    <CardHeader>
-                                        <h3 className="text-lg font-bold">
-                                            {card.title}
-                                        </h3>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-gray-600">
-                                            {card.content}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            )
-                        )}
+                    <div className="flex space-x-4 justify-center items-center pt-2">
+                        <Link
+                            className={buttonVariants({ variant: "outline" })}
+                            href="/demo"
+                        >
+                            <span
+                            className=" text-xl font-semibold decoration-blue-400 underline decoration-2"
+                            >
+                                Try the demo
+                            </span>
+                        </Link>
+                        <Link
+                            className={buttonVariants({ variant: "outline" })}
+                            href="https://forms.gle/cJTuPrewaEYWa61s9"
+                        >
+                            <span
+                            className=" text-xl font-semibold decoration-blue-400 underline decoration-2"
+                            >
+                                Signup for early access
+                            </span>
+                        </Link>
                     </div>
                 </section>
+                <section className="py-2 px-10 bg-background " id="features">
+                    <div className="flex flex-col md:flex-row justify-center items-center  px-2 md:px-12 md: space-x-12">
+                        <div className="flex flex-col justify-center items-center w-[20rem] md:w-[40rem] h-[12rem]">
+                            <h3 className="text-2xl text-center font-semibold">
+                                Use AI powered metrics
+                            </h3>
+                            <p>
+                                A second opinion never hurts. Uprank leverages
+                                AI models to score each freelancer for your
+                                specific project needs, helping you make
+                                well-informed hiring decisions quickly and
+                                confidently.
+                            </p>
+                        </div>
+                        <div className="flex flex-col justify-center items-center w-[20rem] md:w-[40rem] h-[12rem]">
+                            <h3 className="text-2xl text-left font-semibold">
+                                {/* Automate your hiring process */}
+                                Make Data driven decisions
+                            </h3>
+                            <p>
+                                Uprank automatically collects all freelancer
+                                data -{" "}
+                                <span className="underline underline-offset-2 decoration-blue-400 decoration-2 ">
+                                    including their previously completed jobs
+                                </span>
+                                , so you can focus on making the right hiring
+                                decisions. Rather than navigating through a UI
+                                built for showcasing freelancers, see all the
+                                data you need in one place.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                <div className="relative overflow-hidden">
+                    <Image
+                        src="/product-hero-image.png"
 
-                <section className="py-24 px-10 text-center">
-                    <h2 className="text-3xl font-bold">Sign up for early access today</h2>
-                    <p className="mt-6 text-lg text-gray-600">
-                        Join thousands of business owners who have already enhanced their hiring strategy with Uprank.
-                    </p>
-                    <Link className={buttonVariants({ variant: "outline" })} href="https://forms.gle/cJTuPrewaEYWa61s9">Register for early access</Link>
-
+                        alt="Product Image"
+                        width={600}
+                        height={400}
+                        className="w-full h-[400px] object-cover"
+                    />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex flex-col justify-end p-6">
+                <h3 className="text-2xl font-bold text-white mb-2"></h3>
+                <p className="text-white/80 text-sm"></p>
+            </div>
+            </div>
+                <section className="py-24 px-10 flex flex-col justify-center items-center">
+                    <h2 className="text-3xl font-bold">FAQ</h2>
+                    <Accordion type="single" collapsible className="w-[20rem] md:w-[40rem]">
+                        <AccordionItem value="item-1">
+                        <AccordionTrigger>
+                                Why do I need Uprank?
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                Existing freelancer platforms profit whenever you hire a freelancer, so to make all their freelancers hireable, the provided rating metrics are biased.
+                                Every freelancer has a 4.5 star rating, a 95+ job success score, and a 100% completion rate, making it hard to differentiate between real talent and scam artists.
+                                <br/>
+                                <br/>
+                                Uprank scans all of the previous job history of each freelancer and provides unbiased metrics to help you make the best hiring decisions. You wouldn&apos;t hire a full-timer 
+                                without a background check, so why hire a freelancer without one?
+                                <br/>
+                                <br/>
+                                See an example with real data (names redacted): <Link href="/demo" className="underline decoration-blue-400 decoration-2 font-semibold">Demo</Link>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-2">
+                            <AccordionTrigger>
+                                How do I add a job?
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                We have a chrome extension to scrape data from your job postings on Upwork. You are in control of this process, and can request for your data to be deleted at anytime.
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-3">
+                            <AccordionTrigger>What platforms do you support?</AccordionTrigger>
+                            <AccordionContent>
+                                Currently, we only support Upwork. We have plans to expand to other popular platforms including Fiverr and Contra.
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-4">
+                            <AccordionTrigger>I have a feature request or suggestion.</AccordionTrigger>
+                            <AccordionContent>
+                                <Link className={buttonVariants({"variant": "default"})}
+                                href="https://insigh.to/b/uprank">Leave feedback</Link>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </section>
             </main>
             <footer className="py-6 px-10 text-center text-sm text-gray-600">
