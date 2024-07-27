@@ -137,7 +137,7 @@ export default function Component() {
                         alt="Product Image"
                         width={600}
                         height={400}
-                        className="w-full h-[400px] object-cover"
+                        className="w-full h-[350px] object-cover"
                     />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex flex-col justify-end p-6">
                 <h3 className="text-2xl font-bold text-white mb-2"></h3>
@@ -182,6 +182,23 @@ export default function Component() {
                             <AccordionContent>
                                 <Link className={buttonVariants({"variant": "default"})}
                                 href="https://insigh.to/b/uprank">Leave feedback</Link>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-5">
+                            <AccordionTrigger>What features are coming next?</AccordionTrigger>
+                            <AccordionContent>
+                                Uprank is currently being developed by&nbsp;
+                                <Link href="https://www.linkedin.com/in/rz2004/" target="_blank" className="underline decoration-blue-400 decoration-2 font-semibold">me!</Link>&nbsp;
+                                Leaving feature requests are the best way to get the features you want.
+                                Currently, these are the items on the roadmap:
+                                <br/>
+                                <br/>
+                                <ul>
+                                    <li>0. UI/UX overhaul</li>
+                                    <li>1. Support for more platforms (Fiverr, Contra)</li>
+                                    <li>2. More detailed metrics (Time-to-completion estimates using AI)</li>
+                                    <li>3. Automatic listing cross-posting (Have upwork job listings be automatically posted on other platforms)</li>
+                                </ul>
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
